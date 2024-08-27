@@ -5,19 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="619dp" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="25dp">
-
         <EditText
             android:id="@+id/phoneNum"
             android:layout_width="270dp"
@@ -34,7 +21,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pwTextbox"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText,TextFields" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -81,14 +68,15 @@
             tools:layout_editor_absoluteY="41dp" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/addAdmin"
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             android:backgroundTint="#4CAF50"
             android:text="Add Admin"
             app:layout_constraintTop_toBottomOf="@+id/phoneNum"
-            tools:layout_editor_absoluteX="70dp" />
+            tools:layout_editor_absoluteX="70dp"
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:id="@+id/pwTextbox"
@@ -112,7 +100,8 @@
             android:backgroundTint="#009688"
             android:text="Back"
             tools:layout_editor_absoluteX="70dp"
-            tools:layout_editor_absoluteY="380dp" />
+            tools:layout_editor_absoluteY="380dp"
+            tools:ignore="HardcodedText" />
 
         <EditText
             android:id="@+id/userName"
@@ -128,6 +117,16 @@
             tools:layout_editor_absoluteX="70dp"
             tools:layout_editor_absoluteY="107dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="619dp"
+        app:layout_constraintBottom_toBottomOf=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf=""/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
