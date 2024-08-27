@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="80dp"
+        android:layout_height="84dp"
+        android:layout_marginLeft="4dp"
+        android:contentDescription="Logo"
+        app:layout_constraintBottom_toBottomOf=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf=""
+        app:layout_constraintTop_toTopOf=""
+        app:srcCompat="@drawable/logo"
+        tools:ignore="HardcodedText,MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textview1"
+        android:layout_width="178dp"
+        android:layout_height="24dp"
+        android:contentDescription="Heading"
+        android:text="Welcome back, Weiss!"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview2"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/textview2"
+        android:layout_width="98dp"
+        android:layout_height="26dp"
+        android:text="Home Page"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="156dp"
+        tools:layout_editor_absoluteY="30dp"
+        tools:ignore="HardcodedText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf=""
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf=""/>
+
+    <TextView
+        android:id="@+id/titleTable"
+        android:layout_width="155dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="20dp"
+        android:text="Summary of Users"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview1"
+        tools:ignore="HardcodedText" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_height="60dp"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="591dp"
+        android:layout_width="match_parent"/>
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="414dp"
+        android:layout_height="153dp"
+        android:stretchColumns="1"
+        app:layout_constraintBottom_toBottomOf=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleTable">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="Number of Registered users:"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="80"
+                tools:ignore="HardcodedText" />
+
+        </TableRow>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="176dp"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="Number of Nutritionists:"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="20"
+                tools:ignore="HardcodedText" />
+
+        </TableRow>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="Number of Admins:"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="10"
+                tools:ignore="HardcodedText" />
+
+        </TableRow>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="Total Number of Users:"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="110"
+                tools:ignore="HardcodedText" />
+
+        </TableRow>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/addAdminButton"
+        android:layout_width="165dp"
+        android:layout_height="50dp"
+        android:backgroundTint="#9C27B0"
+        android:radius="15dp"
+        android:text="View all accounts"
+        android:textSize="10sp"
+        tools:ignore="HardcodedText,MissingConstraints,SmallSp"
+        tools:layout_editor_absoluteX="123dp"
+        tools:layout_editor_absoluteY="279dp" />
+
+    <Button
+        android:id="@+id/addFAQbutton"
+        android:layout_width="350dp"
+        android:layout_height="50dp"
+        android:backgroundTint="#4CAF50"
+        android:radius="15dp"
+        android:text="Add an FAQ"
+        android:textSize="10sp"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout2"
+        tools:ignore="HardcodedText,MissingConstraints,SmallSp"
+        tools:layout_editor_absoluteX="30dp" />
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="165dp"
+        android:layout_height="51dp"
+        android:backgroundTint="#009688"
+        android:radius="15dp"
+        android:text="Add an admin"
+        android:textSize="10sp"
+        app:layout_constraintTop_toBottomOf="@+id/addAdminButton"
+        tools:ignore="HardcodedText,MissingConstraints,SmallSp"
+        tools:layout_editor_absoluteX="123dp" />
+
+    <TableLayout
+        android:id="@+id/tableLayout2"
+        android:layout_width="415dp"
+        android:layout_height="48dp"
+        android:stretchColumns="1"
+        app:layout_constraintBottom_toBottomOf=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backButton">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="Number of FAQs:"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:text="8"
+                tools:ignore="HardcodedText" />
+
+        </TableRow>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+    </TableLayout>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="85dp"
+        android:layout_height="50dp"
+        android:backgroundTint="#F03737"
+        android:radius="15dp"
+        android:text="Log Out"
+        android:textColor="@color/black"
+        android:textSize="10sp"
+        tools:ignore="HardcodedText,SmallSp"
+        tools:layout_editor_absoluteX="319dp"
+        tools:layout_editor_absoluteY="30dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
