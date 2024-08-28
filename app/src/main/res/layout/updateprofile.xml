@@ -58,11 +58,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="135dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="135dp"
         android:text="Update your profile"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
         tools:ignore="HardcodedText" />
@@ -192,8 +193,8 @@
         android:text="Female"
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/malebutton"
-        tools:layout_editor_absoluteY="264dp"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText"
+        tools:layout_editor_absoluteY="268dp" />
 
     <EditText
         android:id="@+id/lastName"
