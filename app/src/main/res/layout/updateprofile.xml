@@ -3,9 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:layout_editor_absoluteX="0dp"
-    tools:layout_editor_absoluteY="101dp">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
@@ -26,7 +24,9 @@
                 android:layout_width="100dp"
                 android:layout_height="70dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/dietdietmusttry_logo" />
+                android:contentDescription="logo"
+                android:src="@drawable/dietdietmusttry_logo"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -37,7 +37,8 @@
                 android:text="Profile Page"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
 
             <ImageView
                 android:id="@+id/right_icon"
@@ -45,11 +46,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_baseline_menu_24" />
+                android:contentDescription="menuicon"
+                android:src="@drawable/ic_baseline_menu_24"
+                tools:ignore="HardcodedText" />
+
         </RelativeLayout>
     </RelativeLayout>
-
-
 
     <TextView
         android:id="@+id/title"
@@ -58,14 +60,15 @@
         android:layout_marginStart="135dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="135dp"
-        android:text="Creating your profile"
+        android:text="Update your profile"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
+        tools:ignore="HardcodedText" />
 
     <EditText
-        android:id="@+id/userName"
+        android:id="@+id/FirstName"
         android:layout_width="130dp"
         android:layout_height="50dp"
         android:layout_marginTop="12dp"
@@ -89,16 +92,17 @@
         android:text="Male"
         android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@+id/userName"
-        tools:layout_editor_absoluteX="70dp" />
+        tools:layout_editor_absoluteX="70dp"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/update"
         android:layout_width="270dp"
         android:layout_height="50dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:backgroundTint="#9C27B0"
-        android:text="Create"
-        app:layout_constraintTop_toBottomOf="@+id/pwTextbox"
+        android:text="Update Profile"
+        app:layout_constraintTop_toBottomOf="@+id/cfmpwTextbox"
         tools:ignore="HardcodedText"
         tools:layout_editor_absoluteX="70dp" />
 
@@ -138,6 +142,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="12dp"
         android:background="#E6E0E9"
+        android:autofillHints="emailAddress"
         android:ems="10"
         android:hint="Email:"
         android:inputType="text"
@@ -162,6 +167,21 @@
         tools:ignore="HardcodedText"
         tools:layout_editor_absoluteX="70dp" />
 
+    <EditText
+        android:id="@+id/cfmpwTextbox"
+        android:layout_width="270dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="12dp"
+        android:background="#E6E0E9"
+        android:ems="10"
+        android:hint="Confirm Password:"
+        android:inputType="textPassword"
+        android:singleLine="true"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/pwTextbox"
+        tools:ignore="HardcodedText"
+        tools:layout_editor_absoluteX="70dp" />
+
     <RadioButton
         android:id="@+id/femalebutton"
         android:layout_width="130dp"
@@ -172,7 +192,8 @@
         android:text="Female"
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/malebutton"
-        tools:layout_editor_absoluteY="264dp" />
+        tools:layout_editor_absoluteY="264dp"
+        tools:ignore="HardcodedText" />
 
     <EditText
         android:id="@+id/lastName"
@@ -193,16 +214,7 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        app:layout_constraintBottom_toBottomOf=""
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf=""
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="619dp">
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
-
-
+        tools:layout_editor_absoluteY="638dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
