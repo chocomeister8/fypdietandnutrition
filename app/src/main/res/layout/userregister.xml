@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cfmPW"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:layout_editor_absoluteX="2dp"
@@ -32,22 +31,21 @@
         </RelativeLayout>
     </RelativeLayout>
 
-
     <Button
         android:id="@+id/loginbutton"
         android:layout_width="267dp"
         android:layout_height="50dp"
-        android:layout_marginStart="73dp"
+        android:layout_marginStart="72dp"
         android:layout_marginTop="12dp"
-        android:layout_marginEnd="71dp"
+        android:layout_marginEnd="72dp"
         android:radius="15dp"
         android:text="Log In"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cfmPW"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cfmPW"
         tools:ignore="HardcodedText,MissingConstraints" />
 
     <TextView
@@ -55,6 +53,7 @@
         android:name=".RegisterActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:clickable="true"
         android:focusable="true"
         android:text="Already have an account?"
@@ -70,7 +69,7 @@
         android:layout_width="130dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:background="#E6E0E9"
         android:ems="10"
         android:hint="Last name"
@@ -91,17 +90,17 @@
         android:inputType="date"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dobtext"
-        tools:ignore="HardcodedText,MissingConstraints"
-        tools:layout_editor_absoluteX="70dp" />
+        tools:ignore="HardcodedText,MissingConstraints" />
 
     <EditText
         android:id="@+id/firstName"
         android:layout_width="130dp"
         android:layout_height="50dp"
         android:layout_marginStart="70dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:background="#E6E0E9"
         android:ems="10"
         android:hint="First name"
@@ -117,17 +116,17 @@
         android:id="@+id/dobtext"
         android:layout_width="270dp"
         android:layout_height="50dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:background="#E6E0E9"
         android:ems="10"
         android:hint="DOB:"
         android:inputType="date"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/firstName"
-        tools:ignore="HardcodedText"
-        tools:layout_editor_absoluteX="70dp" />
+        tools:ignore="HardcodedText" />
 
     <EditText
         android:id="@+id/editTextPhone"
@@ -142,15 +141,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/email"
-        tools:ignore="HardcodedText"
-        tools:layout_editor_absoluteX="70dp" />
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Register here!"
+        android:layout_marginTop="8dp"
+        android:text="User Registration"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -22,7 +22,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".UserRegisterActivity" />
+        <activity android:name=".NutritionRegister"/>
+        <activity android:name=".Login"/>
+
     </application>
 
 </manifest>
