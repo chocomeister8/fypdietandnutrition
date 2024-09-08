@@ -188,8 +188,9 @@
         android:radius="15dp"
         android:text="View all accounts"
         android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:ignore="HardcodedText,MissingConstraints,SmallSp"
-        tools:layout_editor_absoluteX="123dp"
         tools:layout_editor_absoluteY="313dp" />
 
     <Button
@@ -201,11 +202,10 @@
         android:radius="15dp"
         android:text="Add an FAQ"
         android:textSize="10sp"
-        app:layout_constraintTop_toBottomOf="@+id/faqTable"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        tools:ignore="HardcodedText,MissingConstraints,SmallSp"
-        tools:layout_editor_absoluteX="30dp" />
+        app:layout_constraintTop_toBottomOf="@+id/faqTable"
+        tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
 
     <Button
         android:id="@+id/backButton"
@@ -215,9 +215,10 @@
         android:radius="15dp"
         android:text="Add an admin"
         android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addAdminButton"
-        tools:ignore="HardcodedText,MissingConstraints,SmallSp"
-        tools:layout_editor_absoluteX="123dp" />
+        tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
 
     <TableLayout
         android:id="@+id/faqTable"
