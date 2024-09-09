@@ -54,3 +54,4 @@ public class AppReviewController extends ArrayAdapter<AppRatingsReviews> {
         return convertView;
     }
 }
+//

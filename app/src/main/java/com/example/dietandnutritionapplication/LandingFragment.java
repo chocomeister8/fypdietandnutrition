@@ -44,4 +44,4 @@ public class LandingFragment extends Fragment {
 
         return view;
     }
-}
+}//

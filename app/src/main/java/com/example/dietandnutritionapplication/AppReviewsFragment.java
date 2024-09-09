@@ -82,3 +82,4 @@ public class AppReviewsFragment extends Fragment {
         return view;
     }
 }
+//
