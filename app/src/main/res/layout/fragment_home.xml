@@ -119,4 +119,3 @@
         app:layout_constraintStart_toStartOf="@+id/adminimg" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-    <!-->
