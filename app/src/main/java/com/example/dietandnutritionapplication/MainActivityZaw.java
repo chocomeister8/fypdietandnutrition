@@ -44,9 +44,6 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.profile :
                     replaceFragment(new ProfileFragment());
                     break;
-                case R.id.fab :
-                    replaceFragment(new GraphFragment());
-                    break;
                 case R.id.booking :
                     replaceFragment(new Meal_LogFragment());
                     break;
