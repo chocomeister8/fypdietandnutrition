@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="114dp"
+        android:layout_height="113dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/dietdietmusttry_logo" />
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ratings &amp; Reviews"
+        android:textSize="24sp"
+        android:layout_marginTop="18dp"
+        android:paddingStart="18dp"
+        android:paddingEnd="32dp"/>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:columnCount="3"
+        android:rowCount="1"
+        android:gravity="center">
+
+        <!-- First Column: Rating and Out of 5 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="2"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:id="@+id/ratingTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="48sp"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/ratingOutOfTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="Out of 5"/>
+
+        </LinearLayout>
+
+        <!-- Second Column: Filter All Button -->
+        <Button
+            android:id="@+id/filterAllButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/grey"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:padding="10dp"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- Third Column: Filter Star Spinner -->
+        <Spinner
+            android:id="@+id/filterStarSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:backgroundTint="@color/grey"
+            android:spinnerMode="dropdown"
+            android:textColor="@color/black"
+            android:padding="10dp"
+            android:gravity="center"
+            android:textSize="16sp"/>
+
+    </GridLayout>
+
+    <ListView
+        android:id="@+id/reviewListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>
