@@ -25,6 +25,10 @@
         <activity android:name=".UserRegisterActivity" />
         <activity android:name=".NutritionRegister"/>
         <activity android:name=".Login"/>
+        <activity android:name=".AccountsFragment"/>
+        <activity android:name=".AdminHomeFragment"/>
+        <activity android:name=".FAQFragment"/>
+        <activity android:name=".ProfileAFragment"/>
 
     </application>
 

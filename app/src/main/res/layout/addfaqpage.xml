@@ -57,7 +57,7 @@
         android:id="@+id/container"
         android:layout_width="413dp"
         android:layout_height="383dp"
-        android:background="#AEF0AF"
+        android:background="#C6FAFA"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,21 +69,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="Add an Admin"
+            android:text="Add an FAQ"
             android:textColor="@android:color/black"
             android:textSize="20sp"
             android:textStyle="bold"
             tools:ignore="HardcodedText" />
 
         <EditText
-            android:id="@+id/userName"
+            android:id="@+id/question"
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:layout_marginTop="32dp"
             android:autofillHints="username"
             android:background="#E6E0E9"
             android:ems="10"
-            android:hint="Username:"
+            android:hint="Question:"
             android:inputType="text"
             android:singleLine="true"
             android:textSize="14sp"
@@ -96,14 +96,14 @@
             tools:layout_editor_absoluteX="70dp" />
 
         <EditText
-            android:id="@+id/pwTextbox"
+            android:id="@+id/ans"
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:layout_marginTop="16dp"
             android:autofillHints="password"
             android:background="#E6E0E9"
             android:ems="10"
-            android:hint="Password:"
+            android:hint="Answer:"
             android:inputType="text"
             android:singleLine="true"
             android:textSize="14sp"
@@ -115,32 +115,13 @@
             tools:ignore="HardcodedText"
             tools:layout_editor_absoluteX="70dp" />
 
-        <EditText
-            android:id="@+id/phoneNum"
-            android:layout_width="270dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="16dp"
-            android:autofillHints="phoneNumber"
-            android:background="#E6E0E9"
-            android:ems="10"
-            android:hint="Phone Number:"
-            android:inputType="phone|number"
-            android:singleLine="true"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintLeft_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pwTextbox"
-            tools:ignore="HardcodedText" />
-
         <Button
             android:id="@+id/addButton"
             android:layout_width="270dp"
             android:layout_height="50dp"
             android:layout_marginTop="12dp"
             android:backgroundTint="#4CAF50"
-            android:text="Add Admin"
+            android:text="Add FAQ"
             app:layout_constraintTop_toBottomOf="@+id/phoneNum"
             tools:ignore="HardcodedText,MissingConstraints"
             tools:layout_editor_absoluteX="70dp" />
@@ -157,16 +138,5 @@
 
     </LinearLayout>
 
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="619dp">
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

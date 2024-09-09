@@ -38,7 +38,7 @@ public class LandingFragment extends Fragment {
 
         ImageView adminImageView = view.findViewById(R.id.adminimg);
         adminImageView.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), Login.class);
+            Intent intent = new Intent(getActivity(), AdminHomeFragment.class);
             startActivity(intent);
         });
 
