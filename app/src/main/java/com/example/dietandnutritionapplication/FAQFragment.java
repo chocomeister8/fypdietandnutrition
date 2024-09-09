@@ -1,11 +1,20 @@
 package com.example.dietandnutritionapplication;
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 
-public class FAQFragment extends AppCompatActivity {
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+public class FAQFragment extends Fragment{
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.addfaqpage);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.addfaqpage, container, false);
     }
 }

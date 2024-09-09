@@ -19,6 +19,7 @@ import com.example.dietandnutritionapplication.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private boolean isAdminMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +37,51 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Set up Fragment transactions
+        setupGuestNavigation();
         replaceFragment(new LandingFragment());
-        binding.bottomNavigationView.setBackground(null);
 
-        binding.fab.setOnClickListener(v -> replaceFragment(new HomeFragment()));
+    }
+
+    public void switchToAdminMode() {
+        isAdminMode = true;
+        setupAdminNavigation();
+        replaceFragment(new AdminHomeFragment());
+    }
+
+    public void switchToGuestMode() {
+        isAdminMode = false;
+        setupGuestNavigation();
+        replaceFragment(new LandingFragment());
+    }
+
+    private void setupAdminNavigation() {
+        binding.bottomNavigationView.setBackground(null);
+        binding.bottomNavigationView.getMenu().clear();
+        binding.bottomNavigationView.inflateMenu(R.menu.admin_bottom_menu);
+
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.adminhome:
+                    replaceFragment(new AdminHomeFragment());
+                    break;
+                case R.id.viewallaccounts:
+                    replaceFragment(new AccountsFragment());
+                    break;
+                case R.id.addfaqpage:
+                    replaceFragment(new FAQFragment());
+                    break;
+                case R.id.adminviewprofile:
+                    replaceFragment(new ProfileAFragment());
+                    break;
+            }
+            return true;
+        });
+    }
+
+    private void setupGuestNavigation() {
+        binding.bottomNavigationView.setBackground(null);
+        binding.bottomNavigationView.getMenu().clear();
+        binding.bottomNavigationView.inflateMenu(R.menu.guest_bottom_menu);
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -67,5 +108,5 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
+}
 
-}//

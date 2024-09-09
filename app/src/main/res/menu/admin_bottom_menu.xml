@@ -6,18 +6,18 @@
         android:icon="@drawable/ic_baseline_home_24"
         android:id="@+id/adminhome"/>
     <item android:title="Accounts"
-        android:icon="@drawable/baseline_recipes_24"
+        android:icon="@drawable/ic_baseline_view_accounts_24"
         android:id="@+id/viewallaccounts"/>
     <item
         android:title=""
         android:enabled="false"/>
     <item
         android:title="FAQs"
-        android:icon="@drawable/baseline_meal_24"
+        android:icon="@drawable/ic_baseline_faq_24"
         android:id="@+id/addfaqpage"/>
     <item
         android:title="Profile"
-        android:icon="@drawable/baseline_rate_review_24"
-        android:id="@+id/viewprofile"/>
+        android:icon="@drawable/ic_baseline_profile_circle_24"
+        android:id="@+id/adminviewprofile"/>
 
 </menu>

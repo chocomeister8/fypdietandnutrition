@@ -1,47 +1,49 @@
 package com.example.dietandnutritionapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-public class AdminHomeFragment extends AppCompatActivity {
+public class AdminHomeFragment extends Fragment {
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.adminhomepage);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.adminhomepage, container, false);
 
         // Find the buttons in the layout
-        Button viewAccountsButton = findViewById(R.id.viewAccountsButton);
-        Button addFAQButton = findViewById(R.id.addFAQbutton);
+        Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);
+        Button addFAQButton = view.findViewById(R.id.addFAQbutton);
 
         // Set an OnClickListener on the viewAccountsButton
-        viewAccountsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to AccountsActivity
-                Intent intent = new Intent(AdminHomeFragment.this, AccountsFragment.class);
-                startActivity(intent);
-            }
+        viewAccountsButton.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AccountsFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         });
 
         // Set an OnClickListener on the addFAQButton
-        addFAQButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to FAQActivity
-                Intent intent = new Intent(AdminHomeFragment.this, FAQFragment.class);
-                startActivity(intent);
-            }
+        addFAQButton.setOnClickListener(v -> {
+            // Replace the current fragment with FAQFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new FAQFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         });
+
+        return view;
     }
 
    /* public AdminHomeFragment() {

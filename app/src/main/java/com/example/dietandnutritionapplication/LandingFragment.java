@@ -10,12 +10,10 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class LandingFragment extends Fragment {
-
-    public LandingFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -23,23 +21,31 @@ public class LandingFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.landingpage, container, false);
 
-        // Initialize ImageView and set click listeners
         ImageView userImageView = view.findViewById(R.id.userimg);
-        userImageView.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), UserRegisterActivity.class);
-            startActivity(intent);
-        });
-
-        ImageView nutriImageView = view.findViewById(R.id.nutriimg);
-        nutriImageView.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), NutritionRegister.class);
-            startActivity(intent);
-        });
-
+        //ImageView nutriImageView = view.findViewById(R.id.nutriimg);
         ImageView adminImageView = view.findViewById(R.id.adminimg);
+
+        // Set up click listeners for each role
+        userImageView.setOnClickListener(v -> {
+            // Switch to guest mode
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToGuestMode();
+            }
+        });
+
+        /*
+        nutriImageView.setOnClickListener(v -> {
+            // Switch to guest mode (for nutritionists as guests)
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToGuestMode();
+            }
+        });*/
+
         adminImageView.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AdminHomeFragment.class);
-            startActivity(intent);
+            // Switch to admin mode
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToAdminMode();
+            }
         });
 
         return view;
