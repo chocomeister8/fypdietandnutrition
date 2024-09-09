@@ -10,46 +10,62 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import com.example.dietandnutritionapplication.databinding.ActivityMainBinding;
+
 
 public class MainActivity extends AppCompatActivity {
+
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
-        setContentView(R.layout.landingpage);
+
+        // Initialize ViewBinding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        ImageView userImageView = findViewById(R.id.userimg);
-        userImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, UserRegisterActivity.class);
-                startActivity(intent);
-            }
-        });
+        // Set up Fragment transactions
+        replaceFragment(new LandingFragment());
+        binding.bottomNavigationView.setBackground(null);
 
-        ImageView nutriImageView = findViewById(R.id.nutriimg);
-        nutriImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, NutritionRegister.class);
-                startActivity(intent);
-            }
-        });
+        binding.fab.setOnClickListener(v -> replaceFragment(new HomeFragment()));
 
-        ImageView AdminImageView = findViewById(R.id.adminimg);
-        AdminImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Login.class);
-                startActivity(intent);
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.landing:
+                    replaceFragment(new LandingFragment());
+                    break;
+                case R.id.recipe:
+                    replaceFragment(new RecipeFragment());
+                    break;
+                case R.id.meallog:
+                    replaceFragment(new Meal_LogFragment());
+                    break;
+                case R.id.reviews:
+                    replaceFragment(new AppReviewsFragment());
+                    break;
             }
+            return true;
         });
-
     }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.commit();
+    }
+
 }

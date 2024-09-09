@@ -1,4 +1,4 @@
-package com.example.bottom_nav_bar;
+package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
 
