@@ -1,9 +1,6 @@
 package com.example.dietandnutritionapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -92,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new RecipeFragment());
                     break;
                 case R.id.meallog:
-                    replaceFragment(new Meal_LogFragment());
+                    replaceFragment(new MealLogPreviewFragment());
                     break;
                 case R.id.reviews:
                     replaceFragment(new AppReviewsFragment());

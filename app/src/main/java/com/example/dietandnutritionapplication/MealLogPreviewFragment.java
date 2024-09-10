@@ -1,11 +1,9 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -16,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Meal_LogFragment extends Fragment {
+public class MealLogPreviewFragment extends Fragment {
     private ListView reviewsListView;
     private Button filterAllButton;
     private Spinner filterStarSpinner;
