@@ -5,4 +5,6 @@
     <color name="lavender">#8692f7</color>
     <color name="yellow">#F4F1E1</color>
     <color name="grey">#DCDCDC</color>
+    <color name="lightGreen">#e8f5e1</color>
+    <color name="lightGrey">#D3D3D3</color>
 </resources>

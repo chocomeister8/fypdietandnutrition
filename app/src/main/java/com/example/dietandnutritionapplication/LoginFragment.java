@@ -79,14 +79,19 @@ public class LoginFragment extends Fragment {
                 String enteredPassword = passwordEditText.getText().toString();
 
 
-                String correctUsername = "user123";
-                String correctPassword = "password";
+                User user1 = new User();
+                user1.setUsername("zaw");
+                user1.setPassword("123");
+                user1.setStatus("user");
 
-                if (enteredUsername.equals(correctUsername) && enteredPassword.equals(correctPassword)) {
+                if (enteredUsername.equals(user1.getUsername()) && enteredPassword.equals(user1.getPassword()) && user1.getStatus().equals("user")) {
 
                     Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
                     ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
 
+                } else if (enteredUsername.equals(user1.getUsername()) && enteredPassword.equals(user1.getPassword()) && user1.getStatus().equals("admin")) {
+                    Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                    ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
                 } else {
 
                     Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();

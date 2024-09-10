@@ -21,7 +21,7 @@ public class User extends Profile {
     // Parameterized constructor
     public User(String firstName, String lastName, String username, String email, String password, String gender,
                 String phoneNumber, int calorieLimit, String dietPreference, String foodAllergies, String healthGoal,
-                double currentWeight, double currentHeight, String role, String status) {
+                double currentWeight, double currentHeight) {
         super(firstName, lastName, username, email);  // Calls the parameterized constructor of Profile
         this.password = password;
         this.gender = gender;
@@ -32,8 +32,8 @@ public class User extends Profile {
         this.healthGoal = healthGoal;
         this.currentWeight = currentWeight;
         this.currentHeight = currentHeight;
-        this.role = role;
-        this.status = status;
+        this.role = "user";
+        this.status = "active";
     }
 
     // Getters and Setters for all fields
