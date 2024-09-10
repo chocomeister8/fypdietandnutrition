@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true">
-        <shape android:shape="rectangle">
-            <size android:width="24dp" android:height="24dp"/> <!-- Adjust size as needed -->
-            <solid android:color="#FBDD70"/> <!-- Yellow color -->
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <size android:width="24dp" android:height="24dp"/> <!-- Adjust size as needed -->
-            <solid android:color="#DDDDDD"/> <!-- Light gray color -->
-        </shape>
-    </item>
-</selector>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background"
+        android:drawable="@drawable/ic_star_border"
+        android:tint="#FBDD70" />
+    <item android:id="@android:id/secondaryProgress"
+        android:drawable="@drawable/ic_star_half"
+        android:tint="#FBDD70" />
+    <item android:id="@android:id/progress"
+        android:drawable="@drawable/ic_star"
+        android:tint="#FBDD70" />
+</layer-list>

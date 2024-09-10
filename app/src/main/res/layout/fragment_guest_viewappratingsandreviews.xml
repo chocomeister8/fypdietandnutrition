@@ -3,15 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:background="#F4FBF8">
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="114dp"
-        android:layout_height="113dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/dietdietmusttry_logo" />
+    <RelativeLayout
+        android:id="@+id/relativeLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F4F1E1">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="114dp"
+                android:layout_height="113dp"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/dietdietmusttry_logo" />
+
+        </RelativeLayout>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/titleTextView"
@@ -19,6 +33,7 @@
         android:layout_height="wrap_content"
         android:text="Ratings &amp; Reviews"
         android:textSize="24sp"
+        android:textColor="@color/black"
         android:layout_marginTop="18dp"
         android:paddingStart="18dp"
         android:paddingEnd="32dp"/>
@@ -45,13 +60,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="48sp"
-                android:gravity="center" />
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:text="0.0"/>
 
             <TextView
                 android:id="@+id/ratingOutOfTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
+                android:textColor="@color/black"
                 android:gravity="center"
                 android:text="Out of 5"/>
 
@@ -60,36 +78,27 @@
         <!-- Second Column: Filter All Button -->
         <Button
             android:id="@+id/filterAllButton"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/grey"
+            android:text="All (Total Reviews)"
             android:textColor="@color/black"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:lineSpacingExtra="4dp"
-            android:padding="10dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginBottom="16dp"/>
 
         <!-- Third Column: Filter Star Spinner -->
         <Spinner
-            android:id="@+id/filterStarSpinner"
-            android:layout_width="0dp"
+            android:id="@+id/filterSortSpinner"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:backgroundTint="@color/grey"
-            android:spinnerMode="dropdown"
-            android:textColor="@color/black"
-            android:padding="10dp"
-            android:gravity="center"
-            android:textSize="16sp"/>
+            android:layout_marginBottom="16dp"/>
 
     </GridLayout>
 
     <ListView
         android:id="@+id/reviewListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="120dp"/>
 
 </LinearLayout>

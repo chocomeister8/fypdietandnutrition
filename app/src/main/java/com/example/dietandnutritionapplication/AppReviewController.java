@@ -14,19 +14,16 @@ import android.widget.TextView;
 import java.util.List;
 
 public class AppReviewController extends ArrayAdapter<AppRatingsReviews> {
-    private final Context context;
-    private final List<AppRatingsReviews> reviews;
+
 
     public AppReviewController(Context context, List<AppRatingsReviews> reviews) {
-        super(context, R.layout.appreview_item, reviews);
-        this.context = context;
-        this.reviews = reviews;
+        super(context, 0, reviews);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.appreview_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.appreview_item, parent, false);
         }
 
         // Initialize views
@@ -37,6 +34,7 @@ public class AppReviewController extends ArrayAdapter<AppRatingsReviews> {
 
         // Set review details
         AppRatingsReviews review = getItem(position);
+
         titleTextView.setText(review.getTitle());
         ratingBar.setRating(review.getRating());
         reviewTextView.setText(review.getReview());
@@ -45,11 +43,9 @@ public class AppReviewController extends ArrayAdapter<AppRatingsReviews> {
         String formattedDateTime = String.format("%s | %s", review.getDateTime(), review.getUsername());
         dateTimeTextView.setText(formattedDateTime);
 
-        // Customize the RatingBar programmatically
-        Drawable stars = ratingBar.getProgressDrawable();
-        stars.setColorFilter(Color.parseColor("#FBDD70"), PorterDuff.Mode.SRC_ATOP); // Yellow color
-        ratingBar.setScaleX(0.75f); // Adjust size
-        ratingBar.setScaleY(0.75f); // Adjust size
+        float scale = 0.5f;
+        ratingBar.setScaleX(scale);
+        ratingBar.setScaleY(scale); // Adjust size
 
         return convertView;
     }
