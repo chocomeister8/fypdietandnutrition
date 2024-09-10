@@ -7,6 +7,10 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +18,8 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class LoginFragment extends Fragment {
+    private EditText usernameEditText, passwordEditText;
+    private Button loginButton;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,6 +66,34 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.login, container, false);
+        usernameEditText = view.findViewById(R.id.firstName);
+        passwordEditText = view.findViewById(R.id.editTextTextPassword);
+        loginButton = view.findViewById(R.id.loginbutton);
+
+        // Set click listener for the login button
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the text from the EditTexts
+                String enteredUsername = usernameEditText.getText().toString();
+                String enteredPassword = passwordEditText.getText().toString();
+
+                UserAccount user1 = new UserAccount("zaw","admin123");
+
+                String correctUsername = "user123";
+                String correctPassword = "password";
+
+                if (enteredUsername.equals(user1.getUsername()) && enteredPassword.equals(user1.getPassword())) {
+
+                    Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                    ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
+
+                } else {
+
+                    Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         return view;
     }
 }
