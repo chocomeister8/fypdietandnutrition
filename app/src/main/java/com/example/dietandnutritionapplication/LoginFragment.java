@@ -78,12 +78,11 @@ public class LoginFragment extends Fragment {
                 String enteredUsername = usernameEditText.getText().toString();
                 String enteredPassword = passwordEditText.getText().toString();
 
-                UserAccount user1 = new UserAccount("zaw","admin123");
 
                 String correctUsername = "user123";
                 String correctPassword = "password";
 
-                if (enteredUsername.equals(user1.getUsername()) && enteredPassword.equals(user1.getPassword())) {
+                if (enteredUsername.equals(correctUsername) && enteredPassword.equals(correctPassword)) {
 
                     Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
                     ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
