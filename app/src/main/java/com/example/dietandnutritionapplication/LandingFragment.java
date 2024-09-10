@@ -47,6 +47,12 @@ public class LandingFragment extends Fragment {
                 ((MainActivity) getActivity()).switchToAdminMode();
             }
         });
+        userImageView.setOnClickListener(v -> {
+            // Switch to admin mode
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
+            }
+        });
 
         return view;
     }
