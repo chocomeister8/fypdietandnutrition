@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,6 +21,14 @@ public class AdminHomeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.adminhomepage, container, false);
+
+        ImageView logoutImage = view.findViewById(R.id.right_icon);
+        logoutImage.setOnClickListener(v -> {
+            // Switch to guest mode (for nutritionists as guests)
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+            }
+        });
 
         // Find the buttons in the layout
         Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);

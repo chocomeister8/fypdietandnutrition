@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_baseline_menu_24" />
+            android:src="@drawable/baseline_logout_24" />
 
         <TextView
             android:id="@+id/textView3"

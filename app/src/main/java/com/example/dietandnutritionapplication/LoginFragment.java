@@ -117,7 +117,6 @@ public class LoginFragment extends Fragment {
                     }
                     else {
 
-                        Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
                     }
 
                 }
