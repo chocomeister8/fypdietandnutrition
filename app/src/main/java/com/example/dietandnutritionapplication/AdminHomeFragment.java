@@ -39,7 +39,7 @@ public class AdminHomeFragment extends Fragment {
             // Replace the current fragment with AccountsFragment
             FragmentManager fragmentManager = getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.frame_layout, new AccountsFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.replace(R.id.frame_layout, new viewAccountsFragment()); // Ensure R.id.frame_layout is the container in your activity
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });
