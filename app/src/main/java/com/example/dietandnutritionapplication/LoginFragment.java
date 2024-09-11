@@ -24,6 +24,7 @@ public class LoginFragment extends Fragment {
     private EditText usernameEditText, passwordEditText;
     private Button loginButton;
     ArrayList<Profile> accountArray = new ArrayList<>();
+    private TextView regiesterText;
 
 
 
@@ -76,7 +77,18 @@ public class LoginFragment extends Fragment {
         passwordEditText = view.findViewById(R.id.editTextTextPassword);
         loginButton = view.findViewById(R.id.loginbutton);
 
-        // Set click listener for the login button
+        TextView myTextView = view.findViewById(R.id.noregis);
+        myTextView.setClickable(true);
+
+
+        myTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).replaceFragment(new URegisterFragment());
+            }
+        });
+
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

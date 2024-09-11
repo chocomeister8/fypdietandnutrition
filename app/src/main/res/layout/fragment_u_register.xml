@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:layout_editor_absoluteX="2dp"
-    tools:layout_editor_absoluteY="0dp">
+    tools:layout_editor_absoluteY="0dp"
+    tools:context=".URegisterFragment">
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
@@ -39,7 +40,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="72dp"
         android:radius="15dp"
-        android:text="Log In"
+        android:text="Register"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
