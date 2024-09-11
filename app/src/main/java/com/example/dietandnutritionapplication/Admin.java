@@ -3,7 +3,7 @@ package com.example.dietandnutritionapplication;
 public class Admin extends Profile{
     private String gender;
     private String status;
-    private String role;
+
 
     public Admin(){
         super();
@@ -11,8 +11,10 @@ public class Admin extends Profile{
     public Admin(String gender,String role){
         this.gender = gender;
         this.status = "active";
-        this.role = "admin";
+        this.setRole("admin");
+
     }
+
     public String getGender() {
         return gender;
     }
@@ -29,11 +31,4 @@ public class Admin extends Profile{
         this.status = status;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 }

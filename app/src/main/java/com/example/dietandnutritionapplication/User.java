@@ -10,7 +10,6 @@ public class User extends Profile {
     private String healthGoal;
     private double currentWeight;
     private double currentHeight;
-    private String role;
     private String status;
 
     // Default constructor
@@ -19,11 +18,10 @@ public class User extends Profile {
     }
 
     // Parameterized constructor
-    public User(String firstName, String lastName, String username, String email, String password, String gender,
+    public User(String firstName, String lastName, String username, String email, String gender,
                 String phoneNumber, int calorieLimit, String dietPreference, String foodAllergies, String healthGoal,
                 double currentWeight, double currentHeight) {
-        super(firstName, lastName, username, email);  // Calls the parameterized constructor of Profile
-        this.password = password;
+
         this.gender = gender;
         this.phoneNumber = phoneNumber;
         this.calorieLimit = calorieLimit;
@@ -32,19 +30,11 @@ public class User extends Profile {
         this.healthGoal = healthGoal;
         this.currentWeight = currentWeight;
         this.currentHeight = currentHeight;
-        this.role = "user";
         this.status = "active";
+        this.setRole("user");
     }
 
     // Getters and Setters for all fields
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getGender() {
         return gender;
@@ -110,13 +100,6 @@ public class User extends Profile {
         this.currentHeight = currentHeight;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     public String getStatus() {
         return status;

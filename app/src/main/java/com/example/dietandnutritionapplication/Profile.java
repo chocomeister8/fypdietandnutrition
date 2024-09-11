@@ -4,20 +4,24 @@ public class Profile {
     private String firstName;
     private String lastName;
     private String username;
+    private String password;
     private String dob;
     private String email;
     private String dateJoined;
+    private String role;
 
 
     public Profile(){
 
     }
 
-    public Profile(String firstName,String lastName,String username,String email){
+    public Profile(String firstName,String lastName,String username,String password,String email,String role){
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
+        this.role = role;
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -66,6 +70,20 @@ public class Profile {
 
     public void setDateJoined(String dateJoined) {
         this.dateJoined = dateJoined;
+    }
+
+    public void setRole (String role){
+        this.role= role;
+    }
+    public String getRole(){
+        return this.role;
+    }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 

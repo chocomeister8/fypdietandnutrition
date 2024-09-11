@@ -12,6 +12,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LoginFragment#newInstance} factory method to
@@ -20,6 +23,9 @@ import android.widget.Toast;
 public class LoginFragment extends Fragment {
     private EditText usernameEditText, passwordEditText;
     private Button loginButton;
+    ArrayList<Profile> accountArray = new ArrayList<>();
+
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -82,20 +88,31 @@ public class LoginFragment extends Fragment {
                 User user1 = new User();
                 user1.setUsername("zaw");
                 user1.setPassword("123");
-                user1.setStatus("user");
+                user1.setRole("user");
+                accountArray.add(user1);
+                Admin admin1 = new Admin();
+                admin1.setUsername("admin");
+                admin1.setPassword("admin123");
+                admin1.setRole("admin");
+                accountArray.add(admin1);
 
-                if (enteredUsername.equals(user1.getUsername()) && enteredPassword.equals(user1.getPassword()) && user1.getStatus().equals("user")) {
+                for(Profile account:accountArray){
+                    if (enteredUsername.equals(account.getUsername()) && enteredPassword.equals(account.getPassword()) && account.getRole().equals("user")) {
 
-                    Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
-                    ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
+                        Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
 
-                } else if (enteredUsername.equals(user1.getUsername()) && enteredPassword.equals(user1.getPassword()) && user1.getStatus().equals("admin")) {
-                    Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
-                    ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
-                } else {
+                    } else if (enteredUsername.equals(account.getUsername()) && enteredPassword.equals(account.getPassword()) && account.getRole().equals("admin")) {
+                        Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) getActivity()).switchToAdminMode();
+                    } else {
 
-                    Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
+
+
             }
         });
         return view;
