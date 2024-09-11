@@ -20,9 +20,8 @@ public class LandingFragment extends Fragment {
         View view = inflater.inflate(R.layout.landingpage, container, false);
 
         ImageView userImageView = view.findViewById(R.id.userimg);
-        //ImageView nutriImageView = view.findViewById(R.id.nutriimg);
-        ImageView adminImageView = view.findViewById(R.id.adminimg);
         ImageView nutriImageView = view.findViewById(R.id.nutriimg);
+        ImageView adminImageView = view.findViewById(R.id.adminimg);
 
         // Set up click listeners for each role
         userImageView.setOnClickListener(v -> {
@@ -34,7 +33,7 @@ public class LandingFragment extends Fragment {
 
 
         nutriImageView.setOnClickListener(v -> {
-            // Switch to guest mode (for nutritionists as guests)
+            // Switch to nutri mode (for nutritionists as guests)
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
             }

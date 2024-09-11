@@ -1,7 +1,6 @@
 package com.example.dietandnutritionapplication;
 
 public class User extends Profile {
-    private String password;
     private String gender;
     private String phoneNumber;
     private int calorieLimit;

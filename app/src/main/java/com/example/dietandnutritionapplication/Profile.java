@@ -122,5 +122,4 @@ public class Profile implements Serializable {
         this.password = password;
     }
 
-
 }

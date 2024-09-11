@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/lightGreen">
+
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="96dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@tools:sample/avatars"
+        android:layout_marginBottom="25dp"/>
+
+
+    <EditText
+        android:id="@+id/nameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/white"
+        android:hint="First Name" />
+
+    <EditText
+        android:id="@+id/educationEditText"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/white"
+        android:hint="Education" />
+
+
+    <EditText
+        android:id="@+id/contactInfoEditText"
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/white"
+        android:hint="Contact Info" />
+
+
+    <EditText
+        android:id="@+id/expertiseEditText"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/white"
+        android:hint="Education/Expertise" />
+
+
+    <EditText
+        android:id="@+id/bioEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Bio"
+        android:lines="4"
+        android:gravity="top"
+        android:background="@color/white"
+        android:layout_marginBottom="15dp"/>
+
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Profile" />
+
+    <Button
+        android:id="@+id/discardButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Discard Changes"
+        android:layout_marginTop="8dp" />
+
+
+
+</LinearLayout>
+
+

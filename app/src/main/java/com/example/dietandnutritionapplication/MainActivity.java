@@ -92,6 +92,12 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new MealLogUFragment());
     }
 
+    public void switchToNutriMode() {
+        isAdminMode = false;
+        setupNutriNavigation();
+        replaceFragment(new LandingFragment());
+    }
+
     private void setupAdminNavigation() {
         binding.bottomNavigationView.setBackground(null);
         binding.bottomNavigationView.getMenu().clear();
@@ -164,11 +170,38 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setupNutriNavigation() {
+        binding.bottomNavigationView.setBackground(null);
+        binding.bottomNavigationView.getMenu().clear();
+        binding.bottomNavigationView.inflateMenu(R.menu.nutri_bottom_menu);
+
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.landing:
+                    replaceFragment(new LandingFragment());
+                    break;
+                case R.id.recipe:
+                    replaceFragment(new RecipeFragment());
+                    break;
+//                case R.id.addRecipe: // Handle Add Recipe fragment
+//                    replaceFragment(new AddRecipeFragment());
+//                    break;
+//                case R.id.bookingPage:
+//                    replaceFragment(new BookingFragment());
+//                    break;
+                case R.id.NutriViewProfile:
+                    replaceFragment(new NutriViewProfileFragment());
+                    break;
+            }
+            return true;
+        });
+    }
+
     public void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
     }
-}
 
+}
