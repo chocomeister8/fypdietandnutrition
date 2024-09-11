@@ -25,7 +25,7 @@ public class AccountsController extends ArrayAdapter<Object> {
         TextView phoneNumberTextView = convertView.findViewById(R.id.phone);
         TextView emailTextView = convertView.findViewById(R.id.email);
         TextView genderTextView = convertView.findViewById(R.id.gender);
-        TextView accountTypeTextView = convertView.findViewById(R.id.accountType); // For Nutritionist
+        TextView roleTextView = convertView.findViewById(R.id.role); // For Nutritionist
 
         if (account instanceof Admin) {
             Admin admin = (Admin) account;
@@ -35,9 +35,9 @@ public class AccountsController extends ArrayAdapter<Object> {
             genderTextView.setText(admin.getGender());
             phoneNumberTextView.setText(admin.getPhoneNumber());
             emailTextView.setText(admin.getEmail());
-            accountTypeTextView.setText(admin.getRole());
+            roleTextView.setText(admin.getRole());
 
-            accountTypeTextView.setVisibility(View.GONE); // Not needed for Admin
+            roleTextView.setVisibility(View.GONE); // Not needed for Admin
         } /*else if (account instanceof User) {
             User user = (User) account;
             nameTextView.setText(user.getName());

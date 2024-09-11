@@ -100,6 +100,7 @@
     </GridLayout>
 
     <ListView
+        android:id="@+id/accountsListView"
         android:layout_width="409dp"
         android:layout_height="541dp"
         app:layout_constraintTop_toBottomOf="@+id/gridLayout"

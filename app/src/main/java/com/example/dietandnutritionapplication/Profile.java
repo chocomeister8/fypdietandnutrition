@@ -1,6 +1,8 @@
 package com.example.dietandnutritionapplication;
 
-public class Profile {
+import java.io.Serializable;
+
+public class Profile implements Serializable {
     private String firstName;
     private String lastName;
     private String username;
@@ -13,6 +15,9 @@ public class Profile {
     private String role;
     private String status;
 
+    public String toString() {
+        return firstName + " (" + lastName + ")"; // Customize as needed
+    }
 
     public Profile(){
 

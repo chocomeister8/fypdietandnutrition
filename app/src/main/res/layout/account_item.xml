@@ -5,39 +5,15 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/firstname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="First Name:" />
-
-    <TextView
-        android:id="@+id/lastname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last name:" />
-
-    <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Username:" />
 
     <TextView
-        android:id="@+id/phone"
+        android:id="@+id/role"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Phone:" />
-
-    <TextView
-        android:id="@+id/email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Email:" />
-
-    <TextView
-        android:id="@+id/accountType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Account Type:"
+        android:text="Role:"
         android:visibility="gone" />
 </LinearLayout>
