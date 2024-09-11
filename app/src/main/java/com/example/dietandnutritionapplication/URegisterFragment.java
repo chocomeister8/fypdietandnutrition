@@ -107,7 +107,6 @@ public class URegisterFragment extends Fragment {
                     gender = "Unspecified"; // Handle case where no gender is selected
                 }
                 mainActivity.createUserAccount(firstName,userName,dob,email,phone,gender,password);
-                mainActivity.replaceFragment(new LandingFragment());
             }
         });
 
