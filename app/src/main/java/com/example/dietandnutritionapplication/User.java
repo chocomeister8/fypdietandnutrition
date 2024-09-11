@@ -10,7 +10,6 @@ public class User extends Profile {
     private String healthGoal;
     private double currentWeight;
     private double currentHeight;
-    private String status;
 
     // Default constructor
     public User() {
@@ -30,8 +29,8 @@ public class User extends Profile {
         this.healthGoal = healthGoal;
         this.currentWeight = currentWeight;
         this.currentHeight = currentHeight;
-        this.status = "active";
         this.setRole("user");
+        this.setStatus("active");
     }
 
     // Getters and Setters for all fields
@@ -100,12 +99,4 @@ public class User extends Profile {
         this.currentHeight = currentHeight;
     }
 
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }

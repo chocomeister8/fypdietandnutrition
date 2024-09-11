@@ -95,17 +95,29 @@ public class LoginFragment extends Fragment {
                 admin1.setPassword("admin123");
                 admin1.setRole("admin");
                 accountArray.add(admin1);
+                Nutritionist nutritionist1 = new Nutritionist();
+                nutritionist1.setUsername("sim");
+                nutritionist1.setPassword("123");
+                nutritionist1.setRole("nutritionist");
+                accountArray.add(nutritionist1);
 
                 for(Profile account:accountArray){
                     if (enteredUsername.equals(account.getUsername()) && enteredPassword.equals(account.getPassword()) && account.getRole().equals("user")) {
 
                         Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
                         ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
+                        break;
 
                     } else if (enteredUsername.equals(account.getUsername()) && enteredPassword.equals(account.getPassword()) && account.getRole().equals("admin")) {
                         Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
                         ((MainActivity) getActivity()).switchToAdminMode();
-                    } else {
+                        break;
+                    }else if (enteredUsername.equals(account.getUsername()) && enteredPassword.equals(account.getPassword()) && account.getRole().equals("nutritionist")) {
+                        Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
+                        break;
+                    }
+                    else {
 
                         Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
                     }

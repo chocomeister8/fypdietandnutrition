@@ -9,6 +9,7 @@ public class Profile {
     private String email;
     private String dateJoined;
     private String role;
+    private String status;
 
 
     public Profile(){
@@ -22,6 +23,15 @@ public class Profile {
         this.email = email;
         this.role = role;
         this.password = password;
+
+
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getFirstName() {
