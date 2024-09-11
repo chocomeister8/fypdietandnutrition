@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    tools:context=".AdminProfileFragment">
+    tools:context=".ProfileAFragment">
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
@@ -52,8 +52,8 @@
 
     <LinearLayout
         android:id="@+id/container"
-        android:layout_width="413dp"
-        android:layout_height="418dp"
+        android:layout_width="410dp"
+        android:layout_height="512dp"
         android:background="#C2F4C3"
         android:orientation="vertical"
         android:padding="16dp"
@@ -62,27 +62,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout2">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="372dp"
-            android:layout_height="wrap_content"
-            tools:srcCompat="@tools:sample/avatars" />
-
-        <TextView
-            android:id="@+id/changeProfilePic"
-            android:layout_width="373dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="Change Profile Picture"
-            android:textColor="#000000"
-            android:textStyle="bold" />
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="140dp"
+                android:visibility="visible"
+                android:src="@drawable/profile"
+                android:scaleType="fitCenter"/>
 
         </LinearLayout>
 
@@ -169,15 +161,15 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/genderLabel"
+                        android:id="@+id/pHLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Gender:"
+                        android:text="Phone Number:"
                         android:textColor="#000000"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/gender"
+                        android:id="@+id/phone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
@@ -191,15 +183,15 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/pHLabel"
+                        android:id="@+id/genderLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Phone Number:"
+                        android:text="Gender:"
                         android:textColor="#000000"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/phone"
+                        android:id="@+id/gender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
@@ -251,29 +243,29 @@
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/updateProf"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:text="Update Profile"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/container"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/addAdminButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#009688"
+            android:text="Back"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/updateProf"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/updateProf"
-        android:layout_width="270dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:text="Update Profile"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/container"
-        tools:ignore="HardcodedText" />
-
-    <Button
-        android:id="@+id/addAdminButton"
-        android:layout_width="270dp"
-        android:layout_height="50dp"
-        android:backgroundTint="#009688"
-        android:text="Back"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/updateProf"
-        tools:ignore="HardcodedText" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

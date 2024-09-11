@@ -5,8 +5,10 @@ public class Profile {
     private String lastName;
     private String username;
     private String password;
+    private String phoneNumber;
     private String dob;
     private String email;
+    private String gender;
     private String dateJoined;
     private String role;
     private String status;
@@ -16,11 +18,15 @@ public class Profile {
 
     }
 
-    public Profile(String firstName,String lastName,String username,String password,String email,String role){
+    public Profile(String firstName,String lastName,String username,String phoneNumber, String password, String email,String gender, String role, String dateJoined){
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
+        this.phoneNumber = phoneNumber;
         this.email = email;
+        this.dateJoined = dateJoined;
+        this.gender = gender;
+
         this.role = role;
         this.password = password;
 
@@ -58,6 +64,14 @@ public class Profile {
         this.username = username;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public String getDob() {
         return dob;
     }
@@ -72,6 +86,13 @@ public class Profile {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) { this.gender = gender;
     }
 
     public String getDateJoined() {
