@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Home"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:id="@+id/landing"/>
+    <item android:title="Recipe"
+        android:icon="@drawable/baseline_recipes_24"
+        android:id="@+id/recipe"/>
+    <item
+        android:title=""
+        android:enabled="false"/>
+    <item
+        android:title="Booking"
+        android:icon="@drawable/baseline_book_online_24"
+        android:id="@+id/bookingPage"/>
+    <item
+        android:title="Profile"
+        android:icon="@drawable/ic_baseline_profile_circle_24"
+        android:id="@+id/NutriViewProfile"/>
+
+</menu>
