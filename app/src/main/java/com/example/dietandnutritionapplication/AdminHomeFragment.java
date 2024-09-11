@@ -32,6 +32,7 @@ public class AdminHomeFragment extends Fragment {
 
         // Find the buttons in the layout
         Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);
+        Button addAdminButton = view.findViewById(R.id.addAdminButton);
         Button addFAQButton = view.findViewById(R.id.addFAQbutton);
 
         // Set an OnClickListener on the viewAccountsButton
@@ -44,12 +45,21 @@ public class AdminHomeFragment extends Fragment {
             fragmentTransaction.commit();
         });
 
+        addAdminButton.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AddAdminFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
         // Set an OnClickListener on the addFAQButton
         addFAQButton.setOnClickListener(v -> {
             // Replace the current fragment with FAQFragment
             FragmentManager fragmentManager = getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.frame_layout, new FAQFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.replace(R.id.frame_layout, new AddFAQFragment()); // Ensure R.id.frame_layout is the container in your activity
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });

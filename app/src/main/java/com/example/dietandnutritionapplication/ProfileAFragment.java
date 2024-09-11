@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class ProfileAFragment extends Fragment {
 
@@ -36,6 +39,17 @@ public class ProfileAFragment extends Fragment {
         emailTextView.setText(adminProfile.getEmail());
         genderTextView.setText(adminProfile.getGender());
         accountActiveSinceTextView.setText(adminProfile.getDateJoined());
+
+        Button updateProfileButton = view.findViewById(R.id.updateProfile);
+
+        updateProfileButton.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new UpdateProfileAFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
 
         return view;
     }

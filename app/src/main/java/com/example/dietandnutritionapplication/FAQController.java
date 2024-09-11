@@ -17,23 +17,34 @@ public class FAQController extends ArrayAdapter<FAQ> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.faq_item, parent, false);
         }
+
         TextView titleTextView = convertView.findViewById(R.id.faqTitle);
         TextView questionTextView = convertView.findViewById(R.id.faqQuestion);
-        TextView answerTextView = convertView.findViewById(R.id.faqAnswer);
         TextView dateCreatedTextView = convertView.findViewById(R.id.faqDateCreated);
+        TextView faqAnswerTextView = convertView.findViewById(R.id.faqAnswer);
 
-        // Set review details
+        String answerTextView = "Your long text here...";
+        int maxLength = 100; // Set your max character limit
+        if (answerTextView.length() > maxLength) {
+            answerTextView = answerTextView.substring(0, maxLength) + "...";
+        }
         FAQ faq = getItem(position);
 
-        titleTextView.setText(faq.getTitle());
-        questionTextView.setText(faq.getQuestion());
-        answerTextView.setText(faq.getAnswer());
-        dateCreatedTextView.setText(faq.getDateCreated());
+        // Set review details
+        if (faq != null) {
+            titleTextView.setText(faq.getTitle());
+            questionTextView.setText(faq.getQuestion());
 
-        // Format date and username
-        String formattedDateTime = String.format(faq.getDateCreated());
-        dateCreatedTextView.setText(formattedDateTime);
+            // Handle answer text
+            String answer = faq.getAnswer();
+            if (answer.length() > 100) {
+                answer = answer.substring(0, 100) + "...";
+            }
+            faqAnswerTextView.setText(answer);
 
+            // Set date created
+            dateCreatedTextView.setText(faq.getDateCreated());
+        }
 
         return convertView;
     }
