@@ -62,11 +62,9 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,6 +85,10 @@ public class LoginFragment extends Fragment {
                 ((MainActivity) getActivity()).replaceFragment(new URegisterFragment());
             }
         });
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            accountArray = mainActivity.getAccountArray();
+        }
 
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -96,22 +98,6 @@ public class LoginFragment extends Fragment {
                 String enteredUsername = usernameEditText.getText().toString();
                 String enteredPassword = passwordEditText.getText().toString();
 
-
-                User user1 = new User();
-                user1.setUsername("zaw");
-                user1.setPassword("123");
-                user1.setRole("user");
-                accountArray.add(user1);
-                Admin admin1 = new Admin();
-                admin1.setUsername("admin");
-                admin1.setPassword("admin123");
-                admin1.setRole("admin");
-                accountArray.add(admin1);
-                Nutritionist nutritionist1 = new Nutritionist();
-                nutritionist1.setUsername("sim");
-                nutritionist1.setPassword("123");
-                nutritionist1.setRole("nutritionist");
-                accountArray.add(nutritionist1);
 
                 for(Profile account:accountArray){
                     if (enteredUsername.equals(account.getUsername()) && enteredPassword.equals(account.getPassword()) && account.getRole().equals("user")) {

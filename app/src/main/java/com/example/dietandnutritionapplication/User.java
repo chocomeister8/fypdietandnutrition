@@ -13,7 +13,8 @@ public class User extends Profile {
 
     // Default constructor
     public User() {
-        super();  // Calls the default constructor of the Profile class
+        super();
+        this.setRole("user");// Calls the default constructor of the Profile class
     }
 
     // Parameterized constructor
