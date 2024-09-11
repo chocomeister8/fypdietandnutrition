@@ -7,7 +7,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,6 +21,9 @@ import android.widget.TextView;
 public class URegisterFragment extends Fragment {
 
     private TextView textView;
+    private EditText firstNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
+    private RadioButton maleRadioButton, femaleRadioButton;
+    private Button registerButton;
 
 
 
@@ -60,11 +67,49 @@ public class URegisterFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_u_register, container, false);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        firstNameEditText = view.findViewById(R.id.firstName);
+        userNameEditText = view.findViewById(R.id.userNameCreate);
+        dobEditText = view.findViewById(R.id.dobtext);
+        emailEditText = view.findViewById(R.id.email);
+        phoneEditText = view.findViewById(R.id.editTextPhone);
+        passwordEditText = view.findViewById(R.id.enterPW);
+        confirmPasswordEditText = view.findViewById(R.id.cfmPW);
+        maleRadioButton = view.findViewById(R.id.rbMale);
+        femaleRadioButton = view.findViewById(R.id.rbFemale);
+        registerButton = view.findViewById(R.id.loginbutton);
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get values from the EditTexts
+                String firstName = firstNameEditText.getText().toString();
+                String userName = userNameEditText.getText().toString();
+                String dob = dobEditText.getText().toString();
+                String email = emailEditText.getText().toString();
+                String phone = phoneEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
+                String confirmPassword = confirmPasswordEditText.getText().toString();
+
+                // Check which RadioButton is selected (gender)
+                String gender;
+                if (maleRadioButton.isChecked()) {
+                    gender = "Male";
+                } else if (femaleRadioButton.isChecked()) {
+                    gender = "Female";
+                } else {
+                    gender = "Unspecified"; // Handle case where no gender is selected
+                }
+                mainActivity.createUserAccount(firstName,userName,dob,email,phone,gender,password);
+            }
+        });
+
 
         TextView myTextView = view.findViewById(R.id.haveacct);
         myTextView.setClickable(true);
@@ -74,6 +119,7 @@ public class URegisterFragment extends Fragment {
                 ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
             }
         });
+
 
 
 

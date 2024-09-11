@@ -12,17 +12,52 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.example.dietandnutritionapplication.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private boolean isAdminMode = false;
+    private ArrayList<Profile> accountArray = new ArrayList<>();
 
+
+    public void createUserAccount(String firstname, String username, String dob, String email, String phNum, String gender, String password) {
+        User userCreate = new User();
+        userCreate.setFirstName(firstname);
+        userCreate.setUsername(username);
+        userCreate.setDob(dob);
+        userCreate.setEmail(email);
+        userCreate.setPhoneNumber(phNum);
+        userCreate.setGender(gender);
+        userCreate.setPassword(password);
+        accountArray.add(userCreate);
+    }
+
+    public ArrayList<Profile> getAccountArray() {
+        return accountArray;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         EdgeToEdge.enable(this);
+
+        User user1 = new User();
+        user1.setUsername("zaw");
+        user1.setPassword("123");
+        user1.setRole("user");
+        accountArray.add(user1);
+        Admin admin1 = new Admin();
+        admin1.setUsername("admin");
+        admin1.setPassword("admin123");
+        admin1.setRole("admin");
+        accountArray.add(admin1);
+        Nutritionist nutritionist1 = new Nutritionist();
+        nutritionist1.setUsername("sim");
+        nutritionist1.setPassword("123");
+        nutritionist1.setRole("nutritionist");
+        accountArray.add(nutritionist1);
 
         // Initialize ViewBinding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
