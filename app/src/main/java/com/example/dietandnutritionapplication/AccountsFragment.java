@@ -13,6 +13,6 @@ public class AccountsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.viewallaccounts, container, false);
+        return inflater.inflate(R.layout.fragment_view_accounts, container, false);
     }
 }
