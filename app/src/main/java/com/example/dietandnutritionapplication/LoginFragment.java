@@ -112,11 +112,11 @@ public class LoginFragment extends Fragment {
                         break;
                     }else if (enteredUsername.equals(account.getUsername()) && enteredPassword.equals(account.getPassword()) && account.getRole().equals("nutritionist")) {
                         Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
-                        ((MainActivity) getActivity()).replaceFragment(new RecipeFragment());
+                        ((MainActivity) getActivity()).switchToNutriMode();
                         break;
                     }
                     else {
-                        Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
 
                     }
 
