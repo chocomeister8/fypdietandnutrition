@@ -86,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new LandingFragment());
     }
 
+    public void switchToUserMode() {
+        isAdminMode = false;
+        setupUserNavigation();
+        replaceFragment(new MealLogUFragment());
+    }
+
     private void setupAdminNavigation() {
         binding.bottomNavigationView.setBackground(null);
         binding.bottomNavigationView.getMenu().clear();
@@ -109,6 +115,30 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
+    private void setupUserNavigation() {
+        binding.bottomNavigationView.setBackground(null);
+        binding.bottomNavigationView.getMenu().clear();
+        binding.bottomNavigationView.inflateMenu(R.menu.user_bottom_menu);
+
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.meallog:
+                    replaceFragment(new MealLogUFragment());
+                    break;
+                case R.id.recipe:
+                    replaceFragment(new RecipeFragment());
+                    break;
+                case R.id.consultations:
+                    replaceFragment(new ConsultationsUFragment());
+                    break;
+                case R.id.profile:
+                    replaceFragment(new ProfileUFragment());
+                    break;
+            }
+            return true;
+        });
+    }
+
 
     private void setupGuestNavigation() {
         binding.bottomNavigationView.setBackground(null);
