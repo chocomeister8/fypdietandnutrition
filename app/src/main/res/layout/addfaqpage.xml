@@ -55,20 +55,18 @@
 
     <LinearLayout
         android:id="@+id/container"
-        android:layout_width="413dp"
-        android:layout_height="383dp"
+        android:layout_width="410dp"
+        android:layout_height="437dp"
         android:background="#C6FAFA"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout2">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:text="Add an FAQ"
             android:textColor="@android:color/black"
             android:textSize="20sp"
@@ -91,7 +89,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintLeft_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/relativeLayout2"/>
+            app:layout_constraintTop_toBottomOf="@+id/relativeLayout2" />
 
         <EditText
             android:id="@+id/question"
