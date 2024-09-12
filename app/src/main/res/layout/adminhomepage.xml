@@ -74,203 +74,238 @@
 
     <TableLayout
         android:id="@+id/tableLayout"
-        android:layout_width="414dp"
-        android:layout_height="153dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:stretchColumns="1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleTable">
+        app:layout_constraintTop_toBottomOf="@+id/titleTable"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
 
+        <!-- First Row -->
         <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
-                android:text="Number of Registered users:"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
-                android:text="80"
-                tools:ignore="HardcodedText" />
-
-        </TableRow>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
-
-        <TableRow
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
-                android:text="Number of Nutritionists:"
-                tools:ignore="HardcodedText" />
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5">
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
+                android:padding="12dp"
+                android:text="Number of Registered Users:"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:padding="12dp"
+                android:text="80"
+                android:textColor="#009688"
+                android:textSize="16sp" />
+        </TableRow>
+
+    <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
+
+    <!-- Second Row -->
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FAFAFA">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:padding="12dp"
+                android:text="Number of Nutritionists:"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:padding="12dp"
                 android:text="20"
-                tools:ignore="HardcodedText" />
-
+                android:textColor="#009688"
+                android:textSize="16sp" />
         </TableRow>
 
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
 
+        <!-- Third Row -->
         <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:padding="12dp"
                 android:text="Number of Admins:"
-                tools:ignore="HardcodedText" />
+                android:textColor="#000000"
+                android:textSize="16sp" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:padding="12dp"
                 android:text="10"
-                tools:ignore="HardcodedText" />
-
+                android:textColor="#009688"
+                android:textSize="16sp" />
         </TableRow>
 
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
 
+        <!-- Fourth Row -->
         <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="#FAFAFA">
 
             <TextView
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:padding="12dp"
                 android:text="Total Number of Users:"
-                tools:ignore="HardcodedText" />
+                android:textColor="#000000"
+                android:textSize="16sp" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:padding="12dp"
                 android:text="110"
-                tools:ignore="HardcodedText" />
-
+                android:textColor="#009688"
+                android:textSize="16sp" />
         </TableRow>
 
+    <!-- Divider -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
+
+        <Button
+            android:id="@+id/viewAccountsButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#009688"
+            android:radius="15dp"
+            android:text="View all accounts"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+            tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
+
+        <Button
+            android:id="@+id/addAdminButton"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:backgroundTint="#009688"
+            android:radius="15dp"
+            android:text="Add an admin"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewAccountsButton"
+            tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
+
+
 
     </TableLayout>
-
-    <Button
-        android:id="@+id/viewAccountsButton"
-        android:layout_width="180dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="28dp"
-        android:backgroundTint="#9C27B0"
-        android:radius="15dp"
-        android:text="View all accounts"
-        android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout"
-        tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
-
-    <Button
-        android:id="@+id/addFAQbutton"
-        android:layout_width="180dp"
-        android:layout_height="50dp"
-        android:backgroundTint="#4CAF50"
-        android:radius="15dp"
-        android:text="Add an FAQ"
-        android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="@+id/addAdminButton"
-        app:layout_constraintStart_toStartOf="@+id/addAdminButton"
-        app:layout_constraintTop_toBottomOf="@+id/faqTable"
-        tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
-
-    <Button
-        android:id="@+id/addAdminButton"
-        android:layout_width="180dp"
-        android:layout_height="50dp"
-        android:backgroundTint="#009688"
-        android:radius="15dp"
-        android:text="Add an admin"
-        android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/viewAccountsButton"
-        tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
 
     <TableLayout
         android:id="@+id/faqTable"
         android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:stretchColumns="1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addAdminButton">
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
 
+        <!-- Row for FAQs -->
         <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
-                android:text="Number of FAQs:"
-                tools:ignore="HardcodedText" />
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5">
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp"
-                android:text="8"
-                tools:ignore="HardcodedText" />
+                android:padding="12dp"
+                android:text="Number of FAQs:"
+                android:textColor="#000000"
+                android:textSize="16sp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:padding="12dp"
+                android:text="5"
+                android:textColor="#009688"
+                android:textSize="16sp" />
         </TableRow>
 
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000" />
+            android:layout_height="2dp"
+            android:background="#E0E0E0" />
+
+        <Button
+            android:id="@+id/viewFAQbutton"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:backgroundTint="#009688"
+            android:radius="15dp"
+            android:text="View all FAQs"
+            android:textSize="10sp"
+            tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
+
+        <Button
+            android:id="@+id/addFAQbutton"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:backgroundTint="#009688"
+            android:radius="15dp"
+            android:text="Add an FAQ"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="@+id/addAdminButton"
+            app:layout_constraintStart_toStartOf="@+id/addAdminButton"
+            app:layout_constraintTop_toBottomOf="@+id/faqTable"
+            tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
+
     </TableLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

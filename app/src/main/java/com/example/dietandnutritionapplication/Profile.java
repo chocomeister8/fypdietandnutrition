@@ -31,7 +31,6 @@ public class Profile implements Serializable {
         this.email = email;
         this.dateJoined = dateJoined;
         this.gender = gender;
-
         this.role = role;
         this.password = password;
 

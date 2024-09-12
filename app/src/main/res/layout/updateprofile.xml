@@ -56,16 +56,17 @@
 
     <LinearLayout
         android:id="@+id/container"
-        android:layout_width="408dp"
+        android:layout_width="match_parent"
+        android:layout_height="630dp"
         android:background="#C2F4C3"
         android:orientation="vertical"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
-        android:layout_height="">
+        app:layout_constraintVertical_bias="0.0">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -205,7 +206,35 @@
                     android:background="#E6E0E9"
                     android:ems="10"
                     android:hint="Email:"
-                    android:inputType="text"
+                    android:inputType="textEmailAddress"
+                    android:singleLine="true"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+                <EditText
+                    android:id="@+id/password"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="12dp"
+                    android:autofillHints="emailAddress"
+                    android:background="#E6E0E9"
+                    android:ems="10"
+                    android:hint="Password:"
+                    android:inputType="textPassword"
+                    android:singleLine="true"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+                <EditText
+                    android:id="@+id/confirmpassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="12dp"
+                    android:autofillHints="emailAddress"
+                    android:background="#E6E0E9"
+                    android:ems="10"
+                    android:hint="Confirm Password:"
+                    android:inputType="textPassword"
                     android:singleLine="true"
                     android:textSize="14sp"
                     tools:ignore="HardcodedText" />

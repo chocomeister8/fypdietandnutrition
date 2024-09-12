@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,7 +19,6 @@ import android.widget.Toast;
  */
 public class URegisterFragment extends Fragment {
 
-    private TextView textView;
     private EditText firstNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
     private RadioButton maleRadioButton, femaleRadioButton;
     private Button registerButton;
@@ -117,9 +115,6 @@ public class URegisterFragment extends Fragment {
                 ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
             }
         });
-
-
-
 
         return view;
     }

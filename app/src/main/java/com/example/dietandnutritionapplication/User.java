@@ -11,8 +11,7 @@ public class User extends Profile {
     private double currentHeight;
 
     // Default constructor
-    public User() {
-        super();
+    public User() { super();
         this.setRole("user");// Calls the default constructor of the Profile class
     }
 

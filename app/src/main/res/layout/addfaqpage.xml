@@ -56,102 +56,95 @@
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="410dp"
-        android:layout_height="437dp"
-        android:background="#C6FAFA"
-        android:gravity="center"
+        android:layout_height="630dp"
+        android:background= "#FFF8E1"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout2">
 
-        <TextView
-            android:layout_width="wrap_content"
+
+        <!-- CardView for EditText and Buttons -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add an FAQ"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
-
-        <EditText
-            android:id="@+id/title"
-            android:layout_width="270dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="32dp"
-            android:autofillHints="username"
-            android:background="#E6E0E9"
-            android:ems="10"
-            android:hint="Title:"
-            android:inputType="text"
-            android:singleLine="true"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintLeft_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/relativeLayout2" />
-
-        <EditText
-            android:id="@+id/question"
-            android:layout_width="270dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="16dp"
-            android:autofillHints="username"
-            android:background="#E6E0E9"
-            android:ems="10"
-            android:hint="Question:"
-            android:inputType="text"
-            android:singleLine="true"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintLeft_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/relativeLayout2"
-            tools:ignore="HardcodedText"
-            tools:layout_editor_absoluteX="70dp" />
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:elevation="4dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#FFECB3">
 
 
-        <EditText
-            android:id="@+id/ans"
-            android:layout_width="270dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="16dp"
-            android:autofillHints="password"
-            android:background="#E6E0E9"
-            android:ems="10"
-            android:hint="Answer:"
-            android:inputType="text"
-            android:singleLine="true"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintLeft_toRightOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/userName"
-            tools:ignore="HardcodedText"
-            tools:layout_editor_absoluteX="70dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        <Button
-            android:id="@+id/addButton"
-            android:layout_width="270dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#4CAF50"
-            android:text="Add FAQ"
-            app:layout_constraintTop_toBottomOf="@+id/phoneNum"
-            tools:ignore="HardcodedText,MissingConstraints"
-            tools:layout_editor_absoluteX="70dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add an FAQ"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText"
+                    android:gravity="center"/>
 
-        <Button
-            android:id="@+id/addAdminButton"
-            android:layout_width="270dp"
-            android:layout_height="50dp"
-            android:backgroundTint="#009688"
-            android:text="Back"
-            app:layout_constraintTop_toBottomOf="@+id/addButton"
-            tools:ignore="HardcodedText,MissingConstraints"
-            tools:layout_editor_absoluteX="69dp" />
+                <!-- EditText for Title -->
+                <EditText
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#E6E0E9"
+                    android:hint="Title:"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+                <!-- EditText for Question -->
+                <EditText
+                    android:id="@+id/question"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#E6E0E9"
+                    android:hint="Question:"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+                <!-- EditText for Answer -->
+                <EditText
+                    android:id="@+id/answer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="#E6E0E9"
+                    android:hint="Answer:"
+                    android:inputType="textMultiLine"
+                    android:minLines="5"
+                    android:gravity="top"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+                <!-- Button for Adding FAQ -->
+                <Button
+                    android:id="@+id/addFAQ"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#4CAF50"
+                    android:text="Add FAQ"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 
