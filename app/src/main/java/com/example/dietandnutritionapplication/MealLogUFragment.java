@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.widget.ImageView;
@@ -17,28 +18,16 @@ import java.util.TimeZone;
 public class MealLogUFragment extends Fragment {
 
     private TextView calorieTextView;
-    private TextView breakfastTextView;
-    private TextView lunchTextView;
-    private TextView dinnerTextView;
-    private TextView snackTextView;
     private LinearLayout breakfastImageContainer;
     private LinearLayout lunchImageContainer;
     private LinearLayout dinnerImageContainer;
     private LinearLayout snackImageContainer;
     private ImageView cameraIcon;
-    private TextView calorieLimitTextView;
-
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_meal_log, container, false);
-
-        // Initialize views
-        breakfastTextView = view.findViewById(R.id.breakfastTextView);
-        lunchTextView = view.findViewById(R.id.lunchTextView);
-        dinnerTextView = view.findViewById(R.id.dinnerTextView);
-        snackTextView = view.findViewById(R.id.snackTextView);
 
         breakfastImageContainer = view.findViewById(R.id.breakfastImageContainer);
         lunchImageContainer = view.findViewById(R.id.lunchImageContainer);
@@ -46,22 +35,54 @@ public class MealLogUFragment extends Fragment {
         snackImageContainer = view.findViewById(R.id.snackImageContainer);
         calorieTextView = view.findViewById(R.id.progress_calorielimit);
 
+        CardView cardViewBreakfast = view.findViewById(R.id.breakfastCard);
+        CardView cardViewLunch = view.findViewById(R.id.lunchCard);
+        CardView cardViewDinner = view.findViewById(R.id.dinnerCard);
+        CardView cardViewSnack = view.findViewById(R.id.snackCard);
 
         cameraIcon = view.findViewById(R.id.camera_icon);
-
-        calorieLimitTextView = view.findViewById(R.id.progress_calorielimit);
-
 
         // Set a click listener on the camera icon
         cameraIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addDummyMeal();
+                updateCardViews();
             }
         });
 
         return view;
     }
+
+    private void updateCardViews() {
+        // Get the current time
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+        CardView cardViewBreakfast = getView().findViewById(R.id.breakfastCard);
+        CardView cardViewLunch = getView().findViewById(R.id.lunchCard);
+        CardView cardViewDinner = getView().findViewById(R.id.dinnerCard);
+        CardView cardViewSnack = getView().findViewById(R.id.snackCard);
+
+        // Hide all CardViews initially
+        cardViewBreakfast.setVisibility(View.GONE);
+        cardViewLunch.setVisibility(View.GONE);
+        cardViewDinner.setVisibility(View.GONE);
+        cardViewSnack.setVisibility(View.GONE);
+
+        // Show the CardView based on the current time
+        if (hour >= 6 && hour < 12) {
+            cardViewBreakfast.setVisibility(View.VISIBLE);
+        } else if (hour >= 12 && hour < 15) {
+            cardViewLunch.setVisibility(View.VISIBLE);
+        } else if (hour >= 18 && hour < 21) {
+            cardViewDinner.setVisibility(View.VISIBLE);
+        } else {
+            cardViewSnack.setVisibility(View.VISIBLE);
+        }
+    }
+
 
 
     private void addDummyMeal() {
@@ -101,6 +122,7 @@ public class MealLogUFragment extends Fragment {
         mealTextView.setLayoutParams(layoutParams); // Apply layout parameters
         mealEntryLayout.addView(mealTextView); // Add text to horizontal layout
 
+        // Add the meal entry to the appropriate container
         if (hour >= 6 && hour < 12) {
             // Breakfast
             breakfastImageContainer.addView(mealEntryLayout);  // Add the image-text pair to breakfast container
@@ -114,5 +136,6 @@ public class MealLogUFragment extends Fragment {
             // Snacks
             snackImageContainer.addView(mealEntryLayout);  // Add the image-text pair to snack container
         }
+
     }
 }
