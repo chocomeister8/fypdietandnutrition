@@ -1,4 +1,5 @@
 package com.example.dietandnutritionapplication;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +13,12 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.widget.ImageView;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
+
 
 public class MealLogUFragment extends Fragment {
 
@@ -23,6 +28,11 @@ public class MealLogUFragment extends Fragment {
     private LinearLayout dinnerImageContainer;
     private LinearLayout snackImageContainer;
     private ImageView cameraIcon;
+
+
+    private TextView dateTextView;
+    private Calendar calendar = Calendar.getInstance();
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
 
     @Nullable
     @Override
@@ -34,6 +44,14 @@ public class MealLogUFragment extends Fragment {
         dinnerImageContainer = view.findViewById(R.id.dinnerImageContainer);
         snackImageContainer = view.findViewById(R.id.snackImageContainer);
         calorieTextView = view.findViewById(R.id.progress_calorielimit);
+
+        dateTextView = view.findViewById(R.id.dateTextView);
+
+        // Set today's date by default
+        updateDateTextView(calendar);
+
+        dateTextView.setOnClickListener(v -> showDatePickerDialog());
+
 
         CardView cardViewBreakfast = view.findViewById(R.id.breakfastCard);
         CardView cardViewLunch = view.findViewById(R.id.lunchCard);
@@ -137,5 +155,29 @@ public class MealLogUFragment extends Fragment {
             snackImageContainer.addView(mealEntryLayout);  // Add the image-text pair to snack container
         }
 
+    }
+
+    private void showDatePickerDialog() {
+        new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+            calendar.set(year, month, dayOfMonth);
+            updateDateTextView(calendar);
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+                .show();
+    }
+
+    private void updateDateTextView(Calendar calendar) {
+        String formattedDate = dateFormat.format(calendar.getTime());
+        if (isToday(calendar)) {
+            dateTextView.setText("Today");
+        } else {
+            dateTextView.setText(formattedDate);
+        }
+    }
+
+    private boolean isToday(Calendar calendar) {
+        Calendar today = Calendar.getInstance();
+        return calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                calendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH);
     }
 }
