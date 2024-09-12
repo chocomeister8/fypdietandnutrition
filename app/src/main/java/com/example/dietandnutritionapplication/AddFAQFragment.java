@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -84,6 +85,7 @@ public class AddFAQFragment extends Fragment {
                 String date = now.format(formatter);
 
                 mainActivity.createFAQ(title, question, answer, date);
+                Toast.makeText(getContext(), "FAQ added successfully!", Toast.LENGTH_SHORT).show();
                 mainActivity.replaceFragment(new FAQFragment());
             }
 
