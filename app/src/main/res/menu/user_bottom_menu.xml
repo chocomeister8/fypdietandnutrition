@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Meal Log"
+        android:title="HomePage"
         android:icon="@drawable/baseline_meal_24"
         android:id="@+id/landing"/>
     <item android:title="Recipes"

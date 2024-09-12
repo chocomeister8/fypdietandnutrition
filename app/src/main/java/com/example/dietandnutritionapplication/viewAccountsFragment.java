@@ -61,8 +61,6 @@ public class viewAccountsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         items = new ArrayList<>();
-        items.add("Apple");
-        items.add("Orange");
         MainActivity mainActivity = (MainActivity) getActivity();
         profiles = mainActivity.getAccountArray();
         for(Profile profile:profiles){
