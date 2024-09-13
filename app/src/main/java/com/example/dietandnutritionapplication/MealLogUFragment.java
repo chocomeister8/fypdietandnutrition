@@ -22,6 +22,11 @@ import java.util.TimeZone;
 
 public class MealLogUFragment extends Fragment {
 
+    private boolean isBreakfastExpanded = false;
+    private boolean isLunchExpanded = false;
+    private boolean isDinnerExpanded = false;
+    private boolean isSnackExpanded = false;
+
     private int totalCarbs = 0;
     private int totalProteins = 0;
     private int totalFats = 0;
