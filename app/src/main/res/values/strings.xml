@@ -1,8 +1,39 @@
 <resources>
     <string name="app_name">Diet and Nutrition Application</string>
-    <string name="open_nav">Open Navigation Drawer</string>
-    <string name="close_nav">Close Navigation Drawer</string>
     <string name="profile">Profile</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Gender options -->
+    <string-array name="gender_array">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Dietary Preferences options -->
+    <string-array name="dietary_preferences_array">
+        <item>Vegetarian</item>
+        <item>Vegan</item>
+        <item>Gluten-Free</item>
+        <item>Keto</item>
+        <item>Low-Carb</item>
+        <item>None</item>
+    </string-array>
+
+    <!-- Allergies options -->
+    <string-array name="allergies_array">
+        <item>Peanuts</item>
+        <item>Dairy</item>
+        <item>Seafood</item>
+        <item>Wheat</item>
+        <item>Soy</item>
+        <item>None</item>
+    </string-array>
+
+    <!-- Activity Level options -->
+    <string-array name="activity_level_array">
+        <item>Low</item>
+        <item>Moderate</item>
+        <item>High</item>
+    </string-array>
 </resources>
