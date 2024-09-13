@@ -10,9 +10,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,6 +26,7 @@ public class viewAccountsFragment extends Fragment {
     ArrayList<String> items;
     ArrayAdapter<String> adapter;
     ArrayList<Profile> profiles = new ArrayList<>();
+    private Spinner roleSpinner;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -74,6 +77,18 @@ public class viewAccountsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_accounts, container, false);
         listView = view.findViewById(R.id.listView);
+
+        roleSpinner = view.findViewById(R.id.filterRoleSpinner);
+
+        List<String> sortRole = new ArrayList<>();
+        sortRole.add("All Users");
+        sortRole.add("Admin");
+        sortRole.add("Nutritionist");
+        sortRole.add("User");
+
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, sortRole);
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        roleSpinner.setAdapter(sortAdapter);
 
 
         // Correct initialization of the ArrayAdapter

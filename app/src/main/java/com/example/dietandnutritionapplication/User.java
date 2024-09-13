@@ -1,5 +1,7 @@
 package com.example.dietandnutritionapplication;
 
+import java.util.ArrayList;
+
 public class User extends Profile {
     private String gender;
     private String phoneNumber;

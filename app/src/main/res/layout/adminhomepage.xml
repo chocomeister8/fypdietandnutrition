@@ -50,8 +50,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginEnd="4dp"
-            android:layout_marginRight="4dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="9dp"
             android:text="Welcome back, Weiss"
             app:layout_constraintEnd_toStartOf="@+id/logo" />
 

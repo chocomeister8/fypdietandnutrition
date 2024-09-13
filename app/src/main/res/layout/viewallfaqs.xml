@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -49,15 +50,19 @@
         android:id="@+id/gridLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:alignmentMode="alignMargins"
+        android:background="@color/white"
         android:columnCount="3"
         android:gravity="center"
         android:rowCount="1"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout3"
-        tools:layout_editor_absoluteX="0dp">
+        android:useDefaultMargins="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout3">
 
         <Button
             android:id="@+id/filterFAQButton"
-            android:layout_width="0dp"
+            android:layout_width="10dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
             android:layout_marginEnd="8dp"
@@ -68,7 +73,6 @@
             android:textColor="@color/black"
             android:textSize="16sp" />
 
-        <!-- Third Column: Filter Star Spinner -->
         <Spinner
             android:id="@+id/filterFAQSpinner"
             android:layout_width="170dp"
@@ -82,7 +86,7 @@
             android:textSize="16sp" />
 
         <EditText
-            android:id="@+id/editTextText"
+            android:id="@+id/searchText"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_row="0"
