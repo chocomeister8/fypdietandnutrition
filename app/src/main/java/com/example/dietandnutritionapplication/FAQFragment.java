@@ -78,14 +78,15 @@ public class FAQFragment extends Fragment{
 
 
         // Set the adapter to the ListView
-        FAQAdapter adapter = new FAQAdapter(getContext(), faqs);
+        //FAQAdapter adapter = new FAQAdapter(getContext(), faqs);
+        adapter = new FAQAdapter(getContext(), faqs);
         FAQListView.setAdapter(adapter);
 
 
         FAQListView = view.findViewById(R.id.faqListView);
         filterFAQspinner = view.findViewById(R.id.filterFAQSpinner);
 
-        filterFAQspinner = view.findViewById(R.id.filterFAQSpinner);
+        //filterFAQspinner = view.findViewById(R.id.filterFAQSpinner);
         List<String> sortFAQ = new ArrayList<>();
         sortFAQ.add("Latest to oldest");
         sortFAQ.add("Oldest to latest");
