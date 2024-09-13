@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,9 @@ public class ConsultationsUFragment extends Fragment {
 
     private ListView nutritionistListView;
     private List<Nutritionist> nutritionistList;
+/*
     private UserConsultationsController adapter;
+*/
 
     @Nullable
     @Override
@@ -35,8 +38,9 @@ public class ConsultationsUFragment extends Fragment {
         nutritionistList.add(new Nutritionist("john.doe@example.com", "Dr. John Doe", "MSc in Dietetics", "987-654-3210", "Sports Nutrition", "Expert in sports nutrition and diet planning.", null));
 
         // Set up the adapter
-        adapter = new UserConsultationsController(getActivity(), nutritionistList);
-        nutritionistListView.setAdapter(adapter);
+
+        /*adapter = new UserConsultationsController(getActivity(), nutritionistList);
+        nutritionistListView.setAdapter(adapter);*/
 
         // Handle item clicks
         nutritionistListView.setOnItemClickListener((parent, view1, position, id) -> {

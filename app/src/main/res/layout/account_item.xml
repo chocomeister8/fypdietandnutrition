@@ -9,42 +9,57 @@
     app:cardCornerRadius="8dp"
     app:cardBackgroundColor="#FFECB3">
 
+    <!-- Horizontal layout for items -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@drawable/border_shape"> <!-- Border for the items -->
 
+        <!-- Username Label TextView -->
+        <TextView
+            android:id="@+id/usernamelabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/username"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:paddingEnd="8dp" /> <!-- Add some spacing between the label and value -->
+
+        <!-- Username TextView -->
         <TextView
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Username:"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/usernamelabel"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- Role Label TextView -->
+        <TextView
+            android:id="@+id/rolelabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Role:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/usernamelabel"
+            app:layout_constraintEnd_toStartOf="@+id/role"
+            android:paddingEnd="8dp" /> <!-- Add some spacing between the label and value -->
+
+        <!-- Role TextView -->
         <TextView
             android:id="@+id/role"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Role:"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/username" />
-
-        <Button
-            android:id="@+id/viewmoreButton"
-            android:layout_width="80dp"
-            android:layout_height="33dp"
-            android:background="@color/lightGrey"
-            android:text="View more"
-            android:textSize="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/rolelabel"
             app:layout_constraintTop_toBottomOf="@+id/username" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.cardview.widget.CardView>
-
-

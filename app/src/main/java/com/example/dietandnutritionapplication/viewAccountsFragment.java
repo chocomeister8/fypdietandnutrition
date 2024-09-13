@@ -63,12 +63,17 @@ public class viewAccountsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize the items list
         items = new ArrayList<>();
+
+        // Get the activity context and retrieve the list of profiles from MainActivity
         MainActivity mainActivity = (MainActivity) getActivity();
         profiles = mainActivity.getAccountArray();
-        for(Profile profile:profiles){
-            displayProfile dp = new displayProfile(profile.getUsername(),profile.getRole());
-            items.add(dp.toString());
+
+        // Loop through profiles and convert them to string representations (if needed)
+        for (Profile profile : profiles) {
+            items.add(profile.getUsername() + " - " + profile.getRole());  // Or however you want to display profile data as a string
         }
     }
 
@@ -77,6 +82,14 @@ public class viewAccountsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_accounts, container, false);
         listView = view.findViewById(R.id.listView);
+
+        // Get the profiles from MainActivity
+        MainActivity mainActivity = (MainActivity) getActivity();
+        profiles = mainActivity.getAccountArray();
+
+        // Create and set the ProfileAdapter for the ListView
+        ProfileAdapter adapter = new ProfileAdapter(getContext(), profiles);
+        listView.setAdapter(adapter);
 
         roleSpinner = view.findViewById(R.id.filterRoleSpinner);
 
@@ -90,9 +103,6 @@ public class viewAccountsFragment extends Fragment {
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         roleSpinner.setAdapter(sortAdapter);
 
-
-        // Correct initialization of the ArrayAdapter
-        adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, items);
 
         // Set the adapter to the ListView
         listView.setAdapter(adapter);
