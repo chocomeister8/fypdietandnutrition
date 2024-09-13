@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F9F0"
+    tools:context=".userHomePageFragment">
+
+    <!-- Header Section -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F0F9F0"
+        android:padding="16dp">
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:id="@+id/logo"
+            android:layout_centerVertical="true"
+            android:src="@drawable/dietdietmusttry_logo"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:text="Homepage"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/right_icon"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/baseline_menu_24"/>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:textColor="@color/white"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Empty Rows Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="100dp"
+        android:padding="16dp">
+
+        <!-- Container for Rows -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rounded_item_background">
+
+            <!-- Row 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <!-- Button and Text 1 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/button_recipes"
+                        android:layout_width="77dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Recipes"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+                <!-- Button and Text 2 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/button_MealLog"
+                        android:layout_width="77dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_meal_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Meal Log"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+                <!-- Button and Text 3 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp"
+                    android:textColor="#000000">
+
+                    <Button
+                        android:id="@+id/diary"
+                        android:layout_width="77dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Diary"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+                <!-- Button and Text 4 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/bmiCalculator"
+                        android:layout_width="77dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_calculate_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="BMI Cal"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Row 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <!-- Button and Text 5 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/consultation"
+                        android:layout_width="77dp"
+                        android:layout_height="45dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Consultation"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+                <!-- Button and Text 6 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/healthReport"
+                        android:layout_width="77dp"
+                        android:layout_height="45dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Report"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+                <!-- Button and Text 7 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/FAQ"
+                        android:layout_width="77dp"
+                        android:layout_height="45dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="FAQ"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+                <!-- Button and Text 8 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/profile"
+                        android:layout_width="77dp"
+                        android:layout_height="45dp"
+                        android:layout_margin="4dp"
+                        android:background="@android:color/transparent"
+                        android:drawableTop="@drawable/baseline_profile_24"
+                        android:padding="3dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Profile"
+                        android:gravity="center"
+                        android:textColor="#000000"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+</LinearLayout>
+
+        <!-- Empty Row 2 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rounded_item_background">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today's Details"
+                android:textColor="#000000"
+                android:padding="16dp"
+                android:layout_gravity="start|top" />
+
+
+            <!-- Macronutrients info (Carbohydrates, Proteins, Fats) below ProgressBar -->
+            <LinearLayout
+                android:id="@+id/nutrients_info"
+                android:layout_width="379dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="14dp"
+                android:padding="10dp">
+
+
+                <!-- Carbohydrates Column -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/carbohydrates_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Carbohydrates"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/carbohydrates_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0g"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <!-- Proteins Column -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/proteins_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Proteins"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/proteins_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0g"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <!-- Fats Column -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/fats_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fats"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/fats_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0g"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </FrameLayout>
+
+        <!-- Empty Row 3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/rounded_item_background">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today's Details"
+                android:textColor="#000000"
+                android:padding="16dp"
+                android:layout_gravity="start|top" />
+
+            <!-- Text below Camera Icon -->
+            <Button
+                android:id="@+id/button_MealLog1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Log Meal"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textAlignment="center"
+                android:layout_marginBottom="16dp" />
+        </LinearLayout>
+
+        <!-- Empty Row 4 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:background="@drawable/rounded_item_background">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Meal Recommendation"
+                android:padding="20dp"
+                android:textColor="#000000"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
