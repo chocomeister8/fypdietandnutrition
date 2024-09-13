@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F9F0">
+
+    <!-- Top Relative Layout for Icon and Logo -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/right_icon2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_baseline_menu_24"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/dietdietmusttry_logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:text="Calculate BMI"
+            android:layout_marginTop="25dp" />
+    </RelativeLayout>
+
+    <!-- Height and Weight Input -->
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_marginLeft="30dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="140dp">
+
+        <!-- Container for Height -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/height_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bmi_background"
+                android:padding="10dp"
+                android:paddingStart="110dp"
+                android:hint="Cm"
+                android:inputType="number"/>
+
+
+        </RelativeLayout>
+
+        <!-- Container for Weight -->
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp">
+
+            <EditText
+                android:id="@+id/weight_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bmi_background"
+                android:padding="10dp"
+                android:hint="Kg"
+                android:paddingStart="110dp"
+                android:inputType="number"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Gender and Age Input -->
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_marginLeft="30dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="200dp">
+
+        <LinearLayout
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/bmi_background">
+
+            <ImageButton
+                android:id="@+id/button_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_male_24"
+                android:background="@drawable/bmi_background"
+                android:paddingStart="30dp"
+                android:padding="10dp" />
+
+            <ImageButton
+                android:id="@+id/button_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_female_24"
+                android:background="@drawable/bmi_background"
+                android:padding="10dp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp">
+
+            <EditText
+                android:id="@+id/age_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bmi_background"
+                android:hint="Age"
+                android:inputType="number"
+                android:padding="10dp"
+                android:paddingStart="140dp"
+                android:layout_alignParentStart="true"/>
+
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Calculate Button -->
+
+    <!-- Result Section -->
+    <Button
+        android:id="@+id/calculate_button"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="270dp"
+        android:background="@drawable/rounded_background"
+        android:padding="12dp"
+        android:text="Calculate"
+        android:textColor="@android:color/white" />
+
+    <LinearLayout
+        android:id="@+id/result_column"
+        android:layout_width="350dp"
+        android:layout_marginLeft="30dp"
+        android:layout_height="260dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/calculate_button"
+        android:layout_marginTop="20dp"
+        android:padding="20dp"
+        android:background="@drawable/rounded_item_background">
+
+
+
+        <TextView
+            android:id="@+id/bmi_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BMI"
+            android:textSize="20sp"
+
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/bmi_result_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:text=" "
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/bmr_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Basal Metabolic Rate (BMR)"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/bmr_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:text=" "
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/Calorie_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="To maintain your current weight, you should consume approximately"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/Calorie_Value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:text=" "
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/PastRecord_button"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="605dp"
+        android:padding="12dp"
+        android:text="View My Past Record"
+        android:textColor="#301934"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:background="@android:color/transparent" />
+
+
+</RelativeLayout>

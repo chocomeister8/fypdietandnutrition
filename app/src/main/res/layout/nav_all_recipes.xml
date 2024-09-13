@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Main content layout -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F0F9F0">
+
+        <!-- Header layout with logo and text -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/right_icon2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_baseline_menu_24"
+                android:visibility="visible"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="70dp"
+                android:id="@+id/logo"
+                android:layout_centerVertical="true"
+                android:src="@drawable/dietdietmusttry_logo"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_centerHorizontal="true"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                android:textSize="20sp"
+                android:text="All Recipes"/>
+        </RelativeLayout>
+
+        <!-- Search Bar with Search Icon -->
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="120dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="20dp"
+            android:hint="Enter Recipes"
+            android:padding="10dp"
+            android:background="@drawable/rounded_search_bar_background"
+            android:inputType="text"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="10dp"
+            android:textColor="#000000" />
+
+        <!-- Navigation Bar -->
+        <FrameLayout
+            android:layout_marginTop="187dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:id="@+id/navigationBar"
+            android:layout_width="125dp"
+            android:layout_height="390dp"
+            android:background="@drawable/rounded_search_bar_background">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:orientation="vertical"
+                >
+
+                <Button
+                    android:id="@+id/button_all_recipes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Recipes"
+                    android:background="@android:color/transparent"
+                    android:textColor="#333333"
+                    android:textAlignment="viewStart"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:clickable="true"
+                    android:textSize="11dp" />
+
+                <Button
+                    android:id="@+id/button_vegetarian"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vegetarian"
+                    android:clickable="true"
+                    android:background="@android:color/transparent"
+                    android:textColor="#333333"
+                    android:textAlignment="viewStart"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="11dp" />
+
+                <Button
+                    android:id="@+id/button_favourite"
+                    android:layout_width="wrap_content"
+                    android:clickable="true"
+                    android:layout_height="wrap_content"
+                    android:text="My Fav"
+                    android:background="@android:color/transparent"
+                    android:textColor="#333333"
+                    android:textAlignment="viewStart"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="11dp" />
+
+                <Button
+                    android:id="@+id/button_personalise"
+                    android:layout_width="wrap_content"
+                    android:clickable="true"
+                    android:layout_height="wrap_content"
+                    android:text="Personalise Recipes"
+                    android:background="@android:color/transparent"
+                    android:textColor="#333333"
+                    android:textAlignment="viewStart"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="10dp" />
+
+                <Button
+                    android:id="@+id/button_recipes_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recipes Status"
+                    android:background="@android:color/transparent"
+                    android:textColor="#333333"
+                    android:clickable="true"
+                    android:textAlignment="viewStart"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="11dp" />
+
+                <Button
+                    android:id="@+id/button_calorie_goal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calorie Goal"
+                    android:background="@android:color/transparent"
+                    android:textColor="#333333"
+                    android:clickable="true"
+                    android:textAlignment="viewStart"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textSize="11dp" />
+
+            </LinearLayout>
+        </FrameLayout>
+
+
+        <!-- Column: Content -->
+        <LinearLayout
+            android:layout_width="248dp"
+            android:layout_height="399dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="180dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/rounded_item_background"
+            android:orientation="vertical"
+            android:padding="5dp"><!-- Optional: Add background color for visibility -->
+
+            <!-- Item 1 -->
+            <LinearLayout
+                android:layout_width="239dp"
+                android:layout_height="85dp"
+                android:layout_marginBottom="8dp"
+
+                android:orientation="horizontal"
+                android:padding="12dp"> <!-- Adds space below Item 1 -->
+
+                <!-- Image on the left -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/fried_noodle" />
+
+                <!-- Vertical LinearLayout for text and icon -->
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="1dp">
+
+                    <!-- Top line of text with heart icon -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <!-- Top line of text -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fried Noodle"
+                            android:textColor="#000000"
+                            android:paddingEnd="20dp" />
+
+                        <!-- Heart icon -->
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="match_parent"
+
+                            android:layout_marginStart="10dp"
+                            android:contentDescription="Favorite Icon"
+                            android:src="@drawable/ic_favorite"/> <!-- Adjust margin here -->
+
+                    </LinearLayout>
+
+
+                    <!-- Bottom line of text -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="600 Kcal / Per Serving" />
+
+
+
+
+                </LinearLayout>
+            </LinearLayout>
+            <!-- Item 2 -->
+            <LinearLayout
+                android:layout_width="239dp"
+                android:layout_height="85dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                android:padding="12dp"> <!-- Adds space below Item 1 -->
+
+                <!-- Image on the left -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/mushroom_soup" />
+
+                <!-- Vertical LinearLayout for text and icon -->
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="1dp">
+
+                    <!-- Top line of text with heart icon -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <!-- Top line of text -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mushroom Soup"
+                            android:textColor="#000000"
+                            android:paddingEnd="10dp" />
+
+                        <!-- Heart icon -->
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="match_parent"
+
+                            android:contentDescription="Favorite Icon"
+                            android:src="@drawable/ic_favorite"/><!-- Adjust margin here -->
+
+                    </LinearLayout>
+                    <!-- Bottom line of text -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="96 Kcal / Per Serving" />
+
+
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Item 3 -->
+            <LinearLayout
+                android:layout_width="239dp"
+                android:layout_height="85dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <!-- Image on the left -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/chicken_choop" />
+
+                <!-- Vertical LinearLayout for text and icon -->
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="1dp">
+
+                    <!-- Top line of text with heart icon -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <!-- Top line of text -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chicken Chop"
+                            android:textColor="#000000"
+                            android:paddingEnd="20dp" />
+
+                        <!-- Heart icon -->
+                        <!-- Heart icon -->
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Favorite Icon"
+                            android:src="@drawable/ic_favorite"
+                            android:layout_marginStart="10dp"/> <!-- Adjust margin here -->
+
+                    </LinearLayout>
+
+                    <!-- Bottom line of text -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="425 Kcal / Per Serving" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Item 4 -->
+            <LinearLayout
+                android:layout_width="239dp"
+                android:layout_height="85dp"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <!-- Image on the left -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/salad" />
+
+                <!-- Vertical LinearLayout for text and icon -->
+                <LinearLayout
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="1dp">
+
+                    <!-- Top line of text with heart icon -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="4dp">
+
+                        <!-- Top line of text -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Caesar Salad"
+                            android:textColor="#000000"
+                            android:paddingEnd="20dp" />
+
+                        <!-- Heart icon -->
+                        <!-- Heart icon -->
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="match_parent"
+
+                            android:layout_marginStart="10dp"
+                            android:contentDescription="Favorite Icon"
+                            android:src="@drawable/ic_favorite"/> <!-- Adjust margin here -->
+
+                    </LinearLayout>
+
+                    <!-- Bottom line of text -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="150 Kcal / Per Serving" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
+

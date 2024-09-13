@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new MealLogUFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new RecipeFragment());
+                    replaceFragment(new RecipesFolderFragment());
                     break;
                 case R.id.consultations:
                     replaceFragment(new ConsultationsUFragment());
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new LandingFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new RecipeFragment());
+                    replaceFragment(new RecipesFolderFragment());
                     break;
                 case R.id.meallog:
                     replaceFragment(new MealLogPreviewFragment());
@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new LandingFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new RecipeFragment());
+                    replaceFragment(new RecipesFolderFragment());
                     break;
 //                case R.id.addRecipe: // Handle Add Recipe fragment
 //                    replaceFragment(new AddRecipeFragment());

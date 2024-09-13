@@ -1,0 +1,15 @@
+<!-- res/drawable/approved_button.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Set the background color to green -->
+    <solid android:color="#4CAF50"/> <!-- You can use any green color you prefer -->
+
+    <!-- Set the corner radius for rounded edges -->
+    <corners android:radius="35dp"/> <!-- Adjust the radius as needed for more or less rounded corners -->
+
+    <!-- Optional: Add padding around the text -->
+    <padding
+        android:left="8dp"
+        android:right="8dp"
+        android:top="4dp"
+        android:bottom="4dp"/>
+</shape>
