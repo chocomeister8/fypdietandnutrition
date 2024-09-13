@@ -18,13 +18,13 @@ public class Test_BMI_fragment extends AppCompatActivity {
 
         // Set up the intent for the "Calculate BMI" button
         calculateButton.setOnClickListener(v -> {
-            Intent intent = new Intent(Test_BMI_fragment.this, BMI_Calculator_fragment.class);
+            Intent intent = new Intent(Test_BMI_fragment.this, BMICalculatorFragment.class);
             startActivity(intent);
         });
 
         // Set up the intent for the "Past Record" button
         pastRecordButton.setOnClickListener(v -> {
-            Intent intent = new Intent(Test_BMI_fragment.this, bmi_pastRecord_fragment.class);  // Change to the correct activity for past records
+            Intent intent = new Intent(Test_BMI_fragment.this, BMIPastRecordFragment.class);  // Change to the correct activity for past records
             startActivity(intent);
         });
     }

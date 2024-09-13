@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     public void switchToUserMode() {
         isAdminMode = false;
         setupUserNavigation();
-        replaceFragment(new MealLogUFragment());
+        replaceFragment(new userHomePageFragment());
     }
 
     public void switchToNutriMode() {
@@ -176,8 +176,8 @@ public class MainActivity extends AppCompatActivity {
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
-                case R.id.meallog:
-                    replaceFragment(new MealLogUFragment());
+                case R.id.userHomepage:
+                    replaceFragment(new userHomePageFragment());
                     break;
                 case R.id.recipe:
                     replaceFragment(new RecipesFolderFragment());
