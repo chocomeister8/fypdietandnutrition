@@ -23,7 +23,7 @@ public class userHomePageFragment extends Fragment {
         Button button_mealLog = view.findViewById(R.id.button_MealLog);
 //        Button button_diary = view.findViewById(R.id.diary);
         Button button_bmiCalculator = view.findViewById(R.id.bmiCalculator);
-//        Button button_consultation = view.findViewById(R.id.consultation);
+        Button button_consultation = view.findViewById(R.id.consultation);
         Button button_healthReport = view.findViewById(R.id.healthReport);
 //        Button button_faq = view.findViewById(R.id.FAQ);
         Button button_profile = view.findViewById(R.id.profile);
@@ -67,13 +67,13 @@ public class userHomePageFragment extends Fragment {
                     .commit();
         });
 
-//        button_consultation.setOnClickListener(v -> {
-//            // Replace current fragment with NavConsultationFragment
-//            requireActivity().getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.frame_layout, new NavConsultationFragment())
-//                    .addToBackStack(null)
-//                    .commit();
-//        });
+        button_consultation.setOnClickListener(v -> {
+           // Replace current fragment with NavConsultationFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, new ConsultationsUFragment())
+                .addToBackStack(null)
+                .commit();
+        });
 
         button_healthReport.setOnClickListener(v -> {
             // Replace current fragment with NavHealthReportFragment

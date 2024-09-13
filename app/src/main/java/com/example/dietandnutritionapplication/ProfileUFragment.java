@@ -1,6 +1,7 @@
 package com.example.dietandnutritionapplication;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -57,6 +61,15 @@ public class ProfileUFragment extends Fragment {
 
         // Date Picker for Date of Birth
         dateOfBirthData.setOnClickListener(v -> showDatePickerDialog());
+
+        ImageView logoutImage = view.findViewById(R.id.logout_icon);
+        logoutImage.setOnClickListener(v -> {
+            // Switch to guest mode (for nutritionists as guests)
+            if (getActivity() instanceof MainActivity) {
+                Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+            }
+        });
 
         return view;
     }
@@ -139,4 +152,6 @@ public class ProfileUFragment extends Fragment {
         // For now, we just print the profile data
         System.out.println(userProfile.toString());
     }
+
+
 }

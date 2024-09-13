@@ -3,9 +3,13 @@
     <style name="Base.Theme.DietAndNutritionApplication" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="colorPrimary">@color/lavender</item>
+        <item name="colorPrimary">@color/grey</item>
         <item name="colorPrimaryVariant">@color/lavender</item>
+        <!-- Set the app background color or drawable -->
+        <item name="android:windowBackground">@color/white</item>
     </style>
+
+
 
     <style name="Theme.DietAndNutritionApplication" parent="Base.Theme.DietAndNutritionApplication" />
 </resources>
