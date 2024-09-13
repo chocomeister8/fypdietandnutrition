@@ -22,13 +22,20 @@ import java.util.TimeZone;
 
 public class MealLogUFragment extends Fragment {
 
+    private int totalCarbs = 0;
+    private int totalProteins = 0;
+    private int totalFats = 0;
+
+    private int totalCalories = 1500;
+    private int remainingCalories = totalCalories;
+
     private TextView calorieTextView;
+    private TextView carbsTextView, proteinsTextView, fatsTextView;
     private LinearLayout breakfastImageContainer;
     private LinearLayout lunchImageContainer;
     private LinearLayout dinnerImageContainer;
     private LinearLayout snackImageContainer;
     private ImageView cameraIcon;
-
 
     private TextView dateTextView;
     private Calendar calendar = Calendar.getInstance();
@@ -45,18 +52,17 @@ public class MealLogUFragment extends Fragment {
         snackImageContainer = view.findViewById(R.id.snackImageContainer);
         calorieTextView = view.findViewById(R.id.progress_calorielimit);
 
+        // Initialize TextViews for macronutrients
+        carbsTextView = view.findViewById(R.id.carbohydrates_value);
+        proteinsTextView = view.findViewById(R.id.proteins_value);
+        fatsTextView = view.findViewById(R.id.fats_value);
+
         dateTextView = view.findViewById(R.id.dateTextView);
 
         // Set today's date by default
         updateDateTextView(calendar);
 
         dateTextView.setOnClickListener(v -> showDatePickerDialog());
-
-
-        CardView cardViewBreakfast = view.findViewById(R.id.breakfastCard);
-        CardView cardViewLunch = view.findViewById(R.id.lunchCard);
-        CardView cardViewDinner = view.findViewById(R.id.dinnerCard);
-        CardView cardViewSnack = view.findViewById(R.id.snackCard);
 
         cameraIcon = view.findViewById(R.id.camera_icon);
 
@@ -107,12 +113,25 @@ public class MealLogUFragment extends Fragment {
         // Dummy meal data
         String mealName = "Chicken Chop";
         int mealCalories = 500;
+        int carbs = 30;
+        int proteins = 40;
+        int fats = 15;
 
-        // Dummy total calorie count
-        int totalCalories = 1500; // You can set this to any number you want for testing
+        remainingCalories -= mealCalories;
+        if (remainingCalories >= 0) {
+            calorieTextView.setText("Remaining:\n" + remainingCalories + " Cal");
+        } else {
+            int exceededBy = Math.abs(remainingCalories);
+            calorieTextView.setText("Exceeded by\n " + exceededBy + " Cal");
+            calorieTextView.setTextSize(14);
+        }
+        totalCarbs += carbs;
+        totalProteins += proteins;
+        totalFats += fats;
 
-        // Update calorieTextView with the dummy total calories
-        calorieTextView.setText("Remaining:\n" + totalCalories + " Cal");
+        carbsTextView.setText(totalCarbs + "g");
+        proteinsTextView.setText(totalProteins + "g");
+        fatsTextView.setText(totalFats + "g");
 
         // Get the current time
         Calendar calendar = Calendar.getInstance();
