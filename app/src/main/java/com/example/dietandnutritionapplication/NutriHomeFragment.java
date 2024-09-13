@@ -1,6 +1,5 @@
 package com.example.dietandnutritionapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +28,7 @@ public class NutriHomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nutri_dashboard, container, false);
+        View view = inflater.inflate(R.layout.nutri_homepage, container, false);
 
         // Initialize UI elements
         logoutImageView = view.findViewById(R.id.right_icon);
@@ -55,9 +54,9 @@ public class NutriHomeFragment extends Fragment {
         // Logout action
         logoutImageView.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getActivity(), Login.class);
-            startActivity(intent);
-            getActivity().finish();
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+            }
         });
 
         return view;

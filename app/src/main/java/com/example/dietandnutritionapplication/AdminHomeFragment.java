@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +25,7 @@ public class AdminHomeFragment extends Fragment {
 
         ImageView logoutImage = view.findViewById(R.id.right_icon);
         logoutImage.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
             // Switch to guest mode (for nutritionists as guests)
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
