@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     public void switchToNutriMode() {
         isAdminMode = false;
         setupNutriNavigation();
-        replaceFragment(new LandingFragment());
+        replaceFragment(new NutriHomeFragment());
     }
 
     private void setupAdminNavigation() {
