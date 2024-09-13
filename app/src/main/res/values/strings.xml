@@ -36,4 +36,10 @@
         <item>Moderate</item>
         <item>High</item>
     </string-array>
+
+    <string-array name="specializations_array">
+        <item>Sports Nutritionist</item>
+        <item>General Nutritionist</item>
+        <!-- Add more items as needed -->
+    </string-array>
 </resources>
