@@ -29,6 +29,10 @@
         <activity android:name=".AdminHomeFragment"/>
         <activity android:name=".FAQFragment"/>
         <activity android:name=".ProfileAFragment"/>
+        <activity android:name=".NutriUpdateProfilePage"/>
+        <activity android:name=".NutriHomeFragment"/>
+        <activity android:name=".BookingConsultationsFragment"/>
+
 
     </application>
 

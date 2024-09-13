@@ -1,9 +1,12 @@
 package com.example.dietandnutritionapplication;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,24 +16,39 @@ import androidx.fragment.app.Fragment;
 
 public class NutriViewProfileFragment extends Fragment {
     private TextView nameTextView, bioTextView;
+    private Button updateButton;
     private ViewNutriProfileController viewController;
+    private UpdateNutriProfileController updateController;
+    private NutriAccount nutriAccount;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_nutri_view_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_nprofile, container, false);
 
-        // Initialize the TextViews
-        nameTextView = view.findViewById(R.id.nameTextView);
-        bioTextView = view.findViewById(R.id.bioTextView);
+        // Initialize the TextViews and Button
+        nameTextView = view.findViewById(R.id.textView);
+        bioTextView = view.findViewById(R.id.textView5);
+        updateButton = view.findViewById(R.id.button);
 
-        // Initialize controller and account
-        NutriAccount nutriAccount = new NutriAccount();
+        // Initialize account and controllers
+        nutriAccount = new NutriAccount();
         viewController = new ViewNutriProfileController(nutriAccount);
+        updateController = new UpdateNutriProfileController(nutriAccount);
 
         // Load the profile data
         loadProfile();
+
+        // Set OnClickListener for the update button
+        // Inside NutriViewProfileFragment
+
+        updateButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), NutriUpdateProfilePage.class);
+            startActivity(intent);
+        });
+
+
 
         return view;
     }

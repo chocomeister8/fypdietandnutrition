@@ -225,8 +225,8 @@ public class MainActivity extends AppCompatActivity {
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
-                case R.id.landing:
-                    replaceFragment(new LandingFragment());
+                case R.id.nutriHome:
+                    replaceFragment(new NutriHomeFragment());
                     break;
                 case R.id.recipe:
                     replaceFragment(new RecipesFolderFragment());
@@ -234,9 +234,9 @@ public class MainActivity extends AppCompatActivity {
 //                case R.id.addRecipe: // Handle Add Recipe fragment
 //                    replaceFragment(new AddRecipeFragment());
 //                    break;
-//                case R.id.bookingPage:
-//                    replaceFragment(new BookingFragment());
-//                    break;
+                case R.id.bookingPage:
+                    replaceFragment(new BookingConsultationsFragment());
+                    break;
                 case R.id.NutriViewProfile:
                     replaceFragment(new NutriViewProfileFragment());
                     break;

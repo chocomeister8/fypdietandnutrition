@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -36,30 +37,20 @@ public class NutriUpdateProfilePage extends AppCompatActivity {
         NutriAccount nutriAccount = new NutriAccount();
         updateProfileController = new UpdateNutriProfileController(nutriAccount);
 
+        // Retrieve and set data if available
+        Intent intent = getIntent();
+        if (intent != null) {
+            String currentName = intent.getStringExtra("currentName");
+            String currentBio = intent.getStringExtra("currentBio");
+            // Set these to EditText fields
+            nameEditText.setText(currentName);
+            bioEditText.setText(currentBio);
+            // Handle other fields similarly
+        }
+
         // Set onClickListeners
         saveButton.setOnClickListener(v -> saveProfile());
         discardButton.setOnClickListener(v -> showDiscardConfirmationDialog());
-    }
-
-    private void saveProfile() {
-        String firstName = nameEditText.getText().toString();
-        String education = educationEditText.getText().toString();
-        String contactInfo = contactInfoEditText.getText().toString();
-        String expertise = expertiseEditText.getText().toString();
-        String bio = bioEditText.getText().toString();
-
-        // Convert profile image view to drawable (placeholder)
-        BitmapDrawable drawable = (BitmapDrawable) profileImageView.getDrawable();
-        Bitmap profilePicture = drawable.getBitmap();
-
-        boolean success = updateProfileController.updateProfile(firstName, education, contactInfo, expertise, bio, profilePicture);
-
-        if (success) {
-            Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-            // Optionally navigate to another activity or clear fields
-        } else {
-            Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void showDiscardConfirmationDialog() {
@@ -74,4 +65,62 @@ public class NutriUpdateProfilePage extends AppCompatActivity {
                 //.setBackgroundDrawableResource(R.color.transparent_background) // Set background transparency
                 .show();
     }
+
+
+    private void saveProfile() {
+        if (!validateInputs()) {
+            return;
+        }
+
+        // Get the user's email from the intent (or wherever you store it)
+        Intent intent = getIntent();
+        String email = intent.getStringExtra("email");
+
+        String firstName = nameEditText.getText().toString();
+        String education = educationEditText.getText().toString();
+        String contactInfo = contactInfoEditText.getText().toString();
+        String expertise = expertiseEditText.getText().toString();
+        String bio = bioEditText.getText().toString();
+
+        BitmapDrawable drawable = (BitmapDrawable) profileImageView.getDrawable();
+        Bitmap profilePicture = drawable.getBitmap();
+
+        try {
+            boolean success = updateProfileController.updateProfile(email, firstName, education, contactInfo, expertise, profilePicture, bio);
+            if (success) {
+                Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+
+                // Create an intent to return the updated profile data
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("updatedName", firstName);
+                resultIntent.putExtra("updatedBio", bio);
+                // Add other updated fields as needed
+                setResult(RESULT_OK, resultIntent); // Set result code and data
+                finish(); // Close this activity
+            } else {
+                Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "An error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private boolean validateInputs() {
+        if (nameEditText.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (educationEditText.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Education cannot be empty", Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (expertiseEditText.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Expertise cannot be empty", Toast.LENGTH_SHORT).show();
+            return false;
+
+        }
+
+
+        return true;
+    }
 }
+
