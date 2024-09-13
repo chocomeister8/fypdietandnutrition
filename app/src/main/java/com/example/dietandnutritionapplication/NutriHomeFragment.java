@@ -32,6 +32,9 @@ public class NutriHomeFragment extends Fragment {
 
         // Initialize UI elements
         logoutImageView = view.findViewById(R.id.right_icon);
+        Button button_recipes = view.findViewById(R.id.button_recipes);
+        Button button_consultation = view.findViewById(R.id.consultation);
+        Button button_profile = view.findViewById(R.id.profile);
         bookingsRecyclerView = view.findViewById(R.id.bookings_recycler_view);
         addBookingButton = view.findViewById(R.id.add_booking_button);
 
@@ -57,6 +60,30 @@ public class NutriHomeFragment extends Fragment {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
             }
+        });
+
+        button_recipes.setOnClickListener(v -> {
+            // Replace current fragment with NavAllRecipesFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new RecipesFolderFragment())
+                    .addToBackStack(null)  // Add to back stack to enable back navigation
+                    .commit();
+        });
+
+//        button_consultation.setOnClickListener(v -> {
+//            // Replace current fragment with NavConsultationFragment
+//            requireActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame_layout, new ConsultationsNFragment())
+//                    .addToBackStack(null)
+//                    .commit();
+//        });
+
+        button_profile.setOnClickListener(v -> {
+            // Replace current fragment with NavProfileFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ProfileNFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
 
         return view;

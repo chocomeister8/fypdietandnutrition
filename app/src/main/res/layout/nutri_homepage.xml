@@ -28,13 +28,14 @@
             android:layout_marginTop="20dp"
             android:textSize="20sp"
             android:text="Homepage"/>
+
         <ImageView
+            android:id="@+id/right_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/right_icon"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/baseline_menu_24"/>
+            android:src="@drawable/baseline_logout_24" />
     </RelativeLayout>
 
     <TextView
@@ -227,7 +228,7 @@
                         android:id="@+id/proteins_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5"
+                        android:text="3"
                         android:textAlignment="center"
                         android:textColor="@android:color/black"
                         android:textSize="16sp" />
