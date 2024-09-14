@@ -27,7 +27,7 @@
             android:textStyle="bold"
             android:layout_marginTop="20dp"
             android:textSize="20sp"
-            android:text="Homepage"/>
+            android:text="Home Page"/>
 
         <ImageView
             android:id="@+id/right_icon"
