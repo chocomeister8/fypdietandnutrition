@@ -51,8 +51,11 @@ public class NutriHomeFragment extends Fragment {
 
         // Add booking button (prototype action)
         addBookingButton.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Feature Coming Soon", Toast.LENGTH_SHORT).show();
-        });
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ConsultationNFragment())
+                    .addToBackStack(null)
+                    .commit();
+            });
 
         // Logout action
         logoutImageView.setOnClickListener(v -> {
