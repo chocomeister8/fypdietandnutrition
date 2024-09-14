@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new RecipesFolderFragment());
                     break;
                 case R.id.consultations:
-                    replaceFragment(new ConsultationsUFragment());
+//                    replaceFragment(new ConsultationsUFragment());
                     break;
                 case R.id.profile:
                     replaceFragment(new ProfileUFragment());
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.recipe:
                     replaceFragment(new RecipesFolderFragment());
                     break;
-//                case R.id.addRecipe: // Handle Add Recipe fragment
+//                case R.id.addRecipe: // Link API
 //                    replaceFragment(new AddRecipeFragment());
 //                    break;
                 case R.id.bookingPage:

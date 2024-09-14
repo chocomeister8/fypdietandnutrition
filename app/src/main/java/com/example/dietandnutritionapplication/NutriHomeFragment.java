@@ -70,13 +70,13 @@ public class NutriHomeFragment extends Fragment {
                     .commit();
         });
 
-//        button_consultation.setOnClickListener(v -> {
-//            // Replace current fragment with NavConsultationFragment
-//            requireActivity().getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.frame_layout, new ConsultationsNFragment())
-//                    .addToBackStack(null)
-//                    .commit();
-//        });
+        button_consultation.setOnClickListener(v -> {
+            // Replace current fragment with NavConsultationFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ConsultationNFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         button_profile.setOnClickListener(v -> {
             // Replace current fragment with NavProfileFragment

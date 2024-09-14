@@ -18,16 +18,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookingConsultationsFragment extends Fragment {
+public class PendingConsultationsFragment extends Fragment {
 
-    private RecyclerView bookingConsultationsRecyclerView;
+    private RecyclerView pendingConsultationsRecyclerView;
     private List<Consultation> consultationList;
 
     @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_booking_consultations, container, false);
+        View view = inflater.inflate(R.layout.fragment_pending_consultations, container, false);
 
         // Initialize buttons
         Button button_booking_history = view.findViewById(R.id.booking_history);
@@ -35,24 +35,23 @@ public class BookingConsultationsFragment extends Fragment {
         Button button_pendingConsultation = view.findViewById(R.id.pending_consultation);
 
         // Initialize RecyclerView
-        bookingConsultationsRecyclerView = view.findViewById(R.id.booking_consultation_recycler_view);
-        bookingConsultationsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        pendingConsultationsRecyclerView = view.findViewById(R.id.pending_consultation_recycler_view);
+        pendingConsultationsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Hardcoded data for the prototype
         consultationList = new ArrayList<>();
-        consultationList.add(new Consultation("6 Oct 2024 (Sun), 3:30 PM", "Ms. Tee Zhi Xi", "Confirmed"));
-        consultationList.add(new Consultation("20 Nov 2024 (Sun), 7:30 PM", "Mr. Goh Xiao Ming", "Confirmed"));
-        consultationList.add(new Consultation("17 Nov 2024 (Sun), 4:30 PM", "Mr. Alex", "Confirmed"));
-        consultationList.add(new Consultation("8 Dec 2024 (Sun), 10:30 AM", "Ms. Vivian", "Confirmed"));
+        consultationList.add(new Consultation("1 Oct 2024 (Tue), 10:00 AM", "Mr. John Doe", "Pending"));
+        consultationList.add(new Consultation("15 Oct 2024 (Tue), 2:00 PM", "Ms. Jane Smith", "Pending"));
+        consultationList.add(new Consultation("22 Oct 2024 (Tue), 4:00 PM", "Mr. Michael Lee", "Pending"));
 
         // Set up adapter
-        BookingConsultationsAdapter adapter = new BookingConsultationsAdapter(consultationList);
-        bookingConsultationsRecyclerView.setAdapter(adapter);
+        PendingConsultationsAdapter adapter = new PendingConsultationsAdapter(consultationList);
+        pendingConsultationsRecyclerView.setAdapter(adapter);
 
         button_booking_history.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout, new BookingConsultationsFragment())
-                    .addToBackStack(null)  // Add to back stack to enable back navigation
+                    .addToBackStack(null)
                     .commit();
         });
 
@@ -65,15 +64,13 @@ public class BookingConsultationsFragment extends Fragment {
 
         button_pendingConsultation.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new PendingConsultationsFragment())
+                    .replace(R.id.frame_layout, new BookingConsultationsFragment())
                     .addToBackStack(null)
                     .commit();
         });
 
-
         return view;
     }
-
 
     // Consultation data model
     private static class Consultation {
@@ -89,10 +86,10 @@ public class BookingConsultationsFragment extends Fragment {
     }
 
     // RecyclerView Adapter
-    private static class BookingConsultationsAdapter extends RecyclerView.Adapter<BookingConsultationsAdapter.ConsultationViewHolder> {
+    private static class PendingConsultationsAdapter extends RecyclerView.Adapter<PendingConsultationsAdapter.ConsultationViewHolder> {
         private final List<Consultation> consultations;
 
-        public BookingConsultationsAdapter(List<Consultation> consultations) {
+        public PendingConsultationsAdapter(List<Consultation> consultations) {
             this.consultations = consultations;
         }
 
