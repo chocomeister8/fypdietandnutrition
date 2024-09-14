@@ -108,8 +108,8 @@ public class ProfileUFragment extends Fragment {
         emailAddressData.setText(profile.getEmail());
         healthGoalsData.setText("Lose Weight");
         dailyCalorieLimitData.setText("2000");
-        currentWeightData.setText("70 kg");
-        currentHeightData.setText("175 cm");
+        currentWeightData.setText("70");
+        currentHeightData.setText("175");
 
         // Set Spinner selections
         setSpinnerSelection(genderSpinner, profile.getGender());

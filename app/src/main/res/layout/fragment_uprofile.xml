@@ -209,12 +209,26 @@
                 android:layout_height="wrap_content"
                 android:text="Current Weight"
                 android:textStyle="bold" />
-            <EditText
-                android:id="@+id/current_weight_data"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Current Weight"
-                android:text="70 kg" />
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/current_weight_data"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Current Weight"
+                    android:inputType="numberDecimal"
+                    android:text="70" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="kg"
+                    android:layout_gravity="center_vertical" />
+            </LinearLayout>
 
             <!-- Current Height -->
             <TextView
@@ -222,12 +236,26 @@
                 android:layout_height="wrap_content"
                 android:text="Current Height"
                 android:textStyle="bold" />
-            <EditText
-                android:id="@+id/current_height_data"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Current Height"
-                android:text="175 cm" />
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/current_height_data"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Current Height"
+                    android:inputType="numberDecimal"
+                    android:text="175" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="cm"
+                    android:layout_gravity="center_vertical" />
+            </LinearLayout>
 
             <!-- Activity Level Dropdown -->
             <TextView
