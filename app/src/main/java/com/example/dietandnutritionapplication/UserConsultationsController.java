@@ -30,26 +30,30 @@ public class UserConsultationsController extends ArrayAdapter<Nutritionist> {
 
         // Get the data item for this position
         Nutritionist nutritionist = getItem(position);
-
-        // Lookup view for data population
         ImageView profilePicture = convertView.findViewById(R.id.profile_picture);
         TextView name = convertView.findViewById(R.id.nutritionist_name);
         RatingBar rating = convertView.findViewById(R.id.nutritionist_rating);
         TextView info = convertView.findViewById(R.id.nutritionist_info);
 
-        // Populate the data into the template view using the data object
         if (nutritionist != null) {
             name.setText(nutritionist.getName());
-            rating.setRating(getRatingFromExpertise(nutritionist.getExpertise())); // Method to convert expertise to rating
+            rating.setRating(getRatingFromExpertise(nutritionist.getExpertise()));
             info.setText(nutritionist.getBio());
 
-            // You can set the profile picture if available
-            // profilePicture.setImageBitmap(nutritionist.getProfilePicture());
+            // Set the profile picture
+            if (nutritionist.getProfilePicture() != null) {
+                profilePicture.setImageBitmap(nutritionist.getProfilePicture());
+            } else {
+                // Handle case where profilePicture is null (optional)
+                profilePicture.setImageResource(R.drawable.profile); // Placeholder image
+            }
         }
 
-        // Return the completed view to render on screen
-        return convertView;
-    }
+
+            // Return the completed view to render on screen
+            return convertView;
+        }
+
 
     // Example method to convert expertise to rating (customize as needed -)
     private float getRatingFromExpertise(String expertise) {

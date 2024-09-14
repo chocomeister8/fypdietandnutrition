@@ -1,9 +1,12 @@
 package com.example.dietandnutritionapplication;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -33,14 +36,15 @@ public class ConsultationsUFragment extends Fragment {
 
         // Initialize the list of nutritionists
         nutritionistList = new ArrayList<>();
+        Bitmap janeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
+        Bitmap johnBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
         // Add dummy data (replace with real data source)
-        nutritionistList.add(new Nutritionist("jane.doe@example.com", "Dr. Jane Doe", "PhD in Nutrition", "123-456-7890", "Weight Loss", "Experienced nutritionist specializing in weight loss.", null));
-        nutritionistList.add(new Nutritionist("john.doe@example.com", "Dr. John Doe", "MSc in Dietetics", "987-654-3210", "Sports Nutrition", "Expert in sports nutrition and diet planning.", null));
+        nutritionistList.add(new Nutritionist("jane.doe@example.com", "Dr. Jane Doe", "PhD in Nutrition", "123-456-7890", "Weight Loss", "Experienced nutritionist specializing in weight loss.", janeBitmap));
+        nutritionistList.add(new Nutritionist("john.doe@example.com", "Dr. John Doe", "MSc in Dietetics", "987-654-3210", "Sports Nutrition", "Expert in sports nutrition and diet planning.", johnBitmap));
 
         // Set up the adapter
-
-        /*adapter = new UserConsultationsController(getActivity(), nutritionistList);
-        nutritionistListView.setAdapter(adapter);*/
+        UserConsultationsController adapter = new UserConsultationsController(getActivity(), nutritionistList);
+        nutritionistListView.setAdapter(adapter);
 
         // Handle item clicks
         nutritionistListView.setOnItemClickListener((parent, view1, position, id) -> {
