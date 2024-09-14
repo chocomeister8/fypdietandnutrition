@@ -269,7 +269,10 @@
                 android:id="@+id/add_booking_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add New Booking" />
+                android:text="Add New Booking"
+                android:background="@color/lightGreen"
+                android:textColor="@color/black"
+                />
         </LinearLayout>
 
         <!-- Empty Row 4 -->

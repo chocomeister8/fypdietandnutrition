@@ -20,7 +20,7 @@ public class CreateNProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_profile);
+        setContentView(R.layout.nutri_create_profile);
 
         // Initialize views
         nameEditText = findViewById(R.id.nameEditText);

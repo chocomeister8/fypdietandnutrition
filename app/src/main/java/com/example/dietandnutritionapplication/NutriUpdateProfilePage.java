@@ -21,7 +21,7 @@ public class NutriUpdateProfilePage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_update_profile);
+        setContentView(R.layout.nutri_update_profile);
 
         // Initialize views
         nameEditText = findViewById(R.id.nameEditText);
