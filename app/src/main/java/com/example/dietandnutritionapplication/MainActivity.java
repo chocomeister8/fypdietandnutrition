@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new RecipesFolderFragment());
                     break;
                 case R.id.consultations:
-//                    replaceFragment(new ConsultationsUFragment());
+                    replaceFragment(new ConsultationsUFragment());
                     break;
                 case R.id.profile:
                     replaceFragment(new ProfileUFragment());
