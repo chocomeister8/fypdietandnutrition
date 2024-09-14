@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,11 +60,24 @@ public class NutriHomeFragment extends Fragment {
 
         // Logout action
         logoutImageView.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
-            }
+            // Create an AlertDialog to confirm logout
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Confirm Logout")
+                    .setMessage("Are you sure you want to log out?")
+                    .setPositiveButton("Log out", (dialog, which) -> {
+                        // User confirmed to log out
+                        Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        // User cancelled the logout action
+                        dialog.dismiss();
+                    })
+                    .show();
         });
+
 
         button_recipes.setOnClickListener(v -> {
             // Replace current fragment with NavAllRecipesFragment
