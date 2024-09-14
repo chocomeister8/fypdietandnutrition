@@ -11,14 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookingConsultationsFragment extends Fragment {
+public class BookingHistoryFragment extends Fragment {
 
     private RecyclerView bookingConsultationsRecyclerView;
     private List<Consultation> consultationList;
@@ -51,7 +50,7 @@ public class BookingConsultationsFragment extends Fragment {
 
         button_booking_history.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BookingConsultationsFragment())
+                    .replace(R.id.frame_layout, new BookingHistoryFragment())
                     .addToBackStack(null)  // Add to back stack to enable back navigation
                     .commit();
         });

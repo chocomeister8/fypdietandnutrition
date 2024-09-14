@@ -1,8 +1,6 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -246,13 +244,13 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new NutriHomeFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new RecipesFolderFragment());
+                    replaceFragment(new NutriRecipesFolderFragment());
                     break;
 //                case R.id.addRecipe: // Link API
 //                    replaceFragment(new AddRecipeFragment());
 //                    break;
                 case R.id.bookingPage:
-                    replaceFragment(new BookingConsultationsFragment());
+                    replaceFragment(new BookingHistoryFragment());
                     break;
                 case R.id.NutriViewProfile:
                     replaceFragment(new NutriViewProfileFragment());

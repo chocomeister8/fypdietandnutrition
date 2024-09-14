@@ -100,7 +100,7 @@ public class ConsultationNFragment extends Fragment {
 
         button_booking_history.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BookingConsultationsFragment())
+                    .replace(R.id.frame_layout, new BookingHistoryFragment())
                     .addToBackStack(null)  // Add to back stack to enable back navigation
                     .commit();
         });
@@ -114,7 +114,7 @@ public class ConsultationNFragment extends Fragment {
 
         button_pendingConsultation.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BookingConsultationsFragment())
+                    .replace(R.id.frame_layout, new BookingHistoryFragment())
                     .addToBackStack(null)
                     .commit();
         });

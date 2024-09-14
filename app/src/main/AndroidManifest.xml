@@ -31,7 +31,7 @@
         <activity android:name=".ProfileAFragment"/>
         <activity android:name=".NutriUpdateProfilePage"/>
         <activity android:name=".NutriHomeFragment"/>
-        <activity android:name=".BookingConsultationsFragment"/>
+        <activity android:name=".BookingHistoryFragment"/>
 
 
     </application>

@@ -11,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -50,7 +49,7 @@ public class PendingConsultationsFragment extends Fragment {
 
         button_booking_history.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BookingConsultationsFragment())
+                    .replace(R.id.frame_layout, new BookingHistoryFragment())
                     .addToBackStack(null)
                     .commit();
         });
@@ -64,7 +63,7 @@ public class PendingConsultationsFragment extends Fragment {
 
         button_pendingConsultation.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BookingConsultationsFragment())
+                    .replace(R.id.frame_layout, new BookingHistoryFragment())
                     .addToBackStack(null)
                     .commit();
         });
