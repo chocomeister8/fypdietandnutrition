@@ -25,21 +25,18 @@ android {
             )
         }
     }
+
     buildFeatures {
-        viewBinding = true;
+        viewBinding = true
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
-    buildFeatures{
-        viewBinding = true
-    }
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -49,6 +46,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(libs.mpandroidchart)
 
+    // MPAndroidChart library
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
