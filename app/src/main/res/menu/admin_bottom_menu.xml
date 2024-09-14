@@ -5,7 +5,8 @@
         android:title="Home"
         android:icon="@drawable/ic_baseline_home_24"
         android:id="@+id/adminhome"/>
-    <item android:title="Accounts"
+    <item
+        android:title="Accounts"
         android:icon="@drawable/ic_baseline_view_accounts_24"
         android:id="@+id/viewallaccounts"/>
     <item

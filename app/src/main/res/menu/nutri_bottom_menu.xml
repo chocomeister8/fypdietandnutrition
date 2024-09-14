@@ -4,7 +4,8 @@
         android:title="Home"
         android:icon="@drawable/ic_baseline_home_24"
         android:id="@+id/nutriHome"/>
-    <item android:title="Recipe"
+    <item
+        android:title="Recipe"
         android:icon="@drawable/baseline_recipes_24"
         android:id="@+id/recipe"/>
     <item

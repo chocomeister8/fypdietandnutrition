@@ -1,6 +1,8 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,11 +75,25 @@ public class MainActivity extends AppCompatActivity {
         user1.setPassword("123");
         user1.setRole("user");
         accountArray.add(user1);
+
+        User user2 = new User();
+        user2.setUsername("zero");
+        user2.setPassword("123");
+        user2.setRole("user");
+        accountArray.add(user2);
+
+        User user3 = new User();
+        user3.setUsername("ally");
+        user3.setPassword("123");
+        user3.setRole("user");
+        accountArray.add(user3);
+
         Admin admin1 = new Admin();
         admin1.setUsername("admin");
         admin1.setPassword("admin123");
         admin1.setRole("admin");
         accountArray.add(admin1);
+
         Nutritionist nutritionist1 = new Nutritionist();
         nutritionist1.setUsername("sim");
         nutritionist1.setPassword("123");
@@ -198,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setBackground(null);
         binding.bottomNavigationView.getMenu().clear();
         binding.bottomNavigationView.inflateMenu(R.menu.guest_bottom_menu);
+
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {

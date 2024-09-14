@@ -5,7 +5,8 @@
         android:title="HomePage"
         android:icon="@drawable/baseline_meal_24"
         android:id="@+id/userHomepage"/>
-    <item android:title="Recipes"
+    <item
+        android:title="Recipes"
         android:icon="@drawable/baseline_recipes_24"
         android:id="@+id/recipe"/>
     <item
