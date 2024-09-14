@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 
 public class NutriViewProfileFragment extends Fragment {
     private TextView nameTextView, bioTextView;
-    private Button updateButton;
     private ViewNutriProfileController viewController;
     private UpdateNutriProfileController updateController;
     private NutriAccount nutriAccount;
@@ -29,8 +28,8 @@ public class NutriViewProfileFragment extends Fragment {
 
         // Initialize the TextViews and Button
         nameTextView = view.findViewById(R.id.textView);
-        bioTextView = view.findViewById(R.id.textView5);
-        updateButton = view.findViewById(R.id.button);
+        bioTextView = view.findViewById(R.id.textView6);
+        Button button_update = view.findViewById(R.id.button);
 
         // Initialize account and controllers
         nutriAccount = new NutriAccount();
@@ -42,10 +41,12 @@ public class NutriViewProfileFragment extends Fragment {
 
         // Set OnClickListener for the update button
         // Inside NutriViewProfileFragment
-
-        updateButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), NutriUpdateProfilePage.class);
-            startActivity(intent);
+        button_update.setOnClickListener(v -> {
+            // Replace current fragment with NavProfileFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NutriUpdateProfilePage())
+                    .addToBackStack(null)
+                    .commit();
         });
 
 

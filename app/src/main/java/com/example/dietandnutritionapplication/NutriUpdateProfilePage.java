@@ -1,47 +1,53 @@
 package com.example.dietandnutritionapplication;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
-public class NutriUpdateProfilePage extends AppCompatActivity {
+import org.jetbrains.annotations.Nullable;
+
+public class NutriUpdateProfilePage extends Fragment {
     private EditText nameEditText, educationEditText, contactInfoEditText, expertiseEditText, bioEditText;
     private ImageView profileImageView;
     private Button saveButton, discardButton;
     private UpdateNutriProfileController updateProfileController;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.nutri_update_profile);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.nutri_update_profile, container, false);
 
         // Initialize views
-        nameEditText = findViewById(R.id.nameEditText);
-        educationEditText = findViewById(R.id.educationEditText);
-        contactInfoEditText = findViewById(R.id.contactInfoEditText);
-        expertiseEditText = findViewById(R.id.expertiseEditText);
-        bioEditText = findViewById(R.id.bioEditText);
-        profileImageView = findViewById(R.id.profileImageView);
-        saveButton = findViewById(R.id.saveButton);
-        discardButton = findViewById(R.id.discardButton);
+        nameEditText = view.findViewById(R.id.nameEditText);
+        educationEditText = view.findViewById(R.id.educationEditText);
+        contactInfoEditText = view.findViewById(R.id.contactInfoEditText);
+        expertiseEditText = view.findViewById(R.id.expertiseEditText);
+        bioEditText = view.findViewById(R.id.bioEditText);
+        profileImageView = view.findViewById(R.id.profileImageView);
+        saveButton = view.findViewById(R.id.saveButton);
+        discardButton = view.findViewById(R.id.discardButton);
 
         // Initialize controller
         NutriAccount nutriAccount = new NutriAccount();
         updateProfileController = new UpdateNutriProfileController(nutriAccount);
 
         // Retrieve and set data if available
-        Intent intent = getIntent();
-        if (intent != null) {
-            String currentName = intent.getStringExtra("currentName");
-            String currentBio = intent.getStringExtra("currentBio");
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            String currentName = arguments.getString("currentName");
+            String currentBio = arguments.getString("currentBio");
             // Set these to EditText fields
             nameEditText.setText(currentName);
             bioEditText.setText(currentBio);
@@ -51,30 +57,31 @@ public class NutriUpdateProfilePage extends AppCompatActivity {
         // Set onClickListeners
         saveButton.setOnClickListener(v -> saveProfile());
         discardButton.setOnClickListener(v -> showDiscardConfirmationDialog());
+
+        return view;
     }
 
     private void showDiscardConfirmationDialog() {
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(requireContext())
                 .setTitle("Discard Changes")
                 .setMessage("Are you sure you want to discard the changes you made?")
                 .setPositiveButton("Discard", (dialog, which) -> {
                     // Optionally navigate back or clear fields
-                    finish(); // Close the activity
+                    requireActivity().getSupportFragmentManager().popBackStack(); // Go back to previous fragment
                 })
                 .setNegativeButton("Cancel", null) // Do nothing
                 //.setBackgroundDrawableResource(R.color.transparent_background) // Set background transparency
                 .show();
     }
 
-
     private void saveProfile() {
         if (!validateInputs()) {
             return;
         }
 
-        // Get the user's email from the intent (or wherever you store it)
-        Intent intent = getIntent();
-        String email = intent.getStringExtra("email");
+        // Get the user's email from the arguments
+        Bundle arguments = getArguments();
+        String email = arguments != null ? arguments.getString("email") : "";
 
         String firstName = nameEditText.getText().toString();
         String education = educationEditText.getText().toString();
@@ -83,44 +90,40 @@ public class NutriUpdateProfilePage extends AppCompatActivity {
         String bio = bioEditText.getText().toString();
 
         BitmapDrawable drawable = (BitmapDrawable) profileImageView.getDrawable();
-        Bitmap profilePicture = drawable.getBitmap();
+        Bitmap profilePicture = drawable != null ? drawable.getBitmap() : null;
 
         try {
             boolean success = updateProfileController.updateProfile(email, firstName, education, contactInfo, expertise, profilePicture, bio);
             if (success) {
-                Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
 
-                // Create an intent to return the updated profile data
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("updatedName", firstName);
-                resultIntent.putExtra("updatedBio", bio);
+                // Create a result intent to return updated profile data
+                Bundle result = new Bundle();
+                result.putString("updatedName", firstName);
+                result.putString("updatedBio", bio);
                 // Add other updated fields as needed
-                setResult(RESULT_OK, resultIntent); // Set result code and data
-                finish(); // Close this activity
+                getParentFragmentManager().setFragmentResult("profileUpdate", result); // Use FragmentResult API
+                requireActivity().getSupportFragmentManager().popBackStack(); // Close this fragment
             } else {
-                Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Failed to update profile", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "An error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "An error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-
     private boolean validateInputs() {
         if (nameEditText.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Name cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Name cannot be empty", Toast.LENGTH_SHORT).show();
             return false;
         } else if (educationEditText.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Education cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Education cannot be empty", Toast.LENGTH_SHORT).show();
             return false;
         } else if (expertiseEditText.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Expertise cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Expertise cannot be empty", Toast.LENGTH_SHORT).show();
             return false;
-
         }
-
 
         return true;
     }
 }
-
