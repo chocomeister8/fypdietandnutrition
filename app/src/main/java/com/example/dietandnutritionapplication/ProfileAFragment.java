@@ -28,7 +28,6 @@ public class ProfileAFragment extends Fragment {
         emailTextView = view.findViewById(R.id.email);
         accountActiveSinceTextView = view.findViewById(R.id.accountActiveSince);
 
-        // Initialize profile (this would normally be passed from another activity or fetched from a database)
         adminProfile = new Admin("Weiss", "Low", "admin123", "81889009", "weiss@gmail.com", "Male", "admin", "11-09-2024");
 
         // Set data to TextViews
@@ -41,7 +40,6 @@ public class ProfileAFragment extends Fragment {
         accountActiveSinceTextView.setText(adminProfile.getDateJoined());
 
         Button updateProfileButton = view.findViewById(R.id.updateProfile);
-
         updateProfileButton.setOnClickListener(v -> {
             // Replace the current fragment with AccountsFragment
             FragmentManager fragmentManager = getParentFragmentManager();
@@ -53,4 +51,6 @@ public class ProfileAFragment extends Fragment {
 
         return view;
     }
+
+
 }

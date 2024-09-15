@@ -1,8 +1,8 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
+import android.util.Log;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -10,7 +10,16 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.example.dietandnutritionapplication.databinding.ActivityMainBinding;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.FirebaseApp;
+
 
 import java.util.ArrayList;
 
@@ -21,57 +30,13 @@ public class MainActivity extends AppCompatActivity {
     private boolean isAdminMode = false;
     private ArrayList<Profile> accountArray = new ArrayList<>();
     private ArrayList<FAQ> faqArray = new ArrayList<>();
-
-
-    public void createUserAccount(String firstname, String username, String dob, String email, String phNum, String gender, String password) {
-        User userCreate = new User();
-        userCreate.setFirstName(firstname);
-        userCreate.setUsername(username);
-        userCreate.setDob(dob);
-        userCreate.setEmail(email);
-        userCreate.setPhoneNumber(phNum);
-        userCreate.setGender(gender);
-        userCreate.setPassword(password);
-        accountArray.add(userCreate);
-    }
-
-    public void createFAQ(String title, String question, String answer, String dateCreated){
-        FAQ faqcreate = new FAQ();
-        faqcreate.setTitle(title);
-        faqcreate.setQuestion(question);
-        faqcreate.setAnswer(answer);
-        faqcreate.setDateCreated(dateCreated);
-        faqArray.add(faqcreate);
-    }
-
-    public void createAdminAccount(String firstname,String lastname,String username, String password,String phNum,String dob,String email,String gender, String role) {
-        Admin adminCreate = new Admin();
-        adminCreate.setUsername(username);
-        adminCreate.setPhoneNumber(phNum);
-        adminCreate.setPassword(password);
-        adminCreate.setRole(role);
-        adminCreate.setFirstName(firstname);
-        adminCreate.setLastName(lastname);
-        adminCreate.setDob(dob);
-        adminCreate.setEmail(email);
-        adminCreate.setGender(gender);
-        accountArray.add(adminCreate);
-    }
-
-    public ArrayList<Profile> getAccountArray() {
-        return accountArray;
-    }
-
-    public ArrayList<FAQ> getFAQArray() {
-
-        return faqArray;
-    }
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        EdgeToEdge.enable(this);
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
 
         User user1 = new User();
         user1.setUsername("zaw");
@@ -139,6 +104,75 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new LandingFragment());
 
     }
+
+    public Task<AuthResult> createUserAccount(String firstname, String username, String dob, String email, String phNum, String gender, String password) {
+        return mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Get the newly created user
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String userId = firebaseUser.getUid(); // Unique ID for the user
+
+                            // Create a new user object with additional fields
+                            User userCreate = new User();
+                            userCreate.setFirstName(firstname);
+                            userCreate.setUsername(username);
+                            userCreate.setDob(dob);
+                            userCreate.setEmail(email);
+                            userCreate.setPhoneNumber(phNum);
+                            userCreate.setGender(gender);
+                            userCreate.setPassword(password); // Ideally, don't store raw passwords!
+
+                            // Save additional user data to Firebase Realtime Database or Firestore
+                            // Example: Using Firebase Realtime Database
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
+                            databaseReference.child(userId).setValue(userCreate)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            // Data successfully saved
+                                            Log.d("Firebase", "User profile saved successfully");
+                                        } else {
+                                            // Handle failure
+                                            Log.e("Firebase", "Failed to save user profile");
+                                        }
+                                    });
+                        }
+                    }
+                });
+    }
+
+        public void createFAQ(String title, String question, String answer, String dateCreated){
+            FAQ faqcreate = new FAQ();
+            faqcreate.setTitle(title);
+            faqcreate.setQuestion(question);
+            faqcreate.setAnswer(answer);
+            faqcreate.setDateCreated(dateCreated);
+            faqArray.add(faqcreate);
+        }
+
+        public void createAdminAccount(String firstname,String lastname,String username, String password,String phNum,String dob,String email,String gender, String role) {
+            Admin adminCreate = new Admin();
+            adminCreate.setUsername(username);
+            adminCreate.setPhoneNumber(phNum);
+            adminCreate.setPassword(password);
+            adminCreate.setRole(role);
+            adminCreate.setFirstName(firstname);
+            adminCreate.setLastName(lastname);
+            adminCreate.setDob(dob);
+            adminCreate.setEmail(email);
+            adminCreate.setGender(gender);
+            accountArray.add(adminCreate);
+        }
+
+        public ArrayList<Profile> getAccountArray() {
+            return accountArray;
+        }
+
+        public ArrayList<FAQ> getFAQArray() {
+
+            return faqArray;
+        }
 
 
     public void switchToAdminMode() {

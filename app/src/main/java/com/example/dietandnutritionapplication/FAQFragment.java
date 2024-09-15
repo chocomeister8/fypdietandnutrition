@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
@@ -104,6 +105,17 @@ public class FAQFragment extends Fragment{
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // Do nothing if no item is selected
+            }
+        });
+
+        // Set the adapter to the ListView
+        FAQListView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        FAQListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show();
             }
         });
 
