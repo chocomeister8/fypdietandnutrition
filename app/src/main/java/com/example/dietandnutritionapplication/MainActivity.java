@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new userHomePageFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new RecipesFolderFragment());
+                    replaceFragment(new navCreateFolderFragment());
                     break;
                 case R.id.consultations:
                     replaceFragment(new ConsultationsUFragment());
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new LandingFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new RecipesFolderFragment());
+                    replaceFragment(new navCreateFolderFragment());
                     break;
                 case R.id.meallog:
                     replaceFragment(new MealLogPreviewFragment());
