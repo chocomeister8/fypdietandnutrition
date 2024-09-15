@@ -44,12 +44,17 @@ public class MainActivity extends AppCompatActivity {
         faqArray.add(faqcreate);
     }
 
-    public void createAdminAccount(String username, String phNum, String password, String role) {
+    public void createAdminAccount(String firstname,String lastname,String username, String password,String phNum,String dob,String email,String gender, String role) {
         Admin adminCreate = new Admin();
         adminCreate.setUsername(username);
         adminCreate.setPhoneNumber(phNum);
         adminCreate.setPassword(password);
         adminCreate.setRole(role);
+        adminCreate.setFirstName(firstname);
+        adminCreate.setLastName(lastname);
+        adminCreate.setDob(dob);
+        adminCreate.setEmail(email);
+        adminCreate.setGender(gender);
         accountArray.add(adminCreate);
     }
 

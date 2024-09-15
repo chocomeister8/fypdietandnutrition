@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 /**
@@ -19,8 +20,10 @@ import android.widget.TextView;
  */
 public class AddAdminFragment extends Fragment {
 
-    private EditText userNameEditText, passwordEditText, phoneEditText;
+    private EditText userNameEditText, passwordEditText, phoneEditText,firstNameAdmin,lastNameAdmin,email,dob;
     private Button addButton;
+    private RadioGroup radioGroupGender;
+    private RadioButton selectedRadioButton;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -70,6 +73,11 @@ public class AddAdminFragment extends Fragment {
         userNameEditText = view.findViewById(R.id.usernameEditText);
         passwordEditText = view.findViewById(R.id.passwordEditText);
         phoneEditText = view.findViewById(R.id.phoneEditText);
+        firstNameAdmin = view.findViewById(R.id.firstNameAdmin);
+        lastNameAdmin = view.findViewById(R.id.lastNameAdmin);
+        email = view.findViewById(R.id.email);
+        dob = view.findViewById(R.id.dob);
+        radioGroupGender = view.findViewById(R.id.radioGroupGender);
         addButton = view.findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +87,21 @@ public class AddAdminFragment extends Fragment {
                 String phone = phoneEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 String role = "Admin";
-                mainActivity.createAdminAccount(userName, phone, password, role);
+                String firstName = firstNameAdmin.getText().toString();
+                String lastName = lastNameAdmin.getText().toString();
+                String emailText = email.getText().toString();
+                String dobText = dob.getText().toString();
+                int selectedId = radioGroupGender.getCheckedRadioButtonId();
+                String selectedGender;
+                if (selectedId != -1) {  // Ensure a RadioButton is selected
+                    selectedRadioButton = view.findViewById(selectedId);
+                    selectedGender = selectedRadioButton.getText().toString();
+                } else {
+                    // Handle the case where no RadioButton is selected
+                    selectedGender = "Not selected";
+                }
+
+                mainActivity.createAdminAccount(firstName, lastName, userName, password,phone,dobText,emailText,selectedGender,role);
                 mainActivity.replaceFragment(new AdminHomeFragment());
             }
 
