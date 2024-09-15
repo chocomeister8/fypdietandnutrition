@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new LandingFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new navCreateFolderFragment());
+                    replaceFragment(new navGuestRecipesFolderFragment());
                     break;
                 case R.id.meallog:
                     replaceFragment(new MealLogPreviewFragment());
