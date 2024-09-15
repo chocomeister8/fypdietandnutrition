@@ -172,6 +172,20 @@
                 </LinearLayout>
 
                 <EditText
+                    android:id="@+id/dob"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="12dp"
+                    android:autofillHints="emailAddress"
+                    android:background="#E6E0E9"
+                    android:ems="10"
+                    android:hint="DOB:"
+                    android:inputType="textEmailAddress"
+                    android:singleLine="true"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+                <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
