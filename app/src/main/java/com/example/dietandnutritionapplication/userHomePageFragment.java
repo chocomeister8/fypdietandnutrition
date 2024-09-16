@@ -99,8 +99,6 @@ public class userHomePageFragment extends Fragment {
                     .commit();
         });
 
-
-
         return view;
     }
 }

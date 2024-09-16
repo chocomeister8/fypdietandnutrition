@@ -68,6 +68,7 @@ public class NutriHomeFragment extends Fragment {
                         // User confirmed to log out
                         Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                         if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).switchToGuestMode();
                             ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
                         }
                     })

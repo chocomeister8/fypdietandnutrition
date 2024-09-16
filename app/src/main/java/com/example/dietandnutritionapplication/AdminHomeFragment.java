@@ -141,6 +141,7 @@ public class AdminHomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                 // Switch to guest mode (for nutritionists as guests)
                 if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).switchToGuestMode();
                     ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
                 }
             });
