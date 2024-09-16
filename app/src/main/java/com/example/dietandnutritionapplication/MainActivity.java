@@ -1,7 +1,13 @@
 package com.example.dietandnutritionapplication;
 
+import static android.app.PendingIntent.getActivity;
+
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -16,10 +22,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.FirebaseApp;
-
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -31,12 +39,14 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Profile> accountArray = new ArrayList<>();
     private ArrayList<FAQ> faqArray = new ArrayList<>();
     FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         User user1 = new User();
         user1.setUsername("zaw");
@@ -105,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public Task<AuthResult> createUserAccount(String firstname, String username, String dob, String email, String phNum, String gender, String password) {
+    public Task<AuthResult> createUserAccount(Context context, String firstname, String username, String dob, String email, String phNum, String gender, String password) {
         return mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -124,22 +134,30 @@ public class MainActivity extends AppCompatActivity {
                             userCreate.setGender(gender);
                             userCreate.setPassword(password); // Ideally, don't store raw passwords!
 
-                            // Save additional user data to Firebase Realtime Database or Firestore
-                            // Example: Using Firebase Realtime Database
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
-                            databaseReference.child(userId).setValue(userCreate)
+                            // Save additional user data to Firestore
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            db.collection("Users").document(userId).set(userCreate)
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
                                             // Data successfully saved
-                                            Log.d("Firebase", "User profile saved successfully");
+                                            Log.d("Firestore", "User profile saved successfully");
+                                            Toast.makeText(context, "Account registered", Toast.LENGTH_SHORT).show();
+                                            // You need to implement replaceFragment() method properly
+                                            replaceFragment(new LandingFragment());
                                         } else {
-                                            // Handle failure
-                                            Log.e("Firebase", "Failed to save user profile");
+                                            // Handle failure to save data in Firestore
+                                            Log.e("Firestore", "Failed to save user profile", task1.getException());
+                                            Toast.makeText(context, "Failed to register account in Firestore", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                         }
+                    } else {
+                        // Handle user registration failure
+                        Log.e("Auth", "User registration failed", task.getException());
+                        Toast.makeText(context, "Account registration failed", Toast.LENGTH_SHORT).show();
                     }
                 });
+
     }
 
         public void createFAQ(String title, String question, String answer, String dateCreated){

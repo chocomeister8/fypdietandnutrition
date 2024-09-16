@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,7 +144,7 @@ public class URegisterFragment extends Fragment {
                     gender = "Unspecified"; // Handle case where no gender is selected
                 }
 
-                mainActivity.createUserAccount(firstName, userName, dob, email, gender, phone, password)
+                mainActivity.createUserAccount(getActivity(), firstName, userName, dob, email, phone, gender, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -153,8 +154,14 @@ public class URegisterFragment extends Fragment {
 
                                 }
                                 else {
-                                    // If sign in fails, display a message to the user.
-                                    Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                    // If sign-in fails, log the error and display a message
+                                    Exception exception = task.getException();
+                                    if (exception != null) {
+                                        Log.e("Firebase", "Registration error: " + exception.getMessage());
+                                        Toast.makeText(getActivity(), "Authentication failed: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
                         });
