@@ -87,8 +87,18 @@
                     android:textColor="@android:color/black" />
             </LinearLayout>
 
-            <!-- Editable Fields with Titles -->
+            <!-- Text Fields with Titles -->
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/username_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="John Doe" />
             <!-- Full Name -->
             <TextView
                 android:layout_width="match_parent"
@@ -110,7 +120,8 @@
             <TextView
                 android:id="@+id/date_of_birth_data"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Date of Birth"/>
 
             <!-- Gender Dropdown -->
             <TextView
@@ -182,7 +193,8 @@
             <TextView
                 android:id="@+id/health_goals_data"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Health Goals"/>
 
             <!-- Daily Calorie Limit -->
             <TextView
@@ -261,7 +273,7 @@
                 android:id="@+id/activity_level_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Moderate"/>
+                android:text="Activity Level"/>
 
             <!-- Edit Button -->
             <Button

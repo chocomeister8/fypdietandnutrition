@@ -88,8 +88,10 @@ public class UserAccountEntity {
         User user = new User();
         user.setUsername(document.getString("username"));
         user.setRole(document.getString("role"));
+        user.setFirstName(document.getString("firstName"));
         user.setLastName(document.getString("lastName"));
         user.setPhoneNumber(document.getString("phoneNumber"));
+        user.setDob(document.getString("dob"));
         user.setPassword(document.getString("password"));
         user.setEmail(document.getString("email"));
         user.setGender(document.getString("gender"));
@@ -101,6 +103,7 @@ public class UserAccountEntity {
         user.setHealthGoal(document.getString("foodAllergies"));
         user.setCurrentWeight(document.getDouble("currentWeight"));
         user.setCurrentHeight(document.getDouble("currentHeight"));
+        user.setActivityLevel(document.getString("activityLevel"));
         return user;
     }
 

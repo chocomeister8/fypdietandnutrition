@@ -29,7 +29,7 @@ import java.util.Calendar;
 
 public class ProfileUFragment extends Fragment {
 
-    private TextView fullNameData, dateOfBirthData, phoneNumberData, emailAddressData, healthGoalsData, dailyCalorieLimitData, currentWeightData, currentHeightData;
+    private TextView userNameData, fullNameData, dateOfBirthData, phoneNumberData, emailAddressData, healthGoalsData, dailyCalorieLimitData, currentWeightData, currentHeightData;
     private TextView genderData, dietaryPreferencesData, allergiesData, activityLevelData;
     private Button editButton;
     private UserAccountEntity userAccountEntity;
@@ -66,6 +66,7 @@ public class ProfileUFragment extends Fragment {
     }
 
     private void initializeUI(View view) {
+        userNameData = view.findViewById(R.id.username_data);
         fullNameData = view.findViewById(R.id.full_name_data);
         dateOfBirthData = view.findViewById(R.id.date_of_birth_data);
         phoneNumberData = view.findViewById(R.id.phone_number_data);
@@ -109,6 +110,7 @@ public class ProfileUFragment extends Fragment {
 
     private void loadProfileData(User user) {
         Log.d("ProfileUFragment", "Loading user data: " + user.getEmail());
+        userNameData.setText(user.getUsername());
         fullNameData.setText(user.getFirstName() + " " + user.getLastName());
         dateOfBirthData.setText(user.getDob());
         phoneNumberData.setText(user.getPhoneNumber());
