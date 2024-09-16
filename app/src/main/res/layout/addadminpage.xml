@@ -94,7 +94,7 @@
                     android:id="@+id/usernameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginTop="16dp"
                     android:autofillHints="username"
                     android:background="#E6E0E9"
                     android:ems="10"
@@ -110,44 +110,6 @@
                     tools:ignore="HardcodedText"
                     tools:layout_editor_absoluteX="70dp" />
 
-                <EditText
-                    android:id="@+id/passwordEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="16dp"
-                    android:autofillHints="password"
-                    android:background="#E6E0E9"
-                    android:ems="10"
-                    android:hint="Password:"
-                    android:inputType="text"
-                    android:singleLine="true"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintLeft_toRightOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userName"
-                    tools:ignore="HardcodedText"
-                    tools:layout_editor_absoluteX="70dp" />
-
-                <EditText
-                    android:id="@+id/phoneEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="16dp"
-                    android:autofillHints="phoneNumber"
-                    android:background="#E6E0E9"
-                    android:ems="10"
-                    android:hint="Phone Number:"
-                    android:inputType="phone|number"
-                    android:singleLine="true"
-                    android:textSize="14sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintLeft_toRightOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pwTextbox"
-                    tools:ignore="HardcodedText" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -160,7 +122,7 @@
                         android:layout_height="50dp"
                         android:layout_weight="1"
                         android:background="#E6E0E9"
-                        android:hint="First Name"
+                        android:hint="First Name:"
                         android:inputType="text"
                         android:singleLine="true"
                         android:textSize="14sp"
@@ -181,6 +143,58 @@
                 </LinearLayout>
 
                 <EditText
+                    android:id="@+id/phoneEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="16dp"
+                    android:autofillHints="phoneNumber"
+                    android:background="#E6E0E9"
+                    android:ems="10"
+                    android:hint="Phone Number:"
+                    android:inputType="phone|number"
+                    android:singleLine="true"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintLeft_toRightOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/pwTextbox"
+                    tools:ignore="HardcodedText" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <EditText
+                        android:id="@+id/passwordEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="#E6E0E9"
+                        android:hint="Password:"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:textSize="14sp"
+                        tools:ignore="HardcodedText" />
+
+                    <EditText
+                        android:id="@+id/cfmpasswordEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:background="#E6E0E9"
+                        android:hint="Confirm password:"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:textSize="14sp"
+                        tools:ignore="HardcodedText" />
+
+                </LinearLayout>
+
+                <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -198,12 +212,11 @@
                     android:id="@+id/dob"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-
                     android:layout_marginTop="16dp"
                     android:background="#E6E0E9"
                     android:ems="10"
                     android:hint="DOB"
-                    android:inputType="text"
+                    android:inputType="date"
                     android:textSize="14sp"
                     app:layout_constraintStart_toEndOf="@+id/firstName"
                     app:layout_constraintTop_toBottomOf="@+id/textView2"

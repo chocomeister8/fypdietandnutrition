@@ -16,12 +16,10 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +31,7 @@ public class URegisterFragment extends Fragment {
     private EditText firstNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
     private RadioButton maleRadioButton, femaleRadioButton;
     private Button registerButton;
+    private ArrayList<Profile> accountArray = new ArrayList<>();
     FirebaseAuth mAuth;
 
 
@@ -82,6 +81,7 @@ public class URegisterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_u_register, container, false);
+        mAuth = FirebaseAuth.getInstance();
         MainActivity mainActivity = (MainActivity) getActivity();
         firstNameEditText = view.findViewById(R.id.firstName);
         userNameEditText = view.findViewById(R.id.userNameCreate);
@@ -143,28 +143,6 @@ public class URegisterFragment extends Fragment {
                 } else {
                     gender = "Unspecified"; // Handle case where no gender is selected
                 }
-
-                mainActivity.createUserAccount(getActivity(), firstName, userName, dob, email, phone, gender, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(getActivity(), "Account registered", Toast.LENGTH_SHORT).show();
-                                    mainActivity.replaceFragment(new LandingFragment());
-
-                                }
-                                else {
-                                    // If sign-in fails, log the error and display a message
-                                    Exception exception = task.getException();
-                                    if (exception != null) {
-                                        Log.e("Firebase", "Registration error: " + exception.getMessage());
-                                        Toast.makeText(getActivity(), "Authentication failed: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            }
-                        });
             }
         });
 

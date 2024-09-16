@@ -1,8 +1,12 @@
 package com.example.dietandnutritionapplication;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +14,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +39,10 @@ public class AddFAQFragment extends Fragment {
 
     private EditText titleEditText, questionEditText, answerEditText;
     private Button addFAQ;
+    ProgressDialog pd;
+
+    FirebaseAuth mAuth;
+    FirebaseFirestore db;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -73,23 +93,64 @@ public class AddFAQFragment extends Fragment {
         questionEditText = view.findViewById(R.id.question);
         answerEditText = view.findViewById(R.id.answer);
         addFAQ = view.findViewById(R.id.addFAQ);
+
+        pd = new ProgressDialog(getActivity());
+
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
         addFAQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get values from the EditTexts
+
                 String title = titleEditText.getText().toString();
                 String question = questionEditText.getText().toString();
                 String answer = answerEditText.getText().toString();
+
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 String date = now.format(formatter);
 
-                mainActivity.createFAQ(title, question, answer, date);
-                Toast.makeText(getContext(), "FAQ added successfully!", Toast.LENGTH_SHORT).show();
-                mainActivity.replaceFragment(new FAQFragment());
+                insertFAQ(title, question, answer, date);
+                redirectToViewAllFAQs();
             }
 
         });
         return view;
+    }
+
+    private void insertFAQ(String title,String question, String answer, String date){
+
+        DocumentReference newFAQRef = db.collection("FAQ").document(); // Auto-generated ID
+
+        Map<String, Object> faq = new HashMap<>();
+
+        String id = UUID.randomUUID().toString();
+        faq.put("id",id);
+        faq.put("title", title);
+        faq.put("question", question);
+        faq.put("answer", answer);
+        faq.put("date", date);
+
+
+        db.collection("FAQ").document(id).set(faq).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                pd.dismiss();
+                Toast.makeText(getActivity(), "FAQ added", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getActivity(), "Failed to add", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void redirectToViewAllFAQs() {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_layout, new FAQFragment()); // Use your container ID
+        fragmentTransaction.addToBackStack(null); // Optional: Add to back stack
+        fragmentTransaction.commit();
     }
 }

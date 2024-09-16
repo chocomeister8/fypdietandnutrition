@@ -2,6 +2,8 @@ package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import java.util.List;
 public class viewAccountsFragment extends Fragment {
     ListView listView;
     ArrayList<Profile> profiles = new ArrayList<>();
+    ArrayList<Profile> originalProfiles = new ArrayList<>(); // Keep the unfiltered original list
     private Spinner roleSpinner;
     private ProfileAdapter adapter; // Ensure you have a ProfileAdapter to handle Profile objects
 
@@ -52,8 +55,10 @@ public class viewAccountsFragment extends Fragment {
         userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Profile> accounts) {
-                profiles.clear(); // Clear existing profiles
-                profiles.addAll(accounts); // Add fetched profiles
+                originalProfiles.clear(); // Clear the original profiles list
+                originalProfiles.addAll(accounts); // Store fetched profiles in the original list
+                profiles.clear(); // Clear the filtering list
+                profiles.addAll(accounts); // Store profiles for filtering
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
 
@@ -89,22 +94,20 @@ public class viewAccountsFragment extends Fragment {
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        listView.setOnItemClickListener((parent, view1, position, id) ->
+                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show());
 
         return view;
     }
 
     private void filterProfilesByRole(String role) {
         if (role.equals("All Users")) {
-            adapter.notifyDataSetChanged();
+            // Reset to original profiles when "All Users" is selected
+            profiles.clear();
+            profiles.addAll(originalProfiles); // Restore all profiles from the original list
         } else {
             ArrayList<Profile> filteredProfiles = new ArrayList<>();
-            for (Profile profile : profiles) {
+            for (Profile profile : originalProfiles) { // Filter based on the originalProfiles list
                 if (profile instanceof Admin && role.equals("Admin")) {
                     filteredProfiles.add(profile);
                 } else if (profile instanceof Nutritionist && role.equals("Nutritionist")) {
@@ -113,9 +116,9 @@ public class viewAccountsFragment extends Fragment {
                     filteredProfiles.add(profile);
                 }
             }
-            adapter.clear();
-            adapter.addAll(filteredProfiles);
-            adapter.notifyDataSetChanged();
+            profiles.clear();
+            profiles.addAll(filteredProfiles); // Update the profiles list with filtered data
         }
+        adapter.notifyDataSetChanged(); // Refresh adapter with new data
     }
 }

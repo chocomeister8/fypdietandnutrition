@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -13,6 +14,7 @@ public class UserAccountEntity {
     private ArrayList<User> users = new ArrayList<>();
     private ArrayList<Nutritionist> nutritionists = new ArrayList<>();
     private ArrayList<Profile> accounts = new ArrayList<>();
+    FirebaseAuth mAuth;
 
 
     public UserAccountEntity() {
@@ -68,23 +70,6 @@ public class UserAccountEntity {
     }
 
     private User createUserFromDocument(QueryDocumentSnapshot document) {
-//        return new User(
-//                document.getString("firstName"),
-//                document.getString("lastName"),
-//                document.getString("username"),
-//                document.getString("phoneNumber"),
-//                document.getString("password"),
-//                document.getString("email"),
-//                document.getString("gender"),
-//                document.getString("role"),
-//                document.getString("dateJoined"),
-//                document.getLong("calorieLimit").intValue(),
-//                document.getString("dietPreference"),
-//                document.getString("foodAllergies"),
-//                document.getString("healthGoal"),
-//                document.getDouble("currentWeight"),
-//                document.getDouble("currentHeight")
-//        );
         User user = new User();
         user.setUsername(document.getString("username"));
         user.setRole(document.getString("role"));
@@ -118,10 +103,6 @@ public class UserAccountEntity {
                 document.getString("role"),
                 document.getString("dateJoined")
         );
-//        Admin user = new Admin();
-//        user.setUsername(document.getString("username"));
-//        user.setRole(document.getString("role"));
-//        return user;
     }
 
     private Nutritionist createNutritionistFromDocument(QueryDocumentSnapshot document) {
