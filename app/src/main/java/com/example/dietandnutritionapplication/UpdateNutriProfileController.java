@@ -17,7 +17,7 @@ public class UpdateNutriProfileController {
             nutritionist.setContactInfo(contactInfo);
             nutritionist.setExpertise(expertise);
             nutritionist.setBio(bio);
-            nutritionist.setProfilePicture(profilePicture); // Save the Bitmap
+            nutritionist.setProfilePicture("img"); // Save the Bitmap
             nutriAccount.saveProfile(nutritionist); // Save or update
             return true;
         }

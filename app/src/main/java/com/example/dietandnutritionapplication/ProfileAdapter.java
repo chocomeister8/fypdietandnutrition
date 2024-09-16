@@ -19,19 +19,30 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
         this.profiles = profiles;
     }
 
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
+
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.account_item, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.usernameTextView = convertView.findViewById(R.id.username);
+            viewHolder.roleTextView = convertView.findViewById(R.id.role);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         Profile currentProfile = profiles.get(position);
 
-        TextView usernameTextView = convertView.findViewById(R.id.username);
-        TextView roleTextView = convertView.findViewById(R.id.role);
-
-        usernameTextView.setText(currentProfile.getUsername());
-        roleTextView.setText(currentProfile.getRole());
+        viewHolder.usernameTextView.setText(currentProfile.getUsername());
+        viewHolder.roleTextView.setText(currentProfile.getRole());
 
         return convertView;
+    }
+
+    static class ViewHolder {
+        TextView usernameTextView;
+        TextView roleTextView;
     }
 }

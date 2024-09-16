@@ -20,7 +20,7 @@ public class Profile implements Serializable {
     }
 
     public Profile(){
-
+        this.setStatus("active");
     }
 
     public Profile(String firstName,String lastName,String username,String phoneNumber, String password, String email,String gender, String role, String dateJoined){
@@ -32,6 +32,7 @@ public class Profile implements Serializable {
         this.dateJoined = dateJoined;
         this.gender = gender;
         this.role = role;
+        this.setStatus("active");
         this.password = password;
 
 

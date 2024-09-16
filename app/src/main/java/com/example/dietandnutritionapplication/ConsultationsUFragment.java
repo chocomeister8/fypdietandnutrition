@@ -39,8 +39,7 @@ public class ConsultationsUFragment extends Fragment {
         Bitmap janeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
         Bitmap johnBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
         // Add dummy data (replace with real data source)
-        nutritionistList.add(new Nutritionist("jane.doe@example.com", "Dr. Jane Doe", "PhD in Nutrition", "123-456-7890", "Weight Loss", "Experienced nutritionist specializing in weight loss.", janeBitmap));
-        nutritionistList.add(new Nutritionist("john.doe@example.com", "Dr. John Doe", "MSc in Dietetics", "987-654-3210", "Sports Nutrition", "Expert in sports nutrition and diet planning.", johnBitmap));
+
 
         // Set up the adapter
         UserConsultationsController adapter = new UserConsultationsController(getActivity(), nutritionistList);

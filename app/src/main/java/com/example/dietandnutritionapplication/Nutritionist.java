@@ -7,7 +7,7 @@ public class Nutritionist extends Profile {
     private String contactInfo;
     private String expertise;
     private String bio;
-    private Bitmap profilePicture;
+    private String profilePicture;
     private String name;
 
     // Default constructor
@@ -18,11 +18,16 @@ public class Nutritionist extends Profile {
     }
 
     // Parameterized constructor
-    public Nutritionist(String email, String name, String education, String contactInfo, String expertise, String bio, Bitmap profilePicture) {
+    public Nutritionist(String firstName,String username,String name,String phoneNumber, String password, String email,String gender, String role, String dateJoined,String education, String contactInfo, String expertise, String bio, String profilePicture) {
         super();
-        this.setUsername(email); // Assuming username is set in Profile class
-        this.setName(name); // Assuming firstName is a property of Profile
+        this.setFirstName(firstName);
+        this.setUsername(username);
+        this.setLastName(name);
+        this.setPhoneNumber(phoneNumber);
+        this.setPassword(password);
+        this.setEmail(email);
         this.education = education;
+        this.setGender(gender);
         this.contactInfo = contactInfo;
         this.expertise = expertise;
         this.bio = bio;
@@ -64,16 +69,16 @@ public class Nutritionist extends Profile {
         this.bio = bio;
     }
 
-    public Bitmap getProfilePicture() {
+    public String getProfilePicture() {
         return profilePicture;
     }
 
-    public void setProfilePicture(Bitmap profilePicture) {
+    public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.setFirstName(name);
     }
 
     public String getName() {

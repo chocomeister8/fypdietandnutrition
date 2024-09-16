@@ -45,11 +45,13 @@ public class CreateNProfileActivity extends AppCompatActivity {
         String expertise = expertiseEditText.getText().toString();
         String bio = bioEditText.getText().toString();
 
+
         // Convert profile image view to drawable (placeholder)
         BitmapDrawable drawable = (BitmapDrawable) profileImageView.getDrawable();
         Bitmap profilePicture = drawable.getBitmap();
+        //Nutritionist nutritionist = new Nutritionist(firstName,username,name,phoneNumber,password,email,gender,role,dateJoined,education,contactInfo,expertise,bio,profilePicture)
 
-        boolean success = createProfileController.createProfile(firstName, education, contactInfo, expertise, bio, profilePicture);
+        boolean success = createProfileController.createProfile(firstName, "username","last name","phone","password","email","gender","role","date",education,contactInfo,expertise,bio,"img");
 
         if (success) {
             Toast.makeText(this, "Profile created successfully", Toast.LENGTH_SHORT).show();

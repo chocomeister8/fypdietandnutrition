@@ -42,7 +42,7 @@ public class UserConsultationsController extends ArrayAdapter<Nutritionist> {
 
             // Set the profile picture
             if (nutritionist.getProfilePicture() != null) {
-                profilePicture.setImageBitmap(nutritionist.getProfilePicture());
+                profilePicture.setImageResource(R.drawable.profile);
             } else {
                 // Handle case where profilePicture is null (optional)
                 profilePicture.setImageResource(R.drawable.profile); // Placeholder image

@@ -3,8 +3,6 @@ package com.example.dietandnutritionapplication;
 import java.util.ArrayList;
 
 public class User extends Profile {
-    private String gender;
-    private String phoneNumber;
     private int calorieLimit;
     private String dietPreference;
     private String foodAllergies;
@@ -12,45 +10,22 @@ public class User extends Profile {
     private double currentWeight;
     private double currentHeight;
 
-    // Default constructor
-    public User() { super();
-        this.setRole("user");// Calls the default constructor of the Profile class
+    public User(){
+        this.setRole("user");
+        this.setStatus("active");
     }
 
-    // Parameterized constructor
-    public User(String firstName, String lastName, String username, String email, String gender,
-                String phoneNumber, int calorieLimit, String dietPreference, String foodAllergies, String healthGoal,
-                double currentWeight, double currentHeight) {
-
-        this.gender = gender;
-        this.phoneNumber = phoneNumber;
+    public User(String firstName, String lastName, String username, String phoneNumber, String password, String email, String gender, String role, String dateJoined, int calorieLimit, String dietPreference, String foodAllergies, String healthGoal, double currentWeight, double currentHeight) {
+        super(firstName, lastName, username, phoneNumber, password, email, gender, role, dateJoined);
         this.calorieLimit = calorieLimit;
         this.dietPreference = dietPreference;
         this.foodAllergies = foodAllergies;
         this.healthGoal = healthGoal;
         this.currentWeight = currentWeight;
         this.currentHeight = currentHeight;
-        this.setRole("user");
-        this.setStatus("active");
     }
-
     // Getters and Setters for all fields
 
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 
     public int getCalorieLimit() {
         return calorieLimit;

@@ -1,9 +1,7 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,50 +10,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link viewAccountsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class viewAccountsFragment extends Fragment {
     ListView listView;
-    ArrayList<String> items;
-    ArrayAdapter<String> adapter;
     ArrayList<Profile> profiles = new ArrayList<>();
     private Spinner roleSpinner;
-
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ProfileAdapter adapter; // Ensure you have a ProfileAdapter to handle Profile objects
 
     public viewAccountsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment viewAccountsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static viewAccountsFragment newInstance(String param1, String param2) {
         viewAccountsFragment fragment = new viewAccountsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,36 +33,38 @@ public class viewAccountsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Initialize the items list
-        items = new ArrayList<>();
-
-        // Get the activity context and retrieve the list of profiles from MainActivity
-        MainActivity mainActivity = (MainActivity) getActivity();
-        profiles = mainActivity.getAccountArray();
-
-        // Loop through profiles and convert them to string representations (if needed)
-        for (Profile profile : profiles) {
-            items.add(profile.getUsername() + " - " + profile.getRole());  // Or however you want to display profile data as a string
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_view_accounts, container, false);
+
         listView = view.findViewById(R.id.listView);
-
-        // Get the profiles from MainActivity
-        MainActivity mainActivity = (MainActivity) getActivity();
-        profiles = mainActivity.getAccountArray();
-
-        // Create and set the ProfileAdapter for the ListView
-        ProfileAdapter adapter = new ProfileAdapter(getContext(), profiles);
-        listView.setAdapter(adapter);
-
         roleSpinner = view.findViewById(R.id.filterRoleSpinner);
 
+        // Initialize and set up the ProfileAdapter
+        adapter = new ProfileAdapter(getContext(), profiles);
+        listView.setAdapter(adapter);
+
+        // Fetch accounts from UserManager
+        UserAccountEntity userAccountEntity = new UserAccountEntity();
+        userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Profile> accounts) {
+                profiles.clear(); // Clear existing profiles
+                profiles.addAll(accounts); // Add fetched profiles
+                adapter.notifyDataSetChanged(); // Notify adapter of data changes
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Set up Spinner for role filtering
         List<String> sortRole = new ArrayList<>();
         sortRole.add("All Users");
         sortRole.add("Admin");
@@ -103,18 +75,47 @@ public class viewAccountsFragment extends Fragment {
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         roleSpinner.setAdapter(sortAdapter);
 
+        roleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Handle filter logic here
+                String selectedRole = sortRole.get(position);
+                filterProfilesByRole(selectedRole);
+            }
 
-        // Set the adapter to the ListView
-        listView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle no selection
+            }
+        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
         return view;
+    }
+
+    private void filterProfilesByRole(String role) {
+        if (role.equals("All Users")) {
+            adapter.notifyDataSetChanged();
+        } else {
+            ArrayList<Profile> filteredProfiles = new ArrayList<>();
+            for (Profile profile : profiles) {
+                if (profile instanceof Admin && role.equals("Admin")) {
+                    filteredProfiles.add(profile);
+                } else if (profile instanceof Nutritionist && role.equals("Nutritionist")) {
+                    filteredProfiles.add(profile);
+                } else if (profile instanceof User && role.equals("User")) {
+                    filteredProfiles.add(profile);
+                }
+            }
+            adapter.clear();
+            adapter.addAll(filteredProfiles);
+            adapter.notifyDataSetChanged();
+        }
     }
 }

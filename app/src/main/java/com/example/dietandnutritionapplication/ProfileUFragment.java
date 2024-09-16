@@ -67,6 +67,7 @@ public class ProfileUFragment extends Fragment {
             // Switch to guest mode (for nutritionists as guests)
             if (getActivity() instanceof MainActivity) {
                 Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                ((MainActivity) getActivity()).switchToGuestMode();
                 ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
             }
         });
