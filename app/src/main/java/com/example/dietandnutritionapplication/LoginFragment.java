@@ -55,14 +55,13 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        // Set onClickListener for the login button
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String enteredUsername = usernameEditText.getText().toString();
                 String enteredPassword = passwordEditText.getText().toString();
 
-                // Query Firestore to find the user by username
+
                 db.collection("Users")
                         .whereEqualTo("username", enteredUsername)
                         .get()
