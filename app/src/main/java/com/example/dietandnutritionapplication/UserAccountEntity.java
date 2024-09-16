@@ -96,7 +96,7 @@ public class UserAccountEntity {
         user.setRole(document.getString("role"));
         user.setDateJoined(document.getString("dateJoined"));
         user.setCalorieLimit(document.getLong("calorieLimit").intValue());
-        user.setDietPreference(document.getString("dietPreference"));
+        user.setDietaryPreference(document.getString("dietPreference"));
         user.setFoodAllergies(document.getString("healthGoal"));
         user.setHealthGoal(document.getString("foodAllergies"));
         user.setCurrentWeight(document.getDouble("currentWeight"));

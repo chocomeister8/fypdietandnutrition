@@ -1,8 +1,11 @@
 package com.example.dietandnutritionapplication;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,56 +14,43 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ProfileUFragment extends Fragment {
 
-    private EditText fullNameData, dateOfBirthData, phoneNumberData, emailAddressData, healthGoalsData, dailyCalorieLimitData, currentWeightData, currentHeightData;
-    private Spinner genderSpinner, dietaryPreferencesSpinner, allergiesSpinner, activityLevelSpinner;
-    private Button saveButton;
-
-    private Profile userProfile;  // Profile object to hold user data
+    private TextView fullNameData, dateOfBirthData, phoneNumberData, emailAddressData, healthGoalsData, dailyCalorieLimitData, currentWeightData, currentHeightData;
+    private TextView genderData, dietaryPreferencesData, allergiesData, activityLevelData;
+    private Button editButton;
+    private UserAccountEntity userAccountEntity;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_uprofile, container, false);
 
-        // Initialize UI elements
-        fullNameData = view.findViewById(R.id.full_name_data);
-        dateOfBirthData = view.findViewById(R.id.date_of_birth_data);
-        phoneNumberData = view.findViewById(R.id.phone_number_data);
-        emailAddressData = view.findViewById(R.id.email_address_data);
-        healthGoalsData = view.findViewById(R.id.health_goals_data);
-        dailyCalorieLimitData = view.findViewById(R.id.daily_calorie_limit_data);
-        currentWeightData = view.findViewById(R.id.current_weight_data);
-        currentHeightData = view.findViewById(R.id.current_height_data);
+        initializeUI(view);
 
-        // Initialize Spinners
-        genderSpinner = view.findViewById(R.id.gender_spinner);
-        dietaryPreferencesSpinner = view.findViewById(R.id.dietary_preferences_spinner);
-        allergiesSpinner = view.findViewById(R.id.allergies_spinner);
-        activityLevelSpinner = view.findViewById(R.id.activity_level_spinner);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+        String userEmail = sharedPreferences.getString("loggedInUserEmail", null);
 
-        // Set up Spinner options
-        setUpSpinners();
+        userAccountEntity = new UserAccountEntity();
 
-        // Load profile data (assume you have a user profile)
-        userProfile = new Profile("John", "Doe", "john_doe", "123456789", "password", "john.doe@example.com", "Male", "User", "2022-01-01");
-        loadProfileData(userProfile);
-
-        // Initialize Save Button
-        saveButton = view.findViewById(R.id.save_button);
-        saveButton.setOnClickListener(v -> saveProfileData());
-
-        // Date Picker for Date of Birth
-        dateOfBirthData.setOnClickListener(v -> showDatePickerDialog());
+        if (userEmail != null) {
+            fetchUserProfile(userEmail);
+        } else {
+            Toast.makeText(getContext(), "No user logged in", Toast.LENGTH_SHORT).show();
+        }
 
         ImageView logoutImage = view.findViewById(R.id.logout_icon);
         logoutImage.setOnClickListener(v -> {
@@ -75,83 +65,62 @@ public class ProfileUFragment extends Fragment {
         return view;
     }
 
-    private void setUpSpinners() {
-        // Gender spinner setup
-        ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.gender_array, android.R.layout.simple_spinner_item);
-        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        genderSpinner.setAdapter(genderAdapter);
-
-        // Dietary Preferences spinner setup
-        ArrayAdapter<CharSequence> dietaryAdapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.dietary_preferences_array, android.R.layout.simple_spinner_item);
-        dietaryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dietaryPreferencesSpinner.setAdapter(dietaryAdapter);
-
-        // Allergies spinner setup
-        ArrayAdapter<CharSequence> allergiesAdapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.allergies_array, android.R.layout.simple_spinner_item);
-        allergiesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        allergiesSpinner.setAdapter(allergiesAdapter);
-
-        // Activity Level spinner setup
-        ArrayAdapter<CharSequence> activityLevelAdapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.activity_level_array, android.R.layout.simple_spinner_item);
-        activityLevelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        activityLevelSpinner.setAdapter(activityLevelAdapter);
+    private void initializeUI(View view) {
+        fullNameData = view.findViewById(R.id.full_name_data);
+        dateOfBirthData = view.findViewById(R.id.date_of_birth_data);
+        phoneNumberData = view.findViewById(R.id.phone_number_data);
+        emailAddressData = view.findViewById(R.id.email_address_data);
+        healthGoalsData = view.findViewById(R.id.health_goals_data);
+        dailyCalorieLimitData = view.findViewById(R.id.daily_calorie_limit_data);
+        currentWeightData = view.findViewById(R.id.current_weight_data);
+        currentHeightData = view.findViewById(R.id.current_height_data);
+        genderData = view.findViewById(R.id.gender_data);
+        dietaryPreferencesData = view.findViewById(R.id.dietary_preferences_data);
+        allergiesData = view.findViewById(R.id.allergies_data);
+        activityLevelData = view.findViewById(R.id.activity_level_data);
     }
 
-    private void loadProfileData(Profile profile) {
-        // Load data into UI elements
-        fullNameData.setText(profile.getFirstName() + " " + profile.getLastName());
-        dateOfBirthData.setText(profile.getDob());
-        phoneNumberData.setText(profile.getPhoneNumber());
-        emailAddressData.setText(profile.getEmail());
-        healthGoalsData.setText("Lose Weight");
-        dailyCalorieLimitData.setText("2000");
-        currentWeightData.setText("70");
-        currentHeightData.setText("175");
-
-        // Set Spinner selections
-        setSpinnerSelection(genderSpinner, profile.getGender());
-    }
-
-    private void setSpinnerSelection(Spinner spinner, String value) {
-        ArrayAdapter adapter = (ArrayAdapter) spinner.getAdapter();
-        for (int position = 0; position < adapter.getCount(); position++) {
-            if (adapter.getItem(position).toString().equals(value)) {
-                spinner.setSelection(position);
-                break;
+    private void fetchUserProfile(String userEmail) {
+        Log.d("ProfileUFragment", "Attempting to fetch user profile for email: " + userEmail);
+        userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Profile> accounts) {
+                Log.d("ProfileUFragment", "Successfully fetched accounts.");
+                for (Profile profile : accounts) {
+                    if (profile instanceof User) {
+                        User user = (User) profile;
+                        Log.d("ProfileUFragment", "Fetched user: " + user.getEmail());
+                        if (user.getEmail().equals(userEmail)) {
+                            loadProfileData(user);
+                            return;
+                        }
+                    }
+                }
+                Log.d("ProfileUFragment", "User profile not found.");
+                Toast.makeText(getContext(), "User profile not found", Toast.LENGTH_SHORT).show();
             }
-        }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Failed to fetch profile data", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void showDatePickerDialog() {
-        // Date picker dialog
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, selectedYear, selectedMonth, selectedDay) -> {
-            dateOfBirthData.setText(selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear);
-        }, year, month, day);
-        datePickerDialog.show();
-    }
-
-    private void saveProfileData() {
-        // Save user input to Profile object
-        String[] name = fullNameData.getText().toString().split(" ");
-        userProfile.setFirstName(name[0]);
-        userProfile.setLastName(name.length > 1 ? name[1] : "");
-        userProfile.setPhoneNumber(phoneNumberData.getText().toString());
-        userProfile.setEmail(emailAddressData.getText().toString());
-        userProfile.setDob(dateOfBirthData.getText().toString());
-        userProfile.setGender(genderSpinner.getSelectedItem().toString());
-
-        // Save userProfile to database or other storage
-        // For now, we just print the profile data
-        System.out.println(userProfile.toString());
+    private void loadProfileData(User user) {
+        Log.d("ProfileUFragment", "Loading user data: " + user.getEmail());
+        fullNameData.setText(user.getFirstName() + " " + user.getLastName());
+        dateOfBirthData.setText(user.getDob());
+        phoneNumberData.setText(user.getPhoneNumber());
+        emailAddressData.setText(user.getEmail());
+        healthGoalsData.setText(user.getHealthGoal());
+        dailyCalorieLimitData.setText(String.valueOf(user.getCalorieLimit()));
+        currentWeightData.setText(String.valueOf(user.getCurrentWeight()));
+        currentHeightData.setText(String.valueOf(user.getCurrentHeight()));
+        genderData.setText(user.getGender());
+        dietaryPreferencesData.setText(user.getDietaryPreference());
+        allergiesData.setText(user.getFoodAllergies());
+        activityLevelData.setText(user.getActivityLevel());
     }
 
 

@@ -95,11 +95,10 @@
                 android:layout_height="wrap_content"
                 android:text="Full Name"
                 android:textStyle="bold" />
-            <EditText
+            <TextView
                 android:id="@+id/full_name_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Full Name"
                 android:text="John Doe" />
 
             <!-- Date of Birth (with Date Picker) -->
@@ -108,13 +107,10 @@
                 android:layout_height="wrap_content"
                 android:text="Date of Birth"
                 android:textStyle="bold" />
-            <EditText
+            <TextView
                 android:id="@+id/date_of_birth_data"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Date of Birth"
-                android:focusable="false"
-                android:text="01/01/1990" />
+                android:layout_height="wrap_content" />
 
             <!-- Gender Dropdown -->
             <TextView
@@ -122,10 +118,11 @@
                 android:layout_height="wrap_content"
                 android:text="Gender"
                 android:textStyle="bold" />
-            <Spinner
-                android:id="@+id/gender_spinner"
+            <TextView
+                android:id="@+id/gender_data"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Male" />
 
             <!-- Phone Number -->
             <TextView
@@ -133,11 +130,10 @@
                 android:layout_height="wrap_content"
                 android:text="Phone Number"
                 android:textStyle="bold" />
-            <EditText
+            <TextView
                 android:id="@+id/phone_number_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone Number"
                 android:inputType="phone"
                 android:text="123-456-7890" />
 
@@ -147,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:text="Email Address"
                 android:textStyle="bold" />
-            <EditText
+            <TextView
                 android:id="@+id/email_address_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -161,8 +157,8 @@
                 android:layout_height="wrap_content"
                 android:text="Dietary Preferences"
                 android:textStyle="bold" />
-            <Spinner
-                android:id="@+id/dietary_preferences_spinner"
+            <TextView
+                android:id="@+id/dietary_preferences_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -172,8 +168,8 @@
                 android:layout_height="wrap_content"
                 android:text="Allergies"
                 android:textStyle="bold" />
-            <Spinner
-                android:id="@+id/allergies_spinner"
+            <TextView
+                android:id="@+id/allergies_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -183,12 +179,10 @@
                 android:layout_height="wrap_content"
                 android:text="Health Goals"
                 android:textStyle="bold" />
-            <EditText
+            <TextView
                 android:id="@+id/health_goals_data"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Health Goals"
-                android:text="Lose Weight" />
+                android:layout_height="wrap_content" />
 
             <!-- Daily Calorie Limit -->
             <TextView
@@ -196,7 +190,7 @@
                 android:layout_height="wrap_content"
                 android:text="Daily Calorie Limit"
                 android:textStyle="bold" />
-            <EditText
+            <TextView
                 android:id="@+id/daily_calorie_limit_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -214,7 +208,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <EditText
+                <TextView
                     android:id="@+id/current_weight_data"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -241,7 +235,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <EditText
+                <TextView
                     android:id="@+id/current_height_data"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -263,17 +257,19 @@
                 android:layout_height="wrap_content"
                 android:text="Activity Level"
                 android:textStyle="bold" />
-            <Spinner
-                android:id="@+id/activity_level_spinner"
+            <TextView
+                android:id="@+id/activity_level_data"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Moderate"/>
 
-            <!-- Save Button -->
+            <!-- Edit Button -->
             <Button
-                android:id="@+id/save_button"
+                android:id="@+id/edit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save" />
+                android:text="Edit Profile"
+                android:textColor="@color/black"/>
         </LinearLayout>
 
     </LinearLayout>
