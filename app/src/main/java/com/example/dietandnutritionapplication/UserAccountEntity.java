@@ -1,9 +1,11 @@
 package com.example.dietandnutritionapplication;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import android.content.Context;
 
 import java.util.ArrayList;
 
@@ -18,7 +20,9 @@ public class UserAccountEntity {
 
 
     public UserAccountEntity() {
+
         db = FirebaseFirestore.getInstance();
+        this.mAuth = FirebaseAuth.getInstance();
     }
 
     public interface DataCallback {
@@ -142,8 +146,48 @@ public class UserAccountEntity {
         return user;
     }
 
-    // Method to fetch accounts with callback
+
     public void fetchAccounts(DataCallback callback) {
         retrieveAndClassifyUsers(callback);
     }
+
+
+    public void registerUser(String firstName, String userName, String dob, String email, String phone, String gender, String password, Context context, RegisterCallback callback) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String userId = firebaseUser.getUid();
+
+                            User userCreate = new User();
+                            userCreate.setFirstName(firstName);
+                            userCreate.setUsername(userName);
+                            userCreate.setDob(dob);
+                            userCreate.setEmail(email);
+                            userCreate.setPhoneNumber(phone);
+                            userCreate.setGender(gender);
+
+
+                            db.collection("Users").document(userId).set(userCreate)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            callback.onSuccess();
+                                        } else {
+                                            callback.onFailure("Failed to save user data");
+                                        }
+                                    });
+                        }
+                    } else {
+                        callback.onFailure(task.getException().getMessage());
+                    }
+                });
+    }
+
+    public interface RegisterCallback {
+        void onSuccess();
+        void onFailure(String errorMessage);
+    }
+
 }

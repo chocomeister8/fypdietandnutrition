@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ public class URegisterFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_u_register, container, false);
         mAuth = FirebaseAuth.getInstance();
         MainActivity mainActivity = (MainActivity) getActivity();
@@ -96,7 +98,7 @@ public class URegisterFragment extends Fragment {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get values from the EditTexts
+
                 String firstName = firstNameEditText.getText().toString();
                 String userName = userNameEditText.getText().toString();
                 String dob = dobEditText.getText().toString();
@@ -105,44 +107,39 @@ public class URegisterFragment extends Fragment {
                 String password = passwordEditText.getText().toString();
                 String confirmPassword = confirmPasswordEditText.getText().toString();
 
-                if (TextUtils.isEmpty(firstName)) {
-                    Toast.makeText(getActivity(), "Enter first name", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(userName)) {
-                    Toast.makeText(getActivity(), "Enter a username", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(dob)) {
-                    Toast.makeText(getActivity(), "Enter your birthday", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(getActivity(), "Enter an email", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(phone)) {
-                    Toast.makeText(getActivity(), "Enter your phone number", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(getActivity(), "Enter a password", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (!TextUtils.equals(password, confirmPassword)) {
-                    Toast.makeText(getActivity(), "Please ensure passwords match", Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(dob) ||
+                        TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password) ||
+                        !TextUtils.equals(password, confirmPassword)) {
+                    Toast.makeText(getActivity(), "Please fill in all fields and make sure passwords match", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Check which RadioButton is selected (gender)
+
                 String gender;
                 if (maleRadioButton.isChecked()) {
                     gender = "Male";
                 } else if (femaleRadioButton.isChecked()) {
                     gender = "Female";
                 } else {
-                    gender = "Unspecified"; // Handle case where no gender is selected
+                    gender = "Unspecified";
                 }
+                UserAccountEntity userAccountEntity = new UserAccountEntity();
+                userAccountEntity.registerUser(firstName, userName, dob, email, phone, gender, password, getActivity(),
+                        new UserAccountEntity.RegisterCallback() {
+                            @Override
+                            public void onSuccess() {
+
+                                Toast.makeText(getActivity(), "Registration successful", Toast.LENGTH_SHORT).show();
+                                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                            }
+
+                            @Override
+                            public void onFailure(String errorMessage) {
+
+                                Toast.makeText(getActivity(), "Registration failed: " + errorMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
             }
         });
 
