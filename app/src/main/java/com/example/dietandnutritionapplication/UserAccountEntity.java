@@ -165,6 +165,7 @@ public class UserAccountEntity {
                             userCreate.setFirstName(firstName);
                             userCreate.setUsername(userName);
                             userCreate.setDob(dob);
+                            userCreate.setPassword(password);
                             userCreate.setEmail(email);
                             userCreate.setPhoneNumber(phone);
                             userCreate.setGender(gender);
