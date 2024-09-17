@@ -23,7 +23,7 @@ public class FAQFragment extends Fragment{
     ListView FAQListView;
     ArrayList<String> items;
     FAQAdapter adapter;
-    ArrayList<FAQ> faqs = new ArrayList<>();
+    ArrayList<FAQ> faq = new ArrayList<>();
 
     private Spinner filterFAQspinner;
 
@@ -63,8 +63,8 @@ public class FAQFragment extends Fragment{
         super.onCreate(savedInstanceState);
         items = new ArrayList<>();
         MainActivity mainActivity = (MainActivity) getActivity();
-        faqs = mainActivity.getFAQArray();
-        for(FAQ faq:faqs){
+        faq = mainActivity.getFAQArray();
+        for(FAQ faq:faq){
             displayFAQ faq1= new displayFAQ(faq.getTitle(), faq.getQuestion(), faq.getAnswer(), faq.getDateCreated());
             items.add(faq1.toString());
         }
@@ -80,7 +80,7 @@ public class FAQFragment extends Fragment{
 
         // Set the adapter to the ListView
         //FAQAdapter adapter = new FAQAdapter(getContext(), faqs);
-        adapter = new FAQAdapter(getContext(), faqs);
+        adapter = new FAQAdapter(getContext(), faq);
         FAQListView.setAdapter(adapter);
 
 
@@ -93,6 +93,24 @@ public class FAQFragment extends Fragment{
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, sortFAQ);
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterFAQspinner.setAdapter(sortAdapter);
+
+        FAQEntity faqEntity = new FAQEntity();
+        faqEntity.fetchFAQ(new FAQEntity.DataCallback(){
+            @Override
+            public void onSuccess(ArrayList<FAQ> faqs) {
+/*              originalFAQ.clear(); // Clear the original profiles list
+                originalFAQ.addAll(faqs); // Store fetched profiles in the original list*/
+                faq.clear(); // Clear the filtering list
+                faq.addAll(faqs); // Store profiles for filtering
+                adapter.notifyDataSetChanged(); // Notify adapter of data changes
+            }
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+            }
+
+        });
 
         filterFAQspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -122,7 +140,7 @@ public class FAQFragment extends Fragment{
         return view;
     }
     private void sortFAQByDate(final boolean latestToOldest) {
-        faqs.sort(new Comparator<FAQ>() {
+        faq.sort(new Comparator<FAQ>() {
             @Override
             public int compare(FAQ r1, FAQ r2) {
                 // Sort based on the latestToOldest flag

@@ -74,27 +74,6 @@ public class MainActivity extends AppCompatActivity {
         nutritionist1.setRole("nutritionist");
         accountArray.add(nutritionist1);
 
-        FAQ faq1 = new FAQ();
-        faq1.setTitle("What is the purpose of this app?");
-        faq1.setQuestion("What can this app do to help with my diet and nutrition?");
-        faq1.setAnswer("This app helps you track your daily food intake, monitor your calorie consumption, and provide nutritional information. It also offers personalized meal plans based on your dietary goals and preferences.");
-        faq1.setDateCreated(" 09-10-2024 10:00");
-        faqArray.add(faq1);
-
-        FAQ faq2 = new FAQ();
-        faq2.setTitle("How do I set dietary goals?");
-        faq2.setQuestion("What steps should I follow to set my dietary goals in the app?");
-        faq2.setAnswer("Navigate to the 'Goals' section, where you can set specific dietary objectives such as weight loss, muscle gain, or maintaining your current weight. The app will provide recommendations and track your progress towards these goals.");
-        faq2.setDateCreated(" 09-11-2024 10:00");
-        faqArray.add(faq2);
-
-        FAQ faq3 = new FAQ();
-        faq3.setTitle("Are there any recipes available in the app?");
-        faq3.setQuestion("Can I access recipes that fit my dietary preferences?");
-        faq3.setAnswer("Yes, the app features a variety of recipes that align with different dietary preferences and restrictions. You can filter recipes based on ingredients, cooking time, and nutritional content.");
-        faq3.setDateCreated(" 09-12-2024 10:00");
-        faqArray.add(faq3);
-
         // Initialize ViewBinding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -155,28 +134,6 @@ public class MainActivity extends AppCompatActivity {
                 });
 
     }
-        public void createFAQ(String title, String question, String answer, String dateCreated){
-            FAQ faqcreate = new FAQ();
-            faqcreate.setTitle(title);
-            faqcreate.setQuestion(question);
-            faqcreate.setAnswer(answer);
-            faqcreate.setDateCreated(dateCreated);
-            faqArray.add(faqcreate);
-        }
-
-        public void createAdminAccount(String firstname,String lastname,String username, String password,String phNum,String dob,String email,String gender, String role) {
-            Admin adminCreate = new Admin();
-            adminCreate.setUsername(username);
-            adminCreate.setPhoneNumber(phNum);
-            adminCreate.setPassword(password);
-            adminCreate.setRole(role);
-            adminCreate.setFirstName(firstname);
-            adminCreate.setLastName(lastname);
-            adminCreate.setDob(dob);
-            adminCreate.setEmail(email);
-            adminCreate.setGender(gender);
-            accountArray.add(adminCreate);
-        }
 
         public ArrayList<Profile> getAccountArray() {
             return accountArray;

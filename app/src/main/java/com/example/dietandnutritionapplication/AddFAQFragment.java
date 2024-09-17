@@ -30,6 +30,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link AddFAQFragment#newInstance} factory method to
@@ -107,8 +111,8 @@ public class AddFAQFragment extends Fragment {
                 String question = questionEditText.getText().toString();
                 String answer = answerEditText.getText().toString();
 
-                LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Singapore"));
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
                 String date = now.format(formatter);
 
                 insertFAQ(title, question, answer, date);

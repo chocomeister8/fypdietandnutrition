@@ -15,42 +15,81 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/titletext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title:"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/faqTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="4dp"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/titletext"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/qnstext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Question:"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titletext" />
 
         <TextView
             android:id="@+id/faqQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="18sp"
+            android:layout_marginStart="4dp"
+            android:textSize="15sp"
+            android:maxLines="1"
             android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/qnstext"
+            app:layout_constraintTop_toBottomOf="@+id/titletext" />
+
+        <TextView
+            android:id="@+id/anstext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Answer:"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/faqTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/faqQuestion" />
 
         <TextView
             android:id="@+id/faqAnswer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="4dp"
             android:ellipsize="end"
-            android:maxLines="2"
-            android:textSize="18sp"
+            android:maxLines="1"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/anstext"
+            app:layout_constraintTop_toBottomOf="@+id/faqQuestion" />
+
+        <TextView
+            android:id="@+id/datetext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date Created:"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/faqQuestion" />
+            app:layout_constraintTop_toBottomOf="@+id/faqAnswer" />
 
         <TextView
             android:id="@+id/faqDateCreated"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/faqAnswer" />
+            android:layout_marginStart="4dp"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/datetext"
+            app:layout_constraintTop_toBottomOf="@+id/faqAnswer" />
 
         <!--<Button
             android:id="@+id/faqButton"

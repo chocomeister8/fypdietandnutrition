@@ -79,13 +79,7 @@
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/accountBarchart"
                 android:layout_width="match_parent"
-                android:layout_height="320dp" />
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#E0E0E0" />
+                android:layout_height="400dp" />
 
             <!-- Divider -->
             <View

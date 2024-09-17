@@ -111,9 +111,11 @@ public class Profile implements Serializable {
     public void setRole (String role){
         this.role= role;
     }
+
     public String getRole(){
         return this.role;
     }
+
     public String getPassword() {
         return password;
     }

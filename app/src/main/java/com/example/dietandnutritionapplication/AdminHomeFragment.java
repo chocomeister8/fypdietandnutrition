@@ -32,33 +32,136 @@ import java.util.ArrayList;
 
 public class AdminHomeFragment extends Fragment {
     private BarChart barChart;
+    ArrayList<Profile> profiles = new ArrayList<>();
+    private ProfileAdapter adapter;
+    private int numberOfUsers = 0;
+    private int numberOfNutritionists = 0;
+    private int numberOfAdmins = 0;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.adminhomepage, container, false);
+        barChart = view.findViewById(R.id.accountBarchart);
 
-        // Initialize BarChart by finding it in the view
-        barChart = view.findViewById(R.id.accountBarchart);  // Ensure this matches the ID in your XML
+        ImageView logoutImage = view.findViewById(R.id.right_icon);
+        logoutImage.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+            // Switch to guest mode (for nutritionists as guests)
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToGuestMode();
+                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+            }
+        });
 
+        // Find the buttons in the layout
+        Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);
+        Button addAdminButton = view.findViewById(R.id.addAdminButton);
+        Button viewFAQsButton = view.findViewById(R.id.viewFAQbutton);
+        Button addFAQButton = view.findViewById(R.id.addFAQbutton);
+
+        // Set an OnClickListener on the viewAccountsButton
+        viewAccountsButton.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new viewAccountsFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        addAdminButton.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AddAdminFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        viewFAQsButton.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new FAQFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        // Set an OnClickListener on the addFAQButton
+        addFAQButton.setOnClickListener(v -> {
+            // Replace the current fragment with FAQFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AddFAQFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        adapter = new ProfileAdapter(getContext(), profiles);
+
+        // Create an instance of UserAccountEntity and fetch accounts
+        UserAccountEntity userAccountEntity = new UserAccountEntity();
+        userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Profile> fetchedProfiles) {
+                profiles.clear(); // Clear the current list
+                profiles.addAll(fetchedProfiles); // Add new profiles
+
+                // Count different types of profiles
+                numberOfUsers = 0;
+                numberOfNutritionists = 0;
+                numberOfAdmins = 0;
+
+                for (Profile profile : profiles) {
+                    if (profile.getRole().equals("user")) {
+                        numberOfUsers++;
+                    } else if (profile.getRole().equals("nutritionist")) {
+                        numberOfNutritionists++;
+                    } else if (profile.getRole().equals("admin")) {
+                        numberOfAdmins++;
+                    }
+                }
+
+                // Update the chart with new data
+                fetchAndUpdateProfileData();
+                adapter.notifyDataSetChanged(); // Notify adapter of data changes
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Set up buttons and other UI elements
+        setupUI(view);
+
+        return view;
+    }
+    private void fetchAndUpdateProfileData() {
         // Check if barChart is not null before using it
         if (barChart != null) {
             ArrayList<BarEntry> userEntries = new ArrayList<>();
-            userEntries.add(new BarEntry(1f, 3));  // Registered Users
+            userEntries.add(new BarEntry(0f, numberOfUsers));  // Registered Users
 
             ArrayList<BarEntry> nutritionistEntries = new ArrayList<>();
-            nutritionistEntries.add(new BarEntry(2f, 1));  // Nutritionists
+            nutritionistEntries.add(new BarEntry(1f, numberOfNutritionists));  // Nutritionists
 
             ArrayList<BarEntry> adminEntries = new ArrayList<>();
-            adminEntries.add(new BarEntry(3f, 1));  // Admins
+            adminEntries.add(new BarEntry(2f, numberOfAdmins));  // Admins
+
+            BarDataSet barDataSet = new BarDataSet(userEntries, "Account Types");
+
 
             // Create data sets for each category
             BarDataSet userDataSet = new BarDataSet(userEntries, "Users");
             userDataSet.setColor(Color.rgb(144, 238, 144));  // Set color for users
 
             BarDataSet nutritionistDataSet = new BarDataSet(nutritionistEntries, "Nutritionists");
-            nutritionistDataSet.setColor(Color.rgb(224, 255, 255));  // Set color for nutritionists
+            nutritionistDataSet.setColor(Color.rgb(180, 205, 255));  // Set color for nutritionists
 
             BarDataSet adminDataSet = new BarDataSet(adminEntries, "Admins");
             adminDataSet.setColor(Color.rgb(211, 211, 211));  // Set color for admins
@@ -113,6 +216,10 @@ public class AdminHomeFragment extends Fragment {
             legend.setEnabled(true);  // Ensure the legend is enabled
             legend.setTextSize(14f);  // Adjust the text size of the legend
             legend.setForm(Legend.LegendForm.CIRCLE);  // Customize the legend shape (optional)
+            legend.setFormSize(10f);  // Adjust the size of the legend shape
+            legend.setXEntrySpace(30f);  // Adjust the space between legend entries horizontally
+            legend.setYEntrySpace(5f);  // Adjust the space between legend entries vertically
+            legend.setFormToTextSpace(5f);
 
             barData.setValueTextSize(12f);  // Set text size for the values
             barData.setValueFormatter(new ValueFormatter() {
@@ -135,61 +242,34 @@ public class AdminHomeFragment extends Fragment {
                     // Do nothing
                 }
             });
-
-            ImageView logoutImage = view.findViewById(R.id.right_icon);
-            logoutImage.setOnClickListener(v -> {
-                Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-                // Switch to guest mode (for nutritionists as guests)
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).switchToGuestMode();
-                    ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
-                }
-            });
-
-            // Find the buttons in the layout
-            Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);
-            Button addAdminButton = view.findViewById(R.id.addAdminButton);
-            Button viewFAQsButton = view.findViewById(R.id.viewFAQbutton);
-            Button addFAQButton = view.findViewById(R.id.addFAQbutton);
-
-            // Set an OnClickListener on the viewAccountsButton
-            viewAccountsButton.setOnClickListener(v -> {
-                // Replace the current fragment with AccountsFragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame_layout, new viewAccountsFragment()); // Ensure R.id.frame_layout is the container in your activity
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            });
-
-            addAdminButton.setOnClickListener(v -> {
-                // Replace the current fragment with AccountsFragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame_layout, new AddAdminFragment()); // Ensure R.id.frame_layout is the container in your activity
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            });
-
-            viewFAQsButton.setOnClickListener(v -> {
-                // Replace the current fragment with AccountsFragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame_layout, new FAQFragment()); // Ensure R.id.frame_layout is the container in your activity
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            });
-
-            // Set an OnClickListener on the addFAQButton
-            addFAQButton.setOnClickListener(v -> {
-                // Replace the current fragment with FAQFragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame_layout, new AddFAQFragment()); // Ensure R.id.frame_layout is the container in your activity
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            });
         }
-        return view;
+    }
+    private void setupUI(View view) {
+        ImageView logoutImage = view.findViewById(R.id.right_icon);
+        logoutImage.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToGuestMode();
+                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+            }
+        });
+
+        Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);
+        Button addAdminButton = view.findViewById(R.id.addAdminButton);
+        Button viewFAQsButton = view.findViewById(R.id.viewFAQbutton);
+        Button addFAQButton = view.findViewById(R.id.addFAQbutton);
+
+        viewAccountsButton.setOnClickListener(v -> replaceFragment(new viewAccountsFragment()));
+        addAdminButton.setOnClickListener(v -> replaceFragment(new AddAdminFragment()));
+        viewFAQsButton.setOnClickListener(v -> replaceFragment(new FAQFragment()));
+        addFAQButton.setOnClickListener(v -> replaceFragment(new AddFAQFragment()));
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 }
