@@ -3,12 +3,15 @@ package com.example.dietandnutritionapplication;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -21,6 +24,9 @@ public class viewAccountsFragment extends Fragment {
     ArrayList<Profile> originalProfiles = new ArrayList<>(); // Keep the unfiltered original list
     private Spinner roleSpinner;
     private ProfileAdapter adapter; // Ensure you have a ProfileAdapter to handle Profile objects
+    private EditText searchAdminEditText;
+    private String selectedRole = "All Users"; // To keep track of the selected role
+    private String searchText = ""; // To keep track of the search text
 
     public viewAccountsFragment() {
         // Required empty public constructor
@@ -45,6 +51,7 @@ public class viewAccountsFragment extends Fragment {
 
         listView = view.findViewById(R.id.listView);
         roleSpinner = view.findViewById(R.id.filterRoleSpinner);
+        searchAdminEditText = view.findViewById(R.id.searchAdminEditText);
 
         // Initialize and set up the ProfileAdapter
         adapter = new ProfileAdapter(getContext(), profiles);
@@ -80,17 +87,34 @@ public class viewAccountsFragment extends Fragment {
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         roleSpinner.setAdapter(sortAdapter);
 
+        // Update role filter when spinner selection changes
         roleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Handle filter logic here
-                String selectedRole = sortRole.get(position);
-                filterProfilesByRole(selectedRole);
+                selectedRole = sortRole.get(position); // Update the selected role
+                filterProfiles(); // Apply combined filter
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // Handle no selection
+            }
+        });
+
+        // Update name filter when text changes in EditText
+        searchAdminEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchText = s.toString(); // Update search text
+                filterProfiles(); // Apply combined filter
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
             }
         });
 
@@ -100,25 +124,30 @@ public class viewAccountsFragment extends Fragment {
         return view;
     }
 
-    private void filterProfilesByRole(String role) {
-        if (role.equals("All Users")) {
-            // Reset to original profiles when "All Users" is selected
-            profiles.clear();
-            profiles.addAll(originalProfiles); // Restore all profiles from the original list
-        } else {
-            ArrayList<Profile> filteredProfiles = new ArrayList<>();
-            for (Profile profile : originalProfiles) { // Filter based on the originalProfiles list
-                if (profile instanceof Admin && role.equals("Admin")) {
-                    filteredProfiles.add(profile);
-                } else if (profile instanceof Nutritionist && role.equals("Nutritionist")) {
-                    filteredProfiles.add(profile);
-                } else if (profile instanceof User && role.equals("User")) {
-                    filteredProfiles.add(profile);
-                }
+    // Combined method to filter by both role and name
+    private void filterProfiles() {
+        ArrayList<Profile> filteredProfiles = new ArrayList<>();
+
+        for (Profile profile : originalProfiles) {
+            boolean matchesRole = selectedRole.equals("All Users") ||
+                    (profile instanceof Admin && selectedRole.equals("Admin")) ||
+                    (profile instanceof Nutritionist && selectedRole.equals("Nutritionist")) ||
+                    (profile instanceof User && selectedRole.equals("User"));
+
+            boolean matchesName = searchText.isEmpty() || (
+                    (profile instanceof Admin && ((Admin) profile).getUsername().toLowerCase().contains(searchText)) ||
+                            (profile instanceof Nutritionist && ((Nutritionist) profile).getUsername().toLowerCase().contains(searchText)) ||
+                            (profile instanceof User && ((User) profile).getUsername().toLowerCase().contains(searchText))
+            );
+
+            // Add to filtered list only if it matches both the role and the name
+            if (matchesRole && matchesName) {
+                filteredProfiles.add(profile);
             }
-            profiles.clear();
-            profiles.addAll(filteredProfiles); // Update the profiles list with filtered data
         }
-        adapter.notifyDataSetChanged(); // Refresh adapter with new data
+
+        profiles.clear();
+        profiles.addAll(filteredProfiles);
+        adapter.notifyDataSetChanged(); // Refresh the adapter
     }
 }

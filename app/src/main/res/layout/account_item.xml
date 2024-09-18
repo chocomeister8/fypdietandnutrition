@@ -13,19 +13,29 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="#9DF8EA">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="45dp"
+            android:layout_height="46dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/baseline_person_outline_24" />
 
         <!-- Username Label TextView -->
         <TextView
             android:id="@+id/usernamelabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:text="Username:"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/username"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView2"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
 
@@ -43,11 +53,12 @@
             android:id="@+id/fullNamelabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:text="Full Name:"
             android:textSize="15sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView2"
             app:layout_constraintTop_toBottomOf="@+id/usernamelabel" />
 
         <TextView
@@ -62,11 +73,12 @@
             android:id="@+id/rolelabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:text="Role:"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView2"
             app:layout_constraintTop_toBottomOf="@+id/fullNamelabel" /> <!-- Add some spacing between the label and value -->
 
         <!-- Role TextView -->
@@ -77,6 +89,28 @@
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/rolelabel"
             app:layout_constraintTop_toBottomOf="@+id/fullname" />
+
+        <TextView
+            android:id="@+id/datejoinedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="Date Joined:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/usernamelabel"
+            app:layout_constraintTop_toBottomOf="@+id/rolelabel" />
+
+        <TextView
+            android:id="@+id/dateJoined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/datejoinedLabel"
+            app:layout_constraintTop_toTopOf="@+id/datejoinedLabel" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

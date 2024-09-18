@@ -2,11 +2,14 @@ package com.example.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -24,6 +27,9 @@ public class FAQFragment extends Fragment{
     ArrayList<String> items;
     FAQAdapter adapter;
     ArrayList<FAQ> faq = new ArrayList<>();
+    ArrayList<FAQ> originalFAQ = new ArrayList<>(); // Keep the unfiltered original list
+    private EditText searchFAQEditText;
+
 
     private Spinner filterFAQspinner;
 
@@ -76,6 +82,8 @@ public class FAQFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.viewallfaqs, container, false);
         FAQListView = view.findViewById(R.id.faqListView);
+        searchFAQEditText = view.findViewById(R.id.searchFAQEditText);
+
 
 
         // Set the adapter to the ListView
@@ -98,8 +106,8 @@ public class FAQFragment extends Fragment{
         faqEntity.fetchFAQ(new FAQEntity.DataCallback(){
             @Override
             public void onSuccess(ArrayList<FAQ> faqs) {
-/*              originalFAQ.clear(); // Clear the original profiles list
-                originalFAQ.addAll(faqs); // Store fetched profiles in the original list*/
+                originalFAQ.clear(); // Clear the original profiles list
+                originalFAQ.addAll(faqs); // Store fetched profiles in the original list
                 faq.clear(); // Clear the filtering list
                 faq.addAll(faqs); // Store profiles for filtering
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
@@ -126,16 +134,24 @@ public class FAQFragment extends Fragment{
             }
         });
 
-        // Set the adapter to the ListView
-        FAQListView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-
-        FAQListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        searchFAQEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterFAQbyTitle(s.toString()); // Filter profiles as the user types
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
             }
         });
+
+        FAQListView.setOnItemClickListener((parent, view1, position, id) ->
+                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show());
+
 
         return view;
     }
@@ -152,5 +168,19 @@ public class FAQFragment extends Fragment{
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
+    }
+    private void filterFAQbyTitle(String searchText) {
+        ArrayList<FAQ> filteredfaqs = new ArrayList<>();
+        for (FAQ faqs : originalFAQ) {
+            if (faqs instanceof FAQ) {
+                FAQ searchedFAQ = (FAQ) faqs;
+                if (searchedFAQ.getTitle().toLowerCase().contains(searchText.toLowerCase())) {
+                    filteredfaqs.add(searchedFAQ);
+                }
+            }
+        }
+        faq.clear();
+        faq.addAll(filteredfaqs);
+        adapter.notifyDataSetChanged();
     }
 }

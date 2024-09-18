@@ -152,7 +152,7 @@ public class AddAdminFragment extends Fragment {
                             public void onSuccess() {
 
                                 Toast.makeText(getActivity(), "Registration successful", Toast.LENGTH_SHORT).show();
-                                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                                redirectToViewAllAccounts();
                             }
 
                             @Override
@@ -162,47 +162,10 @@ public class AddAdminFragment extends Fragment {
                             }
                         }
                 );
-
-//                insertAdmin(firstName, lastName, userName, password, phone, dob, email, selectedGender, role);
-//                redirectToViewAllAccounts();
             }
 
         });
         return view;
-    }
-
-    private void insertAdmin(String firstName, String lastName, String userName, String phone, String dob, String email, String password, String gender, String role){
-
-        DocumentReference newAdmin = db.collection("Users").document(); // Auto-generated ID
-
-        Map<String, Object> admin = new HashMap<>();
-
-        String id = UUID.randomUUID().toString();
-        admin.put("id",newAdmin);
-        admin.put("firstName", firstName);
-        admin.put("lastName", lastName);
-        admin.put("username", userName);
-        admin.put("dob", dob);
-        admin.put("phoneNumber", phone);
-        admin.put("email", email);
-        admin.put("password", password);
-        admin.put("gender", gender);
-        admin.put("role", role);
-
-
-
-        db.collection("Users").document(id).set(admin).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                pd.dismiss();
-                Toast.makeText(getActivity(), "New Admin Added", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getActivity(), "Failed to add", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     public boolean isValidEmail(String email) {
