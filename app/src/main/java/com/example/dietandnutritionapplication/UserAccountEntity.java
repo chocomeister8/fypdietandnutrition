@@ -190,5 +190,39 @@ public class UserAccountEntity {
         void onSuccess();
         void onFailure(String errorMessage);
     }
+    public void addAdmin(String firstName, String userName, String dob, String email, String phone, String gender, String password, Context context, RegisterCallback callback) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String userId = firebaseUser.getUid();
+
+                            Admin adminCreate = new Admin();
+                            adminCreate.setFirstName(firstName);
+                            adminCreate.setUsername(userName);
+                            adminCreate.setDob(dob);
+                            adminCreate.setPassword(password);
+                            adminCreate.setEmail(email);
+                            adminCreate.setPhoneNumber(phone);
+                            adminCreate.setGender(gender);
+                            adminCreate.setRole("admin");
+
+
+                            db.collection("Users").document(userId).set(adminCreate)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            callback.onSuccess();
+                                        } else {
+                                            callback.onFailure("Failed to save user data");
+                                        }
+                                    });
+                        }
+                    } else {
+                        callback.onFailure(task.getException().getMessage());
+                    }
+                });
+    }
 
 }

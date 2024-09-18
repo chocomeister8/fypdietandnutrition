@@ -117,7 +117,7 @@ public class AddAdminFragment extends Fragment {
                 String lastName = lastNameEditText.getText().toString();
                 String email = emailEditText.getText().toString();
                 String dob = dobEditText.getText().toString();
-                String role = "Admin";
+                String role = "admin";
                 int selectedId = radioGroupGender.getCheckedRadioButtonId();
                 if (selectedId == -1) {
                     // No RadioButton selected
@@ -145,9 +145,26 @@ public class AddAdminFragment extends Fragment {
                     Toast.makeText(getActivity(), "Please enter a valid phone number.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                UserAccountEntity userAccountEntity = new UserAccountEntity();
+                userAccountEntity.addAdmin(firstName, userName, dob, email, phone, selectedGender, password, getActivity(),
+                        new UserAccountEntity.RegisterCallback() {
+                            @Override
+                            public void onSuccess() {
 
-                insertAdmin(firstName, lastName, userName, password, phone, dob, email, selectedGender, role);
-                redirectToViewAllAccounts();
+                                Toast.makeText(getActivity(), "Registration successful", Toast.LENGTH_SHORT).show();
+                                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                            }
+
+                            @Override
+                            public void onFailure(String errorMessage) {
+
+                                Toast.makeText(getActivity(), "Registration failed: " + errorMessage, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+
+//                insertAdmin(firstName, lastName, userName, password, phone, dob, email, selectedGender, role);
+//                redirectToViewAllAccounts();
             }
 
         });
