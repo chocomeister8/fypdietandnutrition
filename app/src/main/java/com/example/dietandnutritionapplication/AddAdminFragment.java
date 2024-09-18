@@ -25,6 +25,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -117,6 +120,7 @@ public class AddAdminFragment extends Fragment {
                 String lastName = lastNameEditText.getText().toString();
                 String email = emailEditText.getText().toString();
                 String dob = dobEditText.getText().toString();
+                String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 String role = "admin";
                 int selectedId = radioGroupGender.getCheckedRadioButtonId();
                 if (selectedId == -1) {
@@ -146,7 +150,7 @@ public class AddAdminFragment extends Fragment {
                     return;
                 }
                 UserAccountEntity userAccountEntity = new UserAccountEntity();
-                userAccountEntity.addAdmin(firstName, userName, dob, email, phone, selectedGender, password, getActivity(),
+                userAccountEntity.addAdmin(firstName, lastName, userName, dob, email, phone, selectedGender, password, date, getActivity(),
                         new UserAccountEntity.RegisterCallback() {
                             @Override
                             public void onSuccess() {
