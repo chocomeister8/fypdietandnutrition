@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:alignmentMode="alignMargins"
         android:background="@color/white"
-        android:columnCount="3"
+        android:columnCount="1"
         android:gravity="center"
         android:rowCount="1"
         android:useDefaultMargins="true"
@@ -70,12 +70,13 @@
 
         <!-- Second Column: Filter All Button -->
         <EditText
-            android:id="@+id/editTextText"
+            android:id="@+id/searchAdminEditText"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_row="0"
             android:layout_column="0"
             android:layout_columnWeight="1"
+            android:columnCount="1"
             android:layout_marginEnd="8dp"
             android:background="#E6E0E9"
             android:gravity="center"
@@ -89,14 +90,15 @@
             android:id="@+id/filterRoleSpinner"
             android:layout_width="0dp"
             android:layout_height="48dp"
+            android:layout_row="0"
             android:layout_columnWeight="1"
-            android:backgroundTint="@color/grey"
             android:gravity="center"
-            android:padding="10dp"
+            android:padding="12dp"
+            android:popupBackground="@color/grey"
             android:spinnerMode="dropdown"
+            android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="16sp"
-            />
+            android:textSize="16sp" />
 
     </GridLayout>
 
@@ -105,6 +107,7 @@
         android:layout_width="414dp"
         android:layout_height="681dp"
         android:background="#9DF8EA"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gridLayout" />

@@ -2,20 +2,22 @@ package com.example.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 
 
 
@@ -24,6 +26,9 @@ public class FAQFragment extends Fragment{
     ArrayList<String> items;
     FAQAdapter adapter;
     ArrayList<FAQ> faq = new ArrayList<>();
+    ArrayList<FAQ> originalFAQ = new ArrayList<>(); // Keep the unfiltered original list
+    private EditText searchFAQEditText;
+
 
     private Spinner filterFAQspinner;
 
@@ -76,6 +81,8 @@ public class FAQFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.viewallfaqs, container, false);
         FAQListView = view.findViewById(R.id.faqListView);
+        searchFAQEditText = view.findViewById(R.id.searchFAQEditText);
+
 
 
         // Set the adapter to the ListView
@@ -98,8 +105,8 @@ public class FAQFragment extends Fragment{
         faqEntity.fetchFAQ(new FAQEntity.DataCallback(){
             @Override
             public void onSuccess(ArrayList<FAQ> faqs) {
-/*              originalFAQ.clear(); // Clear the original profiles list
-                originalFAQ.addAll(faqs); // Store fetched profiles in the original list*/
+                originalFAQ.clear(); // Clear the original profiles list
+                originalFAQ.addAll(faqs); // Store fetched profiles in the original list
                 faq.clear(); // Clear the filtering list
                 faq.addAll(faqs); // Store profiles for filtering
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
@@ -126,19 +133,41 @@ public class FAQFragment extends Fragment{
             }
         });
 
-        // Set the adapter to the ListView
-        FAQListView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-
-        FAQListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        searchFAQEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterFAQbyTitle(s.toString()); // Filter profiles as the user types
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
             }
         });
 
+        FAQListView.setOnItemClickListener((parent, view1, position, id) -> {
+            FAQ selectedFAQ = faq.get(position); // Get the selected FAQ
+
+            // Create a new instance of FAQDetailsFragment and pass the selected FAQ
+            FAQDetailsFragment faqDetailsFragment = new FAQDetailsFragment(); // Correct the variable name
+
+            // Create a bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedFAQ", selectedFAQ); // Pass the FAQ object (ensure FAQ implements Serializable)
+            faqDetailsFragment.setArguments(bundle);
+
+            // Replace the current fragment with FAQDetailsFragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, faqDetailsFragment) // Ensure correct container ID is used
+                    .addToBackStack(null) // Add to back stack so you can navigate back
+                    .commit();
+        });
         return view;
     }
+
     private void sortFAQByDate(final boolean latestToOldest) {
         faq.sort(new Comparator<FAQ>() {
             @Override
@@ -152,5 +181,19 @@ public class FAQFragment extends Fragment{
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
+    }
+    private void filterFAQbyTitle(String searchText) {
+        ArrayList<FAQ> filteredfaqs = new ArrayList<>();
+        for (FAQ faqs : originalFAQ) {
+            if (faqs instanceof FAQ) {
+                FAQ searchedFAQ = (FAQ) faqs;
+                if (searchedFAQ.getTitle().toLowerCase().contains(searchText.toLowerCase())) {
+                    filteredfaqs.add(searchedFAQ);
+                }
+            }
+        }
+        faq.clear();
+        faq.addAll(filteredfaqs);
+        adapter.notifyDataSetChanged();
     }
 }

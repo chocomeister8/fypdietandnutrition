@@ -31,6 +31,7 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
             viewHolder.usernameTextView = convertView.findViewById(R.id.username);
             viewHolder.fullnameTextView = convertView.findViewById(R.id.fullname);
             viewHolder.roleTextView = convertView.findViewById(R.id.role);
+            viewHolder.dateJoinedTextView = convertView.findViewById(R.id.dateJoined);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -42,6 +43,7 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
         String fullName = currentProfile.getFirstName() + " " + currentProfile.getLastName();
         viewHolder.fullnameTextView.setText(fullName);
         viewHolder.roleTextView.setText(currentProfile.getRole());
+        viewHolder.dateJoinedTextView.setText(currentProfile.getDateJoined());
 
         return convertView;
     }
@@ -50,5 +52,6 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
         TextView usernameTextView;
         TextView roleTextView;
         TextView fullnameTextView;
+        TextView dateJoinedTextView;
     }
 }

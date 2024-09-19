@@ -25,6 +25,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -117,6 +120,7 @@ public class AddAdminFragment extends Fragment {
                 String lastName = lastNameEditText.getText().toString();
                 String email = emailEditText.getText().toString();
                 String dob = dobEditText.getText().toString();
+                String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 String role = "admin";
                 int selectedId = radioGroupGender.getCheckedRadioButtonId();
                 if (selectedId == -1) {
@@ -146,13 +150,13 @@ public class AddAdminFragment extends Fragment {
                     return;
                 }
                 UserAccountEntity userAccountEntity = new UserAccountEntity();
-                userAccountEntity.addAdmin(firstName, userName, dob, email, phone, selectedGender, password, getActivity(),
+                userAccountEntity.addAdmin(firstName, lastName, userName, dob, email, phone, selectedGender, password, date, getActivity(),
                         new UserAccountEntity.RegisterCallback() {
                             @Override
                             public void onSuccess() {
 
                                 Toast.makeText(getActivity(), "Registration successful", Toast.LENGTH_SHORT).show();
-                                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                                redirectToViewAllAccounts();
                             }
 
                             @Override
@@ -162,47 +166,10 @@ public class AddAdminFragment extends Fragment {
                             }
                         }
                 );
-
-//                insertAdmin(firstName, lastName, userName, password, phone, dob, email, selectedGender, role);
-//                redirectToViewAllAccounts();
             }
 
         });
         return view;
-    }
-
-    private void insertAdmin(String firstName, String lastName, String userName, String phone, String dob, String email, String password, String gender, String role){
-
-        DocumentReference newAdmin = db.collection("Users").document(); // Auto-generated ID
-
-        Map<String, Object> admin = new HashMap<>();
-
-        String id = UUID.randomUUID().toString();
-        admin.put("id",newAdmin);
-        admin.put("firstName", firstName);
-        admin.put("lastName", lastName);
-        admin.put("username", userName);
-        admin.put("dob", dob);
-        admin.put("phoneNumber", phone);
-        admin.put("email", email);
-        admin.put("password", password);
-        admin.put("gender", gender);
-        admin.put("role", role);
-
-
-
-        db.collection("Users").document(id).set(admin).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                pd.dismiss();
-                Toast.makeText(getActivity(), "New Admin Added", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getActivity(), "Failed to add", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     public boolean isValidEmail(String email) {

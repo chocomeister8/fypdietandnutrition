@@ -20,7 +20,9 @@
             android:layout_height="wrap_content"
             android:text="Title:"
             android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
+            android:paddingStart="4dp"
+            app:layout_constraintStart_toEndOf="@+id/imageView3"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -38,7 +40,9 @@
             android:layout_height="wrap_content"
             android:text="Question:"
             android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
+            android:paddingStart="4dp"
+            app:layout_constraintStart_toEndOf="@+id/imageView3"
             app:layout_constraintTop_toBottomOf="@+id/titletext" />
 
         <TextView
@@ -58,7 +62,9 @@
             android:layout_height="wrap_content"
             android:text="Answer:"
             android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
+            android:paddingStart="4dp"
+            app:layout_constraintStart_toEndOf="@+id/imageView3"
             app:layout_constraintTop_toBottomOf="@+id/faqQuestion" />
 
         <TextView
@@ -78,7 +84,9 @@
             android:layout_height="wrap_content"
             android:text="Date Created:"
             android:textSize="15sp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textStyle="bold"
+            android:paddingStart="4dp"
+            app:layout_constraintStart_toStartOf="@+id/anstext"
             app:layout_constraintTop_toBottomOf="@+id/faqAnswer" />
 
         <TextView
@@ -91,16 +99,15 @@
             app:layout_constraintStart_toEndOf="@+id/datetext"
             app:layout_constraintTop_toBottomOf="@+id/faqAnswer" />
 
-        <!--<Button
-            android:id="@+id/faqButton"
-            android:layout_width="120dp"
-            android:layout_height="33dp"
-            android:background="@color/lightGrey"
-            android:text="View more"
-            android:textSize="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/faqDateCreated" />-->
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="89dp"
+            android:layout_height="85dp"
+            android:layout_marginStart="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/pngtree_faq_icon_on_white_background_png_image_4915284" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

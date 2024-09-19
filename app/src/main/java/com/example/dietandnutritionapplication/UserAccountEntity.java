@@ -190,7 +190,7 @@ public class UserAccountEntity {
         void onSuccess();
         void onFailure(String errorMessage);
     }
-    public void addAdmin(String firstName, String userName, String dob, String email, String phone, String gender, String password, Context context, RegisterCallback callback) {
+    public void addAdmin(String firstName, String lastName, String userName, String dob, String email, String phone, String gender, String password, String date, Context context, RegisterCallback callback) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -201,12 +201,14 @@ public class UserAccountEntity {
 
                             Admin adminCreate = new Admin();
                             adminCreate.setFirstName(firstName);
+                            adminCreate.setLastName(lastName);
                             adminCreate.setUsername(userName);
                             adminCreate.setDob(dob);
                             adminCreate.setPassword(password);
                             adminCreate.setEmail(email);
                             adminCreate.setPhoneNumber(phone);
                             adminCreate.setGender(gender);
+                            adminCreate.setDateJoined(date);
                             adminCreate.setRole("admin");
 
 

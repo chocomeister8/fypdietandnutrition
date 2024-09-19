@@ -1,6 +1,8 @@
 package com.example.dietandnutritionapplication;
 
-public class FAQ {
+import java.io.Serializable;
+
+public class FAQ implements Serializable {
     private String title;
     private String question;
     private String answer;
