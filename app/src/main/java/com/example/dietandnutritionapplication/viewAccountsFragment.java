@@ -121,7 +121,7 @@ public class viewAccountsFragment extends Fragment {
             Profile selectedProfile = profiles.get(position); // Get the selected profile
 
             // Create a new instance of AccountFragment and pass the selected profile
-            AccountFragment accountFragment = new AccountFragment();
+            AccountDetailsFragment accountFragment = new AccountDetailsFragment();
 
             // Create a bundle to pass data
             Bundle bundle = new Bundle();

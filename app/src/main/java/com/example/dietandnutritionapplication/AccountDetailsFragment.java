@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class AccountFragment extends Fragment {
+public class AccountDetailsFragment extends Fragment {
 
     private Profile selectedProfile; // Declare selectedProfile at class level
 
