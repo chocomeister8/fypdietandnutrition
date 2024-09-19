@@ -44,35 +44,12 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        User user1 = new User();
-        user1.setUsername("zaw");
-        user1.setPassword("123");
-        user1.setRole("user");
-        accountArray.add(user1);
-
-        User user2 = new User();
-        user2.setUsername("zero");
-        user2.setPassword("123");
-        user2.setRole("user");
-        accountArray.add(user2);
-
-        User user3 = new User();
-        user3.setUsername("ally");
-        user3.setPassword("123");
-        user3.setRole("user");
-        accountArray.add(user3);
-
         Admin admin1 = new Admin();
         admin1.setUsername("admin");
         admin1.setPassword("admin123");
         admin1.setRole("admin");
         accountArray.add(admin1);
 
-        Nutritionist nutritionist1 = new Nutritionist();
-        nutritionist1.setUsername("sim");
-        nutritionist1.setPassword("123");
-        nutritionist1.setRole("nutritionist");
-        accountArray.add(nutritionist1);
 
         // Initialize ViewBinding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -134,11 +111,6 @@ public class MainActivity extends AppCompatActivity {
                 });
 
     }
-
-        public ArrayList<Profile> getAccountArray() {
-            return accountArray;
-        }
-
         public ArrayList<FAQ> getFAQArray() {
 
             return faqArray;

@@ -66,13 +66,6 @@ public class FAQFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        items = new ArrayList<>();
-        MainActivity mainActivity = (MainActivity) getActivity();
-        faq = mainActivity.getFAQArray();
-        for(FAQ faq:faq){
-            displayFAQ faq1= new displayFAQ(faq.getTitle(), faq.getQuestion(), faq.getAnswer(), faq.getDateCreated());
-            items.add(faq1.toString());
-        }
     }
 
     @SuppressLint("MissingInflatedId")

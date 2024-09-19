@@ -21,6 +21,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -30,7 +33,7 @@ import java.util.ArrayList;
  */
 public class URegisterFragment extends Fragment {
 
-    private EditText firstNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
+    private EditText firstNameEditText, lastNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
     private RadioButton maleRadioButton, femaleRadioButton;
     private Button registerButton;
     private ArrayList<Profile> accountArray = new ArrayList<>();
@@ -86,6 +89,7 @@ public class URegisterFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         MainActivity mainActivity = (MainActivity) getActivity();
         firstNameEditText = view.findViewById(R.id.firstName);
+        lastNameEditText = view.findViewById(R.id.lastName);
         userNameEditText = view.findViewById(R.id.userNameCreate);
         dobEditText = view.findViewById(R.id.dobtext);
         emailEditText = view.findViewById(R.id.email);
@@ -100,14 +104,17 @@ public class URegisterFragment extends Fragment {
             public void onClick(View v) {
 
                 String firstName = firstNameEditText.getText().toString();
+                String lastName = lastNameEditText.getText().toString();
                 String userName = userNameEditText.getText().toString();
                 String dob = dobEditText.getText().toString();
                 String email = emailEditText.getText().toString();
                 String phone = phoneEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 String confirmPassword = confirmPasswordEditText.getText().toString();
+                String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-                if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(dob) ||
+
+                if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(dob) ||
                         TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password) ||
                         !TextUtils.equals(password, confirmPassword)) {
                     Toast.makeText(getActivity(), "Please fill in all fields and make sure passwords match", Toast.LENGTH_SHORT).show();
@@ -124,7 +131,7 @@ public class URegisterFragment extends Fragment {
                     gender = "Unspecified";
                 }
                 UserAccountEntity userAccountEntity = new UserAccountEntity();
-                userAccountEntity.registerUser(firstName, userName, dob, email, phone, gender, password, getActivity(),
+                userAccountEntity.registerUser(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity(),
                         new UserAccountEntity.RegisterCallback() {
                             @Override
                             public void onSuccess() {

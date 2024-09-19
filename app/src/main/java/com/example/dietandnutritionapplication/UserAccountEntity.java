@@ -152,7 +152,7 @@ public class UserAccountEntity {
     }
 
 
-    public void registerUser(String firstName, String userName, String dob, String email, String phone, String gender, String password, Context context, RegisterCallback callback) {
+    public void registerUser(String firstName, String lastName, String userName, String dob, String email, String phone, String gender, String password, String datejoined, Context context, RegisterCallback callback) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -163,12 +163,14 @@ public class UserAccountEntity {
 
                             User userCreate = new User();
                             userCreate.setFirstName(firstName);
+                            userCreate.setLastName(lastName);
                             userCreate.setUsername(userName);
                             userCreate.setDob(dob);
                             userCreate.setPassword(password);
                             userCreate.setEmail(email);
                             userCreate.setPhoneNumber(phone);
                             userCreate.setGender(gender);
+                            userCreate.setDateJoined(datejoined);
 
 
                             db.collection("Users").document(userId).set(userCreate)
