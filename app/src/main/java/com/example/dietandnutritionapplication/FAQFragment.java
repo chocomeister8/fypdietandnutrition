@@ -13,12 +13,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 
 
 
@@ -149,12 +148,26 @@ public class FAQFragment extends Fragment{
             }
         });
 
-        FAQListView.setOnItemClickListener((parent, view1, position, id) ->
-                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show());
+        FAQListView.setOnItemClickListener((parent, view1, position, id) -> {
+            FAQ selectedFAQ = faq.get(position); // Get the selected FAQ
 
+            // Create a new instance of FAQDetailsFragment and pass the selected FAQ
+            FAQDetailsFragment faqDetailsFragment = new FAQDetailsFragment(); // Correct the variable name
 
+            // Create a bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedFAQ", selectedFAQ); // Pass the FAQ object (ensure FAQ implements Serializable)
+            faqDetailsFragment.setArguments(bundle);
+
+            // Replace the current fragment with FAQDetailsFragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, faqDetailsFragment) // Ensure correct container ID is used
+                    .addToBackStack(null) // Add to back stack so you can navigate back
+                    .commit();
+        });
         return view;
     }
+
     private void sortFAQByDate(final boolean latestToOldest) {
         faq.sort(new Comparator<FAQ>() {
             @Override

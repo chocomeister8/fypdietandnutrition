@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,8 +117,23 @@ public class viewAccountsFragment extends Fragment {
             }
         });
 
-        listView.setOnItemClickListener((parent, view1, position, id) ->
-                Toast.makeText(getContext(), "Item clicked: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_SHORT).show());
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            Profile selectedProfile = profiles.get(position); // Get the selected profile
+
+            // Create a new instance of AccountFragment and pass the selected profile
+            AccountFragment accountFragment = new AccountFragment();
+
+            // Create a bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedProfile", selectedProfile); // Pass the profile object (make sure Profile implements Serializable)
+            accountFragment.setArguments(bundle);
+
+            // Replace the current fragment with AccountFragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, accountFragment) // Make sure to replace with the correct container ID
+                    .addToBackStack(null) // Add to back stack so you can navigate back
+                    .commit();
+        });
 
         return view;
     }
