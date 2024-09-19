@@ -5,11 +5,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 
 public class FAQDetailsFragment extends Fragment {
@@ -31,6 +33,8 @@ public class FAQDetailsFragment extends Fragment {
         TextView questionTextView = view.findViewById(R.id.question);
         TextView answerTextView = view.findViewById(R.id.answer);
         TextView datecreatedTextView = view.findViewById(R.id.datecreated);
+        Button updateFAQButton = view.findViewById(R.id.updateFAQ);  // Find the updateFAQ button
+
 
 
         // Set the details in the UI
@@ -40,6 +44,26 @@ public class FAQDetailsFragment extends Fragment {
             answerTextView.setText(selectedFAQ.getAnswer());
             datecreatedTextView.setText(selectedFAQ.getDateCreated());
         }
+
+        updateFAQButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create the new fragment instance
+                UpdateFAQFragment updateFAQFragment = new UpdateFAQFragment();
+
+                // Pass the selected FAQ to the update fragment using a Bundle
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("selectedFAQ", selectedFAQ);
+                updateFAQFragment.setArguments(bundle);
+
+                // Perform the fragment transaction to navigate to the UpdateFAQFragment
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.frame_layout, updateFAQFragment); // Assuming your container ID is fragment_container
+                transaction.addToBackStack(null); // This allows the user to navigate back
+                transaction.commit();
+            }
+        });
+
 
         return view;
     }
