@@ -45,6 +45,7 @@ public class FAQEntity {
 
     private FAQ createFAQFromDocument(QueryDocumentSnapshot document) {
         FAQ faq = new FAQ();
+        faq.setFaqId(document.getString("id"));
         faq.setTitle(document.getString("title"));
         faq.setQuestion(document.getString("question"));
         faq.setAnswer(document.getString("answer"));

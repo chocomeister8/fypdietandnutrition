@@ -26,7 +26,6 @@ public class FAQAdapter extends ArrayAdapter<FAQ> {
         }
 
         FAQ currentFAQ = faqList.get(position);
-
         TextView titleTextView = convertView.findViewById(R.id.faqTitle);
         TextView questionTextView = convertView.findViewById(R.id.faqQuestion);
         TextView answerTextView = convertView.findViewById(R.id.faqAnswer);
@@ -35,7 +34,7 @@ public class FAQAdapter extends ArrayAdapter<FAQ> {
         titleTextView.setText(currentFAQ.getTitle());
         questionTextView.setText(currentFAQ.getQuestion());
         answerTextView.setText(currentFAQ.getAnswer());
-        dateCreatedTextView.setText(currentFAQ.getDateCreated().toString());
+        dateCreatedTextView.setText(currentFAQ.getDateCreated());
 
         return convertView;
     }

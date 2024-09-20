@@ -3,6 +3,7 @@ package com.example.dietandnutritionapplication;
 import java.io.Serializable;
 
 public class FAQ implements Serializable {
+    private String faqId;
     private String title;
     private String question;
     private String answer;
@@ -12,11 +13,18 @@ public class FAQ implements Serializable {
 
     }
 
-    public FAQ(String title, String question, String answer, String dateCreated) {
+    public FAQ(String faqId, String title, String question, String answer, String dateCreated) {
+        this.faqId = faqId;
         this.title = title;
         this.question = question;
         this.answer = answer;
         this.dateCreated = dateCreated;
+    }
+
+    public String getFaqId(){ return faqId;
+    }
+
+    public void setFaqId(String faqId){ this.faqId = faqId;
     }
 
     public String getTitle() { return title;

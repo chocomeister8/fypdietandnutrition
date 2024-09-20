@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -37,12 +38,14 @@ public class AdminHomeFragment extends Fragment {
     private int numberOfUsers = 0;
     private int numberOfNutritionists = 0;
     private int numberOfAdmins = 0;
+    private TextView faqCountTextView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.adminhomepage, container, false);
+        faqCountTextView = view.findViewById(R.id.faqcount);
         barChart = view.findViewById(R.id.accountBarchart);
 
         ImageView logoutImage = view.findViewById(R.id.right_icon);
@@ -126,6 +129,7 @@ public class AdminHomeFragment extends Fragment {
 
                 // Update the chart with new data
                 fetchAndUpdateProfileData();
+                fetchFAQCount();
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
 
@@ -264,6 +268,24 @@ public class AdminHomeFragment extends Fragment {
         viewFAQsButton.setOnClickListener(v -> replaceFragment(new FAQFragment()));
         addFAQButton.setOnClickListener(v -> replaceFragment(new AddFAQFragment()));
     }
+
+    private void fetchFAQCount() {
+        FAQEntity faqEntity = new FAQEntity();
+        faqEntity.retrieveFAQs(new FAQEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<FAQ> faqs) {
+                int faqCount = faqs.size(); // Get the number of FAQs
+                faqCountTextView.setText("FAQs: " + faqCount); // Update the TextView
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load FAQs.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getParentFragmentManager();
