@@ -66,6 +66,28 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new LandingFragment());
 
     }
+        public void createFAQ(String title, String question, String answer, String dateCreated){
+            FAQ faqcreate = new FAQ();
+            faqcreate.setTitle(title);
+            faqcreate.setQuestion(question);
+            faqcreate.setAnswer(answer);
+            faqcreate.setDateCreated(dateCreated);
+            faqArray.add(faqcreate);
+        }
+
+        public void createAdminAccount(String firstname,String lastname,String username, String password,String phNum,String dob,String email,String gender, String role) {
+            Admin adminCreate = new Admin();
+            adminCreate.setUsername(username);
+            adminCreate.setPhoneNumber(phNum);
+            adminCreate.setPassword(password);
+            adminCreate.setRole(role);
+            adminCreate.setFirstName(firstname);
+            adminCreate.setLastName(lastname);
+            adminCreate.setDob(dob);
+            adminCreate.setEmail(email);
+            adminCreate.setGender(gender);
+            accountArray.add(adminCreate);
+        }
 
     public Task<AuthResult> createUserAccount(Context context, String firstname, String username, String dob, String email, String phNum, String gender, String password) {
         return mAuth.createUserWithEmailAndPassword(email, password)

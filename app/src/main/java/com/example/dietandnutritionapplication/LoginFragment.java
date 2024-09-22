@@ -74,13 +74,13 @@ public class LoginFragment extends Fragment {
                                     QueryDocumentSnapshot document = (QueryDocumentSnapshot) querySnapshot.getDocuments().get(0);
                                     String dbPassword = document.getString("password");
                                     String role = document.getString("role");
-                                    String email = document.getString("email");
+                                    String username = document.getString("username");
 
                                     if (enteredPassword.equals(dbPassword)) {
 
                                         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                                        editor.putString("loggedInUserEmail", email);  // Save the user email
+                                        editor.putString("loggedInUserName", username);  // Save the user email
                                         editor.apply();
 
                                         Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
