@@ -9,8 +9,18 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+
+
 
 public class RecipesFolderFragment extends Fragment {
+
+    private RecyclerView recyclerView;
+    private RecipeAdapter recipeAdapter;
+    private List<Recipe> recipeList;
 
     @Nullable
     @Override
@@ -24,17 +34,16 @@ public class RecipesFolderFragment extends Fragment {
         Button button_favourite = view.findViewById(R.id.button_favourite);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
 
+
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> {
-            // Replace current fragment with NavAllRecipesFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout, new NavAllRecipesFragment())
-                    .addToBackStack(null)  // Add to back stack to enable back navigation
+                    .addToBackStack(null)
                     .commit();
         });
 
         button_vegetarian.setOnClickListener(v -> {
-            // Replace current fragment with NavVegetarianRecipesFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout, new NavVegetarianRecipesFragment())
                     .addToBackStack(null)
@@ -42,7 +51,6 @@ public class RecipesFolderFragment extends Fragment {
         });
 
         button_favourite.setOnClickListener(v -> {
-            // Replace current fragment with NavFavouriteRecipesFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout, new NavFavouriteRecipesFragment())
                     .addToBackStack(null)
@@ -50,7 +58,6 @@ public class RecipesFolderFragment extends Fragment {
         });
 
         button_recipes_status.setOnClickListener(v -> {
-            // Replace current fragment with NavRecipesStatusFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout, new NavRecipesStatusFragment())
                     .addToBackStack(null)
@@ -59,4 +66,5 @@ public class RecipesFolderFragment extends Fragment {
 
         return view;
     }
+
 }
