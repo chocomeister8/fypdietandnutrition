@@ -6,6 +6,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+import android.widget.Toast;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 
@@ -225,6 +231,48 @@ public class UserAccountEntity {
                         }
                     } else {
                         callback.onFailure(task.getException().getMessage());
+                    }
+                });
+    }
+
+    public void login(String enteredUsername, String enteredPassword, Context context, MainActivity mainActivity) {
+        db.collection("Users")
+                .whereEqualTo("username", enteredUsername)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (!querySnapshot.isEmpty()) {
+                            QueryDocumentSnapshot document = (QueryDocumentSnapshot) querySnapshot.getDocuments().get(0);
+                            String dbPassword = document.getString("password");
+                            String role = document.getString("role");
+                            String username = document.getString("username");
+
+                            if (enteredPassword.equals(dbPassword)) {
+                                SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("loggedInUserName", username);  // Save the username
+                                editor.apply();
+
+                                Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
+
+                                if ("user".equals(role)) {
+                                    mainActivity.switchToUserMode();
+                                } else if ("admin".equals(role)) {
+                                    mainActivity.switchToAdminMode();
+                                } else if ("nutritionist".equals(role)) {
+                                    mainActivity.switchToNutriMode();
+                                }
+                            } else {
+                                Toast.makeText(context, "Invalid password", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Exception e = task.getException();
+                        Log.e("LoginError", "Error checking login", e);
+                        Toast.makeText(context, "Error checking login: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

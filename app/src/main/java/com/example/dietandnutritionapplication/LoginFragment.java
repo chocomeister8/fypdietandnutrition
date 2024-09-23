@@ -63,46 +63,9 @@ public class LoginFragment extends Fragment {
                 String enteredUsername = usernameEditText.getText().toString();
                 String enteredPassword = passwordEditText.getText().toString();
 
+                LoginController loginController = new LoginController();
+                loginController.checkLogin(enteredUsername, enteredPassword, getActivity());
 
-                db.collection("Users")
-                        .whereEqualTo("username", enteredUsername)
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                QuerySnapshot querySnapshot = task.getResult();
-                                if (!querySnapshot.isEmpty()) {
-                                    QueryDocumentSnapshot document = (QueryDocumentSnapshot) querySnapshot.getDocuments().get(0);
-                                    String dbPassword = document.getString("password");
-                                    String role = document.getString("role");
-                                    String username = document.getString("username");
-
-                                    if (enteredPassword.equals(dbPassword)) {
-
-                                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                                        editor.putString("loggedInUserName", username);  // Save the user email
-                                        editor.apply();
-
-                                        Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
-                                        if ("user".equals(role)) {
-                                            ((MainActivity) getActivity()).switchToUserMode();
-                                        } else if ("admin".equals(role)) {
-                                            ((MainActivity) getActivity()).switchToAdminMode();
-                                        } else if ("nutritionist".equals(role)) {
-                                            ((MainActivity) getActivity()).switchToNutriMode();
-                                        }
-                                    } else {
-                                        Toast.makeText(getActivity(), "Invalid password", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(getActivity(), "User not found", Toast.LENGTH_SHORT).show();
-                                }
-                            } else {
-                                Exception e = task.getException();
-                                Log.e("LoginError", "Error checking login", e);
-                                Toast.makeText(getActivity(), "Error checking login: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
             }
         });
 
