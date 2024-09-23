@@ -52,11 +52,11 @@ public class NavAllRecipesFragment extends Fragment {
 
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
-        recipeAdapter = new RecipeAdapter(recipeList);
+        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment);
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes("recipe");
+        fetchRecipes("random");
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -80,7 +80,7 @@ public class NavAllRecipesFragment extends Fragment {
                     fetchRecipes(query); // Fetch recipes based on the query
                 } else {
                     // Optionally, fetch default recipes or clear the list when search bar is empty
-                    fetchRecipes("recipe"); // or recipeList.clear();
+                    fetchRecipes("q"); // or recipeList.clear();
                 }
             }
 
@@ -99,9 +99,23 @@ public class NavAllRecipesFragment extends Fragment {
                 .commit();
     }
 
+    private void openRecipeDetailFragment(Recipe recipe) {
+        // Create a new fragment instance and pass the recipe data
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("selected_recipe", recipe);
+
+        RecipeDetailFragment fragment = new RecipeDetailFragment();
+        fragment.setArguments(bundle);
+
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     private void fetchRecipes(String query) {
-        String app_id = "2c7710ea";
-        String app_key = "97f5e9187c865600f74e2baa358a9efb";
+        String app_id = "2c7710ea"; // Your Edamam API app ID
+        String app_key = "97f5e9187c865600f74e2baa358a9efb"; // Your Edamam API app key
         String type = "public";
 
         EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
@@ -110,16 +124,13 @@ public class NavAllRecipesFragment extends Fragment {
         call.enqueue(new Callback<RecipeResponse>() {
             @Override
             public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                Log.d("API Response", "Response Code: " + response.code());
-                Log.d("API Response", "Response Message: " + response.message());
                 if (response.isSuccessful() && response.body() != null) {
                     recipeList.clear();
                     for (RecipeResponse.Hit hit : response.body().getHits()) {
-                        Recipe recipe = hit.getRecipe();
-                        recipe.setCalories(hit.getRecipe().getCalories());
-                        recipeList.add(recipe); // Add the recipe to your list
+                        Recipe recipe = hit.getRecipe(); // Directly get the Recipe object from Hit
+                        recipeList.add(recipe); // Add the recipe to the list
                     }
-                    recipeAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
+                    recipeAdapter.notifyDataSetChanged(); // Notify adapter about data change
                 } else {
                     Log.d("API Response", "Response not successful: " + response.message());
                 }
@@ -131,5 +142,6 @@ public class NavAllRecipesFragment extends Fragment {
             }
         });
     }
+
 
 }
