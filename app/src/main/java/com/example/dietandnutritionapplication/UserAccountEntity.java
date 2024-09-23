@@ -251,7 +251,7 @@ public class UserAccountEntity {
                             if (enteredPassword.equals(dbPassword)) {
                                 SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("loggedInUserName", username);  // Save the username
+                                editor.putString("loggedInUserName", username);
                                 editor.apply();
 
                                 Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
