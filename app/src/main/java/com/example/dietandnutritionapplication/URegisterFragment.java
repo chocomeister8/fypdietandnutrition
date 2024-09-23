@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -111,7 +112,7 @@ public class URegisterFragment extends Fragment {
                 String phone = phoneEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 String confirmPassword = confirmPasswordEditText.getText().toString();
-                String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                @SuppressLint({"NewApi", "LocalSuppress"}) String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
 
                 if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(dob) ||
@@ -130,23 +131,9 @@ public class URegisterFragment extends Fragment {
                 } else {
                     gender = "Unspecified";
                 }
-                UserAccountEntity userAccountEntity = new UserAccountEntity();
-                userAccountEntity.registerUser(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity(),
-                        new UserAccountEntity.RegisterCallback() {
-                            @Override
-                            public void onSuccess() {
 
-                                Toast.makeText(getActivity(), "Registration successful", Toast.LENGTH_SHORT).show();
-                                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
-                            }
-
-                            @Override
-                            public void onFailure(String errorMessage) {
-
-                                Toast.makeText(getActivity(), "Registration failed: " + errorMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
+                URegisterController uRegisterController = new URegisterController();
+                uRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
             }
         });
 
