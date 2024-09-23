@@ -1,8 +1,17 @@
 package com.example.dietandnutritionapplication;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +25,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -30,8 +44,28 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.UploadTask;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.label.ImageLabel;
+import com.google.mlkit.vision.label.ImageLabeler;
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
+import android.Manifest;
+import androidx.activity.result.ActivityResultLauncher;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+
 import java.util.Map;
+import java.util.UUID;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MealLogUFragment extends Fragment {
 
@@ -51,6 +85,7 @@ public class MealLogUFragment extends Fragment {
 
     private TextView calorieTextView;
     private TextView carbsTextView, proteinsTextView, fatsTextView;
+    private TextView nutritionInfoTextView;
     private LinearLayout breakfastImageContainer;
     private LinearLayout lunchImageContainer;
     private LinearLayout dinnerImageContainer;
@@ -62,37 +97,44 @@ public class MealLogUFragment extends Fragment {
     private Calendar calendar = Calendar.getInstance();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
 
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_CAMERA_PERMISSION = 100;
+    private ActivityResultLauncher<Intent> takePictureLauncher;
+
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_meal_log, container, false);
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-        username = sharedPreferences.getString("loggedInUsername", null);
-        db = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        breakfastImageContainer = view.findViewById(R.id.breakfastImageContainer);
-        lunchImageContainer = view.findViewById(R.id.lunchImageContainer);
-        dinnerImageContainer = view.findViewById(R.id.dinnerImageContainer);
-        snackImageContainer = view.findViewById(R.id.snackImageContainer);
-        calorieTextView = view.findViewById(R.id.progress_calorielimit);
+        if (currentUser != null) {
+            // Proceed with meal log logic
+            db = FirebaseFirestore.getInstance();
 
-        // Initialize TextViews for macronutrients
-        carbsTextView = view.findViewById(R.id.carbohydrates_value);
-        proteinsTextView = view.findViewById(R.id.proteins_value);
-        fatsTextView = view.findViewById(R.id.fats_value);
+            breakfastImageContainer = view.findViewById(R.id.breakfastImageContainer);
+            lunchImageContainer = view.findViewById(R.id.lunchImageContainer);
+            dinnerImageContainer = view.findViewById(R.id.dinnerImageContainer);
+            snackImageContainer = view.findViewById(R.id.snackImageContainer);
+            calorieTextView = view.findViewById(R.id.progress_calorielimit);
 
-        dateTextView = view.findViewById(R.id.dateTextView);
+            // Initialize TextViews for macronutrients
+            carbsTextView = view.findViewById(R.id.carbohydrates_value);
+            proteinsTextView = view.findViewById(R.id.proteins_value);
+            fatsTextView = view.findViewById(R.id.fats_value);
 
-        // Set today's date by default
-        updateDateTextView(calendar);
+            dateTextView = view.findViewById(R.id.dateTextView);
+            nutritionInfoTextView = view.findViewById(R.id.nutritionInfoTextView);
+            // Set today's date by default
+            updateDateTextView(calendar);
 
-        dateTextView.setOnClickListener(v -> showDatePickerDialog());
+            dateTextView.setOnClickListener(v -> showDatePickerDialog());
 
-        cameraIcon = view.findViewById(R.id.camera_icon);
-        TextView snapPhotoText = view.findViewById(R.id.snap_photo_text);
+            cameraIcon = view.findViewById(R.id.camera_icon);
+            TextView snapPhotoText = view.findViewById(R.id.snap_photo_text);
 
-        // Set a click listener on the camera icon
+            // Set a click listener on the camera icon
         /*cameraIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,13 +143,108 @@ public class MealLogUFragment extends Fragment {
             }
         });*/
 
-        // Set a click listener on the camera icon
-        cameraIcon.setOnClickListener(v -> showMealOptionDialog());
+            // Set a click listener on the camera icon
+            cameraIcon.setOnClickListener(v -> showMealOptionDialog());
 
-        // Set a click listener on the snap photo text
-        snapPhotoText.setOnClickListener(v -> showMealOptionDialog());
+            // Set a click listener on the snap photo text
+            snapPhotoText.setOnClickListener(v -> showMealOptionDialog());
 
+        }
+        else {
+            Toast.makeText(getActivity(), "User not logged in", Toast.LENGTH_SHORT).show();
+        }
         return view;
+
+    }
+
+    private void openCamera() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        try {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } catch (ActivityNotFoundException e) {
+            Log.e("CameraIntent", "No camera apps installed.");
+            Toast.makeText(getActivity(), "No camera app found!", Toast.LENGTH_SHORT).show();
+            // display error state to the user
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    if (imageBitmap != null) {
+                        Log.d("Debug", "Image captured successfully.");
+
+                        // Downscale the bitmap if necessary
+                        Bitmap scaledBitmap = downscaleBitmap(imageBitmap, 1024); // max size 1024
+
+                        // Perform image recognition
+                        performImageRecognition(scaledBitmap);
+                    } else {
+                        Log.e("Error", "Captured image bitmap is null.");
+                        Toast.makeText(getActivity(), "Failed to capture image.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void performImageRecognition(Bitmap bitmap) {
+        // Convert the Bitmap to InputImage
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
+
+        // Create ImageLabeler with confidence threshold options
+        ImageLabelerOptions options =
+                new ImageLabelerOptions.Builder()
+                        .setConfidenceThreshold(0.8f)  // Set confidence threshold
+                        .build();
+
+        // Initialize the labeler
+        ImageLabeler labeler = com.google.mlkit.vision.label.ImageLabeling.getClient(options);
+
+        labeler.process(image)
+                .addOnSuccessListener(labels -> {
+                    for (ImageLabel label : labels) {
+                        String labelText = label.getText();
+                        // Trigger the Nutritionix API call with the recognized label
+
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    e.printStackTrace();
+                });
+    }
+
+    private Bitmap downscaleBitmap(Bitmap original, int maxSize) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+        if (width > maxSize || height > maxSize) {
+            float scale = Math.min((float) maxSize / width, (float) maxSize / height);
+            width = Math.round(scale * width);
+            height = Math.round(scale * height);
+            return Bitmap.createScaledBitmap(original, width, height, true);
+        }
+        return original;
+    }
+
+    private void saveImageUrlToFirestore(String imageUrl) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> mealRecord = new HashMap<>();
+        mealRecord.put("foodItemImage", imageUrl); // Save the image URL
+
+        db.collection("mealRecords").add(mealRecord)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Firestore", "Image URL saved successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Error saving image URL", e);
+                });
     }
 
     private void updateCardViews() {
@@ -138,8 +275,6 @@ public class MealLogUFragment extends Fragment {
             cardViewSnack.setVisibility(View.VISIBLE);
         }
     }
-
-
 
     private void addDummyMeal() {
         // Dummy meal data
@@ -206,6 +341,7 @@ public class MealLogUFragment extends Fragment {
             snackImageContainer.addView(mealEntryLayout);  // Add the image-text pair to snack container
         }
 
+
     }
 
     private void showDatePickerDialog() {
@@ -241,7 +377,12 @@ public class MealLogUFragment extends Fragment {
                         switch (which) {
                             case 0:
                                 // Handle snapping a photo
-                                handleSnapPhoto();
+                                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                                } else {
+                                    openCamera();
+                                }
+                                //handleEnterManually();
                                 break;
                             case 1:
                                 // Handle entering manually
@@ -254,9 +395,6 @@ public class MealLogUFragment extends Fragment {
                 .show();
     }
 
-    private void handleSnapPhoto() {
-        // Implement the logic for snapping a photo
-    }
 
     private void handleEnterManually() {
         // Create a dialog to enter meal details
