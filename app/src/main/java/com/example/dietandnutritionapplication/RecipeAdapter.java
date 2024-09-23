@@ -34,6 +34,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
         Recipe recipe = recipeList.get(position);
         holder.titleTextView.setText(recipe.getLabel()); // Adjust based on your Recipe class
+        String mealTypes = String.join(", ", recipe.getMealType());
+        holder.mealTypeTextView.setText(mealTypes); // Set the mealType text
+        holder.caloriesTextView.setText(String.format("Calories: %.1f kcal", recipe.getCalories()));
         Picasso.get().load(recipe.getImage()).into(holder.imageView); // Adjust based on your Recipe class
     }
 
@@ -43,12 +46,14 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView;
+        TextView titleTextView, mealTypeTextView, caloriesTextView;
         ImageView imageView;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.recipe_title);
+            mealTypeTextView = itemView.findViewById(R.id.meal_type);
+            caloriesTextView = itemView.findViewById(R.id.calories);
             imageView = itemView.findViewById(R.id.recipe_image);
         }
     }

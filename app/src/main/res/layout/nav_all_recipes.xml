@@ -14,6 +14,7 @@
 
         <!-- Header layout with logo and text -->
         <RelativeLayout
+            android:id="@+id/relativeLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
@@ -29,165 +30,168 @@
                 tools:visibility="visible" />
 
             <ImageView
+                android:id="@+id/logo"
                 android:layout_width="100dp"
                 android:layout_height="70dp"
-                android:id="@+id/logo"
                 android:layout_centerVertical="true"
-                android:src="@drawable/dietdietmusttry_logo"/>
+                android:src="@drawable/dietdietmusttry_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_centerHorizontal="true"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
+                android:text="All Recipes"
+                android:textColor="@android:color/black"
                 android:textSize="20sp"
-                android:text="All Recipes"/>
+                android:textStyle="bold" />
         </RelativeLayout>
 
         <!-- Search Bar with Search Icon -->
         <EditText
-            android:id="@+id/search_bar"
+            android:id="@+id/search_recipe"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginTop="120dp"
+            android:layout_below="@+id/relativeLayout4"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="18dp"
             android:layout_marginEnd="20dp"
-            android:hint="Enter Recipes"
-            android:padding="10dp"
             android:background="@drawable/rounded_search_bar_background"
-            android:inputType="text"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="10dp"
+            android:hint="Enter Recipes"
+            android:inputType="text"
+            android:padding="10dp"
             android:textColor="#000000" />
 
         <!-- Navigation Bar -->
+
+
+        <!-- Column: Content -->
+
         <FrameLayout
-            android:layout_marginTop="187dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:id="@+id/navigationBar"
-            android:layout_width="125dp"
-            android:layout_height="390dp"
+            android:layout_width="102dp"
+            android:layout_height="695dp"
+            android:layout_below="@+id/search_recipe"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="9dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="13dp"
+            android:layout_marginBottom="16dp"
+            android:layout_toStartOf="@+id/linearLayout"
             android:background="@drawable/rounded_search_bar_background">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="99dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <Button
                     android:id="@+id/button_all_recipes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="All Recipes"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:clickable="true"
+                    android:text="All Recipes"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
                     android:id="@+id/button_vegetarian"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vegetarian"
-                    android:clickable="true"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="Vegetarian"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
                     android:id="@+id/button_favourite"
                     android:layout_width="wrap_content"
-                    android:clickable="true"
                     android:layout_height="wrap_content"
-                    android:text="My Fav"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="My Fav"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
                     android:id="@+id/button_personalise"
                     android:layout_width="wrap_content"
-                    android:clickable="true"
                     android:layout_height="wrap_content"
-                    android:text="Personalise Recipes"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="Personalise Recipes"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="10dp" />
 
                 <Button
                     android:id="@+id/button_recipes_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Recipes Status"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
                     android:clickable="true"
-                    android:textAlignment="viewStart"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="Recipes Status"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
                     android:id="@+id/button_calorie_goal"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Calorie Goal"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
                     android:clickable="true"
-                    android:textAlignment="viewStart"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="Calorie Goal"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
             </LinearLayout>
+
         </FrameLayout>
 
-
-        <!-- Column: Content -->
         <LinearLayout
-            android:layout_width="248dp"
-            android:layout_height="399dp"
+            android:id="@+id/linearLayout"
+            android:layout_width="283dp"
+            android:layout_height="695dp"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="180dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="11dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/rounded_item_background"
             android:orientation="vertical"
-            android:padding="5dp"><!-- Optional: Add background color for visibility -->
+            android:padding="5dp">
 
-            <!-- Item 1 -->
-            <LinearLayout
-                android:layout_width="239dp"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recipe_recycler_view"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="8dp"
-                android:orientation="horizontal"
-                android:padding="12dp"> <!-- Adds space below Item 1 -->
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recipe_recycler_view"
-                    android:layout_width="209dp"
-                    android:layout_height="match_parent"
-                    android:scrollbars="vertical" />
-
-                </LinearLayout>
+                android:scrollbars="vertical" />
         </LinearLayout>
 
     </RelativeLayout>

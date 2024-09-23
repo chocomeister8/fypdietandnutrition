@@ -1,11 +1,14 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +28,8 @@ public class NavAllRecipesFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList;
+    private EditText searchEditText;
+
 
     @Nullable
     @Override
@@ -39,6 +44,8 @@ public class NavAllRecipesFragment extends Fragment {
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_calorie_goal = view.findViewById(R.id.button_calorie_goal);
 
+        searchEditText = view.findViewById(R.id.search_recipe);
+
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.recipe_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -49,7 +56,7 @@ public class NavAllRecipesFragment extends Fragment {
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes();
+        fetchRecipes("recipe");
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -59,6 +66,29 @@ public class NavAllRecipesFragment extends Fragment {
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
         button_calorie_goal.setOnClickListener(v -> navigateToFragment(new NavCalorieGoalFragment()));
 
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Do nothing before text is changed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Perform search when text changes
+                String query = charSequence.toString();
+                if (!query.isEmpty()) {
+                    fetchRecipes(query); // Fetch recipes based on the query
+                } else {
+                    // Optionally, fetch default recipes or clear the list when search bar is empty
+                    fetchRecipes("recipe"); // or recipeList.clear();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Do nothing after text is changed
+            }
+        });
         return view;
     }
 
@@ -69,10 +99,9 @@ public class NavAllRecipesFragment extends Fragment {
                 .commit();
     }
 
-    private void fetchRecipes() {
+    private void fetchRecipes(String query) {
         String app_id = "2c7710ea";
         String app_key = "97f5e9187c865600f74e2baa358a9efb";
-        String query = "chicken"; // Example query
         String type = "public";
 
         EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
@@ -83,14 +112,14 @@ public class NavAllRecipesFragment extends Fragment {
             public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
                 Log.d("API Response", "Response Code: " + response.code());
                 Log.d("API Response", "Response Message: " + response.message());
-                Log.d("API Request", "Request URL: " + call.request().url().toString());
                 if (response.isSuccessful() && response.body() != null) {
                     recipeList.clear();
                     for (RecipeResponse.Hit hit : response.body().getHits()) {
                         Recipe recipe = hit.getRecipe();
+                        recipe.setCalories(hit.getRecipe().getCalories());
                         recipeList.add(recipe); // Add the recipe to your list
                     }
-                    recipeAdapter.notifyDataSetChanged();
+                    recipeAdapter.notifyDataSetChanged(); // Notify the adapter that the data has changed
                 } else {
                     Log.d("API Response", "Response not successful: " + response.message());
                 }
@@ -102,4 +131,5 @@ public class NavAllRecipesFragment extends Fragment {
             }
         });
     }
+
 }
