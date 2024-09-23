@@ -42,12 +42,12 @@ public class ProfileUFragment extends Fragment {
         initializeUI(view);
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-        String userEmail = sharedPreferences.getString("loggedInUserEmail", null);
+        String username = sharedPreferences.getString("loggedInUserName", null);
 
         userAccountEntity = new UserAccountEntity();
 
-        if (userEmail != null) {
-            fetchUserProfile(userEmail);
+        if (username != null) {
+            fetchUserProfile(username);
         } else {
             Toast.makeText(getContext(), "No user logged in", Toast.LENGTH_SHORT).show();
         }
@@ -81,8 +81,8 @@ public class ProfileUFragment extends Fragment {
         activityLevelData = view.findViewById(R.id.activity_level_data);
     }
 
-    private void fetchUserProfile(String userEmail) {
-        Log.d("ProfileUFragment", "Attempting to fetch user profile for email: " + userEmail);
+    private void fetchUserProfile(String username) {
+        Log.d("ProfileUFragment", "Attempting to fetch user profile for email: " + username);
         userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Profile> accounts) {
@@ -91,7 +91,7 @@ public class ProfileUFragment extends Fragment {
                     if (profile instanceof User) {
                         User user = (User) profile;
                         Log.d("ProfileUFragment", "Fetched user: " + user.getEmail());
-                        if (user.getEmail().equals(userEmail)) {
+                        if (user.getUsername().equals(username)) {
                             loadProfileData(user);
                             return;
                         }
@@ -109,7 +109,7 @@ public class ProfileUFragment extends Fragment {
     }
 
     private void loadProfileData(User user) {
-        Log.d("ProfileUFragment", "Loading user data: " + user.getEmail());
+        Log.d("ProfileUFragment", "Loading user data: " + user.getUsername());
         userNameData.setText(user.getUsername());
         fullNameData.setText(user.getFirstName() + " " + user.getLastName());
         dateOfBirthData.setText(user.getDob());

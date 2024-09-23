@@ -2,6 +2,7 @@ package com.example.dietandnutritionapplication;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -236,45 +237,86 @@ public class UserAccountEntity {
     }
 
     public void login(String enteredUsername, String enteredPassword, Context context, MainActivity mainActivity) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        // First, query Firestore to get the user's email by their username
         db.collection("Users")
                 .whereEqualTo("username", enteredUsername)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (!querySnapshot.isEmpty()) {
-                            QueryDocumentSnapshot document = (QueryDocumentSnapshot) querySnapshot.getDocuments().get(0);
-                            String dbPassword = document.getString("password");
-                            String role = document.getString("role");
-                            String username = document.getString("username");
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        // Get the email associated with the entered username
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        String email = document.getString("email"); // Assume email is stored in Firestore
 
-                            if (enteredPassword.equals(dbPassword)) {
-                                SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("loggedInUserName", username);
-                                editor.apply();
+                        // Now, use FirebaseAuth to sign in the user with the retrieved email and entered password
+                        auth.signInWithEmailAndPassword(email, enteredPassword)
+                                .addOnCompleteListener(authTask -> {
+                                    if (authTask.isSuccessful()) {
+                                        // Authentication successful, retrieve additional user data from Firestore
+                                        FirebaseUser firebaseUser = auth.getCurrentUser();
+                                        if (firebaseUser != null) {
+                                            String userId = firebaseUser.getUid();
 
-                                Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
+                                            // Fetch the user's role and other details from Firestore
+                                            db.collection("Users").document(userId)
+                                                    .get()
+                                                    .addOnCompleteListener(userTask -> {
+                                                        if (userTask.isSuccessful()) {
+                                                            DocumentSnapshot userDoc = userTask.getResult();
+                                                            if (userDoc.exists()) {
+                                                                // Retrieve additional data like role
+                                                                String role = userDoc.getString("role");
+                                                                String username = userDoc.getString("username");
+                                                                String dbPassword = document.getString("password");
 
-                                if ("user".equals(role)) {
-                                    mainActivity.switchToUserMode();
-                                } else if ("admin".equals(role)) {
-                                    mainActivity.switchToAdminMode();
-                                } else if ("nutritionist".equals(role)) {
-                                    mainActivity.switchToNutriMode();
-                                }
-                            } else {
-                                Toast.makeText(context, "Invalid password", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show();
-                        }
+                                                                if (enteredPassword.equals(dbPassword)) {
+                                                                    // Save the username in SharedPreferences
+                                                                    SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+                                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                    editor.putString("loggedInUserName", username);
+                                                                    editor.apply();
+
+                                                                    // Display login success message
+                                                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
+
+
+                                                                    // Redirect based on the user's role
+                                                                    if ("user".equals(role)) {
+                                                                        mainActivity.switchToUserMode();
+                                                                    } else if ("admin".equals(role)) {
+                                                                        mainActivity.switchToAdminMode();
+                                                                    } else if ("nutritionist".equals(role)) {
+                                                                        mainActivity.switchToNutriMode();
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                Toast.makeText(context, "User data not found in Firestore", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        } else {
+                                                            Log.e("FirestoreError", "Error getting user data", userTask.getException());
+                                                            Toast.makeText(context, "Error retrieving user data: " + userTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                        }
+                                    } else {
+                                        // Authentication failed
+                                        Exception e = authTask.getException();
+                                        Toast.makeText(context, "Authentication failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
                     } else {
-                        Exception e = task.getException();
-                        Log.e("LoginError", "Error checking login", e);
-                        Toast.makeText(context, "Error checking login: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        // No user found with the entered username
+                        Toast.makeText(context, "User not found", Toast.LENGTH_SHORT).show();
                     }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Error querying username", e);
+                    Toast.makeText(context, "Error querying username: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 }
