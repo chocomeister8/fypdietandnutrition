@@ -33,6 +33,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Inflate the recipe_item layout
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_item, parent, false);
+
         return new RecipeViewHolder(view);
     }
 
@@ -44,12 +45,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Set the recipe title
         holder.titleTextView.setText(recipe.getLabel());
 
-        // Join meal types into a single string
-        String mealTypes = String.join(", ", recipe.getMealType());
-        holder.mealTypeTextView.setText(mealTypes);
 
-        // Set the calorie value
-        holder.caloriesTextView.setText(String.format("Calories: %.1f kcal", recipe.getCalories()));
+        String mealTypes = String.join(", ", recipe.getMealType());
+        holder.mealTypeTextView.setText("Type: " + mealTypes);
+
+        holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.2f", recipe.getCaloriesPer100g()));
+
+
 
         // Use Picasso to load the image
         Picasso.get().load(recipe.getImage()).into(holder.imageView);
@@ -60,6 +62,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 onRecipeClickListener.onRecipeClick(recipe); // Trigger the click callback with the selected recipe
             }
         });
+
     }
 
     @Override
@@ -69,7 +72,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     // ViewHolder class to represent each recipe item view
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, mealTypeTextView, caloriesTextView;
+        TextView titleTextView, mealTypeTextView, caloriesper100gTextView;
         ImageView imageView;
 
         public RecipeViewHolder(View itemView) {
@@ -77,7 +80,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             // Initialize the views
             titleTextView = itemView.findViewById(R.id.recipe_title);
             mealTypeTextView = itemView.findViewById(R.id.meal_type);
-            caloriesTextView = itemView.findViewById(R.id.calories);
+            caloriesper100gTextView = itemView.findViewById(R.id.calories_per_100g);
             imageView = itemView.findViewById(R.id.recipe_image);
         }
     }

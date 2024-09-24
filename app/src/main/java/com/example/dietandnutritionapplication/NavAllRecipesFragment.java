@@ -44,6 +44,9 @@ public class NavAllRecipesFragment extends Fragment {
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_calorie_goal = view.findViewById(R.id.button_calorie_goal);
 
+        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
+
+
         searchEditText = view.findViewById(R.id.search_recipe);
 
         // Initialize RecyclerView
@@ -56,7 +59,7 @@ public class NavAllRecipesFragment extends Fragment {
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes("random");
+        fetchRecipes("balanced diet");
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -65,6 +68,9 @@ public class NavAllRecipesFragment extends Fragment {
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
         button_calorie_goal.setOnClickListener(v -> navigateToFragment(new NavCalorieGoalFragment()));
+
+        button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
+
 
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -80,7 +86,7 @@ public class NavAllRecipesFragment extends Fragment {
                     fetchRecipes(query); // Fetch recipes based on the query
                 } else {
                     // Optionally, fetch default recipes or clear the list when search bar is empty
-                    fetchRecipes("q"); // or recipeList.clear();
+                    fetchRecipes("rice"); // or recipeList.clear();
                 }
             }
 
@@ -128,6 +134,16 @@ public class NavAllRecipesFragment extends Fragment {
                     recipeList.clear();
                     for (RecipeResponse.Hit hit : response.body().getHits()) {
                         Recipe recipe = hit.getRecipe(); // Directly get the Recipe object from Hit
+
+                        double caloriesPer100g = recipe.getCaloriesPer100g();
+                        if (recipe.getTotalWeight() > 0) {
+                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                        }
+
+                        // Optionally, you can set this value back into the recipe object or create a new object to store it
+                        // For example:
+                        recipe.setCaloriesPer100g(caloriesPer100g); // Make sure to add this method in Recipe class
+
                         recipeList.add(recipe); // Add the recipe to the list
                     }
                     recipeAdapter.notifyDataSetChanged(); // Notify adapter about data change

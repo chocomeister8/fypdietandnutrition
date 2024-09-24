@@ -63,6 +63,7 @@
                         android:layout_weight="1"
                         android:textSize="10sp"
                         android:textStyle="bold" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -73,7 +74,7 @@
 
                     <!-- Meal Type Data -->
                     <TextView
-                        android:id="@+id/calories"
+                        android:id="@+id/calories_per_100g"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

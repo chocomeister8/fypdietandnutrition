@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.util.List;
 
 public class Recipe implements Parcelable {
+    private String recipe_id;
     private String label; // The title of the recipe
     private String image; // URL of the recipe image
     private List<String> mealType; // Meal type (e.g., lunch, dinner)
@@ -16,9 +17,16 @@ public class Recipe implements Parcelable {
     private String url; // Link to the full recipe
     private List<String> ingredientLines; // List of ingredients
     private double calories; // Calorie count
+    private double totalWeight; // Total weight of the recipe in grams
     private int totalTime; // Total cooking time in minutes
+    private double caloriesPer100g; // New field for calories per 100g
+
+    public Recipe() {
+    }
 
     // Getters for the fields
+    public String getRecipe_id(){ return  recipe_id;}
+
     public String getLabel() {
         return label;
     }
@@ -59,13 +67,24 @@ public class Recipe implements Parcelable {
         return calories;
     }
 
+    public double getTotalWeight() {return totalWeight;
+    }
+
+    public double getCaloriesPer100g() { return caloriesPer100g;
+    }
+
+    public void setCaloriesPer100g(double caloriesPer100g) {
+        this.caloriesPer100g = caloriesPer100g;
+    }
+
     public int getTotalTime() {
         return totalTime;
     }
 
     // Optionally, add a constructor
-    public Recipe(String label, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
-                  List<String> healthLabels, String url, List<String> ingredientLines, double calories, int totalTime) {
+    public Recipe(String recipe_id, String label, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
+                  List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int totalTime) {
+        this.recipe_id = recipe_id;
         this.label = label;
         this.image = image;
         this.mealType = mealType;
@@ -76,11 +95,13 @@ public class Recipe implements Parcelable {
         this.url = url;
         this.ingredientLines = ingredientLines;
         this.calories = calories;
+        this.totalWeight = totalWeight;
         this.totalTime = totalTime;
     }
 
     // Parcelable implementation for passing Recipe between fragments
     protected Recipe(Parcel in) {
+        recipe_id = in.readString();
         label = in.readString();
         image = in.readString();
         mealType = in.createStringArrayList();
@@ -91,6 +112,7 @@ public class Recipe implements Parcelable {
         url = in.readString();
         ingredientLines = in.createStringArrayList();
         calories = in.readDouble();
+        totalWeight = in.readDouble();
         totalTime = in.readInt();
     }
 
@@ -113,6 +135,7 @@ public class Recipe implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(recipe_id);
         dest.writeString(label);
         dest.writeString(image);
         dest.writeStringList(mealType);
@@ -123,6 +146,7 @@ public class Recipe implements Parcelable {
         dest.writeString(url);
         dest.writeStringList(ingredientLines);
         dest.writeDouble(calories);
+        dest.writeDouble(totalWeight);
         dest.writeInt(totalTime);
     }
 }

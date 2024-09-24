@@ -34,6 +34,8 @@ public class RecipeDetailFragment extends Fragment {
         // Initialize views
         TextView titleTextView = view.findViewById(R.id.detail_recipe_title);
         TextView caloriesTextView = view.findViewById(R.id.detail_calories);
+        TextView weightTextView = view.findViewById(R.id.detail_total_weight);
+        TextView caloriesp100gTextView = view.findViewById(R.id.detail_calories_p100g);
         TextView totalTimeTextView = view.findViewById(R.id.detail_total_time);
         TextView mealTypeTextView = view.findViewById(R.id.detail_meal_type);
         TextView cuisineTypeTextView = view.findViewById(R.id.detail_cuisine_type);
@@ -52,8 +54,10 @@ public class RecipeDetailFragment extends Fragment {
         // Set recipe details
         if (recipe != null) {
             titleTextView.setText(recipe.getLabel());
-            caloriesTextView.setText(String.format("Calories: %.1f kcal", recipe.getCalories()));
+            caloriesTextView.setText(String.format("%.1f kcal", recipe.getCalories()));
+            weightTextView.setText(String.format("%.1f g", recipe.getTotalWeight())); // Set text
             totalTimeTextView.setText(String.format("%d mins", recipe.getTotalTime()));
+            caloriesp100gTextView.setText(String.format("%.2f", recipe.getCaloriesPer100g()));
             mealTypeTextView.setText(String.join(", ", recipe.getMealType()));
             cuisineTypeTextView.setText(String.join(", ", recipe.getCuisineType()));
             dishTypeTextView.setText(String.join(", ", recipe.getDishType()));

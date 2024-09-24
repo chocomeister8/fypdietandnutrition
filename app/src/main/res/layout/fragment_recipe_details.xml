@@ -10,9 +10,10 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
         android:background="#F4F1E1"
-        android:layout_marginBottom="8dp">
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/right_icon2"
@@ -25,22 +26,22 @@
             tools:visibility="visible" />
 
         <ImageView
+            android:id="@+id/logo"
             android:layout_width="100dp"
             android:layout_height="70dp"
-            android:id="@+id/logo"
             android:layout_centerVertical="true"
             android:src="@drawable/dietdietmusttry_logo" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_centerHorizontal="true"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="20dp"
+            android:text="All Recipes"
+            android:textColor="@android:color/black"
             android:textSize="20sp"
-            android:text="All Recipes" />
+            android:textStyle="bold" />
     </RelativeLayout>
 
     <ScrollView
@@ -74,15 +75,73 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/detail_calories"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:text="Calories: 0.0 kcal"
-                android:textSize="16sp" />
+                android:orientation="horizontal"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/calorie_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calories:"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/detail_calories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="8dp"
+                    android:text=""
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/calorie_per100g_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calories per 100g:"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/detail_calories_p100g"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:paddingStart="4dp"
+                    android:text=""
+                    android:textSize="16sp" />
+            </LinearLayout>
+
 
             <!-- Total Time (side by side) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/label_detail_total_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Weight:"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/detail_total_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="4dp"
+                    android:text=""
+                    android:textSize="16sp" />
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -101,7 +160,7 @@
                     android:id="@+id/detail_total_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="8dp"
+                    android:paddingStart="4dp"
                     android:text="0 mins"
                     android:textSize="16sp" />
             </LinearLayout>

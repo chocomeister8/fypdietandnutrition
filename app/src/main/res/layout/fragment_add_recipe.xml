@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecipeFormActivity">
+
+    <!-- Header with logo and title -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="#F4F1E1"
+        android:layout_marginBottom="8dp">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="70dp"
+            android:id="@+id/logo"
+            android:layout_centerVertical="true"
+            android:src="@drawable/dietdietmusttry_logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:text="Add Recipes" />
+    </RelativeLayout>
+
+    <!-- Scrollable form content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Recipe Title -->
+            <EditText
+                android:id="@+id/recipe_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Recipe Title"
+                android:inputType="text"
+                android:padding="10dp"
+                android:background="@android:drawable/editbox_background" />
+
+            <!-- Calories -->
+            <EditText
+                android:id="@+id/recipe_calories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Calories"
+                android:inputType="number"
+                android:padding="10dp"
+                android:background="@android:drawable/editbox_background" />
+
+            <!-- Weight -->
+            <EditText
+                android:id="@+id/recipe_weight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Weight (grams)"
+                android:inputType="number"
+                android:padding="10dp"
+                android:background="@android:drawable/editbox_background" />
+
+            <!-- Total Time -->
+            <EditText
+                android:id="@+id/recipe_total_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Total Time (in minutes)"
+                android:inputType="number"
+                android:padding="10dp"
+                android:background="@android:drawable/editbox_background" />
+
+            <!-- Meal Type Spinner -->
+            <Spinner
+                android:id="@+id/meal_type_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <!-- Cuisine Type Spinner -->
+            <Spinner
+                android:id="@+id/cuisine_type_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <!-- Dish Type Spinner -->
+            <Spinner
+                android:id="@+id/dish_type_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+
+
+
+            <!-- Dynamic Section for Ingredients -->
+            <LinearLayout
+                android:id="@+id/ingredients_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="12dp">
+
+                <Button
+                    android:id="@+id/add_ingredient_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Ingredient"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/save_recipe_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Save Recipe"
+                android:background="@android:color/holo_blue_light"
+                android:textColor="@android:color/white"
+                android:padding="12dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="50dp"
+                android:background="@android:color/darker_gray" />
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

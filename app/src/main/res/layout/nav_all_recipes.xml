@@ -48,41 +48,55 @@
                 android:textStyle="bold" />
         </RelativeLayout>
 
-        <!-- Search Bar with Search Icon -->
-        <EditText
-            android:id="@+id/search_recipe"
+        <RelativeLayout
+            android:id="@+id/relativeLayout6"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/relativeLayout4"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
             android:layout_marginStart="16dp"
             android:layout_marginTop="18dp"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/rounded_search_bar_background"
-            android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="10dp"
-            android:hint="Enter Recipes"
-            android:inputType="text"
-            android:padding="10dp"
-            android:textColor="#000000" />
+            android:layout_marginEnd="20dp">
 
-        <!-- Navigation Bar -->
+            <!-- Search Bar -->
+            <EditText
+                android:id="@+id/search_recipe"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="10dp"
+                android:layout_toStartOf="@+id/add_recipe_button"
+                android:background="@drawable/rounded_search_bar_background"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="10dp"
+                android:hint="Enter Recipe Name:"
+                android:inputType="text"
+                android:padding="10dp"
+                android:textColor="#000000" />
 
-
+            <!-- Add Recipe Button -->
+            <Button
+                android:id="@+id/add_recipe_button"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:padding="5dp"
+                android:text="Add"
+                android:textColor="@color/black"
+                android:textSize="12dp" />
+        </RelativeLayout>
         <!-- Column: Content -->
 
         <FrameLayout
             android:id="@+id/navigationBar"
-            android:layout_width="102dp"
+            android:layout_width="100dp"
             android:layout_height="695dp"
-            android:layout_below="@+id/search_recipe"
+            android:layout_below="@+id/relativeLayout6"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="9dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="13dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="20dp"
             android:layout_toStartOf="@+id/linearLayout"
             android:background="@drawable/rounded_search_bar_background">
 
@@ -178,12 +192,12 @@
             android:id="@+id/linearLayout"
             android:layout_width="283dp"
             android:layout_height="695dp"
-            android:layout_below="@+id/search_recipe"
+            android:layout_below="@+id/relativeLayout6"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="11dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/rounded_item_background"
             android:orientation="vertical"
             android:padding="5dp">
@@ -200,7 +214,7 @@
             android:layout_height="1dp"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="50dp"
             android:background="@android:color/darker_gray" />
 
     </RelativeLayout>
