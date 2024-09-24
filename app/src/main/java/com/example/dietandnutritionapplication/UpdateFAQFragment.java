@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,60 +70,23 @@ public class UpdateFAQFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Call the method to update FAQ in Firestore
-                updateFAQInFirestore();
+//                updateFAQInFirestore();
+                String updatedTitle = titleEditText.getText().toString();
+                String updatedQuestion = questionEditText.getText().toString();
+                String updatedAnswer = answerEditText.getText().toString();
+                String updatedDate = datecreatedEditText.getText().toString();
+                if (selectedFAQ != null && selectedFAQ.getFaqId() != null){
+                    String id = selectedFAQ.getFaqId();
+                    UpdateFAQController updateFAQController = new UpdateFAQController();
+                    updateFAQController.chechUpdateFAQ( id,updatedTitle,  updatedQuestion,  updatedAnswer,  updatedDate,getActivity());
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).replaceFragment(new FAQFragment());
+                    }
+                }
             }
         });
 
         return view;
     }
 
-    private void updateFAQInFirestore() {
-        // Get updated values from the EditText fields
-        String updatedTitle = titleEditText.getText().toString();
-        String updatedQuestion = questionEditText.getText().toString();
-        String updatedAnswer = answerEditText.getText().toString();
-        String updatedDate = datecreatedEditText.getText().toString();
-
-        // Check if the selectedFAQ and its ID are not null
-        if (selectedFAQ != null && selectedFAQ.getFaqId() != null) {
-            String id = selectedFAQ.getFaqId();  // Get the document ID
-
-            // Prepare the map with specific fields to update
-            Map<String, Object> updatedFields = new HashMap<>();
-            updatedFields.put("id", id);          // Update the id field
-            updatedFields.put("date", updatedDate);  // Update the date field
-            updatedFields.put("title", updatedTitle);
-            updatedFields.put("question", updatedQuestion);
-            updatedFields.put("answer", updatedAnswer);
-
-            // Update specific fields in the FAQ document in Firestore
-            firestore.collection("FAQ").document(id)
-                    .update(updatedFields)  // Use update to update specific fields
-                    .addOnSuccessListener(aVoid -> {
-                        // Display a success message
-                        Toast.makeText(getActivity(), "FAQ updated successfully", Toast.LENGTH_SHORT).show();
-
-                        // Create a new FAQ object with the updated values
-                        FAQ updatedFAQ = new FAQ(id, updatedTitle, updatedQuestion, updatedAnswer, updatedDate);
-
-                        // Create a new instance of ViewFAQDetailsFragment and pass the updated FAQ
-                        FAQDetailsFragment viewFAQDetailsFragment = new FAQDetailsFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("selectedFAQ", updatedFAQ);  // Pass updated FAQ
-                        viewFAQDetailsFragment.setArguments(bundle);
-
-                        // Perform the fragment transaction to replace UpdateFAQFragment with ViewFAQDetailsFragment
-                        getParentFragmentManager().beginTransaction()
-                                .replace(R.id.frame_layout, viewFAQDetailsFragment)  // R.id.frame_layout is the container ID
-                                .addToBackStack(null)  // Optional: adds to the back stack
-                                .commit();
-                    })
-                    .addOnFailureListener(e -> {
-                        // Display an error message
-                        Toast.makeText(getActivity(), "Failed to update FAQ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        } else {
-            Toast.makeText(getActivity(), "Error: FAQ ID is null", Toast.LENGTH_SHORT).show();
-        }
-    }
 }

@@ -94,8 +94,8 @@ public class FAQFragment extends Fragment{
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filterFAQspinner.setAdapter(sortAdapter);
 
-        FAQEntity faqEntity = new FAQEntity();
-        faqEntity.fetchFAQ(new FAQEntity.DataCallback(){
+        ViewFAQController  viewFAQController= new ViewFAQController(); // Ensure you have a member variable for ViewFAQController
+        viewFAQController.getAllFAQ(new FAQEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<FAQ> faqs) {
                 originalFAQ.clear(); // Clear the original profiles list
@@ -104,12 +104,12 @@ public class FAQFragment extends Fragment{
                 faq.addAll(faqs); // Store profiles for filtering
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
+
             @Override
             public void onFailure(Exception e) {
                 e.printStackTrace();
-                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load FAQs.", Toast.LENGTH_SHORT).show();
             }
-
         });
 
         filterFAQspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

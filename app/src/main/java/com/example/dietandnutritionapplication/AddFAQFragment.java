@@ -115,7 +115,9 @@ public class AddFAQFragment extends Fragment {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
                 String date = now.format(formatter);
 
-                insertFAQ(title, question, answer, date);
+//                insertFAQ(title, question, answer, date);
+                AddFAQController addFAQController = new AddFAQController();
+                addFAQController.checkFAQ(title,question,answer,date,pd,getActivity());
                 redirectToViewAllFAQs();
             }
 
@@ -123,33 +125,6 @@ public class AddFAQFragment extends Fragment {
         return view;
     }
 
-    private void insertFAQ(String title,String question, String answer, String date){
-
-        DocumentReference newFAQRef = db.collection("FAQ").document(); // Auto-generated ID
-
-        Map<String, Object> faq = new HashMap<>();
-
-        String id = UUID.randomUUID().toString();
-        faq.put("id",id);
-        faq.put("title", title);
-        faq.put("question", question);
-        faq.put("answer", answer);
-        faq.put("date", date);
-
-
-        db.collection("FAQ").document(id).set(faq).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                pd.dismiss();
-                Toast.makeText(getActivity(), "FAQ added", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getActivity(), "Failed to add", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
     private void redirectToViewAllFAQs() {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
