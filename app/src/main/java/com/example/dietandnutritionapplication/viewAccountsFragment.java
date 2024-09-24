@@ -56,24 +56,27 @@ public class viewAccountsFragment extends Fragment {
         adapter = new ProfileAdapter(getContext(), profiles);
         listView.setAdapter(adapter);
 
-        // Fetch accounts from UserManager
-        UserAccountEntity userAccountEntity = new UserAccountEntity();
-        userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
-            @Override
-            public void onSuccess(ArrayList<Profile> accounts) {
-                originalProfiles.clear(); // Clear the original profiles list
-                originalProfiles.addAll(accounts); // Store fetched profiles in the original list
-                profiles.clear(); // Clear the filtering list
-                profiles.addAll(accounts); // Store profiles for filtering
-                adapter.notifyDataSetChanged(); // Notify adapter of data changes
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        // Fetch accounts from UserManager
+//        UserAccountEntity userAccountEntity = new UserAccountEntity();
+//        userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
+//            @Override
+//            public void onSuccess(ArrayList<Profile> accounts) {
+//                originalProfiles.clear(); // Clear the original profiles list
+//                originalProfiles.addAll(accounts); // Store fetched profiles in the original list
+//                profiles.clear(); // Clear the filtering list
+//                profiles.addAll(accounts); // Store profiles for filtering
+//                adapter.notifyDataSetChanged(); // Notify adapter of data changes
+//            }
+//
+//            @Override
+//            public void onFailure(Exception e) {
+//                e.printStackTrace();
+//                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+        ViewAccountsController viewAccountsController = new ViewAccountsController();
+        profiles.addAll(viewAccountsController.retrieveAccounts());
+        adapter.notifyDataSetChanged();
 
         // Set up Spinner for role filtering
         List<String> sortRole = new ArrayList<>();
