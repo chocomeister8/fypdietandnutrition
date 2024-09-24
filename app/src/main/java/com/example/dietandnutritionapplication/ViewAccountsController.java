@@ -9,22 +9,21 @@ public class ViewAccountsController {
     public ViewAccountsController(){
 
     }
-    public ArrayList<Profile> retrieveAccounts(){
+    public void retrieveAccounts(final UserAccountEntity.DataCallback callback) {
         UserAccountEntity userAccountEntity = new UserAccountEntity();
         userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Profile> accounts) {
-                profiles.clear(); // Clear the filtering list
+                profiles.clear();
                 profiles.addAll(accounts);
-                // Store profiles for filtering
+                callback.onSuccess(profiles);
             }
 
             @Override
             public void onFailure(Exception e) {
                 e.printStackTrace();
-//                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+                callback.onFailure(e);
             }
         });
-        return profiles;
     }
 }

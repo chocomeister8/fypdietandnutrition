@@ -56,7 +56,7 @@ public class viewAccountsFragment extends Fragment {
         adapter = new ProfileAdapter(getContext(), profiles);
         listView.setAdapter(adapter);
 
-//        // Fetch accounts from UserManager
+        // Fetch accounts from UserManager
 //        UserAccountEntity userAccountEntity = new UserAccountEntity();
 //        userAccountEntity.fetchAccounts(new UserAccountEntity.DataCallback() {
 //            @Override
@@ -75,8 +75,19 @@ public class viewAccountsFragment extends Fragment {
 //            }
 //        });
         ViewAccountsController viewAccountsController = new ViewAccountsController();
-        profiles.addAll(viewAccountsController.retrieveAccounts());
-        adapter.notifyDataSetChanged();
+        viewAccountsController.retrieveAccounts(new UserAccountEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Profile> accounts) {
+                profiles.clear(); // Clear the current list
+                profiles.addAll(accounts); // Add the fetched accounts
+                adapter.notifyDataSetChanged(); // Notify the adapter about the new data
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Set up Spinner for role filtering
         List<String> sortRole = new ArrayList<>();
