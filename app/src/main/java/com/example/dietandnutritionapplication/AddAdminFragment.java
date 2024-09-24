@@ -149,23 +149,8 @@ public class AddAdminFragment extends Fragment {
                     Toast.makeText(getActivity(), "Please enter a valid phone number.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                UserAccountEntity userAccountEntity = new UserAccountEntity();
-                userAccountEntity.addAdmin(firstName, lastName, userName, dob, email, phone, selectedGender, password, date, getActivity(),
-                        new UserAccountEntity.RegisterCallback() {
-                            @Override
-                            public void onSuccess() {
-
-                                Toast.makeText(getActivity(), "Registration successful", Toast.LENGTH_SHORT).show();
-                                redirectToViewAllAccounts();
-                            }
-
-                            @Override
-                            public void onFailure(String errorMessage) {
-
-                                Toast.makeText(getActivity(), "Registration failed: " + errorMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
+                AddAdminController addAdminController = new AddAdminController();
+                addAdminController.checkRegisterAdmin(firstName, lastName,  userName, dob, email, phone, selectedGender, password, date, getActivity());
             }
 
         });
