@@ -127,9 +127,10 @@ public class NavAllRecipesFragment extends Fragment {
         String app_id = "2c7710ea"; // Your Edamam API app ID
         String app_key = "97f5e9187c865600f74e2baa358a9efb"; // Your Edamam API app key
         String type = "public";
+        String health = "DASH";
 
         EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type);
+        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type, health);
 
         call.enqueue(new Callback<RecipeResponse>() {
             @Override
