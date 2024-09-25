@@ -178,6 +178,7 @@
             android:background="@drawable/rounded_item_background"
             android:orientation="vertical">
 
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recipe_status_recycle_view"
                 android:layout_width="match_parent"

@@ -45,6 +45,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         recipesAdapter = new RecipeAdapter(recipeList, this);
         recipesRecyclerView.setAdapter(recipesAdapter);
 
+
         // Fetch recipes from Firestore
         fetchAllRecipes(); // Call method to fetch all recipes
         Log.d(TAG, "Recipe list size: " + recipeList.size());
@@ -87,10 +88,19 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
                     public void onComplete(Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                String recipeId = document.getId(); // Get the document ID
-                                // Create a Recipe object and add it to the list
-                                Recipe recipe = document.toObject(Recipe.class); // Assuming you have a Recipe class
-                                recipeList.add(recipe);
+                                Recipe recipe = document.toObject(Recipe.class);
+                                recipe.setRecipe_id(document.getId());
+
+                                double caloriesPer100g = recipe.getCaloriesPer100g();
+                                if (recipe.getTotalWeight() > 0) {
+                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                                }
+
+                                // Optionally, you can set this value back into the recipe object or create a new object to store it
+                                // For example:
+                                recipe.setCaloriesPer100g(caloriesPer100g); // Make sure to add this method in Recipe class
+
+                                recipeList.add(recipe); // Add the recipe to the list
                             }
                             // Notify the adapter of data changes
                             recipesAdapter.notifyDataSetChanged();
@@ -104,22 +114,6 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
     @Override
     public void onRecipeClick(Recipe recipe) {
         String recipeId = recipe.getRecipe_id(); // Assuming you have a method to get ID
-        fetchRecipeById(recipeId); // Call this method with the recipe ID
-    }
-
-    private void fetchRecipeById(String recipeId) {
-        db.collection("Recipes").document(recipeId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            Recipe recipe = task.getResult().toObject(Recipe.class); // Retrieve the recipe details
-                            // Do something with the recipe details, e.g., display them in a new fragment
-                        } else {
-                            Log.w(TAG, "Error getting recipe details.", task.getException());
-                        }
-                    }
-                });
+        fetchAllRecipes(); // Call this method with the recipe ID
     }
 }

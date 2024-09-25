@@ -27,6 +27,9 @@ public class Recipe implements Parcelable {
     // Getters for the fields
     public String getRecipe_id(){ return  recipe_id;}
 
+    public void setRecipe_id(String recipe_id) {
+        this.recipe_id = recipe_id;}
+
     public String getLabel() {
         return label;
     }
@@ -67,15 +70,12 @@ public class Recipe implements Parcelable {
         return calories;
     }
 
-    public double getTotalWeight() {return totalWeight;
-    }
+    public double getTotalWeight() {return totalWeight;}
 
-    public double getCaloriesPer100g() { return caloriesPer100g;
-    }
+    public double getCaloriesPer100g() { return caloriesPer100g;}
 
     public void setCaloriesPer100g(double caloriesPer100g) {
-        this.caloriesPer100g = caloriesPer100g;
-    }
+        this.caloriesPer100g = caloriesPer100g;}
 
     public int getTotalTime() {
         return totalTime;

@@ -16,6 +16,7 @@ import java.util.List;
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> recipeList;
     private OnRecipeClickListener onRecipeClickListener;
+    private ImageView imagePreview;
 
     // Interface for handling click events
     public interface OnRecipeClickListener {
@@ -34,6 +35,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Inflate the recipe_item layout
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_item, parent, false);
 
+        imagePreview = view.findViewById(R.id.recipe_image);
+
+        // Set the image resource to the ImageView
+        imagePreview.setImageResource(R.drawable.recipe_image);
+
         return new RecipeViewHolder(view);
     }
 
@@ -49,12 +55,17 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         String mealTypes = String.join(", ", recipe.getMealType());
         holder.mealTypeTextView.setText("Type: " + mealTypes);
 
-        holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.2f", recipe.getCaloriesPer100g()));
+        String cuisineTypes = String.join(", ", recipe.getCuisineType());
+        holder.cuisineTypeTextView.setText("Cuisine: " + cuisineTypes);
+
+        holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.1f", recipe.getCaloriesPer100g()));
 
 
-
-        // Use Picasso to load the image
-        Picasso.get().load(recipe.getImage()).into(holder.imageView);
+        if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
+            Picasso.get().load(recipe.getImage()).into(holder.imageView);
+        } else {
+            holder.imageView.setImageResource(R.drawable.recipe_image); // Use a placeholder image if no URL is available
+        }
 
         // Set the click listener for the recipe item
         holder.itemView.setOnClickListener(v -> {
@@ -72,7 +83,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     // ViewHolder class to represent each recipe item view
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, mealTypeTextView, caloriesper100gTextView;
+        TextView titleTextView, mealTypeTextView, cuisineTypeTextView, caloriesper100gTextView, weightTextView;
         ImageView imageView;
 
         public RecipeViewHolder(View itemView) {
@@ -80,7 +91,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             // Initialize the views
             titleTextView = itemView.findViewById(R.id.recipe_title);
             mealTypeTextView = itemView.findViewById(R.id.meal_type);
+            cuisineTypeTextView = itemView.findViewById(R.id.cuisine_type);
             caloriesper100gTextView = itemView.findViewById(R.id.calories_per_100g);
+            weightTextView = itemView.findViewById(R.id.recipe_weight); // Initialize the weight TextView
             imageView = itemView.findViewById(R.id.recipe_image);
         }
     }
