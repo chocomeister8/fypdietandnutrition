@@ -167,6 +167,4 @@ public class NavAllRecipesFragment extends Fragment {
         int index = random.nextInt(recipeQueries.length); // Get a random index
         return recipeQueries[index]; // Return the random query
     }
-
-
 }

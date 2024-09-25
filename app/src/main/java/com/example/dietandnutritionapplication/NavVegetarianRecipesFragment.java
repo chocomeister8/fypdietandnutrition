@@ -21,6 +21,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,6 +36,8 @@ public class NavVegetarianRecipesFragment extends Fragment {
     private List<Recipe> recipeList = new ArrayList<>();
     private EditText searchEditText;
 
+    private final String[] recipeQueries = {"American", "Asian", "British", "Caribbean", "Central Europe", "Chinese", "Eastern Europe", "French", "Indian", "Italian", "Japanese", "Kosher", "Mediterranean", "Mexican", "Middle Eastern", "Nordic", "South American", "South East Asian"};
+    private final Random random = new Random();
 
     private static final String BASE_URL = "https://api.edamam.com/";
     private static final String APP_ID = "your_app_id";  // Replace with your actual App ID
@@ -53,6 +56,8 @@ public class NavVegetarianRecipesFragment extends Fragment {
         recyclerView.setAdapter(recipeAdapter);
         searchEditText = view.findViewById(R.id.search_recipe);
 
+        fetchRecipes(getRandomQuery());
+
 
         // Initialize buttons using view.findViewById
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
@@ -70,10 +75,10 @@ public class NavVegetarianRecipesFragment extends Fragment {
                     .commit();
         });
 
+
         button_vegetarian.setOnClickListener(v -> {
-            String query = "vegetarian";
             // Fetch vegetarian/vegan recipes when the button is clicked
-            fetchRecipes(query);
+            fetchRecipes(getRandomQuery());
         });
 
         button_favourite.setOnClickListener(v -> {
@@ -184,5 +189,10 @@ public class NavVegetarianRecipesFragment extends Fragment {
                 Log.e("API Error", "Failed to fetch recipes: " + t.getMessage());
             }
         });
+    }
+
+    private String getRandomQuery() {
+        int index = random.nextInt(recipeQueries.length); // Get a random index
+        return recipeQueries[index]; // Return the random query
     }
 }
