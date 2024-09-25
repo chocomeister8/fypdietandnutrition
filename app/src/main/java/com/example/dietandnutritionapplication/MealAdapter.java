@@ -6,15 +6,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder> {
-    private List<Meal> mealList;
+    private List<MealRecord> mealList;
 
-    public MealAdapter(List<Meal> mealList) {
+    public MealAdapter(List<MealRecord> mealList) {
         this.mealList = mealList;
     }
 
@@ -26,10 +25,10 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     @Override
     public void onBindViewHolder(MealViewHolder holder, int position) {
-        Meal meal = mealList.get(position);
-        holder.titleTextView.setText(meal.getTitle());
-        holder.calorieTextView.setText(String.valueOf(meal.getCalorie()));
-        holder.imageView.setImageBitmap(meal.getImage()); // Set image to ImageView
+        MealRecord meal = mealList.get(position);
+        holder.titleTextView.setText(meal.getMealName());
+        holder.calorieTextView.setText(String.valueOf(meal.getCalories()));
+        //holder.imageView.setImageBitmap(meal.getImage()); // Set image to ImageView
         holder.mealTypeTextView.setText(meal.getMealType());
     }
 

@@ -43,10 +43,20 @@
         <!-- Add more items as needed -->
     </string-array>
 
+    <string-array name="serving_units_array">
+        <item>grams</item>
+        <item>cups</item>
+        <item>pieces</item>
+        <item>ounces</item>
+        <item>milliliters</item>
+    </string-array>
+
     <string-array name="meal_types_array">
         <item>Breakfast</item>
         <item>Lunch</item>
         <item>Dinner</item>
         <item>Snack</item>
     </string-array>
+
+
 </resources>
