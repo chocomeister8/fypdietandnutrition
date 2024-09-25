@@ -24,7 +24,8 @@ public class NavVegetarianRecipesFragment extends Fragment {
         Button button_favourite = view.findViewById(R.id.button_favourite);
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_calorie_goal = view.findViewById(R.id.button_calorie_goal);
+        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
+
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> {
@@ -67,10 +68,10 @@ public class NavVegetarianRecipesFragment extends Fragment {
                     .commit();
         });
 
-        button_calorie_goal.setOnClickListener(v -> {
+        button_recommendedRecipes.setOnClickListener(v -> {
             // Replace current fragment with NavRecipesStatusFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavCalorieGoalFragment())
+                    .replace(R.id.frame_layout, new NavRecommendedRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });

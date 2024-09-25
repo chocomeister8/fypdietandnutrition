@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -64,7 +63,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         Button button_favourite = view.findViewById(R.id.button_favourite);
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_calorie_goal = view.findViewById(R.id.button_calorie_goal);
+        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -72,7 +71,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         button_favourite.setOnClickListener(v -> navigateToFragment(new NavFavouriteRecipesFragment()));
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
-        button_calorie_goal.setOnClickListener(v -> navigateToFragment(new NavCalorieGoalFragment()));
+        button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
     }
 
     private void navigateToFragment(Fragment fragment) {

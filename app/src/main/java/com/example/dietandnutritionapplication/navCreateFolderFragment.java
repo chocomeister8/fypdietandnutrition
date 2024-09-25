@@ -127,6 +127,7 @@ public class navCreateFolderFragment extends Fragment {
         defaultFolders.add(new Folder("Vegetarian", false, NavVegetarianRecipesFragment.class));
         defaultFolders.add(new Folder("Personalise Recipes", false, NavPersonaliseRecipesFragment.class));
         defaultFolders.add(new Folder("Recipes Status", false, NavRecipesStatusFragment.class));
+        defaultFolders.add(new Folder("Recommended Recipes", false, NavRecommendedRecipesFragment.class));
         return defaultFolders;
     }
 
