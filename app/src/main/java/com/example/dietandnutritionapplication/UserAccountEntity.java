@@ -303,6 +303,7 @@ public class UserAccountEntity {
                                     } else {
                                         // Authentication failed
                                         Exception e = authTask.getException();
+                                        Log.e("AuthError", "Authentication failed: " + e.getMessage(), e);
                                         Toast.makeText(context, "Authentication failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });

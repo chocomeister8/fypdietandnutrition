@@ -7,26 +7,27 @@
 
     <EditText
         android:id="@+id/food_name_input"
+        android:hint="Enter food name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Food Name" />
+        android:layout_height="wrap_content" />
 
+    <!-- Input for serving size -->
     <EditText
         android:id="@+id/serving_size_input"
+        android:hint="Enter serving size"
+        android:inputType="numberDecimal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Serving Size" />
+        android:layout_height="wrap_content" />
+
+    <!-- Input for serving unit -->
+    <Spinner
+        android:id="@+id/serving_unit_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <Spinner
         android:id="@+id/meal_type_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/calories_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Calories (optional)"
-        android:inputType="number" />
 
 </LinearLayout>
