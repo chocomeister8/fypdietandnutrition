@@ -54,12 +54,6 @@ public class AddRecipeFragment extends Fragment {
         cuisineTypeCheckboxes = view.findViewById(R.id.cuisine_type_checkboxes);
         dishTypeCheckboxes = view.findViewById(R.id.dish_type_checkboxes);
 
-        imagePreview = view.findViewById(R.id.recipe_image);
-
-        // Set the image resource
-        imagePreview.setImageResource(R.drawable.recipe_image);
-
-
         // Initialize Firebase Firestore
         db = FirebaseFirestore.getInstance();
 
@@ -72,20 +66,36 @@ public class AddRecipeFragment extends Fragment {
         return view;
     }
 
-    private List<String> getSelectedCheckboxes(LinearLayout checkboxGroup) {
+    private List<String> getSelectedCheckboxes(LinearLayout checkboxGroup, boolean singleSelection) {
         List<String> selectedItems = new ArrayList<>();
         int count = checkboxGroup.getChildCount();
+
         for (int i = 0; i < count; i++) {
             View view = checkboxGroup.getChildAt(i);
             if (view instanceof CheckBox) {
                 CheckBox checkBox = (CheckBox) view;
+
                 if (checkBox.isChecked()) {
+                    // Log the checked checkbox
+                    Log.d("CheckboxSelection", "Checked: " + checkBox.getText().toString());
+
+                    // If single selection is allowed, clear the list before adding
+                    if (singleSelection) {
+                        selectedItems.clear(); // Clear previous selections
+                    }
                     selectedItems.add(checkBox.getText().toString());
+
+                    // If single selection is allowed, break the loop after adding the first checked item
+                    if (singleSelection) {
+                        break; // Only one item can be selected
+                    }
                 }
             }
         }
         return selectedItems;
     }
+
+
 
     // Add Dynamic Ingredient Fields
     private void addIngredientField() {
@@ -164,9 +174,9 @@ public class AddRecipeFragment extends Fragment {
         Log.d("RecipeInput", "Total Time: " + totalTime);
 
         // Get selected values from checkboxes
-        List<String> mealTypes = getSelectedCheckboxes(mealTypeCheckboxes);
-        List<String> cuisineTypes = getSelectedCheckboxes(cuisineTypeCheckboxes);
-        List<String> dishTypes = getSelectedCheckboxes(dishTypeCheckboxes);
+        List<String> mealTypes = getSelectedCheckboxes(mealTypeCheckboxes, false);
+        List<String> cuisineTypes = getSelectedCheckboxes(cuisineTypeCheckboxes, false);
+        List<String> dishTypes = getSelectedCheckboxes(dishTypeCheckboxes, false);
 
         // Collect dynamic ingredients
         List<Map<String, String>> ingredientsList = new ArrayList<>();
