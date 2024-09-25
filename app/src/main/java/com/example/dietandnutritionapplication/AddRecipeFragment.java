@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -130,13 +131,23 @@ public class AddRecipeFragment extends Fragment {
     }
 
     // Save Recipe Data to Firestore
+    // Save Recipe Data to Firestore
     private void saveRecipeToFirestore() {
 
         String recipeTitle = recipeTitleInput.getText().toString();
         double calories = 0;
         double weight = 0;
         double totalTime = 0;
+        String status = "Pending";
 
+        // Fetch current user ID from Firebase Authentication
+        String userId = getCurrentUserId();
+        if (userId == null) {
+            Toast.makeText(getContext(), "User not authenticated. Please log in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Parse calories input
         String caloriesInputValue = caloriesInput.getText().toString().trim();
         if (!caloriesInputValue.isEmpty()) {
             try {
@@ -147,7 +158,7 @@ public class AddRecipeFragment extends Fragment {
             }
         }
 
-        // Attempt to parse weight
+        // Parse weight input
         String weightInputValue = weightInput.getText().toString().trim();
         if (!weightInputValue.isEmpty()) {
             try {
@@ -158,7 +169,7 @@ public class AddRecipeFragment extends Fragment {
             }
         }
 
-        // Attempt to parse total time
+        // Parse total time input
         String totalTimeInputValue = totalTimeInput.getText().toString().trim();
         if (!totalTimeInputValue.isEmpty()) {
             try {
@@ -212,6 +223,8 @@ public class AddRecipeFragment extends Fragment {
         recipeData.put("cuisineType", cuisineTypes); // Store cuisineTypes as a List<String>
         recipeData.put("dishType", dishTypes); // Store dishTypes as a List<String>
         recipeData.put("ingredientsList", ingredientsList); // Store ingredients as a list of maps
+        recipeData.put("userId", userId); // Add the current user's ID to the recipe data
+        recipeData.put("status", status);
 
         // Add data to Firestore
         db.collection("Recipes")
@@ -234,5 +247,12 @@ public class AddRecipeFragment extends Fragment {
                 });
     }
 
-
+    // Method to retrieve the current user's ID from Firebase Authentication
+    private String getCurrentUserId() {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            return FirebaseAuth.getInstance().getCurrentUser().getUid(); // Return the user ID
+        } else {
+            return null; // User not logged in
+        }
+    }
 }

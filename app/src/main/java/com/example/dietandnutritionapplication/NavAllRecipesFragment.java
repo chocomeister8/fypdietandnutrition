@@ -22,6 +22,7 @@ import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class NavAllRecipesFragment extends Fragment {
 
@@ -29,6 +30,9 @@ public class NavAllRecipesFragment extends Fragment {
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList;
     private EditText searchEditText;
+
+    private final String[] recipeQueries = {"balanced", "high-fiber", "high-protein", "low-carb", "low-fat", "low-sodium"};
+    private final Random random = new Random();
 
 
     @Nullable
@@ -55,11 +59,11 @@ public class NavAllRecipesFragment extends Fragment {
 
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
-        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment);
+        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes("balanced diet");
+        fetchRecipes(getRandomQuery());
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -157,6 +161,10 @@ public class NavAllRecipesFragment extends Fragment {
                 Log.e("API Error", "Failed to fetch recipes: " + t.getMessage());
             }
         });
+    }
+    private String getRandomQuery() {
+        int index = random.nextInt(recipeQueries.length); // Get a random index
+        return recipeQueries[index]; // Return the random query
     }
 
 

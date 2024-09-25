@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -31,6 +32,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
     private RecipeAdapter recipesAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,12 +44,12 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize adapter with an empty list and set it to the RecyclerView
-        recipesAdapter = new RecipeAdapter(recipeList, this);
+        recipesAdapter = new RecipeAdapter(recipeList, this, true);
         recipesRecyclerView.setAdapter(recipesAdapter);
 
 
         // Fetch recipes from Firestore
-        fetchAllRecipes(); // Call method to fetch all recipes
+        fetchUserRecipes(); // Call method to fetch all recipes
         Log.d(TAG, "Recipe list size: " + recipeList.size());
 
         // Setup buttons
@@ -80,25 +82,28 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
                 .commit();
     }
 
-    private void fetchAllRecipes() {
+    private void fetchUserRecipes() {
+        String currentUserId = getCurrentUserId(); // Method to retrieve current user ID
+
         db.collection("Recipes")
+                .whereEqualTo("userId", currentUserId) // Filter to get only the recipes by the current user
+                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            recipeList.clear(); // Clear the list before adding new data
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Recipe recipe = document.toObject(Recipe.class);
                                 recipe.setRecipe_id(document.getId());
 
+                                // Calculate calories per 100g if total weight is available
                                 double caloriesPer100g = recipe.getCaloriesPer100g();
                                 if (recipe.getTotalWeight() > 0) {
                                     caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
                                 }
-
-                                // Optionally, you can set this value back into the recipe object or create a new object to store it
-                                // For example:
-                                recipe.setCaloriesPer100g(caloriesPer100g); // Make sure to add this method in Recipe class
+                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
 
                                 recipeList.add(recipe); // Add the recipe to the list
                             }
@@ -114,6 +119,10 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
     @Override
     public void onRecipeClick(Recipe recipe) {
         String recipeId = recipe.getRecipe_id(); // Assuming you have a method to get ID
-        fetchAllRecipes(); // Call this method with the recipe ID
+        fetchUserRecipes(); // Call this method with the recipe ID
+    }
+
+    private String getCurrentUserId() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 }

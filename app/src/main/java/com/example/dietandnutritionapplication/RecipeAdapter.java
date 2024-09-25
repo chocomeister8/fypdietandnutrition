@@ -16,17 +16,18 @@ import java.util.List;
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> recipeList;
     private OnRecipeClickListener onRecipeClickListener;
-    private ImageView imagePreview;
+    private boolean showStatus; // New parameter to control visibility of status
 
     // Interface for handling click events
     public interface OnRecipeClickListener {
         void onRecipeClick(Recipe recipe);
     }
 
-    // Constructor to accept both recipe list and the listener
-    public RecipeAdapter(List<Recipe> recipeList, OnRecipeClickListener listener) {
+    // Constructor to accept both recipe list, listener, and the showStatus flag
+    public RecipeAdapter(List<Recipe> recipeList, OnRecipeClickListener listener, boolean showStatus) {
         this.recipeList = recipeList;
         this.onRecipeClickListener = listener;
+        this.showStatus = showStatus; // Initialize the showStatus flag
     }
 
     @NonNull
@@ -34,12 +35,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Inflate the recipe_item layout
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_item, parent, false);
-
-        imagePreview = view.findViewById(R.id.recipe_image);
-
-        // Set the image resource to the ImageView
-        imagePreview.setImageResource(R.drawable.recipe_image);
-
         return new RecipeViewHolder(view);
     }
 
@@ -51,7 +46,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Set the recipe title
         holder.titleTextView.setText(recipe.getLabel());
 
-
         String mealTypes = String.join(", ", recipe.getMealType());
         holder.mealTypeTextView.setText("Type: " + mealTypes);
 
@@ -60,7 +54,15 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.1f", recipe.getCaloriesPer100g()));
 
+        // Conditionally show or hide the status
+        if (showStatus) {
+            holder.statusViewText.setText("Status: " + recipe.getStatus());
+            holder.statusViewText.setVisibility(View.VISIBLE); // Show status
+        } else {
+            holder.statusViewText.setVisibility(View.GONE); // Hide status
+        }
 
+        // Load image with Picasso
         if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
             Picasso.get().load(recipe.getImage()).into(holder.imageView);
         } else {
@@ -73,7 +75,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 onRecipeClickListener.onRecipeClick(recipe); // Trigger the click callback with the selected recipe
             }
         });
-
     }
 
     @Override
@@ -83,7 +84,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     // ViewHolder class to represent each recipe item view
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, mealTypeTextView, cuisineTypeTextView, caloriesper100gTextView, weightTextView;
+        TextView titleTextView, mealTypeTextView, cuisineTypeTextView, caloriesper100gTextView, weightTextView, statusViewText;
         ImageView imageView;
 
         public RecipeViewHolder(View itemView) {
@@ -95,6 +96,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             caloriesper100gTextView = itemView.findViewById(R.id.calories_per_100g);
             weightTextView = itemView.findViewById(R.id.recipe_weight); // Initialize the weight TextView
             imageView = itemView.findViewById(R.id.recipe_image);
+            statusViewText = itemView.findViewById(R.id.status); // Initialize the status TextView
         }
     }
 }

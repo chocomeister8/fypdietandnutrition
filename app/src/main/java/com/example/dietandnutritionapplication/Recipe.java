@@ -8,6 +8,7 @@ import java.util.List;
 public class Recipe implements Parcelable {
     private String recipe_id;
     private String label; // The title of the recipe
+    private String status;
     private String image; // URL of the recipe image
     private List<String> mealType; // Meal type (e.g., lunch, dinner)
     private List<String> cuisineType; // Cuisine type (e.g., Italian, Asian)
@@ -29,6 +30,8 @@ public class Recipe implements Parcelable {
 
     public void setRecipe_id(String recipe_id) {
         this.recipe_id = recipe_id;}
+
+    public String getStatus(){ return status;}
 
     public String getLabel() {
         return label;
@@ -82,10 +85,11 @@ public class Recipe implements Parcelable {
     }
 
     // Optionally, add a constructor
-    public Recipe(String recipe_id, String label, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
+    public Recipe(String recipe_id, String label, String status, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
                   List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int totalTime) {
         this.recipe_id = recipe_id;
         this.label = label;
+        this.status = status;
         this.image = image;
         this.mealType = mealType;
         this.cuisineType = cuisineType;
@@ -103,6 +107,7 @@ public class Recipe implements Parcelable {
     protected Recipe(Parcel in) {
         recipe_id = in.readString();
         label = in.readString();
+        status = in.readString();
         image = in.readString();
         mealType = in.createStringArrayList();
         cuisineType = in.createStringArrayList();
@@ -137,6 +142,7 @@ public class Recipe implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(recipe_id);
         dest.writeString(label);
+        dest.writeString(status);
         dest.writeString(image);
         dest.writeStringList(mealType);
         dest.writeStringList(cuisineType);
