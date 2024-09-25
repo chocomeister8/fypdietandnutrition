@@ -33,7 +33,7 @@ public class userHomePageFragment extends Fragment {
         button_recipes.setOnClickListener(v -> {
             // Replace current fragment with NavAllRecipesFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new RecipesFolderFragment())
+                    .replace(R.id.frame_layout, new navCreateFolderFragment())
                     .addToBackStack(null)  // Add to back stack to enable back navigation
                     .commit();
         });

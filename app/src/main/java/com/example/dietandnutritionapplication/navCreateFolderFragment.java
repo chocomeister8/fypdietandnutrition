@@ -28,9 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// Listener interface
+// Listener interface for folder deletion
 interface OnFolderDeleteListener {
-    void onFolderDelete(navCreateFolderFragment.Folder folder); // Ensure this matches your Folder definition
+    void onFolderDelete(navCreateFolderFragment.Folder folder);
 }
 
 public class navCreateFolderFragment extends Fragment {
@@ -65,8 +65,8 @@ public class navCreateFolderFragment extends Fragment {
         }
 
         // Initialize folder creation button
-        ImageButton button_create_recipes = view.findViewById(R.id.button_folder);
-        button_create_recipes.setOnClickListener(v -> showCreateFolderDialog());
+        ImageButton buttonCreateRecipes = view.findViewById(R.id.button_folder);
+        buttonCreateRecipes.setOnClickListener(v -> showCreateFolderDialog());
 
         // Fetch both default and user folders
         fetchFoldersFromFirebase();
@@ -74,27 +74,27 @@ public class navCreateFolderFragment extends Fragment {
         return view;
     }
 
+    // Show dialog to create a new folder
     private void showCreateFolderDialog() {
         final EditText folderNameInput = new EditText(requireContext());
         folderNameInput.setHint("Enter folder name");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Please enter folder name");
-        builder.setView(folderNameInput);
-
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            String recipesFolder = folderNameInput.getText().toString().trim();
-            if (!recipesFolder.isEmpty()) {
-                addFolderToFirebase(recipesFolder);
-            } else {
-                Toast.makeText(requireContext(), "Folder name cannot be empty!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
+        builder.setTitle("Please enter folder name")
+                .setView(folderNameInput)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    String recipesFolder = folderNameInput.getText().toString().trim();
+                    if (!recipesFolder.isEmpty()) {
+                        addFolderToFirebase(recipesFolder);
+                    } else {
+                        Toast.makeText(requireContext(), "Folder name cannot be empty!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.cancel())
+                .show();
     }
 
+    // Fetch folders from Firestore
     private void fetchFoldersFromFirebase() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -119,7 +119,7 @@ public class navCreateFolderFragment extends Fragment {
                 });
     }
 
-    // Add default folders
+    // Create a list of default folders
     private List<Folder> getDefaultFolders() {
         List<Folder> defaultFolders = new ArrayList<>();
         defaultFolders.add(new Folder("All Recipes", false, NavAllRecipesFragment.class));
@@ -130,6 +130,7 @@ public class navCreateFolderFragment extends Fragment {
         return defaultFolders;
     }
 
+    // Add a new folder to Firestore
     private void addFolderToFirebase(String recipesFolder) {
         Map<String, Object> folderData = new HashMap<>();
         folderData.put("folderName", recipesFolder);
@@ -148,6 +149,7 @@ public class navCreateFolderFragment extends Fragment {
                 });
     }
 
+    // Confirm and delete a folder
     private void confirmAndDeleteFolder(Folder folder) {
         if (!folder.isDeletable()) {
             Toast.makeText(requireContext(), "This folder cannot be deleted.", Toast.LENGTH_SHORT).show();
@@ -162,6 +164,7 @@ public class navCreateFolderFragment extends Fragment {
                 .show();
     }
 
+    // Delete a folder from Firestore
     private void deleteFolderFromFirebase(String folderName) {
         db.collection("RecipesFolders")
                 .whereEqualTo("folderName", folderName)
@@ -186,7 +189,7 @@ public class navCreateFolderFragment extends Fragment {
                 });
     }
 
-    // Updated FolderAdapter to handle non-deletable folders
+    // Adapter class to handle folder display and deletion
     private class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderViewHolder> {
         private final List<Folder> folderList;
         private final OnFolderDeleteListener deleteListener;
@@ -215,7 +218,8 @@ public class navCreateFolderFragment extends Fragment {
                     // Navigate to the target fragment
                     Fragment fragment = null;
                     try {
-                        fragment = folder.getTargetFragment().newInstance(); // Create an instance of the target fragment
+                        // Cast to Class<? extends Fragment>
+                        fragment = (Fragment) folder.getTargetFragment().newInstance(); // Create an instance of the target fragment
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -228,10 +232,9 @@ public class navCreateFolderFragment extends Fragment {
                 }
             });
 
-            if (!folder.isDeletable()) {
-                holder.deleteButton.setVisibility(View.GONE); // Hide delete button for default folders
-            } else {
-                holder.deleteButton.setVisibility(View.VISIBLE);
+            // Handle visibility of delete button based on folder type
+            holder.deleteButton.setVisibility(folder.isDeletable() ? View.VISIBLE : View.GONE);
+            if (folder.isDeletable()) {
                 holder.deleteButton.setOnClickListener(v -> deleteListener.onFolderDelete(folder));
             }
         }
@@ -242,11 +245,12 @@ public class navCreateFolderFragment extends Fragment {
             return folderList.size();
         }
 
-        public class FolderViewHolder extends RecyclerView.ViewHolder {
+        // ViewHolder class to hold folder views
+        class FolderViewHolder extends RecyclerView.ViewHolder {
             TextView folderName;
             Button deleteButton;
 
-            public FolderViewHolder(View itemView) {
+            public FolderViewHolder(@NonNull View itemView) {
                 super(itemView);
                 folderName = itemView.findViewById(R.id.folder_name);
                 deleteButton = itemView.findViewById(R.id.delete_button);
@@ -254,22 +258,21 @@ public class navCreateFolderFragment extends Fragment {
         }
     }
 
-    // Folder class defined as public inner class
+    // Inner class to represent Folder object
     public static class Folder {
         private final String folderName;
-        private final boolean isDeletable;
-        private final Class<? extends Fragment> targetFragment; // Add this field
+        private final boolean deletable; // Indicates if the folder can be deleted
+        private Class<?> targetFragment; // Target fragment class for navigation
 
-        // Constructor with three parameters
-        public Folder(String folderName, boolean isDeletable, Class<? extends Fragment> targetFragment) {
+        public Folder(String folderName, boolean deletable) {
             this.folderName = folderName;
-            this.isDeletable = isDeletable;
-            this.targetFragment = targetFragment; // Set target fragment
+            this.deletable = deletable;
         }
 
-        // Overloaded constructor with two parameters
-        public Folder(String folderName, boolean isDeletable) {
-            this(folderName, isDeletable, null); // Default target fragment is null
+        public Folder(String folderName, boolean deletable, Class<?> targetFragment) {
+            this.folderName = folderName;
+            this.deletable = deletable;
+            this.targetFragment = targetFragment;
         }
 
         public String getFolderName() {
@@ -277,11 +280,12 @@ public class navCreateFolderFragment extends Fragment {
         }
 
         public boolean isDeletable() {
-            return isDeletable;
+            return deletable;
         }
 
-        public Class<? extends Fragment> getTargetFragment() {
-            return targetFragment; // New getter for target fragment
+        public Class<?> getTargetFragment() {
+            return targetFragment;
         }
     }
 }
+
