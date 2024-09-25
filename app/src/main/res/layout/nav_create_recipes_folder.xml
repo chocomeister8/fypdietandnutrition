@@ -69,13 +69,40 @@
         android:src="@drawable/baseline_add_24"
         android:padding="10dp"/>
 
+
+    <!-- Folder name and delete button layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="180dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="20dp"
+        android:padding="25dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/rounded_search_bar_background">
+
+        <TextView
+            android:id="@+id/button_all_recipes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="All recipes"
+            android:textSize="18sp"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
     <!-- RecyclerView for folders -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/folder_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/search_bar"
-        android:layout_marginTop="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="103dp"
+        android:layout_marginEnd="-1dp"
         android:padding="16dp"
         android:scrollbars="vertical" />
 
