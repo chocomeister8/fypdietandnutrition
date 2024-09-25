@@ -126,9 +126,13 @@ public class MealLogUFragment extends Fragment {
     private TextView dinnerTextView;
     private TextView snackTextView;
 
+    private ImageView mealOptionButton1;
+    private TextView mealOptionButton2;
     private String selectedDateString;
 
-    private TextView carbsTextView, proteinsTextView, fatsTextView;
+    private TextView carbsTextView, proteinsTextView, fatsTextView, calorieLimitView, remainingCaloriesView;
+
+    private String selectedMealType;
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -156,37 +160,38 @@ public class MealLogUFragment extends Fragment {
         proteinsTextView = view.findViewById(R.id.proteins_value);
         fatsTextView = view.findViewById(R.id.fats_value);
 
+        calorieLimitView = view.findViewById(R.id.progress_calorielimit);
+        remainingCaloriesView = view.findViewById(R.id.progress_remainingcalorie);
+
+
         calendar = Calendar.getInstance();
 
         if (currentUser != null) {
             String userId = currentUser.getUid();
-            updateDateTextView(view, calendar);
-            String selectedDateString = getSelectedDate();
-            Log.d("MealLogFragment", "get selecteddatestring : " + selectedDateString);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+            String selectedDateString = dateFormat.format(calendar.getTime());
+            dateTextView.setText(selectedDateString);
 
             fetchUsername(userId, new OnUsernameFetchedListener() {
                 @Override
                 public void onUsernameFetched(String username) {
                     if (username != null) {
-                        fetchMealsLogged(view, username, selectedDateString);
-                        calculateRemainingCalories(view, userId);
+                        fetchMealsLogged(username, selectedDateString);
+                        calculateRemainingCalories(userId);
+
+                        dateTextView.setOnClickListener(v -> showDatePickerDialog(username, userId));
                     } else {
                         Log.w("MealLogFragment", "Username not found, cannot fetch meals.");
                     }
                 }
             });
-            setupMealOptionButtons(view);
+            mealOptionButton1 = view.findViewById(R.id.camera_icon);
+            mealOptionButton2 = view.findViewById(R.id.snap_photo_text);
+            mealOptionButton1.setOnClickListener(v -> showMealOptionDialog());
+            mealOptionButton2.setOnClickListener(v -> showMealOptionDialog());
 
-            takePictureLauncher = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            Intent data = result.getData();
-                            // Handle the captured image here
-                        }
-                    }
-            );
-            dateTextView.setOnClickListener(v -> showDatePickerDialog());
         }
         else {
             Toast.makeText(getActivity(), "User not logged in", Toast.LENGTH_SHORT).show();
@@ -196,19 +201,8 @@ public class MealLogUFragment extends Fragment {
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            } else {
-                Toast.makeText(getActivity(), "Camera permission denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void openCamera() {
+    private void openCameraWithMealType(String mealType) {
+        selectedMealType = mealType;
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         try {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
@@ -217,7 +211,46 @@ public class MealLogUFragment extends Fragment {
         }
     }
 
-    private void performImageRecognition(Bitmap bitmap) {
+    private Bitmap downscaleBitmap(Bitmap bitmap, int maxSize) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float aspectRatio = (float) width / height;
+
+        if (width > height) {
+            width = maxSize;
+            height = Math.round(maxSize / aspectRatio);
+        } else {
+            height = maxSize;
+            width = Math.round(maxSize * aspectRatio);
+        }
+
+        return Bitmap.createScaledBitmap(bitmap, width, height, true);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    if (imageBitmap != null) {
+                        Log.d("Debug", "Image captured successfully.");
+
+                        Bitmap scaledBitmap = downscaleBitmap(imageBitmap, 1024); // max size 1024
+
+                        performImageRecognition(selectedMealType, scaledBitmap);
+                    } else {
+                        Log.e("Error", "Captured image bitmap is null.");
+                        Toast.makeText(getActivity(), "Failed to capture image.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    }
+
+    private void performImageRecognition(String selectedMealType, Bitmap bitmap) {
         InputImage image = InputImage.fromBitmap(bitmap, 0);
 
         ImageLabelerOptions options =
@@ -240,7 +273,7 @@ public class MealLogUFragment extends Fragment {
                         String labelText = label.getText();
 
                         if (isFoodLabel(labelText)) {
-                            //searchFoodInEdamam(labelText);
+                            searchFoodInEdamam(labelText, 100.00, "grams", selectedMealType);
                         }
                     }
                 })
@@ -257,11 +290,10 @@ public class MealLogUFragment extends Fragment {
         return isFood;
     }
 
-    private void calculateRemainingCalories(View view, String userId) {
+    private void calculateRemainingCalories(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        TextView dateTextView = view.findViewById(R.id.dateTextView);
-        String selectedDate = dateTextView.getText().toString();
+       String selectedDate = dateTextView.getText().toString();
         Log.d("CalorieTracking", "SelectedDate: " + selectedDate);
 
         TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
@@ -310,7 +342,7 @@ public class MealLogUFragment extends Fragment {
                                     Log.d("CalorieTracking", "Remaining Calories: " + remainingCalories);
 
                                     // Display the results on UI
-                                    updateCalorieDisplay(view, calorieLimit, remainingCalories);
+                                    updateCalorieDisplay(calorieLimit, remainingCalories);
                                 }else {
                                     Log.e("CalorieTracking", "Error retrieving meals: ", mealTask.getException());
                                 }
@@ -324,15 +356,12 @@ public class MealLogUFragment extends Fragment {
         });
     }
 
-    private void updateCalorieDisplay(View view, int calorieLimit, int remainingCalories) {
-        TextView calorieLimitView = view.findViewById(R.id.progress_calorielimit);
-        TextView remainingCaloriesView = view.findViewById(R.id.progress_remainingcalorie);
-
+    private void updateCalorieDisplay(int calorieLimit, int remainingCalories) {
         calorieLimitView.setText("Calorie Limit: " + calorieLimit);
         remainingCaloriesView.setText("Remaining:\n " + remainingCalories);
     }
 
-    private void handleEnterManually(View view) {
+    private void handleEnterManually(String selectedMealType) {
         // Create a dialog to enter meal details
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Enter Meal Details");
@@ -346,18 +375,12 @@ public class MealLogUFragment extends Fragment {
         EditText foodNameInput = dialogView.findViewById(R.id.food_name_input);
         EditText servingSizeInput = dialogView.findViewById(R.id.serving_size_input);
         Spinner servingUnitSpinner = dialogView.findViewById(R.id.serving_unit_spinner);
-        Spinner mealTypeSpinner = dialogView.findViewById(R.id.meal_type_spinner);
 
         // Setup the Spinner for serving units (e.g., grams, cups, pieces)
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
                 R.array.serving_units_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         servingUnitSpinner.setAdapter(adapter);
-
-        ArrayAdapter<CharSequence> mealTypeAdapter = ArrayAdapter.createFromResource(requireContext(),
-                R.array.meal_types_array, android.R.layout.simple_spinner_item); // Make sure you define this array in strings.xml
-        mealTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mealTypeSpinner.setAdapter(mealTypeAdapter);
 
         builder.setPositiveButton("Add", (dialog, which) -> {
             String foodName = foodNameInput.getText().toString();
@@ -370,12 +393,10 @@ public class MealLogUFragment extends Fragment {
 
                 String servingUnit = servingUnitSpinner.getSelectedItem().toString();
                 Log.d("MealLogFragment", "Serving Unit Selected: " + servingUnit);
-
-                String mealType = mealTypeSpinner.getSelectedItem().toString(); // Get the selected meal type
-                Log.d("MealLogFragment", "Meal Type Selected: " + mealType);
+                  Log.d("MealLogFragment", "Meal Type Selected: " + selectedMealType);
 
                 // Call the function to search for the food and scale nutrients accordingly
-                searchFoodInEdamam(view, foodName, servingSize, servingUnit, mealType);
+                searchFoodInEdamam(foodName, servingSize, servingUnit, selectedMealType);
             } else {
                 // Handle empty serving size input (e.g., show an error)
                 Toast.makeText(requireContext(), "Please enter a valid serving size", Toast.LENGTH_SHORT).show();
@@ -386,7 +407,7 @@ public class MealLogUFragment extends Fragment {
         builder.create().show();
     }
 
-    private void searchFoodInEdamam(View view, String foodName, Double servingSize, String servingUnit, String mealType) {
+    private void searchFoodInEdamam(String foodName, Double servingSize, String servingUnit, String selectedMealType) {
         String appId = "997e8d42";
         String appKey = "4483ab153d93c4a64d6f156fcffa78ff";
 
@@ -411,8 +432,7 @@ public class MealLogUFragment extends Fragment {
                         Log.d("FoodAPI", "Food Label: " + foodLabel);
                         Log.d("FoodAPI", "Reference Calories: " + referenceCalories);
 
-                        TextView dateTextView = view.findViewById(R.id.dateTextView);
-                        String selectedDate = dateTextView.getText().toString();
+                       String selectedDate = dateTextView.getText().toString();
                         Log.d("FoodAPI", "Selected Date: " + selectedDate);
 
                         double scaleFactor = servingSize / 100.0; // Assuming Edamam data is per 100 grams
@@ -440,7 +460,7 @@ public class MealLogUFragment extends Fragment {
                                                 // Get the username field
                                                 String username = document.getString("username");
                                                 Log.d("MealLogFragment", "Username: " + username);
-                                                storeMealData(view, username, foodLabel, mealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat);
+                                                storeMealData(username, foodLabel, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat);
                                             }
                                         }
                                     });
@@ -461,11 +481,10 @@ public class MealLogUFragment extends Fragment {
         });
         }
 
-    private void storeMealData(View view,String username, String mealName, String mealType, String servingInfo, double calories, double carbs, double proteins, double fats) {
+    private void storeMealData(String username, String mealName, String selectedMealType, String servingInfo, double calories, double carbs, double proteins, double fats) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        TextView dateTextView = view.findViewById(R.id.dateTextView);
-        String selectedDateStr = dateTextView.getText().toString(); // e.g., "2024-09-25"
+       String selectedDateStr = dateTextView.getText().toString(); // e.g., "2024-09-25"
 
         // Convert the selected date string to a Date object
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -473,7 +492,7 @@ public class MealLogUFragment extends Fragment {
 
         Map<String, Object> mealData = new HashMap<>();
         mealData.put("mealName", mealName);
-        mealData.put("mealType", mealType);
+        mealData.put("mealType", selectedMealType);
         mealData.put("servingSize", servingInfo);
         mealData.put("calories", calories);
         mealData.put("carbs", carbs);
@@ -495,8 +514,8 @@ public class MealLogUFragment extends Fragment {
         db.collection("MealRecords")
                 .add(mealData)
                 .addOnSuccessListener(documentReference -> {
-                    fetchMealsLogged(view, username, selectedDateStr);
-                    calculateRemainingCalories(view, username);
+                    fetchMealsLogged(username, selectedDateStr);
+                    calculateRemainingCalories(username);
                     Log.d("MealLogUFragment", "Meal added with ID: " + documentReference.getId());
                     Toast.makeText(getActivity(), "Meal added successfully", Toast.LENGTH_SHORT).show();
 
@@ -506,7 +525,7 @@ public class MealLogUFragment extends Fragment {
                 });
     }
 
-    private void fetchMealsLogged(View view, String username, String selectedDateStr) {
+    private void fetchMealsLogged(String username, String selectedDateStr) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         Log.d("MealLogUFragment", "fetchMealsLogged() date:"+ selectedDateStr);
@@ -545,8 +564,8 @@ public class MealLogUFragment extends Fragment {
 
                         }
                         Log.d("MealLogUFragment", "Fetched meal records: " + mealRecords.size());
-                        updateMealLogUI(view, mealRecords, selectedDateStr, getCurrentUserId());
-                        calculateRemainingCalories(view, username);
+                        updateMealLogUI(mealRecords, selectedDateStr, getCurrentUserId());
+                        calculateRemainingCalories(username);
                     } else {
                         Log.w("MealLogUFragment", "Error getting documents.", task.getException());
                     }
@@ -577,7 +596,7 @@ public class MealLogUFragment extends Fragment {
         }
     }
 
-    private void updateMealLogUI(View view,List<MealRecord> mealRecords, String selectedDateString, String userId) {
+    private void updateMealLogUI(List<MealRecord> mealRecords, String selectedDateString, String userId) {
         Log.d("MealLogFragment", "Selected Date: " + selectedDateString);
         totalCarbs = 0;
         totalProteins = 0;
@@ -649,60 +668,80 @@ public class MealLogUFragment extends Fragment {
         Log.d("MealLogFragment", "Total Proteins: " + totalProteins + "g");
         if (fatsTextView != null) fatsTextView.setText(totalFats + "g");
         Log.d("MealLogFragment", "Total Fats: " + totalFats + "g");
-        calculateRemainingCalories(view, userId);
-        Log.d("MealLogFragment", "Finished updating meal log UI for user: " + userId);
 
-
-        calculateRemainingCalories(view, userId);
+        calculateRemainingCalories(userId);
         Log.d("MealLogFragment", "Finished updating meal log UI for user: " + userId);
     }
 
-    private String getSelectedDate() {
-        // Check if a date has been previously selected
-        if (selectedDateString != null && !selectedDateString.isEmpty()) {
-            return selectedDateString; // Return the previously selected date
-        } else {
-            // Return today's date in a specific format (e.g., "yyyy-MM-dd")
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            return dateFormat.format(new Date()); // Return today's date
-        }
-    }
-
-    private void showMealOptionDialog(View view) {
+    private void showMealOptionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Choose an Option")
-                .setItems(new CharSequence[]{"Snap a Photo", "Enter Manually"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                // Handle snapping a photo
-                                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-                                } else {
-                                    openCamera();
+
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.meal_log_dialog_meal_type_selection, null);
+
+        Spinner mealTypeSpinner = dialogView.findViewById(R.id.mealTypeSpinner);
+
+        // Populate the spinner with meal types (same as earlier setup)
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.meal_types_array,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mealTypeSpinner.setAdapter(adapter);
+
+        // Add the custom view to the dialog
+        builder.setView(dialogView);
+        builder.setTitle("Choose a Meal Type and Option");
+
+        builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Get the selected meal type from the spinner
+                String selectedMealType = mealTypeSpinner.getSelectedItem().toString();
+
+                // Validate that a meal type has been selected
+                if (selectedMealType == null || selectedMealType.isEmpty()) {
+                    Toast.makeText(requireContext(), "Please select a meal type!", Toast.LENGTH_SHORT).show();
+                    return; // Stop if no meal type is selected
+                }
+
+                // Show the options dialog (Snap a Photo or Enter Manually)
+                AlertDialog.Builder optionBuilder = new AlertDialog.Builder(requireContext());
+                optionBuilder.setTitle("Choose an Option")
+                        .setItems(new CharSequence[]{"Snap a Photo", "Enter Manually"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:
+                                        // Handle snapping a photo
+                                        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                                        } else {
+                                            openCameraWithMealType(selectedMealType); // Pass the selected meal type
+                                        }
+                                        break;
+                                    case 1:
+                                        // Handle entering manually
+                                        handleEnterManually(selectedMealType); // Pass the selected meal type
+                                        break;
                                 }
-                                break;
-                            case 1:
-                                // Handle entering manually
-                                handleEnterManually(view);
-                                break;
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 
-    private void updateDateTextView(View view, Calendar calendar) {
-        TextView dateTextView = view.findViewById(R.id.dateTextView); // Ensure the correct ID is used
-        if (dateTextView != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String formattedDate = dateFormat.format(calendar.getTime());
-            dateTextView.setText(formattedDate);
-        } else {
-            Log.e("MealLogUFragment", "dateTextView is null");
-        }
+    private void updateDateTextView(Calendar calendar, String username, String userId) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String formattedDate = dateFormat.format(calendar.getTime());
+        dateTextView.setText(formattedDate);
+        fetchMealsLogged(username, formattedDate);
     }
 
     private String getCurrentUserId() {
@@ -739,32 +778,22 @@ public class MealLogUFragment extends Fragment {
         void onUsernameFetched(String username);
     }
 
-    private void showDatePickerDialog() {
+    private void showDatePickerDialog(String username, String userId) {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 getContext(),
                 (view, year, month, dayOfMonth) -> {
                     calendar.set(Calendar.YEAR, year);
                     calendar.set(Calendar.MONTH, month);
                     calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    updateDateTextView(view,calendar);
-                    selectedDateString = getSelectedDate();
-                    // Fetch new meal logs for the selected date
-                    fetchMealsLogged(view, currentUser.getUid(), selectedDateString);
-                    calculateRemainingCalories(getView(), currentUser.getUid());  // Call to update the remaining calories
+
+                    updateDateTextView(calendar, username, userId);
+
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
         datePickerDialog.show();
-    }
-
-    private void setupMealOptionButtons(View view) {
-        ImageView mealOptionButton1 = view.findViewById(R.id.camera_icon);
-        TextView mealOptionButton2 = view.findViewById(R.id.snap_photo_text);
-
-        mealOptionButton1.setOnClickListener(v -> showMealOptionDialog(view));
-        mealOptionButton2.setOnClickListener(v -> showMealOptionDialog(view));
     }
 
 }
