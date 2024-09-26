@@ -61,6 +61,8 @@ public class NavAllRecipesFragment extends Fragment {
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
         Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
+
+
         searchEditText = view.findViewById(R.id.search_recipe);
 
         // Initialize RecyclerView
