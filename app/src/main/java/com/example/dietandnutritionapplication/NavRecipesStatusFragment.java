@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -31,6 +31,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
     private RecipeAdapter recipesAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,11 +43,12 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize adapter with an empty list and set it to the RecyclerView
-        recipesAdapter = new RecipeAdapter(recipeList, this);
+        recipesAdapter = new RecipeAdapter(recipeList, this, true);
         recipesRecyclerView.setAdapter(recipesAdapter);
 
+
         // Fetch recipes from Firestore
-        fetchAllRecipes(); // Call method to fetch all recipes
+        fetchUserRecipes(); // Call method to fetch all recipes
         Log.d(TAG, "Recipe list size: " + recipeList.size());
 
         // Setup buttons
@@ -61,7 +63,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         Button button_favourite = view.findViewById(R.id.button_favourite);
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_calorie_goal = view.findViewById(R.id.button_calorie_goal);
+        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -69,7 +71,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         button_favourite.setOnClickListener(v -> navigateToFragment(new NavFavouriteRecipesFragment()));
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
-        button_calorie_goal.setOnClickListener(v -> navigateToFragment(new NavCalorieGoalFragment()));
+        button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -79,18 +81,30 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
                 .commit();
     }
 
-    private void fetchAllRecipes() {
+    private void fetchUserRecipes() {
+        String currentUserId = getCurrentUserId(); // Method to retrieve current user ID
+
         db.collection("Recipes")
+                .whereEqualTo("userId", currentUserId) // Filter to get only the recipes by the current user
+                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            recipeList.clear(); // Clear the list before adding new data
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                String recipeId = document.getId(); // Get the document ID
-                                // Create a Recipe object and add it to the list
-                                Recipe recipe = document.toObject(Recipe.class); // Assuming you have a Recipe class
-                                recipeList.add(recipe);
+                                Recipe recipe = document.toObject(Recipe.class);
+                                recipe.setRecipe_id(document.getId());
+
+                                // Calculate calories per 100g if total weight is available
+                                double caloriesPer100g = recipe.getCaloriesPer100g();
+                                if (recipe.getTotalWeight() > 0) {
+                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                                }
+                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                                recipeList.add(recipe); // Add the recipe to the list
                             }
                             // Notify the adapter of data changes
                             recipesAdapter.notifyDataSetChanged();
@@ -104,22 +118,10 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
     @Override
     public void onRecipeClick(Recipe recipe) {
         String recipeId = recipe.getRecipe_id(); // Assuming you have a method to get ID
-        fetchRecipeById(recipeId); // Call this method with the recipe ID
+        fetchUserRecipes(); // Call this method with the recipe ID
     }
 
-    private void fetchRecipeById(String recipeId) {
-        db.collection("Recipes").document(recipeId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            Recipe recipe = task.getResult().toObject(Recipe.class); // Retrieve the recipe details
-                            // Do something with the recipe details, e.g., display them in a new fragment
-                        } else {
-                            Log.w(TAG, "Error getting recipe details.", task.getException());
-                        }
-                    }
-                });
+    private String getCurrentUserId() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 }

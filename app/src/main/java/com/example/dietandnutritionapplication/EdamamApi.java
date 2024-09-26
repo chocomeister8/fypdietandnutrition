@@ -10,6 +10,7 @@ public interface EdamamApi {
             @Query("q") String query,
             @Query("app_id") String app_id,
             @Query("app_key") String app_key,
-            @Query("type") String type
+            @Query("type") String type,
+            @Query("health") String health
     );
 }

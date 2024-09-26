@@ -22,6 +22,7 @@ import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class NavAllRecipesFragment extends Fragment {
 
@@ -29,6 +30,9 @@ public class NavAllRecipesFragment extends Fragment {
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList;
     private EditText searchEditText;
+
+    private final String[] recipeQueries = {"balanced", "high-fiber", "high-protein", "low-carb", "low-fat", "low-sodium"};
+    private final Random random = new Random();
 
 
     @Nullable
@@ -42,7 +46,7 @@ public class NavAllRecipesFragment extends Fragment {
         Button button_favourite = view.findViewById(R.id.button_favourite);
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_calorie_goal = view.findViewById(R.id.button_calorie_goal);
+        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
 
         Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
 
@@ -55,11 +59,11 @@ public class NavAllRecipesFragment extends Fragment {
 
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
-        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment);
+        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes("balanced diet");
+        fetchRecipes(getRandomQuery());
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -67,7 +71,7 @@ public class NavAllRecipesFragment extends Fragment {
         button_favourite.setOnClickListener(v -> navigateToFragment(new NavFavouriteRecipesFragment()));
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
-        button_calorie_goal.setOnClickListener(v -> navigateToFragment(new NavCalorieGoalFragment()));
+        button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
 
         button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 
@@ -123,9 +127,10 @@ public class NavAllRecipesFragment extends Fragment {
         String app_id = "2c7710ea"; // Your Edamam API app ID
         String app_key = "97f5e9187c865600f74e2baa358a9efb"; // Your Edamam API app key
         String type = "public";
+        String health = "DASH";
 
         EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type);
+        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type, health);
 
         call.enqueue(new Callback<RecipeResponse>() {
             @Override
@@ -158,6 +163,8 @@ public class NavAllRecipesFragment extends Fragment {
             }
         });
     }
-
-
+    private String getRandomQuery() {
+        int index = random.nextInt(recipeQueries.length); // Get a random index
+        return recipeQueries[index]; // Return the random query
+    }
 }

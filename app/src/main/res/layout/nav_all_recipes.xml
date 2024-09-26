@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/relativeLayout4"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp">
 
             <!-- Search Bar -->
@@ -89,7 +89,7 @@
         <FrameLayout
             android:id="@+id/navigationBar"
             android:layout_width="100dp"
-            android:layout_height="695dp"
+            android:layout_height="670dp"
             android:layout_below="@+id/relativeLayout6"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
@@ -97,7 +97,6 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="13dp"
             android:layout_marginBottom="20dp"
-            android:layout_toStartOf="@+id/linearLayout"
             android:background="@drawable/rounded_search_bar_background">
 
             <LinearLayout
@@ -171,15 +170,16 @@
                     android:textColor="#333333"
                     android:textSize="11dp" />
 
+
                 <Button
-                    android:id="@+id/button_calorie_goal"
+                    android:id="@+id/button_recommendRecipes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="Calorie Goal"
+                    android:text="Recommended Recipes"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="11dp" />
@@ -191,7 +191,7 @@
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="283dp"
-            android:layout_height="695dp"
+            android:layout_height="670dp"
             android:layout_below="@+id/relativeLayout6"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"

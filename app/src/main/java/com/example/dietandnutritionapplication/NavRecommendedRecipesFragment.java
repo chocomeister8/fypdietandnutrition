@@ -10,13 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class NavCalorieGoalFragment extends Fragment {
+public class NavRecommendedRecipesFragment extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.nav_calorie_goal_recipes, container, false);
+        View view = inflater.inflate(R.layout.nav_recommended_recipes, container, false);
 
         // Initialize buttons using view.findViewById
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
@@ -24,7 +24,7 @@ public class NavCalorieGoalFragment extends Fragment {
         Button button_favourite = view.findViewById(R.id.button_favourite);
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_calorie_goal = view.findViewById(R.id.button_calorie_goal);
+        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> {
@@ -67,10 +67,11 @@ public class NavCalorieGoalFragment extends Fragment {
                     .commit();
         });
 
-        button_calorie_goal.setOnClickListener(v -> {
+
+        button_recommendedRecipes.setOnClickListener(v -> {
             // Replace current fragment with NavRecipesStatusFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavCalorieGoalFragment())
+                    .replace(R.id.frame_layout, new NavRecommendedRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });

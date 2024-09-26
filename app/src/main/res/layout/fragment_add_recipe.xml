@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".RecipeFormActivity">
+    android:layout_height="match_parent">
 
     <!-- Header with logo and title -->
     <RelativeLayout
@@ -39,6 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:background="@android:color/white"
         app:layout_constraintTop_toBottomOf="@+id/header"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Calories"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:padding="10dp"
                 android:background="@android:drawable/editbox_background" />
 
@@ -91,31 +91,259 @@
                 android:padding="10dp"
                 android:background="@android:drawable/editbox_background" />
 
-            <!-- Meal Type Spinner -->
-            <Spinner
-                android:id="@+id/meal_type_spinner"
-                android:layout_width="match_parent"
+            <!-- Meal Type Checkboxes -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Meal Type"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:layout_marginTop="12dp" />
 
-            <!-- Cuisine Type Spinner -->
-            <Spinner
-                android:id="@+id/cuisine_type_spinner"
+            <LinearLayout
+                android:id="@+id/meal_type_checkboxes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <CheckBox
+                    android:id="@+id/meal_type_breakfast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Breakfast" />
+
+                <CheckBox
+                    android:id="@+id/meal_type_lunch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lunch" />
+
+                <CheckBox
+                    android:id="@+id/meal_type_dinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dinner" />
+
+                <CheckBox
+                    android:id="@+id/meal_type_snack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Snack" />
+
+                <CheckBox
+                    android:id="@+id/meal_type_teatime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Teatime" />
+            </LinearLayout>
+
+            <!-- Cuisine Type Checkboxes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cuisine Type"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:layout_marginTop="12dp" />
 
-            <!-- Dish Type Spinner -->
-            <Spinner
-                android:id="@+id/dish_type_spinner"
+            <LinearLayout
+                android:id="@+id/cuisine_type_checkboxes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_american"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="American" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_asian"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Asian" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_british"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="British" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_caribbean"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Caribbean" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_central_europe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Central Europe" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_chinese"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chinese" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_eastern_europe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Eastern Europe" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_french"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="French" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_indian"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Indian" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_italian"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Italian" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_japanese"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Japanese" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_kosher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kosher" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_mexican"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mexican" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_middle_eastern"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Middle Eastern" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_nordic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nordic" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_mediterranean"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mediterranean" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_southeast_asian"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Southeast Asian" />
+
+                <CheckBox
+                    android:id="@+id/cuisine_type_south_american"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="South American" />
+            </LinearLayout>
+
+            <!-- Dish Type Checkboxes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dish Type"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:layout_marginTop="12dp" />
 
+            <LinearLayout
+                android:id="@+id/dish_type_checkboxes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
+                <CheckBox
+                    android:id="@+id/dish_type_biscuits_cookies"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Biscuits and Cookies" />
 
+                <CheckBox
+                    android:id="@+id/dish_type_bread"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bread" />
 
-            <!-- Dynamic Section for Ingredients -->
+                <CheckBox
+                    android:id="@+id/dish_type_cereals"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cereals" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_dessert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dessert" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_dip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dip" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_drink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Drink" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_main_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Main Course" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_salad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Salad" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_sandwich"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sandwich" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_soup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Soup" />
+
+                <CheckBox
+                    android:id="@+id/dish_type_side_dish"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Side Dish" />
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/ingredients_section"
                 android:layout_width="match_parent"
@@ -137,10 +365,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:background="@android:color/holo_green_light"
+                android:padding="12dp"
                 android:text="Save Recipe"
-                android:background="@android:color/holo_blue_light"
-                android:textColor="@android:color/white"
-                android:padding="12dp" />
+                android:textColor="@android:color/white" />
 
             <View
                 android:layout_width="match_parent"

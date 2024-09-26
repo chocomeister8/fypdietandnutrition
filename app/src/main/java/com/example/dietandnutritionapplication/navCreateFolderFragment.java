@@ -8,12 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,196 +28,265 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Listener interface for folder deletion
+interface OnFolderDeleteListener {
+    void onFolderDelete(navCreateFolderFragment.Folder folder);
+}
+
 public class navCreateFolderFragment extends Fragment {
 
     private FirebaseFirestore db;
-    private LinearLayout folderContainer;  // Container to hold folder views
+    private RecyclerView folderRecyclerView;
+    private FolderAdapter folderAdapter;
+    private List<Folder> folderList; // List of Folder objects
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.nav_create_recipes_folder, container, false);
 
         // Initialize Firebase Firestore
         db = FirebaseFirestore.getInstance();
 
+        // Initialize RecyclerView
+        folderRecyclerView = view.findViewById(R.id.folder_recycler_view);
+        folderRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        // Initialize folder list and adapter
+        folderList = new ArrayList<>();
+        folderAdapter = new FolderAdapter(folderList, this::confirmAndDeleteFolder);
+        folderRecyclerView.setAdapter(folderAdapter);
+
         // Check if the user is logged in
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(requireContext(), "User not logged in. Cannot create folders.", Toast.LENGTH_SHORT).show();
-            return view; // Exit if the user is not logged in
+            return view;
         }
 
-        // Initialize buttons and container using view.findViewById
-        Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
-        Button button_vegetarian = view.findViewById(R.id.button_vegetarian);
-        Button button_favourite = view.findViewById(R.id.button_favourite);
-        Button button_create_recipes = view.findViewById(R.id.button_create_recipes);
-        //folderContainer = view.findViewById(R.id.folder_container); // Assume this is a LinearLayout in your layout file
+        // Initialize folder creation button
+        ImageButton buttonCreateRecipes = view.findViewById(R.id.button_folder);
+        buttonCreateRecipes.setOnClickListener(v -> showCreateFolderDialog());
 
-        // Set up button click listeners to navigate between fragments
-        button_all_recipes.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavAllRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        button_vegetarian.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavVegetarianRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        button_favourite.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavFavouriteRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        // Add long click listeners for "delete folder" confirmation on long press for each button (except 'Create Recipes')
-        addLongClickListener(button_all_recipes, "All Recipes");
-        addLongClickListener(button_vegetarian, "Vegetarian");
-        addLongClickListener(button_favourite, "Favourite");
-
-        // Set up the button to create a folder by popping up a dialog to enter the folder name
-        button_create_recipes.setOnClickListener(v -> {
-            final EditText folderNameInput = new EditText(requireContext());
-            folderNameInput.setHint("Enter folder name");
-
-            // Build the AlertDialog
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            builder.setTitle("Please enter folder name");
-            builder.setView(folderNameInput);
-
-            builder.setPositiveButton("OK", (dialog, which) -> {
-                String recipesFolder = folderNameInput.getText().toString().trim();
-                if (!recipesFolder.isEmpty()) {
-                    addFolderToFirebase(recipesFolder);
-                } else {
-                    Toast.makeText(requireContext(), "Folder name cannot be empty!", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
-            builder.show();
-        });
-
-//        // Initially fetch folders from Firebase
-//        fetchFoldersFromFirebase();
+        // Fetch both default and user folders
+        fetchFoldersFromFirebase();
 
         return view;
     }
 
-    // Method to handle long-click and show a delete confirmation dialog
-    private void addLongClickListener(Button button, String folderName) {
-        button.setOnLongClickListener(v -> {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Confirm Delete")
-                    .setMessage("Are you sure you want to delete the '" + folderName + "' folder?")
-                    .setPositiveButton("Yes", (dialog, which) -> deleteFolderFromFirebase(folderName))
-                    .setNegativeButton("No", null)
-                    .show();
-            return true;
-        });
+    // Show dialog to create a new folder
+    private void showCreateFolderDialog() {
+        final EditText folderNameInput = new EditText(requireContext());
+        folderNameInput.setHint("Enter folder name");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Please enter folder name")
+                .setView(folderNameInput)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    String recipesFolder = folderNameInput.getText().toString().trim();
+                    if (!recipesFolder.isEmpty()) {
+                        addFolderToFirebase(recipesFolder);
+                    } else {
+                        Toast.makeText(requireContext(), "Folder name cannot be empty!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.cancel())
+                .show();
     }
 
-    // Method to add the created folder to Firebase Firestore
-    private void addFolderToFirebase(String RecipesFolder) {
-        Map<String, Object> recipesFolder = new HashMap<>();
-        recipesFolder.put("folderName", RecipesFolder);  // Using the specified field name
-        recipesFolder.put("created_at", System.currentTimeMillis());
-        recipesFolder.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
+    // Fetch folders from Firestore
+    private void fetchFoldersFromFirebase() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        db.collection("RecipesFolders")  // Updated to match the new collection name
-                .add(recipesFolder)
+        // Fetch default folders (not deletable)
+        List<Folder> defaultFolders = getDefaultFolders();
+        folderList.addAll(defaultFolders);
+
+        // Fetch user-created folders from Firebase
+        db.collection("RecipesFolders")
+                .whereEqualTo("user_id", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String folderName = document.getString("folderName");
+                            folderList.add(new Folder(folderName, true)); // User folders are deletable
+                        }
+                        folderAdapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(requireContext(), "Error fetching folders: " + task.getException(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // Create a list of default folders
+    private List<Folder> getDefaultFolders() {
+        List<Folder> defaultFolders = new ArrayList<>();
+        defaultFolders.add(new Folder("All Recipes", false, NavAllRecipesFragment.class));
+        defaultFolders.add(new Folder("Favourite Recipes", false, NavFavouriteRecipesFragment.class));
+        defaultFolders.add(new Folder("Vegetarian", false, NavVegetarianRecipesFragment.class));
+        defaultFolders.add(new Folder("Personalise Recipes", false, NavPersonaliseRecipesFragment.class));
+        defaultFolders.add(new Folder("Recipes Status", false, NavRecipesStatusFragment.class));
+        defaultFolders.add(new Folder("Recommended Recipes", false, NavRecommendedRecipesFragment.class));
+        return defaultFolders;
+    }
+
+    // Add a new folder to Firestore
+    private void addFolderToFirebase(String recipesFolder) {
+        Map<String, Object> folderData = new HashMap<>();
+        folderData.put("folderName", recipesFolder);
+        folderData.put("created_at", System.currentTimeMillis());
+        folderData.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        db.collection("RecipesFolders")
+                .add(folderData)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(requireContext(), "Folder '" + RecipesFolder + "' added to Firebase.", Toast.LENGTH_SHORT).show();
-                    // Update UI with the new folder
-                    addFolderToUI(RecipesFolder);
+                    Toast.makeText(requireContext(), "Folder '" + recipesFolder + "' added.", Toast.LENGTH_SHORT).show();
+                    folderList.add(new Folder(recipesFolder, true)); // New folder is deletable
+                    folderAdapter.notifyItemInserted(folderList.size() - 1);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(requireContext(), "Error adding folder: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
-    // Method to delete a folder from Firebase Firestore
-    private void deleteFolderFromFirebase(String RecipesFolder) {
-        db.collection("RecipesFolders")  // Updated to match the new collection name
-                .whereEqualTo("folderName", RecipesFolder)  // Using the specified field name
+    // Confirm and delete a folder
+    private void confirmAndDeleteFolder(Folder folder) {
+        if (!folder.isDeletable()) {
+            Toast.makeText(requireContext(), "This folder cannot be deleted.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Folder")
+                .setMessage("Are you sure you want to delete the folder '" + folder.getFolderName() + "'?")
+                .setPositiveButton("Yes", (dialog, which) -> deleteFolderFromFirebase(folder.getFolderName()))
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    // Delete a folder from Firestore
+    private void deleteFolderFromFirebase(String folderName) {
+        db.collection("RecipesFolders")
+                .whereEqualTo("folderName", folderName)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            db.collection("RecipesFolders").document(document.getId())  // Updated to match the new collection name
+                            db.collection("RecipesFolders").document(document.getId())
                                     .delete()
                                     .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(requireContext(), "Folder '" + RecipesFolder + "' deleted from Firebase.", Toast.LENGTH_SHORT).show();
-                                        // Remove folder from UI
-                                        removeFolderFromUI(RecipesFolder);
+                                        Toast.makeText(requireContext(), "Folder '" + folderName + "' deleted.", Toast.LENGTH_SHORT).show();
+                                        folderList.removeIf(folder -> folder.getFolderName().equals(folderName));
+                                        folderAdapter.notifyDataSetChanged();
                                     })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(requireContext(), "Error deleting folder: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     });
                         }
                     } else {
-                        Toast.makeText(requireContext(), "Folder '" + RecipesFolder + "' not found in Firebase.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Folder not found.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-//    // Method to fetch and display folders from Firebase Firestore
-//    private void fetchFoldersFromFirebase() {
-//        db.collection("RecipesFolders")  // Updated to match the new collection name
-//                .whereEqualTo("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid())
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        List<String> folderNames = new ArrayList<>();
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            String folderName = document.getString("folderName");  // Using the specified field name
-//                            if (folderName != null) {
-//                                folderNames.add(folderName);
-//                            }
-//                        }
-//                        // Populate the UI with the fetched folder names
-//                        for (String name : folderNames) {
-//                            addFolderToUI(name);
-//                        }
-//                    } else {
-//                        Toast.makeText(requireContext(), "Error retrieving folders: " + task.getException(), Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
+    // Adapter class to handle folder display and deletion
+    private class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderViewHolder> {
+        private final List<Folder> folderList;
+        private final OnFolderDeleteListener deleteListener;
 
-    // Method to add a folder view to the UI
-    private void addFolderToUI(String RecipesFolder) {
-        Button folderButton = new Button(requireContext());
-        folderButton.setText(RecipesFolder);
-        folderButton.setOnLongClickListener(v -> {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Confirm Delete")
-                    .setMessage("Are you sure you want to delete the '" + RecipesFolder + "' folder?")
-                    .setPositiveButton("Yes", (dialog, which) -> deleteFolderFromFirebase(RecipesFolder))
-                    .setNegativeButton("No", null)
-                    .show();
-            return true;
-        });
-        folderContainer.addView(folderButton);
-    }
+        public FolderAdapter(List<Folder> folderList, OnFolderDeleteListener deleteListener) {
+            this.folderList = folderList;
+            this.deleteListener = deleteListener;
+        }
 
-    // Method to remove a folder view from the UI
-    private void removeFolderFromUI(String RecipesFolder) {
-        for (int i = 0; i < folderContainer.getChildCount(); i++) {
-            View child = folderContainer.getChildAt(i);
-            if (child instanceof Button && ((Button) child).getText().equals(RecipesFolder)) {
-                folderContainer.removeViewAt(i);
-                break;
+        @NonNull
+        @Override
+        public FolderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_folder, parent, false);
+            return new FolderViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull FolderViewHolder holder, int position) {
+            Folder folder = folderList.get(position);
+            holder.folderName.setText(folder.getFolderName());
+
+            // Set click listener to the folder name
+            holder.folderName.setOnClickListener(v -> {
+                // Check if the target fragment is not null
+                if (folder.getTargetFragment() != null) {
+                    // Navigate to the target fragment
+                    Fragment fragment = null;
+                    try {
+                        // Cast to Class<? extends Fragment>
+                        fragment = (Fragment) folder.getTargetFragment().newInstance(); // Create an instance of the target fragment
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (fragment != null) {
+                        // Replace the current fragment with the target fragment
+                        ((MainActivity) v.getContext()).replaceFragment(fragment); // Assuming you have a method to replace fragments
+                    }
+                } else {
+                    Toast.makeText(v.getContext(), "No action defined for this folder.", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Handle visibility of delete button based on folder type
+            holder.deleteButton.setVisibility(folder.isDeletable() ? View.VISIBLE : View.GONE);
+            if (folder.isDeletable()) {
+                holder.deleteButton.setOnClickListener(v -> deleteListener.onFolderDelete(folder));
+            }
+        }
+
+
+        @Override
+        public int getItemCount() {
+            return folderList.size();
+        }
+
+        // ViewHolder class to hold folder views
+        class FolderViewHolder extends RecyclerView.ViewHolder {
+            TextView folderName;
+            Button deleteButton;
+
+            public FolderViewHolder(@NonNull View itemView) {
+                super(itemView);
+                folderName = itemView.findViewById(R.id.folder_name);
+                deleteButton = itemView.findViewById(R.id.delete_button);
             }
         }
     }
+
+    // Inner class to represent Folder object
+    public static class Folder {
+        private final String folderName;
+        private final boolean deletable; // Indicates if the folder can be deleted
+        private Class<?> targetFragment; // Target fragment class for navigation
+
+        public Folder(String folderName, boolean deletable) {
+            this.folderName = folderName;
+            this.deletable = deletable;
+        }
+
+        public Folder(String folderName, boolean deletable, Class<?> targetFragment) {
+            this.folderName = folderName;
+            this.deletable = deletable;
+            this.targetFragment = targetFragment;
+        }
+
+        public String getFolderName() {
+            return folderName;
+        }
+
+        public boolean isDeletable() {
+            return deletable;
+        }
+
+        public Class<?> getTargetFragment() {
+            return targetFragment;
+        }
+    }
 }
+

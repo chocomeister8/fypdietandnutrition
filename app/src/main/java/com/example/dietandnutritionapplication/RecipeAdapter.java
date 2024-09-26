@@ -16,16 +16,18 @@ import java.util.List;
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> recipeList;
     private OnRecipeClickListener onRecipeClickListener;
+    private boolean showStatus; // New parameter to control visibility of status
 
     // Interface for handling click events
     public interface OnRecipeClickListener {
         void onRecipeClick(Recipe recipe);
     }
 
-    // Constructor to accept both recipe list and the listener
-    public RecipeAdapter(List<Recipe> recipeList, OnRecipeClickListener listener) {
+    // Constructor to accept both recipe list, listener, and the showStatus flag
+    public RecipeAdapter(List<Recipe> recipeList, OnRecipeClickListener listener, boolean showStatus) {
         this.recipeList = recipeList;
         this.onRecipeClickListener = listener;
+        this.showStatus = showStatus; // Initialize the showStatus flag
     }
 
     @NonNull
@@ -33,7 +35,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Inflate the recipe_item layout
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_item, parent, false);
-
         return new RecipeViewHolder(view);
     }
 
@@ -45,16 +46,28 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Set the recipe title
         holder.titleTextView.setText(recipe.getLabel());
 
-
         String mealTypes = String.join(", ", recipe.getMealType());
         holder.mealTypeTextView.setText("Type: " + mealTypes);
 
-        holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.2f", recipe.getCaloriesPer100g()));
+        String cuisineTypes = String.join(", ", recipe.getCuisineType());
+        holder.cuisineTypeTextView.setText("Cuisine: " + cuisineTypes);
 
+        holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.1f", recipe.getCaloriesPer100g()));
 
+        // Conditionally show or hide the status
+        if (showStatus) {
+            holder.statusViewText.setText("Status: " + recipe.getStatus());
+            holder.statusViewText.setVisibility(View.VISIBLE); // Show status
+        } else {
+            holder.statusViewText.setVisibility(View.GONE); // Hide status
+        }
 
-        // Use Picasso to load the image
-        Picasso.get().load(recipe.getImage()).into(holder.imageView);
+        // Load image with Picasso
+        if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
+            Picasso.get().load(recipe.getImage()).into(holder.imageView);
+        } else {
+            holder.imageView.setImageResource(R.drawable.recipe_image); // Use a placeholder image if no URL is available
+        }
 
         // Set the click listener for the recipe item
         holder.itemView.setOnClickListener(v -> {
@@ -62,7 +75,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                 onRecipeClickListener.onRecipeClick(recipe); // Trigger the click callback with the selected recipe
             }
         });
-
     }
 
     @Override
@@ -72,7 +84,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     // ViewHolder class to represent each recipe item view
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, mealTypeTextView, caloriesper100gTextView;
+        TextView titleTextView, mealTypeTextView, cuisineTypeTextView, caloriesper100gTextView, weightTextView, statusViewText;
         ImageView imageView;
 
         public RecipeViewHolder(View itemView) {
@@ -80,8 +92,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             // Initialize the views
             titleTextView = itemView.findViewById(R.id.recipe_title);
             mealTypeTextView = itemView.findViewById(R.id.meal_type);
+            cuisineTypeTextView = itemView.findViewById(R.id.cuisine_type);
             caloriesper100gTextView = itemView.findViewById(R.id.calories_per_100g);
+            weightTextView = itemView.findViewById(R.id.recipe_weight); // Initialize the weight TextView
             imageView = itemView.findViewById(R.id.recipe_image);
+            statusViewText = itemView.findViewById(R.id.status); // Initialize the status TextView
         }
     }
 }

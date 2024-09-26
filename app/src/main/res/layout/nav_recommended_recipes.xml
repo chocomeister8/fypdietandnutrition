@@ -14,7 +14,7 @@
 
         <!-- Header layout with logo and text -->
         <RelativeLayout
-            android:id="@+id/relativeLayout8"
+            android:id="@+id/relativeLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
@@ -40,28 +40,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="20dp"
-                android:text="Vegetarian"
+                android:text="Recommended Recipes"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </RelativeLayout>
 
-        <!-- Search Bar with Search Icon -->
-
-        <!-- Navigation Bar -->
-
-
-        <!-- Column: Content -->
-
         <RelativeLayout
             android:id="@+id/relativeLayout6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/relativeLayout8"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
+            android:layout_below="@+id/relativeLayout4"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp">
 
             <!-- Search Bar -->
@@ -91,21 +84,23 @@
                 android:textColor="@color/black"
                 android:textSize="12dp" />
         </RelativeLayout>
+        <!-- Column: Content -->
 
         <FrameLayout
             android:id="@+id/navigationBar"
             android:layout_width="100dp"
-            android:layout_height="670dp"
+            android:layout_height="695dp"
             android:layout_below="@+id/relativeLayout6"
             android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginStart="9dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="13dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/rounded_search_bar_background">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="99dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:orientation="vertical">
@@ -175,6 +170,7 @@
                     android:textColor="#333333"
                     android:textSize="11dp" />
 
+
                 <Button
                     android:id="@+id/button_recommendRecipes"
                     android:layout_width="match_parent"
@@ -189,13 +185,16 @@
                     android:textSize="11dp" />
 
             </LinearLayout>
+
         </FrameLayout>
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="283dp"
-            android:layout_height="670dp"
+            android:layout_height="695dp"
             android:layout_below="@+id/relativeLayout6"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="20dp"
