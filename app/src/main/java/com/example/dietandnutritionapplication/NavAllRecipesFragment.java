@@ -7,8 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +24,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -30,27 +34,33 @@ public class NavAllRecipesFragment extends Fragment {
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList;
     private EditText searchEditText;
+    private Spinner mealTypeSpinner;
+    private Spinner dishTypeSpinner;
 
-    private final String[] recipeQueries = {"balanced", "high-fiber", "high-protein", "low-carb", "low-fat", "low-sodium"};
     private final Random random = new Random();
 
+    // Define your meal types and dish types
+    private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
+    private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
+
+    private List<String> simpleFoodSearches = Arrays.asList(
+            "chicken", "beef", "fish", "vegetables", "pasta", "salad",
+            "rice", "soup", "pizza", "sandwich", "egg", "cereal", "yogurt", "toast", "noodles"
+    );
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.nav_all_recipes, container, false);
 
-        // Initialize buttons
+        // Initialize views
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
         Button button_vegetarian = view.findViewById(R.id.button_vegetarian);
         Button button_favourite = view.findViewById(R.id.button_favourite);
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
-
         Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
-
-
         searchEditText = view.findViewById(R.id.search_recipe);
 
         // Initialize RecyclerView
@@ -63,7 +73,16 @@ public class NavAllRecipesFragment extends Fragment {
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes(getRandomQuery());
+        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+
+        // Setup spinners
+        mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
+        dishTypeSpinner = view.findViewById(R.id.spinner_dish_type);
+        setupSpinners(); // Call to setup spinners
+
+        // Call the setup methods for listeners
+        setupSpinnerListeners(); // Call to setup spinner listeners
+        setupSearchBar(); // Call to setup search bar listeners
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -72,10 +91,78 @@ public class NavAllRecipesFragment extends Fragment {
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
-
         button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 
+        // Clear filters button logic
+        Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
+        clearFiltersButton.setOnClickListener(v -> {
+            // Reset the spinners to default selections
+            mealTypeSpinner.setSelection(0); // Assuming the first position is the default
+            dishTypeSpinner.setSelection(0); // Assuming the first position is the default
 
+            // Clear the search bar
+            searchEditText.setText(""); // This will clear the search bar
+
+            // Fetch recipes with a random query
+            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        });
+
+        return view;
+    }
+
+
+    private void setupSpinners() {
+        // Set up meal type spinner
+        ArrayAdapter<String> mealTypeAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, mealTypes);
+        mealTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mealTypeSpinner.setAdapter(mealTypeAdapter);
+
+        // Set up dish type spinner
+        ArrayAdapter<String> dishTypeAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, dishTypes);
+        dishTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dishTypeSpinner.setAdapter(dishTypeAdapter);
+    }
+
+    private void filterRecipes() {
+        String searchQuery = searchEditText.getText().toString().trim();
+        String selectedMealType = mealTypeSpinner.getSelectedItem() != null ? mealTypeSpinner.getSelectedItem().toString() : "--Select Meal Type--";
+        String selectedDishType = dishTypeSpinner.getSelectedItem() != null ? dishTypeSpinner.getSelectedItem().toString() : "--Select Dish Type--";
+
+        // Log the current selections
+        Log.d("FilterRecipes", "Search Query: " + searchQuery + ", Meal Type: " + selectedMealType + ", Dish Type: " + selectedDishType);
+
+        // Call fetchRecipes with all current parameters
+        fetchRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
+                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
+    }
+
+    private void setupSpinnerListeners() {
+        mealTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Call filterRecipes when meal type changes
+                filterRecipes();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        dishTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Call filterRecipes when dish type changes
+                filterRecipes();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void setupSearchBar() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -84,14 +171,8 @@ public class NavAllRecipesFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // Perform search when text changes
-                String query = charSequence.toString();
-                if (!query.isEmpty()) {
-                    fetchRecipes(query); // Fetch recipes based on the query
-                } else {
-                    // Optionally, fetch default recipes or clear the list when search bar is empty
-                    fetchRecipes("rice"); // or recipeList.clear();
-                }
+                // Call the method to filter recipes based on search input
+                filterRecipes(); // This now calls the combined filter method
             }
 
             @Override
@@ -99,7 +180,6 @@ public class NavAllRecipesFragment extends Fragment {
                 // Do nothing after text is changed
             }
         });
-        return view;
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -110,10 +190,8 @@ public class NavAllRecipesFragment extends Fragment {
     }
 
     private void openRecipeDetailFragment(Recipe recipe) {
-        // Create a new fragment instance and pass the recipe data
         Bundle bundle = new Bundle();
         bundle.putParcelable("selected_recipe", recipe);
-
         RecipeDetailFragment fragment = new RecipeDetailFragment();
         fragment.setArguments(bundle);
 
@@ -123,48 +201,54 @@ public class NavAllRecipesFragment extends Fragment {
                 .commit();
     }
 
-    private void fetchRecipes(String query) {
+    private void fetchRecipes(String query, String mealType, String dishType) {
         String app_id = "2c7710ea"; // Your Edamam API app ID
-        String app_key = "97f5e9187c865600f74e2baa358a9efb"; // Your Edamam API app key
+        String app_key = "97f5e9187c865600f74e2baa358a9efb";
         String type = "public";
-        String health = "DASH";
 
         EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type, health);
+
+        // Assuming the API requires meal type and dish type as separate parameters
+        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType);
 
         call.enqueue(new Callback<RecipeResponse>() {
             @Override
             public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+
+                    // Debugging: Log the number of recipes fetched
+                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
+
+                    // Clear previous recipes
                     recipeList.clear();
-                    for (RecipeResponse.Hit hit : response.body().getHits()) {
-                        Recipe recipe = hit.getRecipe(); // Directly get the Recipe object from Hit
 
-                        double caloriesPer100g = recipe.getCaloriesPer100g();
-                        if (recipe.getTotalWeight() > 0) {
-                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                        }
-
-                        // Optionally, you can set this value back into the recipe object or create a new object to store it
-                        // For example:
-                        recipe.setCaloriesPer100g(caloriesPer100g); // Make sure to add this method in Recipe class
-
-                        recipeList.add(recipe); // Add the recipe to the list
+                    for (RecipeResponse.Hit hit : hits) {
+                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
+                        recipeList.add(recipe);
                     }
-                    recipeAdapter.notifyDataSetChanged(); // Notify adapter about data change
+
+                    recipeAdapter.notifyDataSetChanged();
                 } else {
-                    Log.d("API Response", "Response not successful: " + response.message());
+                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<RecipeResponse> call, Throwable t) {
-                Log.e("API Error", "Failed to fetch recipes: " + t.getMessage());
+                Log.e("Fetch Recipes", "Error: " + t.getMessage());
             }
         });
     }
-    private String getRandomQuery() {
-        int index = random.nextInt(recipeQueries.length); // Get a random index
-        return recipeQueries[index]; // Return the random query
+
+
+    private String getRandomSimpleFoodSearch() {
+        if (!simpleFoodSearches.isEmpty()) {
+            return simpleFoodSearches.get(random.nextInt(simpleFoodSearches.size()));
+        } else {
+            Log.w("Random Search", "Simple food searches list is empty!");
+            return ""; // Return an empty string or handle it appropriately
+        }
     }
+
 }
