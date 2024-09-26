@@ -178,8 +178,48 @@ public class UserAccountEntity {
                             userCreate.setPhoneNumber(phone);
                             userCreate.setGender(gender);
                             userCreate.setDateJoined(datejoined);
+                            userCreate.setRole("user");
 
 
+                            db.collection("Users").document(userId).set(userCreate)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            callback.onSuccess();
+                                        } else {
+                                            callback.onFailure("Failed to save user data");
+                                        }
+                                    });
+                        }
+                    } else {
+                        callback.onFailure(task.getException().getMessage());
+                    }
+                });
+    }
+
+    public void registerNutri(String firstName, String lastName, String userName, String dob, String email, String phone, String gender, String password, String datejoined, Context context, RegisterCallback callback) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            String userId = firebaseUser.getUid();
+
+                            Nutritionist userCreate = new Nutritionist();
+                            userCreate.setFirstName(firstName);
+                            userCreate.setLastName(lastName);
+                            userCreate.setUsername(userName);
+                            userCreate.setDob(dob);
+                            userCreate.setPassword(password);
+                            userCreate.setEmail(email);
+                            userCreate.setPhoneNumber(phone);
+                            userCreate.setGender(gender);
+                            userCreate.setDateJoined(datejoined);
+                            userCreate.setRole("nutritionist");
+                            userCreate.setBio(" ");
+                            userCreate.setExpertise(" ");
+                            userCreate.setEducation(" ");
+                            userCreate.setContactInfo(" ");
                             db.collection("Users").document(userId).set(userCreate)
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
@@ -240,7 +280,7 @@ public class UserAccountEntity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        // First, query Firestore to get the user's email by their username
+        // Query Firestore to get the user's email by their username
         db.collection("Users")
                 .whereEqualTo("username", enteredUsername)
                 .get()
@@ -250,7 +290,7 @@ public class UserAccountEntity {
                         DocumentSnapshot document = task.getResult().getDocuments().get(0);
                         String email = document.getString("email"); // Assume email is stored in Firestore
 
-                        // Now, use FirebaseAuth to sign in the user with the retrieved email and entered password
+                        // Sign in the user using FirebaseAuth
                         auth.signInWithEmailAndPassword(email, enteredPassword)
                                 .addOnCompleteListener(authTask -> {
                                     if (authTask.isSuccessful()) {
@@ -269,27 +309,29 @@ public class UserAccountEntity {
                                                                 // Retrieve additional data like role
                                                                 String role = userDoc.getString("role");
                                                                 String username = userDoc.getString("username");
-                                                                String dbPassword = document.getString("password");
 
-                                                                if (enteredPassword.equals(dbPassword)) {
-                                                                    // Save the username in SharedPreferences
-                                                                    SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-                                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                                    editor.putString("loggedInUserName", username);
-                                                                    editor.apply();
+                                                                // Save the username in SharedPreferences
+                                                                SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+                                                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                editor.putString("loggedInUserName", username);
+                                                                editor.apply();
 
-                                                                    // Display login success message
-                                                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
+                                                                // Display login success message
+                                                                Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
 
-
-                                                                    // Redirect based on the user's role
-                                                                    if ("user".equals(role)) {
+                                                                // Redirect based on the user's role
+                                                                switch (role) {
+                                                                    case "user":
                                                                         mainActivity.switchToUserMode();
-                                                                    } else if ("admin".equals(role)) {
+                                                                        break;
+                                                                    case "admin":
                                                                         mainActivity.switchToAdminMode();
-                                                                    } else if ("nutritionist".equals(role)) {
+                                                                        break;
+                                                                    case "nutritionist":
                                                                         mainActivity.switchToNutriMode();
-                                                                    }
+                                                                        break;
+                                                                    default:
+                                                                        Toast.makeText(context, "Unknown role", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             } else {
                                                                 Toast.makeText(context, "User data not found in Firestore", Toast.LENGTH_SHORT).show();

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,8 @@ import java.util.ArrayList;
 public class URegisterFragment extends Fragment {
 
     private EditText firstNameEditText, lastNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
-    private RadioButton maleRadioButton, femaleRadioButton;
+    private RadioButton maleRadioButton, femaleRadioButton,selectedRadioButtonRole;
+    private RadioGroup radioGroupRole;
     private Button registerButton;
     private ArrayList<Profile> accountArray = new ArrayList<>();
     FirebaseAuth mAuth;
@@ -96,10 +98,10 @@ public class URegisterFragment extends Fragment {
         emailEditText = view.findViewById(R.id.email);
         phoneEditText = view.findViewById(R.id.editTextPhone);
         passwordEditText = view.findViewById(R.id.enterPW);
-        confirmPasswordEditText = view.findViewById(R.id.cfmPW);
         maleRadioButton = view.findViewById(R.id.rbMale);
         femaleRadioButton = view.findViewById(R.id.rbFemale);
         registerButton = view.findViewById(R.id.loginbutton);
+        radioGroupRole = view.findViewById(R.id.radioGroupRole);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,14 +113,22 @@ public class URegisterFragment extends Fragment {
                 String email = emailEditText.getText().toString();
                 String phone = phoneEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
-                String confirmPassword = confirmPasswordEditText.getText().toString();
+                int selectedId = radioGroupRole.getCheckedRadioButtonId();
+                if (selectedId == -1) {
+                    // No RadioButton selected
+                    Toast.makeText(getActivity(), "Please select a role.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                selectedRadioButtonRole = view.findViewById(selectedId);
+                String selectedRole = selectedRadioButtonRole.getText().toString();
+//                String confirmPassword = confirmPasswordEditText.getText().toString();
                 @SuppressLint({"NewApi", "LocalSuppress"}) String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
 
                 if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(dob) ||
-                        TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password) ||
-                        !TextUtils.equals(password, confirmPassword)) {
-                    Toast.makeText(getActivity(), "Please fill in all fields and make sure passwords match", Toast.LENGTH_SHORT).show();
+                        TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password)) {
+                    Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -132,8 +142,17 @@ public class URegisterFragment extends Fragment {
                     gender = "Unspecified";
                 }
 
-                URegisterController uRegisterController = new URegisterController();
-                uRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
+                if(selectedRole.equals("User")){
+                    URegisterController uRegisterController = new URegisterController();
+                    uRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
+                }else {
+                    NRegisterController nRegisterController = new NRegisterController();
+                    nRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
+                }
+
+
+//                URegisterController uRegisterController = new URegisterController();
+//                uRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
             }
         });
 
