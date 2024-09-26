@@ -7,7 +7,7 @@ public class URegisterController {
     public URegisterController(){
 
     }
-
+    // Check here for valid info 
     public void checkRegister(String firstName, String lastName, String userName, String dob, String email, String phone, String gender, String password, String datejoined, Context context) {
         UserAccountEntity userAccountEntity = new UserAccountEntity();
         userAccountEntity.registerUser(firstName, lastName, userName, dob, email, phone, gender, password, datejoined, context,
