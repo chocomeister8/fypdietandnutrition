@@ -95,17 +95,7 @@ public class NavAllRecipesFragment extends Fragment {
 
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
-        clearFiltersButton.setOnClickListener(v -> {
-            // Reset the spinners to default selections
-            mealTypeSpinner.setSelection(0); // Assuming the first position is the default
-            dishTypeSpinner.setSelection(0); // Assuming the first position is the default
-
-            // Clear the search bar
-            searchEditText.setText(""); // This will clear the search bar
-
-            // Fetch recipes with a random query
-            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
-        });
+        clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
 
         return view;
     }
@@ -180,6 +170,18 @@ public class NavAllRecipesFragment extends Fragment {
                 // Do nothing after text is changed
             }
         });
+    }
+
+    private void clearFiltersAndFetchRandomRecipes() {
+        // Reset the spinners to default selections
+        mealTypeSpinner.setSelection(0); // Assuming the first position is the default
+        dishTypeSpinner.setSelection(0); // Assuming the first position is the default
+
+        // Clear the search bar
+        searchEditText.setText(""); // This will clear the search bar
+
+        // Fetch recipes with a random query
+        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
     }
 
     private void navigateToFragment(Fragment fragment) {
