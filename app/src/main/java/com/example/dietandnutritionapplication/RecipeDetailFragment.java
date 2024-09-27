@@ -119,11 +119,38 @@ public class RecipeDetailFragment extends Fragment {
         }
 
         backButton.setOnClickListener(v -> {
-            // Navigate back to NavAllRecipesFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavAllRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
+            String source = getArguments().getString("source", "all");  // Default to "all" if no source is passed
+            String searchQuery = getArguments().getString("search_query", "");
+            int spinner1Value = getArguments().getInt("spinner1_value", 0);
+            int spinner2Value = getArguments().getInt("spinner2_value", 0);
+
+            if ("all".equals(source)) {
+                // Pass the search and spinner values back to NavAllRecipesFragment
+                NavAllRecipesFragment fragment = new NavAllRecipesFragment();
+                Bundle args = new Bundle();
+                args.putString("search_query", searchQuery);
+                args.putInt("spinner1_value", spinner1Value);
+                args.putInt("spinner2_value", spinner2Value);
+                fragment.setArguments(args);
+
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            } else if ("vegetarian".equals(source)) {
+                // Pass the search and spinner values back to NavVegetarianRecipesFragment
+                NavVegetarianRecipesFragment fragment = new NavVegetarianRecipesFragment();
+                Bundle args = new Bundle();
+                args.putString("search_query", searchQuery);
+                args.putInt("spinner1_value", spinner1Value);
+                args.putInt("spinner2_value", spinner2Value);
+                fragment.setArguments(args);
+
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         });
 
         return view;

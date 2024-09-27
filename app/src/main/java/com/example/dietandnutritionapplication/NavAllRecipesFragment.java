@@ -84,7 +84,24 @@ public class NavAllRecipesFragment extends Fragment {
 
         // Call the setup methods for listeners
         setupSpinnerListeners(); // Call to setup spinner listeners
-        setupSearchBar(); // Call to setup search bar listeners
+        setupSearchBar(); // Call to setup search bar listenersv
+
+        if (getArguments() != null) {
+            String savedSearchQuery = getArguments().getString("search_query", "");
+            int savedMealTypePos = getArguments().getInt("spinner1_value", 0);
+            int savedDishTypePos = getArguments().getInt("spinner2_value", 0);
+
+            // Restore the saved search query and spinner selections
+            searchEditText.setText(savedSearchQuery);
+            mealTypeSpinner.setSelection(savedMealTypePos);
+            dishTypeSpinner.setSelection(savedDishTypePos);
+
+            // Apply the filters with the restored values
+            filterRecipes();
+        } else {
+            // Fetch recipes with default random query if no arguments exist
+            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        }
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -194,15 +211,21 @@ public class NavAllRecipesFragment extends Fragment {
     }
 
     private void openRecipeDetailFragment(Recipe recipe) {
+        // From NavAllRecipesFragment
         Bundle bundle = new Bundle();
-        bundle.putParcelable("selected_recipe", recipe);
-        RecipeDetailFragment fragment = new RecipeDetailFragment();
-        fragment.setArguments(bundle);
+        bundle.putParcelable("selected_recipe", recipe);  // Assuming selectedRecipe is the clicked recipe object
+        bundle.putString("source", "all");  // Pass "all" as the source
+        bundle.putString("search_query", searchEditText.getText().toString());  // Pass the search query
+        bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner1
+        bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner2
 
+        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        recipeDetailFragment.setArguments(bundle);
         requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, fragment)
+                .replace(R.id.frame_layout, recipeDetailFragment)
                 .addToBackStack(null)
                 .commit();
+
     }
 
     private void fetchRecipes(String query, String mealType, String dishType) {
@@ -229,6 +252,13 @@ public class NavAllRecipesFragment extends Fragment {
 
                     for (RecipeResponse.Hit hit : hits) {
                         Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
+
+                        double caloriesPer100g = recipe.getCaloriesPer100g();
+                        if (recipe.getTotalWeight() > 0) {
+                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                        }
+                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
                         recipeList.add(recipe);
                     }
 
