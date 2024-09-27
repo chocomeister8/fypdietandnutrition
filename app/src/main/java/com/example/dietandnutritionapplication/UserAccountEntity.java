@@ -6,6 +6,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -15,6 +17,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class UserAccountEntity {
@@ -323,6 +328,8 @@ public class UserAccountEntity {
                                                                 switch (role) {
                                                                     case "user":
                                                                         mainActivity.switchToUserMode();
+                                                                        ViewUserProfileController profileController = new ViewUserProfileController(mainActivity);
+                                                                        profileController.checkUserProfileCompletion(userId, context, mainActivity);
                                                                         break;
                                                                     case "admin":
                                                                         mainActivity.switchToAdminMode();
@@ -358,6 +365,72 @@ public class UserAccountEntity {
                 .addOnFailureListener(e -> {
                     Log.e("FirestoreError", "Error querying username", e);
                     Toast.makeText(context, "Error querying username: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void fetchUserProfile(String userId, final UserProfileCallback callback) {
+        db.collection("Users")
+                .document(userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            User user = document.toObject(User.class);
+                            Log.d("ProfileUFragment", "User retrieved: " + user);
+                            callback.onUserProfileFetched(user);
+                        } else {
+                            callback.onFailure("No user found with the given ID.");
+                        }
+                    } else {
+                        Log.e("ProfileUFragment", "Error fetching user profile", task.getException());
+                        Log.e("ProfileUFragment", "Error details: " + task.getException().getMessage());
+                        callback.onFailure(task.getException().getMessage());
+                    }
+                });
+    }
+
+    public interface UserProfileCallback {
+        void onUserProfileFetched(User user);
+        void onFailure(String errorMessage);
+    }
+
+    public interface UserProfileUpdateCallback {
+        void onSuccess();
+        void onFailure(String errorMessage);
+    }
+
+    public interface UserFetchCallback {
+        void onUserFetched(User user);
+        void onFailure(String errorMessage);
+    }
+
+    public void getUserById(String userId, UserFetchCallback callback) {
+        db.collection("Users") // Replace with your Firestore collection name
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        User user = documentSnapshot.toObject(User.class);
+                        callback.onUserFetched(user);
+                    } else {
+                        callback.onUserFetched(null); // User not found
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("UserAccountEntity", "Error fetching user", e);
+                    callback.onFailure(e.getMessage());
+                });
+    }
+
+    public void updateUserProfile(String userId, Map<String, Object> updatedFields, UserProfileUpdateCallback callback) {
+        db.collection("Users") // Replace with your Firestore collection name
+                .document(userId)
+                .update(updatedFields) // Use update to change only the specified fields
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(e -> {
+                    Log.e("UserAccountEntity", "Error updating user profile", e);
+                    callback.onFailure(e.getMessage());
                 });
     }
 

@@ -37,6 +37,15 @@ public class Profile implements Serializable {
 
 
     }
+
+    public Profile(String firstName,String lastName,String username,String phoneNumber, String email,String gender){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.gender = gender;
+    }
     public String getStatus() {
         return status;
     }

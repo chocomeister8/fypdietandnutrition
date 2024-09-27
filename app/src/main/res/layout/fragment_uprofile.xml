@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:text="Username"
                 android:textStyle="bold" />
-            <TextView
+            <EditText
                 android:id="@+id/username_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,11 +105,30 @@
                 android:layout_height="wrap_content"
                 android:text="Full Name"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/full_name_data"
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="John Doe" />
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:padding="8dp">
+
+                <EditText
+                    android:id="@+id/first_name_data"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="First Name"
+                    android:text="John" />
+
+                <EditText
+                    android:id="@+id/last_name_data"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Last Name"
+                    android:text="Doe" />
+            </LinearLayout>
 
             <!-- Date of Birth (with Date Picker) -->
             <TextView
@@ -117,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:text="Date of Birth"
                 android:textStyle="bold" />
-            <TextView
+            <EditText
                 android:id="@+id/date_of_birth_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -129,11 +148,10 @@
                 android:layout_height="wrap_content"
                 android:text="Gender"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/gender_data"
+            <Spinner
+                android:id="@+id/gender_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Male" />
+                android:layout_height="wrap_content" />
 
             <!-- Phone Number -->
             <TextView
@@ -141,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:text="Phone Number"
                 android:textStyle="bold" />
-            <TextView
+            <EditText
                 android:id="@+id/phone_number_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -154,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:text="Email Address"
                 android:textStyle="bold" />
-            <TextView
+            <EditText
                 android:id="@+id/email_address_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -168,10 +186,46 @@
                 android:layout_height="wrap_content"
                 android:text="Dietary Preferences"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/dietary_preferences_data"
+
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+
+                <!-- Checkboxes for Dietary Preferences -->
+                <CheckBox
+                    android:id="@+id/checkbox_gluten_free"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gluten-Free" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_lactose_intolerance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lactose Intolerance" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_vegetarian"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vegetarian" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_dp_other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Others" />
+
+                <!-- EditText for Custom Input when 'Other' is selected -->
+                <EditText
+                    android:id="@+id/other_dp_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Specify Other"
+                    android:visibility="gone" /> <!-- Initially hidden -->
+
+            </LinearLayout>
 
             <!-- Allergies Dropdown -->
             <TextView
@@ -179,10 +233,64 @@
                 android:layout_height="wrap_content"
                 android:text="Allergies"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/allergies_data"
+
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+
+                <!-- Checkboxes for Dietary Preferences -->
+                <CheckBox
+                    android:id="@+id/checkbox_peanuts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Peanuts" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_dairy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dairy" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_eggs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Eggs" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_soy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Soy" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_seafood"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Seafood" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_wheat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wheat" />
+
+                <CheckBox
+                    android:id="@+id/checkbox_a_other"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Others" />
+
+                <!-- EditText for Custom Input when 'Other' is selected -->
+                <EditText
+                    android:id="@+id/other_a_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Specify Other"
+                    android:visibility="gone" /> <!-- Initially hidden -->
+
+            </LinearLayout>
 
             <!-- Health Goals -->
             <TextView
@@ -190,24 +298,24 @@
                 android:layout_height="wrap_content"
                 android:text="Health Goals"
                 android:textStyle="bold" />
-            <TextView
-                android:id="@+id/health_goals_data"
+            <Spinner
+                android:id="@+id/health_goals_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Health Goals"/>
+                android:layout_height="wrap_content" />
 
             <!-- Daily Calorie Limit -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Daily Calorie Limit"
+                android:text="Daily Calorie Goal"
                 android:textStyle="bold" />
-            <TextView
+            <EditText
                 android:id="@+id/daily_calorie_limit_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Daily Calorie Limit"
-                android:text="2000" />
+                android:text="2000"
+                android:editable="false"
+                android:focusable="false" />
 
             <!-- Current Weight -->
             <TextView
@@ -220,7 +328,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+                <EditText
                     android:id="@+id/current_weight_data"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -247,7 +355,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+                <EditText
                     android:id="@+id/current_height_data"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -269,20 +377,26 @@
                 android:layout_height="wrap_content"
                 android:text="Activity Level"
                 android:textStyle="bold" />
-            <TextView
+            <Spinner
                 android:id="@+id/activity_level_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Activity Level"/>
 
-            <!-- Edit Button -->
-            <Button
-                android:id="@+id/edit_button"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Edit Profile"
-                android:textColor="@color/black"/>
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:gravity="center">
 
+                <Button
+                    android:id="@+id/save_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="Save"
+                    android:layout_marginEnd="16dp" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -7,34 +7,8 @@
     <string-array name="gender_array">
         <item>Male</item>
         <item>Female</item>
-        <item>Other</item>
-    </string-array>
-
-    <!-- Dietary Preferences options -->
-    <string-array name="dietary_preferences_array">
-        <item>Vegetarian</item>
-        <item>Vegan</item>
-        <item>Gluten-Free</item>
-        <item>Keto</item>
-        <item>Low-Carb</item>
-        <item>None</item>
-    </string-array>
-
-    <!-- Allergies options -->
-    <string-array name="allergies_array">
-        <item>Peanuts</item>
-        <item>Dairy</item>
-        <item>Seafood</item>
-        <item>Wheat</item>
-        <item>Soy</item>
-        <item>None</item>
-    </string-array>
-
-    <!-- Activity Level options -->
-    <string-array name="activity_level_array">
-        <item>Low</item>
-        <item>Moderate</item>
-        <item>High</item>
+        <item>Non-binary</item>
+        <item>Prefer not to say</item>
     </string-array>
 
     <string-array name="specializations_array">
@@ -57,6 +31,27 @@
         <item>Dinner</item>
         <item>Snack</item>
     </string-array>
+
+    <string-array name="activity_levels">
+        <item>Sedentary: little or no exercise</item>
+        <item>Exercise 1-3 times/week</item>
+        <item>Exercise 4-5 times/week</item>
+        <item>Daily exercise or intense exercise 3-4 times/week</item>
+        <item>Intense exercise 6-7 times/week</item>
+        <item>Very intense exercise daily, or physical job</item>
+    </string-array>
+
+
+    <string-array name="health_goals_array">
+        <item>Lose Weight</item>
+        <item>Build Muscle</item>
+        <item>Improve Endurance</item>
+        <item>Maintain Current Weight</item>
+        <item>Improve Flexibility</item>
+
+    </string-array>
+
+
 
 
 </resources>

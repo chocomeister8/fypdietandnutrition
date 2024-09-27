@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<FAQ> faqArray = new ArrayList<>();
     FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private ViewUserProfileController viewUserProfileController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        viewUserProfileController = new ViewUserProfileController(this);
 
         Admin admin1 = new Admin();
         admin1.setUsername("admin");
@@ -270,6 +273,15 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Check user profile completion each time the activity is resumed
+        if (mAuth.getCurrentUser() != null) { // Ensure a user is logged in
+            String userId = mAuth.getCurrentUser().getUid();
+            viewUserProfileController.checkUserProfileCompletion(userId, this, this);
+        }
+    }
 
 
 }

@@ -29,6 +29,19 @@ public class User extends Profile {
         this.activityLevel = activityLevel;
     }
 
+    public User(String username, String firstName, String lastName, String email,
+                String gender, String phoneNumber, String healthGoal, double currentWeight,
+                double currentHeight, String dietaryPreference, String foodAllergies,
+                String activityLevel) {
+        super(firstName, lastName, username, phoneNumber, email, gender);
+        this.healthGoal = healthGoal;
+        this.currentWeight = currentWeight;
+        this.currentHeight = currentHeight;
+        this.dietaryPreference = dietaryPreference;
+        this.foodAllergies = foodAllergies;
+        this.activityLevel = activityLevel;
+    }
+
     // Getters and Setters for all fields
     public int getCalorieLimit() {
         return calorieLimit;
