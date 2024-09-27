@@ -1,14 +1,12 @@
 package com.example.dietandnutritionapplication;
 
-import android.graphics.Bitmap;
-
 public class Nutritionist extends Profile {
+    private String firstName;
     private String education;
     private String contactInfo;
     private String expertise;
     private String bio;
     private String profilePicture;
-    private String name;
 
     // Default constructor
     public Nutritionist() {
@@ -34,6 +32,13 @@ public class Nutritionist extends Profile {
         this.profilePicture = profilePicture;
         this.setRole("nutritionist");
         this.setStatus("active");
+    }
+
+    //for consulationUFragement class
+    public Nutritionist(String firstName, String email, String profilePicture) {
+        this.firstName = firstName;
+        this.setEmail(email);
+        this.profilePicture = profilePicture;
     }
 
     // Getter and Setter methods
@@ -77,11 +82,11 @@ public class Nutritionist extends Profile {
         this.profilePicture = profilePicture;
     }
 
-    public void setName(String name) {
-        this.setFirstName(name);
+    public void setName(String firstName) {
+        this.setFirstName(firstName);
     }
 
     public String getName() {
-        return name;
+        return firstName;
     }
 }

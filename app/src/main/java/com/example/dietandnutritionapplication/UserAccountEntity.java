@@ -123,22 +123,6 @@ public class UserAccountEntity {
 
     private Nutritionist createNutritionistFromDocument(QueryDocumentSnapshot document) {
         // Assuming profilePicture is a string path; handle conversion if needed
-//        return new Nutritionist(
-//                document.getString("firstName"),
-//                document.getString("lastName"),
-//                document.getString("username"),
-//                document.getString("phoneNumber"),
-//                document.getString("password"),
-//                document.getString("email"),
-//                document.getString("gender"),
-//                document.getString("role"),
-//                document.getString("dateJoined"),
-//                document.getString("education"),
-//                document.getString("contactInfo"),
-//                document.getString("expertise"),
-//                document.getString("bio"),
-//                document.getString("profilePicture") // Convert to Bitmap if needed
-//        );
         Nutritionist user = new Nutritionist();
         user.setUsername(document.getString("username"));
         user.setRole(document.getString("role"));

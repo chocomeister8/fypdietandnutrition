@@ -17,7 +17,7 @@ import java.util.List;
 public class UserConsultationsController extends ArrayAdapter<Nutritionist> {
 
     public UserConsultationsController(Context context, List<Nutritionist> nutritionists) {
-        super(context, 0, nutritionists);
+        super(context, R.layout.fragment_consultations_u, nutritionists);
     }
 
     @NonNull
