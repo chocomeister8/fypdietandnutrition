@@ -6,6 +6,7 @@ import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 import android.content.Context;
 
@@ -189,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
     }
+
     private void setupUserNavigation() {
         binding.bottomNavigationView.setBackground(null);
         binding.bottomNavigationView.getMenu().clear();
@@ -211,6 +213,14 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    public void hideBottomNavigationView() {
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void showBottomNavigationView() {
+        binding.bottomNavigationView.setVisibility(View.VISIBLE);
     }
 
 
@@ -273,15 +283,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Check user profile completion each time the activity is resumed
-        if (mAuth.getCurrentUser() != null) { // Ensure a user is logged in
-            String userId = mAuth.getCurrentUser().getUid();
-            viewUserProfileController.checkUserProfileCompletion(userId, this, this);
-        }
-    }
 
 
 }

@@ -38,7 +38,7 @@ public class ViewUserProfileController {
 
                 if (isIncomplete) {
                     if (isNotOnProfileUFragment()) {
-                        // Redirect to ProfileUFragment
+                        mainActivity.hideBottomNavigationView();
                         mainActivity.replaceFragment(new ProfileUFragment());
                         Toast.makeText(context, "Please complete your profile.", Toast.LENGTH_SHORT).show();
                     }
@@ -120,6 +120,7 @@ public class ViewUserProfileController {
                     userAccountEntity.updateUserProfile(userId, updatedFields, new UserAccountEntity.UserProfileUpdateCallback() {
                         @Override
                         public void onSuccess() {
+                            mainActivity.showBottomNavigationView();
                             Toast.makeText(context, "Profile updated successfully.", Toast.LENGTH_SHORT).show();
 
                         }

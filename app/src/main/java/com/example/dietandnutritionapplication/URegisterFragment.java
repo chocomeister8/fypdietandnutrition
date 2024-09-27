@@ -1,6 +1,7 @@
 package com.example.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,10 +24,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,8 +46,6 @@ public class URegisterFragment extends Fragment {
     private ArrayList<Profile> accountArray = new ArrayList<>();
     FirebaseAuth mAuth;
 
-
-
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -52,6 +54,7 @@ public class URegisterFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
 
     public URegisterFragment() {
         // Required empty public constructor
@@ -156,6 +159,7 @@ public class URegisterFragment extends Fragment {
             }
         });
 
+        dobEditText.setOnClickListener(v -> showDatePickerDialog(dobEditText));
 
         TextView myTextView = view.findViewById(R.id.haveacct);
         myTextView.setClickable(true);
@@ -168,4 +172,36 @@ public class URegisterFragment extends Fragment {
 
         return view;
     }
+
+    private void showDatePickerDialog(EditText dobEditText) {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), (view, selectedYear, selectedMonth, selectedDay) -> {
+            calendar.set(Calendar.YEAR, selectedYear);
+            calendar.set(Calendar.MONTH, selectedMonth);
+            calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            String formattedDate = dateFormat.format(calendar.getTime());
+
+            dobEditText.setText(formattedDate);
+        }, year, month, day);
+
+        // Set the date range for the DatePickerDialog
+        Calendar minDate = Calendar.getInstance();
+        minDate.set(Calendar.YEAR, 1900); // Set the minimum year (e.g., 1900)
+
+        Calendar maxDate = Calendar.getInstance();
+        maxDate.set(Calendar.YEAR, 2024); // Set the maximum year to 2024
+
+        datePickerDialog.getDatePicker().setMinDate(minDate.getTimeInMillis());
+        datePickerDialog.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
+
+        // Show the dialog
+        datePickerDialog.show();
+    }
+
+
 }

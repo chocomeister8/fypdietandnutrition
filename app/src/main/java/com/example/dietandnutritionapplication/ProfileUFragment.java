@@ -38,8 +38,8 @@ public class ProfileUFragment extends Fragment {
     private EditText emailAddressData, currentWeightData, currentHeightData;
     private Spinner genderSpinner, activityLevelSpinner, healthGoalsSpinner;
     private Button saveButton;
-    private CheckBox peanutsCheckbox, dairyCheckbox, eggsCheckbox, soyCheckbox, seafoodCheckbox, wheatCheckbox, aOthersCheckbox;
-    private CheckBox glutenFreeCheckBox, lactoseIntoleranceCheckBox, vegetarianCheckBox, dpOthersCheckbox;
+    private CheckBox aNoneCheckbox, peanutsCheckbox, dairyCheckbox, eggsCheckbox, soyCheckbox, seafoodCheckbox, wheatCheckbox, aOthersCheckbox;
+    private CheckBox dpNoneCheckbox, glutenFreeCheckBox, lactoseIntoleranceCheckBox, vegetarianCheckBox, dpOthersCheckbox;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseUser currentUser;
@@ -85,12 +85,10 @@ public class ProfileUFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // Show the EditText when "Others" is checked
                     dpOthersText.setVisibility(View.VISIBLE);
                 } else {
-                    // Hide the EditText when "Others" is unchecked
                     dpOthersText.setVisibility(View.GONE);
-                    dpOthersText.setText(""); // Clear input when unchecked
+                    dpOthersText.setText("");
                 }
             }
         });
@@ -99,12 +97,10 @@ public class ProfileUFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // Show the EditText when "Others" is checked
                     aOthersText.setVisibility(View.VISIBLE);
                 } else {
-                    // Hide the EditText when "Others" is unchecked
                     aOthersText.setVisibility(View.GONE);
-                    aOthersText.setText(""); // Clear input when unchecked
+                    aOthersText.setText("");
                 }
             }
         });
@@ -115,6 +111,137 @@ public class ProfileUFragment extends Fragment {
                 showDatePickerDialog();
             }
         });
+
+        dpNoneCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                glutenFreeCheckBox.setChecked(false);
+                glutenFreeCheckBox.setEnabled(false);
+
+                lactoseIntoleranceCheckBox.setChecked(false);
+                lactoseIntoleranceCheckBox.setEnabled(false);
+
+                vegetarianCheckBox.setChecked(false);
+                vegetarianCheckBox.setEnabled(false);
+
+                dpOthersCheckbox.setChecked(false);
+                dpOthersCheckbox.setEnabled(false);
+                dpOthersText.setEnabled(false);
+            } else {
+                glutenFreeCheckBox.setEnabled(true);
+                lactoseIntoleranceCheckBox.setEnabled(true);
+                vegetarianCheckBox.setEnabled(true);
+                dpOthersCheckbox.setEnabled(true);
+                dpOthersText.setEnabled(true);
+            }
+        });
+
+        glutenFreeCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                dpNoneCheckbox.setChecked(false);
+            }
+        });
+
+        lactoseIntoleranceCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                dpNoneCheckbox.setChecked(false);
+            }
+        });
+
+        vegetarianCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                dpNoneCheckbox.setChecked(false);
+            }
+        });
+
+        dpOthersCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                dpNoneCheckbox.setChecked(false);
+                dpOthersText.setEnabled(true);
+            } else {
+                dpOthersText.setEnabled(false);
+            }
+        });
+
+        aNoneCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                peanutsCheckbox.setChecked(false);
+                peanutsCheckbox.setEnabled(false);
+
+                dairyCheckbox.setChecked(false);
+                dairyCheckbox.setEnabled(false);
+
+                eggsCheckbox.setChecked(false);
+                eggsCheckbox.setEnabled(false);
+
+                soyCheckbox.setChecked(false);
+                soyCheckbox.setEnabled(false);
+
+                seafoodCheckbox.setChecked(false);
+                seafoodCheckbox.setEnabled(false);
+
+                wheatCheckbox.setChecked(false);
+                wheatCheckbox.setEnabled(false);
+
+                aOthersCheckbox.setChecked(false);
+                aOthersCheckbox.setEnabled(false);
+                aOthersText.setEnabled(false);
+            } else {
+                peanutsCheckbox.setEnabled(true);
+                dairyCheckbox.setEnabled(true);
+                eggsCheckbox.setEnabled(true);
+                soyCheckbox.setEnabled(true);
+                seafoodCheckbox.setEnabled(true);
+                wheatCheckbox.setEnabled(true);
+                aOthersCheckbox.setEnabled(true);
+                aOthersText.setEnabled(true);
+            }
+        });
+
+        peanutsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                aNoneCheckbox.setChecked(false);
+            }
+        });
+
+        dairyCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                aNoneCheckbox.setChecked(false);
+            }
+        });
+
+        eggsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                aNoneCheckbox.setChecked(false);
+            }
+        });
+
+        soyCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                aNoneCheckbox.setChecked(false);
+            }
+        });
+
+        seafoodCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                aNoneCheckbox.setChecked(false);
+            }
+        });
+
+        wheatCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                aNoneCheckbox.setChecked(false);
+            }
+        });
+
+        aOthersCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                aNoneCheckbox.setChecked(false);
+                aOthersText.setEnabled(true);
+            } else {
+                aOthersText.setEnabled(false);
+            }
+        });
+
 
 
         return view;
@@ -133,11 +260,14 @@ public class ProfileUFragment extends Fragment {
         currentWeightData = view.findViewById(R.id.current_weight_data);
         currentHeightData = view.findViewById(R.id.current_height_data);
         calorieLimitData = view.findViewById(R.id.daily_calorie_limit_data);
+
+        dpNoneCheckbox= view.findViewById(R.id.checkbox_dp_none);
         glutenFreeCheckBox = view.findViewById(R.id.checkbox_gluten_free);
         lactoseIntoleranceCheckBox = view.findViewById(R.id.checkbox_lactose_intolerance);
         vegetarianCheckBox = view.findViewById(R.id.checkbox_vegetarian);
         dpOthersCheckbox = view.findViewById(R.id.checkbox_dp_other);
 
+        aNoneCheckbox = view.findViewById(R.id.checkbox_a_none);
         peanutsCheckbox = view.findViewById(R.id.checkbox_peanuts);
         dairyCheckbox = view.findViewById(R.id.checkbox_dairy);
         eggsCheckbox = view.findViewById(R.id.checkbox_eggs);
@@ -156,8 +286,10 @@ public class ProfileUFragment extends Fragment {
 
     }
 
+
     private String getDietaryPreferences() {
         StringBuilder preferences = new StringBuilder();
+        if (dpNoneCheckbox.isChecked()) preferences.append("None, ");
         if (glutenFreeCheckBox.isChecked()) preferences.append("Gluten Free, ");
         if (lactoseIntoleranceCheckBox.isChecked()) preferences.append("Lactose Intolerance, ");
         if (vegetarianCheckBox.isChecked()) preferences.append("Vegetarian, ");
@@ -176,6 +308,7 @@ public class ProfileUFragment extends Fragment {
 
     private String getAllergies() {
         StringBuilder allergies = new StringBuilder();
+        if (aNoneCheckbox.isChecked()) allergies.append("None, ");
         if (peanutsCheckbox.isChecked()) allergies.append("Peanuts, ");
         if (dairyCheckbox.isChecked()) allergies.append("Dairy, ");
         if (eggsCheckbox.isChecked()) allergies.append("Eggs, ");
