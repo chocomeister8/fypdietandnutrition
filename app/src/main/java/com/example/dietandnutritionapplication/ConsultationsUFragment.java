@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,9 +93,11 @@ public class ConsultationsUFragment extends Fragment {
                     nutritionistList.add(nutritionist);
                 }
                 adapter.notifyDataSetChanged();
-            } else {
-                // Handle errors
+            } else if (!task.isSuccessful()) {
+                Log.e("FirestoreError", "Error fetching data: ", task.getException());
+                Toast.makeText(getContext(), "Failed to load nutritionists. Please try again later.", Toast.LENGTH_SHORT).show();
             }
+
         });
     }
 }
