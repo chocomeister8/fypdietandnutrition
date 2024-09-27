@@ -3,6 +3,7 @@ package com.example.dietandnutritionapplication;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -35,32 +37,33 @@ public class AppReviewsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_guest_viewappratingsandreviews, container, false);
 
-        // Populate some dummy reviews
-        reviews.add(new AppRatingsReviews(
-                "Great Tool for Healthy Living",
-                "This app makes managing my nutrition easy with personalized tips, meal logging, and quick access to expert advice.",
-                3.0f,
-                "09-08-2024 15:55",
-                "John Tan"));
 
-        reviews.add(new AppRatingsReviews(
-                "Useful App for Healthy Living",
-                "It is a user-friendly app that helps me effortlessly track meals, manage calories, and stay healthy.",
-                4.0f,
-                "09-08-2024 17:55",
-                "Lily"));
-
-        reviews.add(new AppRatingsReviews(
-                "Average App",
-                "The app works fine but has some issues with performance.",
-                5.0f,
-                "09-08-2024 14:55",
-                "Alex"));
-
-        // Setup ListView
         reviewsListView = view.findViewById(R.id.reviewListView);
         adapter = new AppReviewController(getContext(), reviews);
         reviewsListView.setAdapter(adapter);
+        AppRatingsReviewsController appRatingsReviewsController = new AppRatingsReviewsController();
+        appRatingsReviewsController.retrieveRatings(new AppRatingReviewEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<AppRatingsReviews> ratingList) {
+                reviews.clear();
+                reviews.addAll(ratingList);
+                adapter.notifyDataSetChanged();  // Refresh list
+                filterAllButton.setText("All (" + reviews.size() + ")");  // Update button text
+
+                // Log the size of the retrieved list
+                Log.d("AppReviewsFragment", "Number of reviews retrieved: " + ratingList.size());
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("AppReviewsFragment", "Failed to retrieve reviews", e);
+                Toast.makeText(getContext(), "Failed to load reviews. Please try again.", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        // Setup ListView
+
 
         // Setup Button and Spinner
         filterAllButton = view.findViewById(R.id.filterAllButton);
