@@ -151,6 +151,20 @@ public class RecipeDetailFragment extends Fragment {
                         .addToBackStack(null)
                         .commit();
             }
+            else if ("recommended".equals(source)) {
+                // Pass the search and spinner values back to NavVegetarianRecipesFragment
+                NavRecommendedRecipesFragment fragment = new NavRecommendedRecipesFragment();
+                Bundle args = new Bundle();
+                args.putString("search_query", searchQuery);
+                args.putInt("spinner1_value", spinner1Value);
+                args.putInt("spinner2_value", spinner2Value);
+                fragment.setArguments(args);
+
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         });
 
         return view;

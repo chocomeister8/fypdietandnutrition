@@ -256,7 +256,7 @@ public class NavVegetarianRecipesFragment extends Fragment {
         EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
 
         // Assuming the API requires meal type and dish type as separate parameters
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,"vegetarian" ,mealType, dishType);
+        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,"vegetarian" ,mealType, dishType, null);
 
         call.enqueue(new Callback<RecipeResponse>() {
             @Override

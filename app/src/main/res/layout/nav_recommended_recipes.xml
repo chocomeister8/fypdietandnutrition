@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/relativeLayout4"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp">
 
             <!-- Search Bar -->
@@ -63,7 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="8dp"
                 android:layout_toStartOf="@+id/add_recipe_button"
                 android:background="@drawable/rounded_search_bar_background"
                 android:drawableStart="@drawable/ic_search"
@@ -79,6 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
+                android:layout_marginEnd="0dp"
                 android:padding="5dp"
                 android:text="Add"
                 android:textColor="@color/black"
@@ -86,16 +87,59 @@
         </RelativeLayout>
         <!-- Column: Content -->
 
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relativeLayout6"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="horizontal">
+
+            <!-- Meal Type Spinner -->
+            <Spinner
+                android:id="@+id/spinner_meal_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_search_bar_background"
+                android:hint="Select Meal Type" />
+
+            <!-- Dish Type Spinner -->
+            <Spinner
+                android:id="@+id/spinner_dish_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_search_bar_background"
+                android:hint="Select Dish Type" />
+
+            <Button
+                android:id="@+id/clear_filters_button"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/decline_background"
+                android:padding="4dp"
+                android:textSize="12dp"
+                android:text="Clear Filters"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
         <FrameLayout
             android:id="@+id/navigationBar"
             android:layout_width="100dp"
-            android:layout_height="695dp"
-            android:layout_below="@+id/relativeLayout6"
+            android:layout_height="650dp"
+            android:layout_below="@+id/linearLayout2"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="9dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="13dp"
+            android:layout_marginEnd="12dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/rounded_search_bar_background">
 
@@ -114,6 +158,19 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:text="All Recipes"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
+                    android:textSize="11dp" />
+
+                <Button
+                    android:id="@+id/button_recommendRecipes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Recommended Recipes"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="11dp" />
@@ -170,44 +227,24 @@
                     android:textColor="#333333"
                     android:textSize="11dp" />
 
-
-                <Button
-                    android:id="@+id/button_recommendRecipes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Recommended Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="11dp" />
-
             </LinearLayout>
 
         </FrameLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="283dp"
-            android:layout_height="695dp"
-            android:layout_below="@+id/relativeLayout6"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recipe_recycler_view"
+            android:layout_width="300dp"
+            android:layout_height="650dp"
+            android:layout_below="@+id/linearLayout2"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/rounded_item_background"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:layout_marginStart="-10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="2dp"
+            android:layout_toEndOf="@+id/navigationBar"
+            android:background="@drawable/recycler_view_bg"
+            android:paddingTop="4dp"
+            android:scrollbars="vertical" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recipe_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scrollbars="vertical" />
-        </LinearLayout>
 
         <View
             android:layout_width="match_parent"

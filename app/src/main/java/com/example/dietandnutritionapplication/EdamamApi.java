@@ -13,6 +13,7 @@ public interface EdamamApi {
             @Query("type") String type,
             @Query("health") String health,
             @Query("mealType") String mealType,
-            @Query("dishType") String dishType
+            @Query("dishType") String dishType,
+            @Query("calories") String calories
     );
 }

@@ -44,8 +44,7 @@ public class NavAllRecipesFragment extends Fragment {
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
 
     private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "fish", "vegetables", "pasta", "salad",
-            "rice", "soup", "pizza", "sandwich", "egg", "cereal", "yogurt", "toast", "noodles"
+            "chicken", "beef", "noodles", "rice", "steak", "fish", "soup", "lamb", "pasta", "vegetable", "potato", "sandwich", "burger", "curry", "shrimp", "bacon", "mushroom"
     );
 
     @Nullable
@@ -236,7 +235,7 @@ public class NavAllRecipesFragment extends Fragment {
         EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
 
         // Assuming the API requires meal type and dish type as separate parameters
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType);
+        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType, null);
 
         call.enqueue(new Callback<RecipeResponse>() {
             @Override
