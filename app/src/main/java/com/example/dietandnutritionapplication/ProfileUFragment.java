@@ -58,6 +58,7 @@ public class ProfileUFragment extends Fragment {
         initializeUI(view);
         initializeSpinners();
 
+
         if (currentUser != null) {
             userId = currentUser.getUid();
             Log.d("First:UserProfileFragment", "User ID: " + userId);

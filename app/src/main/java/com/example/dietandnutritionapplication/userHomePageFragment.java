@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +18,8 @@ public class userHomePageFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.user_homepage, container, false);
+
+        ImageView reviewIcon = view.findViewById(R.id.reviewIcon);
 
         // Initialize buttons using view.findViewById
         Button button_recipes = view.findViewById(R.id.button_recipes);
@@ -36,6 +39,11 @@ public class userHomePageFragment extends Fragment {
                     .replace(R.id.frame_layout, new navCreateFolderFragment())
                     .addToBackStack(null)  // Add to back stack to enable back navigation
                     .commit();
+        });
+        reviewIcon.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).replaceFragment(new userReviewAppFragment());
+            }
         });
 
         // Define the OnClickListener

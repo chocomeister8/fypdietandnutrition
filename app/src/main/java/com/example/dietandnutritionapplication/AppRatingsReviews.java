@@ -19,6 +19,7 @@ public class AppRatingsReviews {
         return title;
     }
 
+
     public String getReview() {
         return review;
     }

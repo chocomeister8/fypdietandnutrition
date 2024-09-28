@@ -2,6 +2,7 @@ package com.example.dietandnutritionapplication;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -390,21 +391,19 @@ public class UserAccountEntity {
     }
 
     public void getUserById(String userId, UserFetchCallback callback) {
-        db.collection("Users") // Replace with your Firestore collection name
-                .document(userId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        User user = documentSnapshot.toObject(User.class);
-                        callback.onUserFetched(user);
-                    } else {
-                        callback.onUserFetched(null); // User not found
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("UserAccountEntity", "Error fetching user", e);
-                    callback.onFailure(e.getMessage());
-                });
+        DocumentReference docRef = db.collection("Users").document(userId);
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                User user = documentSnapshot.toObject(User.class);
+                if (user != null) {
+                    callback.onUserFetched(user);
+                } else {
+                    callback.onFailure("User data is null");
+                }
+            } else {
+                callback.onFailure("User does not exist");
+            }
+        }).addOnFailureListener(e -> callback.onFailure(e.getMessage()));
     }
 
     public void updateUserProfile(String userId, Map<String, Object> updatedFields, UserProfileUpdateCallback callback) {
@@ -418,5 +417,23 @@ public class UserAccountEntity {
                 });
     }
 
+    private void retrieveUsername(String userId,Context context) {
+        // Retrieve username from Firestore
+
+        db.collection("Users").document(userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String username = document.getString("username");
+                        } else {
+                            Toast.makeText(context, "No user document found", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(context, "Failed to retrieve username: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
 }
