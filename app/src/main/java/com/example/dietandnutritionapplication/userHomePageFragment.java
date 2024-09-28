@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ public class userHomePageFragment extends Fragment {
         View view = inflater.inflate(R.layout.user_homepage, container, false);
 
         ImageView reviewIcon = view.findViewById(R.id.reviewIcon);
+        ImageView logoutIcon = view.findViewById(R.id.logout_icon);
 
         // Initialize buttons using view.findViewById
         Button button_recipes = view.findViewById(R.id.button_recipes);
@@ -43,6 +45,14 @@ public class userHomePageFragment extends Fragment {
         reviewIcon.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).replaceFragment(new userReviewAppFragment());
+            }
+        });
+        logoutIcon.setOnClickListener(v -> {
+
+            if (getActivity() instanceof MainActivity) {
+                Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                ((MainActivity) getActivity()).switchToGuestMode();
+                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
             }
         });
 

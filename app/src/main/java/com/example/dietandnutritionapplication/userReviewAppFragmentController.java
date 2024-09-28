@@ -16,6 +16,11 @@ public class userReviewAppFragmentController {
             @Override
             public void onSuccess(ArrayList<AppRatingsReviews> ratingList) {
                 Toast.makeText(context, "Review submitted successfully!", Toast.LENGTH_SHORT).show();
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).replaceFragment(new userHomePageFragment());
+                } else {
+                    Toast.makeText(context, "Error: Context is not an instance of MainActivity", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override

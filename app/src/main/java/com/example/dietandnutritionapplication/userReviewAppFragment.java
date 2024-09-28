@@ -70,6 +70,7 @@ public class userReviewAppFragment extends Fragment {
 
         submitRateButton.setOnClickListener(v -> submitReview());
 
+
         return view;
     }
 
@@ -102,6 +103,7 @@ public class userReviewAppFragment extends Fragment {
                 etReviewTitle.setText("");
                 etReviewContent.setText("");
                 ratingBar.setRating(0);
+
             }
 
             @Override
