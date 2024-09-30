@@ -46,7 +46,8 @@ public class userViewFAQFragment extends Fragment {
                 "Nutrition and Diet Tracking",
                 "Meal Plans and Recipes",
                 "Supported Diets and Preferences",
-                "Health and Fitness Goals"
+                "Health and Fitness Goals",
+                "Technical Support"
         );
 
         viewFAQController.getAllFAQ(new FAQEntity.DataCallback() {
