@@ -60,6 +60,7 @@ public class FAQEntity {
         FAQ faq = new FAQ();
         faq.setFaqId(document.getString("id"));
         faq.setTitle(document.getString("title"));
+        faq.setCategory(document.getString("category"));
         faq.setQuestion(document.getString("question"));
         faq.setAnswer(document.getString("answer"));
         faq.setDateCreated(document.getString("date"));
@@ -74,11 +75,12 @@ public class FAQEntity {
         // Implementation for updating FAQ
     }
 
-    public void insertFAQ(String title, String question, String answer, String date, ProgressDialog pd, Context context) {
+    public void insertFAQ(String title, String category, String question, String answer, String date, ProgressDialog pd, Context context) {
         String id = UUID.randomUUID().toString();
         Map<String, Object> faq = new HashMap<>();
         faq.put("id", id);
         faq.put("title", title);
+        faq.put("category", category);
         faq.put("question", question);
         faq.put("answer", answer);
         faq.put("date", date);
@@ -94,11 +96,12 @@ public class FAQEntity {
                 });
     }
 
-    public void updateFAQInFirestore(String id, String updatedTitle, String updatedQuestion, String updatedAnswer, String updatedDate, Context context) {
+    public void updateFAQInFirestore(String id, String updatedTitle, String updatedCategory, String updatedQuestion, String updatedAnswer, String updatedDate, Context context) {
         if (id != null) {
             Map<String, Object> updatedFields = new HashMap<>();
             updatedFields.put("date", updatedDate);
             updatedFields.put("title", updatedTitle);
+            updatedFields.put("category", updatedCategory);
             updatedFields.put("question", updatedQuestion);
             updatedFields.put("answer", updatedAnswer);
 
@@ -107,7 +110,7 @@ public class FAQEntity {
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(context, "FAQ updated successfully", Toast.LENGTH_SHORT).show();
 
-                        FAQ updatedFAQ = new FAQ(id, updatedTitle, updatedQuestion, updatedAnswer, updatedDate);
+                        FAQ updatedFAQ = new FAQ(id, updatedTitle, updatedCategory, updatedQuestion, updatedAnswer, updatedDate);
                         FAQDetailsFragment viewFAQDetailsFragment = new FAQDetailsFragment();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("selectedFAQ", updatedFAQ);

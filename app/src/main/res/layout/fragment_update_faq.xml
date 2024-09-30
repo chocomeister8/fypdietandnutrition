@@ -124,6 +124,34 @@
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <!-- Label for Title -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="0.3"
+                        android:gravity="center_vertical"
+                        android:text="Category:"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <Spinner
+                        android:id="@+id/category"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="0.85"
+                        android:background="#E6E0E9"
+                        android:spinnerMode="dropdown" />
+
+                </LinearLayout>
+
                 <!-- Question Row -->
                 <LinearLayout
                     android:layout_width="match_parent"

@@ -10,8 +10,10 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 
@@ -26,7 +28,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -43,6 +47,7 @@ public class AddFAQFragment extends Fragment {
 
     private EditText titleEditText, questionEditText, answerEditText;
     private Button addFAQ;
+    private Spinner categorySpinner;
     ProgressDialog pd;
 
     FirebaseAuth mAuth;
@@ -98,6 +103,18 @@ public class AddFAQFragment extends Fragment {
         answerEditText = view.findViewById(R.id.answer);
         addFAQ = view.findViewById(R.id.addFAQ);
 
+        categorySpinner = view.findViewById(R.id.faq_category_spinner);
+
+        // Create a list of FAQ categories
+        List<String> categories = Arrays.asList("General Information", "Account and Profile Management", "Nutrition and Diet Tracking", "Meal Plans and Recipes", "Supported Diets and Preferences", "Health and Fitness Goals");
+
+        // Create an ArrayAdapter using the categories and requireContext() for fragment context
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Set the adapter to the spinner
+        categorySpinner.setAdapter(adapter);
+
         pd = new ProgressDialog(getActivity());
 
         mAuth = FirebaseAuth.getInstance();
@@ -109,6 +126,7 @@ public class AddFAQFragment extends Fragment {
 
                 String title = titleEditText.getText().toString();
                 String question = questionEditText.getText().toString();
+                String category = categorySpinner.getSelectedItem().toString();
                 String answer = answerEditText.getText().toString();
 
                 ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Singapore"));
@@ -117,7 +135,7 @@ public class AddFAQFragment extends Fragment {
 
 //                insertFAQ(title, question, answer, date);
                 AddFAQController addFAQController = new AddFAQController();
-                addFAQController.checkFAQ(title,question,answer,date,pd,getActivity());
+                addFAQController.checkFAQ(title,category,question,answer,date,pd,getActivity());
                 redirectToViewAllFAQs();
             }
 

@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class FAQ implements Serializable {
     private String faqId;
     private String title;
+    private String category;
     private String question;
     private String answer;
     private String dateCreated;
@@ -13,9 +14,10 @@ public class FAQ implements Serializable {
 
     }
 
-    public FAQ(String faqId, String title, String question, String answer, String dateCreated) {
+    public FAQ(String faqId, String title, String category, String question, String answer, String dateCreated) {
         this.faqId = faqId;
         this.title = title;
+        this.category = category;
         this.question = question;
         this.answer = answer;
         this.dateCreated = dateCreated;
@@ -31,6 +33,12 @@ public class FAQ implements Serializable {
     }
 
     public void setTitle(String title) { this.title = title;
+    }
+
+    public String getCategory() { return category;
+    }
+
+    public void setCategory(String category) { this.category = category;
     }
 
     public String getQuestion() { return question;

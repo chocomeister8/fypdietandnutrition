@@ -76,15 +76,11 @@ public class FAQFragment extends Fragment{
         FAQListView = view.findViewById(R.id.faqListView);
         searchFAQEditText = view.findViewById(R.id.searchFAQEditText);
 
-
-
         // Set the adapter to the ListView
         //FAQAdapter adapter = new FAQAdapter(getContext(), faqs);
         adapter = new FAQAdapter(getContext(), faq);
         FAQListView.setAdapter(adapter);
 
-
-        FAQListView = view.findViewById(R.id.faqListView);
         filterFAQspinner = view.findViewById(R.id.filterFAQSpinner);
 
         List<String> sortFAQ = new ArrayList<>();

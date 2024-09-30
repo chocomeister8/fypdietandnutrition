@@ -30,6 +30,7 @@ public class FAQDetailsFragment extends Fragment {
 
         // Find your TextView or other UI elements to display profile details
         TextView titleTextView = view.findViewById(R.id.title);
+        TextView categoryTextView = view.findViewById(R.id.category);
         TextView questionTextView = view.findViewById(R.id.question);
         TextView answerTextView = view.findViewById(R.id.answer);
         TextView datecreatedTextView = view.findViewById(R.id.datecreated);
@@ -40,6 +41,7 @@ public class FAQDetailsFragment extends Fragment {
         // Set the details in the UI
         if (selectedFAQ != null) {
             titleTextView.setText(selectedFAQ.getTitle());
+            categoryTextView.setText(selectedFAQ.getCategory());
             questionTextView.setText(selectedFAQ.getQuestion());
             answerTextView.setText(selectedFAQ.getAnswer());
             datecreatedTextView.setText(selectedFAQ.getDateCreated());

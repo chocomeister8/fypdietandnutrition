@@ -70,9 +70,10 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new LandingFragment());
 
     }
-        public void createFAQ(String title, String question, String answer, String dateCreated){
+        public void createFAQ(String title, String category, String question, String answer, String dateCreated){
             FAQ faqcreate = new FAQ();
             faqcreate.setTitle(title);
+            faqcreate.setCategory(category);
             faqcreate.setQuestion(question);
             faqcreate.setAnswer(answer);
             faqcreate.setDateCreated(dateCreated);

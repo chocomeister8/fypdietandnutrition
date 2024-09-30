@@ -6,8 +6,8 @@ public class UpdateFAQController {
     public UpdateFAQController(){
 
     }
-    public void chechUpdateFAQ(String id, String updatedTitle, String updatedQuestion, String updatedAnswer, String updatedDate, Context context){
+    public void checkUpdateFAQ(String id, String updatedTitle, String updatedCategory, String updatedQuestion, String updatedAnswer, String updatedDate, Context context){
         FAQEntity faqEntity = new FAQEntity();
-        faqEntity.updateFAQInFirestore( id,  updatedTitle,  updatedQuestion,  updatedAnswer,  updatedDate,context);
+        faqEntity.updateFAQInFirestore( id,  updatedTitle, updatedCategory, updatedQuestion,  updatedAnswer,  updatedDate,context);
     }
 }
