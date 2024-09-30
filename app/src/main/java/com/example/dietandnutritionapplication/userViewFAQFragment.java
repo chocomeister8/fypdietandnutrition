@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,31 +39,54 @@ public class userViewFAQFragment extends Fragment {
     }
 
     private void loadFAQs() {
+        // Define the categories
+        List<String> categories = Arrays.asList(
+                "General Information",
+                "Account and Profile Management",
+                "Nutrition and Diet Tracking",
+                "Meal Plans and Recipes",
+                "Supported Diets and Preferences",
+                "Health and Fitness Goals"
+        );
+
         viewFAQController.getAllFAQ(new FAQEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<FAQ> faqs) {
-                // Convert FAQs into categories for the adapter
-                List<String> groupTitles = new ArrayList<>();
+                // Initialize data structures for categories
+                List<String> groupTitles = new ArrayList<>(categories);
                 HashMap<String, List<String>> childItems = new HashMap<>();
                 HashMap<String, List<String>> answers = new HashMap<>();
 
+                // Initialize childItems and answers for each category
+                for (String category : categories) {
+                    childItems.put(category, new ArrayList<>());
+                    answers.put(category, new ArrayList<>());
+                }
+
+                // Populate the childItems and answers with FAQs
                 for (FAQ faq : faqs) {
                     String category = faq.getCategory();
                     String question = faq.getQuestion();
                     String answer = faq.getAnswer();
 
-                    if (!groupTitles.contains(category)) {
-                        groupTitles.add(category);
-                        childItems.put(category, new ArrayList<>());
-                        answers.put(category, new ArrayList<>());
+                    // Check if the category exists
+                    if (childItems.containsKey(category)) {
+                        childItems.get(category).add(question);
+                        answers.get(category).add(answer);
                     }
-                    childItems.get(category).add(question);
-                    answers.get(category).add(answer);
                 }
 
-                // Set up the adapter with the fetched data
+                // Update the adapter with the fetched data
                 faqAdapter = new FAQExpandableListAdapter(groupTitles, childItems, answers);
                 faqExpandableListView.setAdapter(faqAdapter);
+
+                // Set default message for empty categories
+                for (String category : categories) {
+                    if (childItems.get(category).isEmpty()) {
+                        childItems.get(category).add("No FAQs added yet.");
+                        answers.get(category).add(""); // Empty answer for "No FAQs added yet."
+                    }
+                }
             }
 
             @Override
