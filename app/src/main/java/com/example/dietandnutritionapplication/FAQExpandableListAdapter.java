@@ -1,23 +1,24 @@
 package com.example.dietandnutritionapplication;
 
-import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class FAQExpandableListAdapter extends BaseExpandableListAdapter {
 
-    private Context context; // Add context variable
     private List<String> listGroupTitles;
-    private HashMap<String, List<String>> listChildItems;
+    private HashMap<String, List<String>> listChildItems; // Questions
+    private HashMap<String, List<String>> listChildAnswers; // Answers
 
-    public FAQExpandableListAdapter(Context context, List<String> listGroupTitles, HashMap<String, List<String>> listChildItems) {
-        this.context = context; // Initialize the context
+    public FAQExpandableListAdapter(List<String> listGroupTitles, HashMap<String, List<String>> listChildItems, HashMap<String, List<String>> listChildAnswers) {
         this.listGroupTitles = listGroupTitles;
         this.listChildItems = listChildItems;
+        this.listChildAnswers = listChildAnswers;
     }
 
     @Override
@@ -57,15 +58,30 @@ public class FAQExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        // Inflate or return the view for the group (question)
-        // TODO: Implement the actual view layout for group
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            convertView = inflater.inflate(android.R.layout.simple_expandable_list_item_1, parent, false);
+        }
+        TextView titleTextView = convertView.findViewById(android.R.id.text1);
+        titleTextView.setText((String) getGroup(groupPosition));
         return convertView;
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        // Inflate or return the view for the child (answer)
-        // TODO: Implement the actual view layout for child
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            convertView = inflater.inflate(android.R.layout.simple_expandable_list_item_2, parent, false);
+        }
+        TextView questionTextView = convertView.findViewById(android.R.id.text1);
+        TextView answerTextView = convertView.findViewById(android.R.id.text2);
+
+        String question = listChildItems.get(listGroupTitles.get(groupPosition)).get(childPosition);
+        String answer = listChildAnswers.get(listGroupTitles.get(groupPosition)).get(childPosition);
+
+        questionTextView.setText(question);
+        answerTextView.setText(answer);
+
         return convertView;
     }
 
