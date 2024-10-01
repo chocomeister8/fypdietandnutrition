@@ -28,8 +28,10 @@ public class ConsultationsUFragment extends Fragment {
 
     private ListView nutritionistListView;
     private List<Nutritionist> nutritionistList;
-    private UserConsultationsController adapter;
+//    private UserConsultationsController adapter;
     private FirebaseFirestore db;
+    ArrayList<Profile> nutriAccounts = new ArrayList<>();
+    private ProfileAdapter adapter;
 
     @Nullable
     @Override
@@ -46,33 +48,46 @@ public class ConsultationsUFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Set up the adapter
-        adapter = new UserConsultationsController(getActivity(), nutritionistList);
+        adapter = new ProfileAdapter(getContext(), nutriAccounts);
         nutritionistListView.setAdapter(adapter);
+        ConsultationController consultationController = new ConsultationController();
+        consultationController.retrieveNutri(new UserAccountEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Profile> accounts) {
+                nutriAccounts.clear(); // Clear the current list
+                nutriAccounts.addAll(accounts); // Add the fetched accounts
+                adapter.notifyDataSetChanged(); // Notify the adapter about the new data
+            }
 
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+            }
+        });
         // Fetch nutritionists from Firestore
-        loadNutritionistsFromFirestore();
+//        loadNutritionistsFromFirestore();
 
 //        Bitmap janeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
 //        Bitmap johnBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
 //        // Add dummy data (replace with real data source)
 
         // Handle item clicks
-        nutritionistListView.setOnItemClickListener((parent, view1, position, id) -> {
-            Nutritionist selectedNutritionist = nutritionistList.get(position);
-            // Create an instance of NutriViewProfileFragment
-            NutriViewProfileFragment profileFragment = new NutriViewProfileFragment();
-
-            // Create a bundle to pass the email
-            Bundle args = new Bundle();
-            args.putString("email", selectedNutritionist.getEmail());
-            profileFragment.setArguments(args);
-
-            // Replace the current fragment with NutriViewProfileFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, profileFragment)
-                    .addToBackStack(null)
-                    .commit();
-        });
+//        nutritionistListView.setOnItemClickListener((parent, view1, position, id) -> {
+//            Nutritionist selectedNutritionist = nutritionistList.get(position);
+//            // Create an instance of NutriViewProfileFragment
+//            NutriViewProfileFragment profileFragment = new NutriViewProfileFragment();
+//
+//            // Create a bundle to pass the email
+//            Bundle args = new Bundle();
+//            args.putString("email", selectedNutritionist.getEmail());
+//            profileFragment.setArguments(args);
+//
+//            // Replace the current fragment with NutriViewProfileFragment
+//            requireActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame_layout, profileFragment)
+//                    .addToBackStack(null)
+//                    .commit();
+//        });
 
         return view;
     }

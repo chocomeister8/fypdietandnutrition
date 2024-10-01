@@ -30,6 +30,7 @@ public class UserAccountEntity {
     private ArrayList<Nutritionist> nutritionists = new ArrayList<>();
     private ArrayList<Profile> accounts = new ArrayList<>();
     FirebaseAuth mAuth;
+    private ArrayList<Profile> nutriProfiles = new ArrayList<>();
 
 
     public UserAccountEntity() {
@@ -77,6 +78,49 @@ public class UserAccountEntity {
                             }
 
                             callback.onSuccess(accounts);
+                        } else {
+                            callback.onFailure(new Exception("QuerySnapshot is null"));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    public void retrieveNutritionists(final DataCallback callback) {
+        db.collection("Users").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null) {
+                            admins.clear();
+                            users.clear();
+                            nutritionists.clear();
+                            accounts.clear();
+
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                String role = document.getString("role");
+
+                                switch (role) {
+                                    case "user":
+                                        User user = createUserFromDocument(document);
+                                        users.add(user);
+                                        accounts.add(user);
+                                        break;
+                                    case "admin":
+                                        Admin admin = createAdminFromDocument(document);
+                                        admins.add(admin);
+                                        accounts.add(admin);
+                                        break;
+                                    case "nutritionist":
+                                        Nutritionist nutritionist = createNutritionistFromDocument(document);
+                                        nutritionists.add(nutritionist);
+                                        accounts.add(nutritionist);
+                                        break;
+                                }
+                            }
+                            nutriProfiles.addAll(nutritionists);
+                            callback.onSuccess(nutriProfiles);
                         } else {
                             callback.onFailure(new Exception("QuerySnapshot is null"));
                         }
