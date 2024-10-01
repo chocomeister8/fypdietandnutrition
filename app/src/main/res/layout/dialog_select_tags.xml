@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Tags"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Question 1: Reason for Eating -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reason for Eating"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"/>
+
+    <RadioGroup
+        android:id="@+id/question1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/tag1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hunger"/>
+
+        <RadioButton
+            android:id="@+id/tag2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Boredom"/>
+
+        <RadioButton
+            android:id="@+id/tag3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stress"/>
+
+        <RadioButton
+            android:id="@+id/tag4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Craving"/>
+    </RadioGroup>
+
+    <!-- Question 2: Feelings of Hunger and Fullness After Eating -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Feelings of Hunger and Fullness After Eating"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/question2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/tag5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Still hungry"/>
+
+        <RadioButton
+            android:id="@+id/tag6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comfortably full"/>
+
+        <RadioButton
+            android:id="@+id/tag7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Overly full"/>
+
+        <RadioButton
+            android:id="@+id/tag8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stuffed"/>
+    </RadioGroup>
+
+    <!-- Question 3: Meal Duration -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Meal Duration"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/question3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/tag9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Less than 10 minutes"/>
+
+        <RadioButton
+            android:id="@+id/tag10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10-20 minutes"/>
+
+        <RadioButton
+            android:id="@+id/tag11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20-30 minutes"/>
+
+        <RadioButton
+            android:id="@+id/tag12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="More than 30 minutes"/>
+    </RadioGroup>
+
+    <!-- Question 4: Location -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/question4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/tag13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"/>
+
+        <RadioButton
+            android:id="@+id/tag14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Work"/>
+
+        <RadioButton
+            android:id="@+id/tag15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Restaurant"/>
+
+        <RadioButton
+            android:id="@+id/tag16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="On the go"/>
+    </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/confirmTagsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirm" />
+            <Button
+                android:id="@+id/cancelTagsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:layout_marginEnd="8dp" />
+
+
+        </LinearLayout>
+</LinearLayout>
+</ScrollView>

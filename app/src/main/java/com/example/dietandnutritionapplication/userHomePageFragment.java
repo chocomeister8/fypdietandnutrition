@@ -26,7 +26,7 @@ public class userHomePageFragment extends Fragment {
         // Initialize buttons using view.findViewById
         Button button_recipes = view.findViewById(R.id.button_recipes);
         Button button_mealLog = view.findViewById(R.id.button_MealLog);
-//        Button button_diary = view.findViewById(R.id.diary);
+        Button button_diary = view.findViewById(R.id.diary);
         Button button_bmiCalculator = view.findViewById(R.id.bmiCalculator);
         Button button_consultation = view.findViewById(R.id.consultation);
         Button button_healthReport = view.findViewById(R.id.healthReport);
@@ -69,13 +69,13 @@ public class userHomePageFragment extends Fragment {
         button_mealLog.setOnClickListener(buttonClickListener);
         button_mealLog1.setOnClickListener(buttonClickListener);
 
-//        button_diary.setOnClickListener(v -> {
-//            // Replace current fragment with NavFavouriteRecipesFragment
-//            requireActivity().getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.frame_layout, new NavFavouriteRecipesFragment())
-//                    .addToBackStack(null)
-//                    .commit();
-//        });
+        button_diary.setOnClickListener(v -> {
+           // Replace current fragment with NavFavouriteRecipesFragment
+           requireActivity().getSupportFragmentManager().beginTransaction()
+                   .replace(R.id.frame_layout, new UserDiaryFragment())
+                    .addToBackStack(null)
+                   .commit();
+       });
 
         button_bmiCalculator.setOnClickListener(v -> {
             // Replace current fragment with NavRecipesStatusFragment
