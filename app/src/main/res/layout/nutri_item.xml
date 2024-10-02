@@ -26,26 +26,26 @@
 
         <!-- Username Label TextView -->
         <TextView
-            android:id="@+id/usernamelabel"
+            android:id="@+id/expertiseLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:text="Username:"
+            android:text="Expertise:"
             android:textSize="15sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/username"
+            app:layout_constraintEnd_toStartOf="@+id/expertise"
             app:layout_constraintStart_toEndOf="@+id/imageView2"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed" />
 
         <!-- Username TextView -->
         <TextView
-            android:id="@+id/username"
+            android:id="@+id/expertise"
             android:layout_width="0dp"
             android:layout_height="17dp"
             android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/usernamelabel"
+            app:layout_constraintStart_toEndOf="@+id/expertiseLabel"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Role Label TextView -->
@@ -59,7 +59,7 @@
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toBottomOf="@+id/usernamelabel" />
+            app:layout_constraintTop_toBottomOf="@+id/expertiseLabel" />
 
         <TextView
             android:id="@+id/fullname"
@@ -67,15 +67,15 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@+id/fullNamelabel"
-            app:layout_constraintTop_toBottomOf="@+id/username" />
+            app:layout_constraintTop_toBottomOf="@+id/expertise" />
 
         <TextView
-            android:id="@+id/rolelabel"
+            android:id="@+id/bioLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:text="Role:"
+            android:text="Rating:"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/imageView2"
@@ -83,32 +83,32 @@
 
         <!-- Role TextView -->
         <TextView
-            android:id="@+id/role"
+            android:id="@+id/bio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@+id/rolelabel"
+            app:layout_constraintStart_toEndOf="@+id/bioLabel"
             app:layout_constraintTop_toBottomOf="@+id/fullname" />
 
         <TextView
-            android:id="@+id/datejoinedLabel"
+            android:id="@+id/educationLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:text="Date Joined:"
+            android:text="Education:"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@+id/usernamelabel"
-            app:layout_constraintTop_toBottomOf="@+id/rolelabel" />
+            app:layout_constraintStart_toStartOf="@+id/expertiseLabel"
+            app:layout_constraintTop_toBottomOf="@+id/bioLabel" />
 
         <TextView
-            android:id="@+id/dateJoined"
+            android:id="@+id/education"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@+id/datejoinedLabel"
-            app:layout_constraintTop_toTopOf="@+id/datejoinedLabel" />
+            app:layout_constraintStart_toEndOf="@+id/educationLabel"
+            app:layout_constraintTop_toTopOf="@+id/educationLabel" />
 
 
 

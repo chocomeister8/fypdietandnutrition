@@ -32,6 +32,8 @@ public class ConsultationsUFragment extends Fragment {
     private FirebaseFirestore db;
     ArrayList<Profile> nutriAccounts = new ArrayList<>();
     private ProfileAdapter adapter;
+    private NutriProfileAdapter nutriProfileAdapter;
+    private NutriAdapterTest nutriAdapterTest;
 
     @Nullable
     @Override
@@ -47,16 +49,18 @@ public class ConsultationsUFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        // Set up the adapter
-        adapter = new ProfileAdapter(getContext(), nutriAccounts);
-        nutritionistListView.setAdapter(adapter);
+
+        nutriProfileAdapter = new NutriProfileAdapter(getContext(),nutriAccounts);
+        nutritionistListView.setAdapter(nutriProfileAdapter);
+
         ConsultationController consultationController = new ConsultationController();
         consultationController.retrieveNutri(new UserAccountEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Profile> accounts) {
                 nutriAccounts.clear(); // Clear the current list
                 nutriAccounts.addAll(accounts); // Add the fetched accounts
-                adapter.notifyDataSetChanged(); // Notify the adapter about the new data
+
+                nutriProfileAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -92,27 +96,4 @@ public class ConsultationsUFragment extends Fragment {
         return view;
     }
 
-    private void loadNutritionistsFromFirestore() {
-        CollectionReference nutritionistsRef = db.collection("nutritionists");
-
-        nutritionistsRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                nutritionistList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    String firsName = document.getString("firstName");
-                    String email = document.getString("email");
-                    String profilePicture = document.getString("profileImageURL");
-
-                    // Load profile image as Bitmap using Picasso or Glide (image library)
-                    Nutritionist nutritionist = new Nutritionist(firsName, email, profilePicture);
-                    nutritionistList.add(nutritionist);
-                }
-                adapter.notifyDataSetChanged();
-            } else if (!task.isSuccessful()) {
-                Log.e("FirestoreError", "Error fetching data: ", task.getException());
-                Toast.makeText(getContext(), "Failed to load nutritionists. Please try again later.", Toast.LENGTH_SHORT).show();
-            }
-
-        });
-    }
 }

@@ -15,10 +15,12 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
     private Context context;
     private ArrayList<Profile> profiles;
 
+
     public ProfileAdapter(Context context, ArrayList<Profile> profiles) {
         super(context, 0, profiles);
         this.context = context;
         this.profiles = profiles;
+
     }
 
     @Override

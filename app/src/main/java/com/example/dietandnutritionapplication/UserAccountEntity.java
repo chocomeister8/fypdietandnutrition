@@ -172,6 +172,7 @@ public class UserAccountEntity {
         user.setUsername(document.getString("username"));
         user.setRole(document.getString("role"));
         user.setLastName(document.getString("lastName"));
+        user.setFirstName(document.getString("firstName"));
         user.setPhoneNumber(document.getString("phoneNumber"));
         user.setPassword(document.getString("password"));
         user.setEmail(document.getString("email"));
