@@ -341,72 +341,55 @@ public class UserAccountEntity {
                         auth.signInWithEmailAndPassword(email, enteredPassword)
                                 .addOnCompleteListener(authTask -> {
                                     if (authTask.isSuccessful()) {
-                                        // Authentication successful, check if email is verified
+                                        // Authentication successful, retrieve additional user data from Firestore
                                         FirebaseUser firebaseUser = auth.getCurrentUser();
                                         if (firebaseUser != null) {
-                                            if (firebaseUser.isEmailVerified()) {
-                                                // Email is verified, proceed with role-based redirection
-                                                String userId = firebaseUser.getUid();
+                                            String userId = firebaseUser.getUid();
 
-                                                // Fetch the user's role and other details from Firestore
-                                                db.collection("Users").document(userId)
-                                                        .get()
-                                                        .addOnCompleteListener(userTask -> {
-                                                            if (userTask.isSuccessful()) {
-                                                                DocumentSnapshot userDoc = userTask.getResult();
-                                                                if (userDoc.exists()) {
-                                                                    // Retrieve additional data like role
-                                                                    String role = userDoc.getString("role");
-                                                                    String username = userDoc.getString("username");
+                                            // Fetch the user's role and other details from Firestore
+                                            db.collection("Users").document(userId)
+                                                    .get()
+                                                    .addOnCompleteListener(userTask -> {
+                                                        if (userTask.isSuccessful()) {
+                                                            DocumentSnapshot userDoc = userTask.getResult();
+                                                            if (userDoc.exists()) {
+                                                                // Retrieve additional data like role
+                                                                String role = userDoc.getString("role");
+                                                                String username = userDoc.getString("username");
 
-                                                                    // Save the username in SharedPreferences
-                                                                    SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-                                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                                    editor.putString("loggedInUserName", username);
-                                                                    editor.apply();
+                                                                // Save the username in SharedPreferences
+                                                                SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+                                                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                editor.putString("loggedInUserName", username);
+                                                                editor.apply();
 
-                                                                    // Display login success message
-                                                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
+                                                                // Display login success message
+                                                                Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                                                                    // Redirect based on the user's role
-                                                                    switch (role) {
-                                                                        case "user":
-                                                                            mainActivity.switchToUserMode();
-                                                                            ViewUserProfileController profileController = new ViewUserProfileController(mainActivity);
-                                                                            profileController.checkUserProfileCompletion(userId, context, mainActivity);
-                                                                            break;
-                                                                        case "admin":
-                                                                            mainActivity.switchToAdminMode();
-                                                                            break;
-                                                                        case "nutritionist":
-                                                                            mainActivity.switchToNutriMode();
-                                                                            break;
-                                                                        default:
-                                                                            Toast.makeText(context, "Unknown role", Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                } else {
-                                                                    Toast.makeText(context, "User data not found in Firestore", Toast.LENGTH_SHORT).show();
+                                                                // Redirect based on the user's role
+                                                                switch (role) {
+                                                                    case "user":
+                                                                        mainActivity.switchToUserMode();
+                                                                        ViewUserProfileController profileController = new ViewUserProfileController(mainActivity);
+                                                                        profileController.checkUserProfileCompletion(userId, context, mainActivity);
+                                                                        break;
+                                                                    case "admin":
+                                                                        mainActivity.switchToAdminMode();
+                                                                        break;
+                                                                    case "nutritionist":
+                                                                        mainActivity.switchToNutriMode();
+                                                                        break;
+                                                                    default:
+                                                                        Toast.makeText(context, "Unknown role", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             } else {
-                                                                Log.e("FirestoreError", "Error getting user data", userTask.getException());
-                                                                Toast.makeText(context, "Error retrieving user data: " + userTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(context, "User data not found in Firestore", Toast.LENGTH_SHORT).show();
                                                             }
-                                                        });
-                                            } else {
-                                                // Email not verified, prompt the user to verify their email
-                                                Toast.makeText(context, "Email not verified. Please verify your email before logging in.", Toast.LENGTH_SHORT).show();
-                                                firebaseUser.sendEmailVerification()
-                                                        .addOnCompleteListener(verificationTask -> {
-                                                            if (verificationTask.isSuccessful()) {
-                                                                Toast.makeText(context, "Verification email sent. Please check your inbox.", Toast.LENGTH_SHORT).show();
-                                                            } else {
-                                                                Toast.makeText(context, "Failed to send verification email.", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
-
-                                                // Sign the user out to prevent them from proceeding
-                                                auth.signOut();
-                                            }
+                                                        } else {
+                                                            Log.e("FirestoreError", "Error getting user data", userTask.getException());
+                                                            Toast.makeText(context, "Error retrieving user data: " + userTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
                                         }
                                     } else {
                                         // Authentication failed
@@ -426,7 +409,6 @@ public class UserAccountEntity {
                     Toast.makeText(context, "Error querying username: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     public void fetchUserProfile(String userId, final UserProfileCallback callback) {
         db.collection("Users")
