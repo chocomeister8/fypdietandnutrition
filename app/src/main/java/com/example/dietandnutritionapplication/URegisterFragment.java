@@ -105,6 +105,7 @@ public class URegisterFragment extends Fragment {
         femaleRadioButton = view.findViewById(R.id.rbFemale);
         registerButton = view.findViewById(R.id.loginbutton);
         radioGroupRole = view.findViewById(R.id.radioGroupRole);
+
         registerButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -136,7 +137,6 @@ public class URegisterFragment extends Fragment {
                     return;
                 }
 
-
                 String gender;
                 if (maleRadioButton.isChecked()) {
                     gender = "Male";
@@ -154,9 +154,6 @@ public class URegisterFragment extends Fragment {
                     nRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
                 }
 
-
-//                URegisterController uRegisterController = new URegisterController();
-//                uRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
             }
         });
 
