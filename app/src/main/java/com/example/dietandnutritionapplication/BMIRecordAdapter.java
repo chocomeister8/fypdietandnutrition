@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,12 +31,8 @@ public class BMIRecordAdapter extends RecyclerView.Adapter<BMIRecordAdapter.BMIV
     @Override
     public void onBindViewHolder(@NonNull BMIViewHolder holder, int position) {
         BMIDetail bmiDetail = bmiList.get(position);
-        holder.bmiValue.setText(String.format("BMI: %.1f", bmiDetail.getBmi()));
-
-        // Format timestamp to readable date
-        String date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                .format(bmiDetail.getTimestamp());
-        holder.timeStamp.setText(date);
+        holder.bmiTextView.setText(String.format("BMI: %.1f", bmiDetail.getBmi()));
+        holder.timestampTextView.setText(formatDate(bmiDetail.getTimestamp()));
     }
 
     @Override
@@ -44,13 +41,22 @@ public class BMIRecordAdapter extends RecyclerView.Adapter<BMIRecordAdapter.BMIV
     }
 
     static class BMIViewHolder extends RecyclerView.ViewHolder {
-        TextView bmiValue;
-        TextView timeStamp;
+        TextView bmiTextView;
+        TextView timestampTextView;
 
-        BMIViewHolder(View itemView) {
+        public BMIViewHolder(@NonNull View itemView) {
             super(itemView);
-            bmiValue = itemView.findViewById(R.id.bmi_value);
-            timeStamp = itemView.findViewById(R.id.timeStamp);
+            bmiTextView = itemView.findViewById(R.id.bmi_value);
+            timestampTextView = itemView.findViewById(R.id.timeStamp);
         }
+    }
+
+    private String formatDate(long timestamp) {
+        // Create a Date object from the timestamp
+        Date date = new Date(timestamp);
+        // Define a date format
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        // Return the formatted date string
+        return dateFormat.format(date);
     }
 }

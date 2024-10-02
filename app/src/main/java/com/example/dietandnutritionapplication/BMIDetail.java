@@ -1,14 +1,18 @@
 package com.example.dietandnutritionapplication;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class BMIDetail {
     private double bmi;
     private long timestamp;
-    private String documentId; // Add this field
+    private String id;
 
-    public BMIDetail(double bmi, long timestamp, String documentId) { // Update constructor
+    public BMIDetail(double bmi, long timestamp, String id) {
         this.bmi = bmi;
         this.timestamp = timestamp;
-        this.documentId = documentId; // Set documentId
+        this.id = id;
     }
 
     public double getBmi() {
@@ -19,7 +23,14 @@ public class BMIDetail {
         return timestamp;
     }
 
-    public String getDocumentId() {
-        return documentId; // Add this getter
+    public String getId() {
+        return id;
+    }
+
+    // Method to get a formatted date string
+    public String getFormattedDate() {
+        Date date = new Date(timestamp);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+        return sdf.format(date);
     }
 }

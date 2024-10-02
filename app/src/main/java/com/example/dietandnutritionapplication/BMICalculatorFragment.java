@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BMICalculatorFragment extends Fragment {
@@ -28,9 +30,9 @@ public class BMICalculatorFragment extends Fragment {
     private Button pastRecordButton;
     private ImageButton buttonMale, buttonFemale;
     private String selectedGender = ""; // No default gender
-
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+    private List<BMIDetail> bmiList = new ArrayList<>(); // Initialize the BMI list
 
     @Nullable
     @Override
@@ -50,7 +52,7 @@ public class BMICalculatorFragment extends Fragment {
         pastRecordButton = view.findViewById(R.id.PastRecord_button);
         buttonMale = view.findViewById(R.id.button_male);
         buttonFemale = view.findViewById(R.id.button_female);
-        bmiAdvice = view.findViewById(R.id.bmi_advice); // Initialize the advice TextView
+        bmiAdvice = view.findViewById(R.id.bmi_advice);
 
         // Set button backgrounds
         updateButtonBackground(buttonMale, false);
@@ -71,9 +73,10 @@ public class BMICalculatorFragment extends Fragment {
         calculateButton.setOnClickListener(v -> calculateBMIAndBMR());
 
         pastRecordButton.setOnClickListener(v -> {
+            BMIPastRecordFragment pastRecordFragment = new BMIPastRecordFragment(bmiList);
             getActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, new BMIPastRecordFragment())
+                    .replace(R.id.fragment_container, pastRecordFragment)
                     .addToBackStack(null)
                     .commit();
         });
@@ -145,12 +148,13 @@ public class BMICalculatorFragment extends Fragment {
                 .add(bmiData)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(requireContext(), "BMI record added.", Toast.LENGTH_SHORT).show();
+                    // Add the new record to the local list
+                    bmiList.add(new BMIDetail(bmi, System.currentTimeMillis(), userId));
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(requireContext(), "Error adding BMI record: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     private void setBmiAdvice(double bmi) {
         String advice;
