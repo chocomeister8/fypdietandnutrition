@@ -38,7 +38,7 @@ public class userHomePageFragment extends Fragment {
     private final Random random = new Random();
 
     private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "steak", "fish","lamb", "pasta","burger", "curry", "shrimp", "bacon"
+            "chicken", "beef", "steak", "fish","lamb", "pasta","burger", "curry", "shrimp", "bacon", "fried", "grilled", "smoked", "salmon"
     );
 
     private List<String> mealtype = Arrays.asList(

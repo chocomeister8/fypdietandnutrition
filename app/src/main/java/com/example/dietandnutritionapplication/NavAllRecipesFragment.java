@@ -44,7 +44,7 @@ public class NavAllRecipesFragment extends Fragment {
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
 
     private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "noodles", "rice", "steak", "fish", "soup", "lamb", "pasta", "vegetable", "potato", "sandwich", "burger", "curry", "shrimp", "bacon", "mushroom"
+            "chicken", "beef", "steak", "fish", "soup", "lamb", "pasta", "potato", "burger", "curry", "shrimp", "bacon", "fried", "grilled", "smoked", "salmon"
     );
 
     @Nullable
