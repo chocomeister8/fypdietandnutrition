@@ -216,7 +216,7 @@
                     android:background="#E6E0E9"
                     android:ems="10"
                     android:hint="DOB"
-                    android:inputType="date"
+                    android:inputType="none"
                     android:textSize="14sp"
                     app:layout_constraintStart_toEndOf="@+id/firstName"
                     app:layout_constraintTop_toBottomOf="@+id/textView2"

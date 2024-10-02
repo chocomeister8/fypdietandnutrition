@@ -176,7 +176,7 @@ public class FAQFragment extends Fragment{
         for (FAQ faqs : originalFAQ) {
             if (faqs instanceof FAQ) {
                 FAQ searchedFAQ = (FAQ) faqs;
-                if (searchedFAQ.getTitle().toLowerCase().contains(searchText.toLowerCase())) {
+                if (searchedFAQ.getQuestion().toLowerCase().contains(searchText.toLowerCase())) {
                     filteredfaqs.add(searchedFAQ);
                 }
             }

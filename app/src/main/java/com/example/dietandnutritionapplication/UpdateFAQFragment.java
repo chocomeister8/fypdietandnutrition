@@ -28,7 +28,6 @@ public class UpdateFAQFragment extends Fragment {
 
     private FAQ selectedFAQ;
     private TextView faqIdTextView;
-    private EditText titleEditText;
     private EditText questionEditText;
     private EditText answerEditText;
     private EditText datecreatedEditText;
@@ -47,7 +46,6 @@ public class UpdateFAQFragment extends Fragment {
 
         // Find EditText fields
         faqIdTextView = view.findViewById(R.id.faqId);
-        titleEditText = view.findViewById(R.id.titleEdit);
         questionEditText = view.findViewById(R.id.questionEdit);
         answerEditText = view.findViewById(R.id.answerEdit);
         datecreatedEditText = view.findViewById(R.id.dateEdit);
@@ -73,7 +71,6 @@ public class UpdateFAQFragment extends Fragment {
             // Populate EditText fields with selectedFAQ details
             if (selectedFAQ != null) {
                 faqIdTextView.setText(selectedFAQ.getFaqId());
-                titleEditText.setText(selectedFAQ.getTitle());
 
                 questionEditText.setText(selectedFAQ.getQuestion());
                 answerEditText.setText(selectedFAQ.getAnswer());
@@ -93,7 +90,6 @@ public class UpdateFAQFragment extends Fragment {
             public void onClick(View v) {
                 // Call the method to update FAQ in Firestore
 //                updateFAQInFirestore();
-                String updatedTitle = titleEditText.getText().toString();
                 String updatedCategory = categorySpinner.getSelectedItem().toString();
                 String updatedQuestion = questionEditText.getText().toString();
                 String updatedAnswer = answerEditText.getText().toString();
@@ -102,7 +98,7 @@ public class UpdateFAQFragment extends Fragment {
                 if (selectedFAQ != null && selectedFAQ.getFaqId() != null){
                     String id = selectedFAQ.getFaqId();
                     UpdateFAQController updateFAQController = new UpdateFAQController();
-                    updateFAQController.checkUpdateFAQ( id,updatedTitle, updatedCategory, updatedQuestion,  updatedAnswer,  updatedDate,getActivity());
+                    updateFAQController.checkUpdateFAQ( id, updatedCategory, updatedQuestion,  updatedAnswer,  updatedDate,getActivity());
 
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).replaceFragment(new FAQFragment());

@@ -14,9 +14,8 @@ public class FAQ implements Serializable {
 
     }
 
-    public FAQ(String faqId, String title, String category, String question, String answer, String dateCreated) {
+    public FAQ(String faqId, String category, String question, String answer, String dateCreated) {
         this.faqId = faqId;
-        this.title = title;
         this.category = category;
         this.question = question;
         this.answer = answer;
@@ -27,12 +26,6 @@ public class FAQ implements Serializable {
     }
 
     public void setFaqId(String faqId){ this.faqId = faqId;
-    }
-
-    public String getTitle() { return title;
-    }
-
-    public void setTitle(String title) { this.title = title;
     }
 
     public String getCategory() { return category;

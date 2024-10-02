@@ -58,5 +58,8 @@
         <item>Snack</item>
     </string-array>
 
+    <string name="arrow_icon">Arrow Icon</string>
+
+
 
 </resources>

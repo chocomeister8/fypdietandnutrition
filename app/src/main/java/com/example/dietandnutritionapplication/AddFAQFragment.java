@@ -97,18 +97,16 @@ public class AddFAQFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.addfaqpage, container, false);
-        MainActivity mainActivity = (MainActivity) getActivity();
-        titleEditText = view.findViewById(R.id.title);
+
         questionEditText = view.findViewById(R.id.question);
         answerEditText = view.findViewById(R.id.answer);
         addFAQ = view.findViewById(R.id.addFAQ);
-
         categorySpinner = view.findViewById(R.id.faq_category_spinner);
 
         // Create a list of FAQ categories
         List<String> categories = Arrays.asList("General Information", "Account and Profile Management", "Nutrition and Diet Tracking", "Meal Plans and Recipes", "Supported Diets and Preferences", "Health and Fitness Goals");
 
-        // Create an ArrayAdapter using the categories and requireContext() for fragment context
+        // Create an ArrayAdapter using the categories
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -116,30 +114,36 @@ public class AddFAQFragment extends Fragment {
         categorySpinner.setAdapter(adapter);
 
         pd = new ProgressDialog(getActivity());
-
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         addFAQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                String title = titleEditText.getText().toString();
-                String question = questionEditText.getText().toString();
+                String question = questionEditText.getText().toString().trim();
                 String category = categorySpinner.getSelectedItem().toString();
-                String answer = answerEditText.getText().toString();
+                String answer = answerEditText.getText().toString().trim();
 
+                // Check if any field is empty
+                if (question.isEmpty() || answer.isEmpty()) {
+                    Toast.makeText(getContext(), "Please fill in all fields!", Toast.LENGTH_SHORT).show();
+                    return;  // Exit the method if fields are empty
+                }
+
+                // Get current date and time
                 ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Singapore"));
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
                 String date = now.format(formatter);
 
-//                insertFAQ(title, question, answer, date);
+                // Insert FAQ
                 AddFAQController addFAQController = new AddFAQController();
-                addFAQController.checkFAQ(title,category,question,answer,date,pd,getActivity());
+                addFAQController.checkFAQ(category, question, answer, date, pd, getActivity());
+
+                // Redirect to view all FAQs
                 redirectToViewAllFAQs();
             }
-
         });
+
         return view;
     }
 

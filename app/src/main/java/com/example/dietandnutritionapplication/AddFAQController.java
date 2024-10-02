@@ -7,8 +7,8 @@ public class AddFAQController {
     public AddFAQController(){
 
     }
-    public void checkFAQ(String title, String category, String question, String answer, String date, ProgressDialog pd, Context context){
+    public void checkFAQ(String category, String question, String answer, String date, ProgressDialog pd, Context context){
         FAQEntity faqEntity = new FAQEntity();
-        faqEntity.insertFAQ(title,category,question,answer,date,pd,context);
+        faqEntity.insertFAQ(category,question,answer,date,pd,context);
     }
 }

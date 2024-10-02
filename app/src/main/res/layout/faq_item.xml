@@ -15,46 +15,26 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/titletext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Title:"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:paddingStart="4dp"
-            app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/faqTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/titletext"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/categorytext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="4dp"
             android:text="Category:"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:paddingStart="4dp"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toBottomOf="@+id/titletext" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/faqCategory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:textSize="15sp"
             android:maxLines="1"
+            android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/categorytext"
-            app:layout_constraintTop_toBottomOf="@+id/titletext" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/qnstext"

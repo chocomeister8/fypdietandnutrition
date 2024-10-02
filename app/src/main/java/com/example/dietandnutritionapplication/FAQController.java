@@ -18,7 +18,6 @@ public class FAQController extends ArrayAdapter<FAQ> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.faq_item, parent, false);
         }
 
-        TextView titleTextView = convertView.findViewById(R.id.faqTitle);
         TextView questionTextView = convertView.findViewById(R.id.faqQuestion);
         TextView dateCreatedTextView = convertView.findViewById(R.id.faqDateCreated);
         TextView faqAnswerTextView = convertView.findViewById(R.id.faqAnswer);
@@ -32,7 +31,6 @@ public class FAQController extends ArrayAdapter<FAQ> {
 
         // Set review details
         if (faq != null) {
-            titleTextView.setText(faq.getTitle());
             questionTextView.setText(faq.getQuestion());
 
             // Handle answer text

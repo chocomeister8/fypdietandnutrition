@@ -106,6 +106,7 @@ public class URegisterFragment extends Fragment {
         registerButton = view.findViewById(R.id.loginbutton);
         radioGroupRole = view.findViewById(R.id.radioGroupRole);
         registerButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
