@@ -14,6 +14,7 @@
 
         <!-- Header layout with logo and text -->
         <RelativeLayout
+            android:id="@+id/relativeLayout9"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
@@ -29,22 +30,22 @@
                 tools:visibility="visible" />
 
             <ImageView
+                android:id="@+id/logo"
                 android:layout_width="100dp"
                 android:layout_height="70dp"
-                android:id="@+id/logo"
                 android:layout_centerVertical="true"
-                android:src="@drawable/dietdietmusttry_logo"/>
+                android:src="@drawable/dietdietmusttry_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:layout_centerHorizontal="true"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
+                android:text="Personalise Recipes"
+                android:textColor="@android:color/black"
                 android:textSize="20sp"
-                android:text="Personalise Recipes"/>
+                android:textStyle="bold" />
         </RelativeLayout>
 
         <!-- Search Bar with Search Icon -->
@@ -52,97 +53,98 @@
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginTop="120dp"
+            android:layout_below="@+id/relativeLayout9"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="20dp"
-            android:hint="Enter Recipes"
-            android:padding="10dp"
             android:background="@drawable/rounded_search_bar_background"
-            android:inputType="text"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="10dp"
+            android:hint="Enter Recipes"
+            android:inputType="text"
+            android:padding="10dp"
             android:textColor="#000000" />
 
         <!-- Navigation Bar -->
         <FrameLayout
-            android:layout_marginTop="187dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:id="@+id/navigationBar"
-            android:layout_width="125dp"
-            android:layout_height="390dp"
+            android:layout_width="100dp"
+            android:layout_height="650dp"
+            android:layout_below="@+id/search_bar"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/rounded_search_bar_background">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <Button
                     android:id="@+id/button_all_recipes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="All Recipes"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:clickable="true"
+                    android:text="All Recipes"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
                     android:id="@+id/button_vegetarian"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vegetarian"
-                    android:clickable="true"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="Vegetarian"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
                     android:id="@+id/button_favourite"
                     android:layout_width="wrap_content"
-                    android:clickable="true"
                     android:layout_height="wrap_content"
-                    android:text="My Fav"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="My Fav"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
                     android:id="@+id/button_personalise"
                     android:layout_width="wrap_content"
-                    android:clickable="true"
                     android:layout_height="wrap_content"
-                    android:text="Personalise Recipes"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
-                    android:textAlignment="viewStart"
+                    android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="Personalise Recipes"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="10dp" />
 
                 <Button
                     android:id="@+id/button_recipes_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Recipes Status"
                     android:background="@android:color/transparent"
-                    android:textColor="#333333"
                     android:clickable="true"
-                    android:textAlignment="viewStart"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
+                    android:text="Recipes Status"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
                     android:textSize="11dp" />
 
                 <Button
@@ -164,11 +166,12 @@
 
         <!-- Column: Content -->
         <LinearLayout
-            android:layout_width="248dp"
-            android:layout_height="399dp"
+            android:layout_width="300dp"
+            android:layout_height="650dp"
+            android:layout_below="@+id/search_bar"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="180dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="2dp"
             android:background="@drawable/rounded_item_background"
             android:orientation="vertical"
             android:padding="5dp"><!-- Optional: Add background color for visibility -->

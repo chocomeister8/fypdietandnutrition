@@ -60,9 +60,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/relativeLayout8"
-            android:layout_marginStart="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp">
+            android:layout_marginEnd="8dp">
 
             <!-- Search Bar -->
             <EditText
@@ -81,15 +83,33 @@
                 android:textColor="#000000" />
 
             <!-- Add Recipe Button -->
+
+            <!-- Clear Filters Button -->
+
             <Button
                 android:id="@+id/add_recipe_button"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="4dp"
+                android:layout_toStartOf="@+id/clear_filters_button"
                 android:padding="5dp"
                 android:text="Add"
                 android:textColor="@color/black"
-                android:textSize="12dp" />
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/clear_filters_button"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/decline_background"
+                android:padding="4dp"
+                android:text="Clear Filters"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
         </RelativeLayout>
 
         <LinearLayout
@@ -123,16 +143,6 @@
                 android:background="@drawable/rounded_search_bar_background"
                 android:hint="Select Dish Type" />
 
-            <Button
-                android:id="@+id/clear_filters_button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:background="@drawable/decline_background"
-                android:padding="4dp"
-                android:textSize="12dp"
-                android:text="Clear Filters"
-                android:textColor="@android:color/white" />
         </LinearLayout>
 
         <FrameLayout
@@ -143,7 +153,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="12dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/rounded_search_bar_background">
