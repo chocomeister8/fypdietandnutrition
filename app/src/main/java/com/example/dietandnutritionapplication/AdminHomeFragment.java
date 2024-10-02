@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,8 @@ public class AdminHomeFragment extends Fragment {
         ImageView logoutImage = view.findViewById(R.id.right_icon);
         logoutImage.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-            // Switch to guest mode (for nutritionists as guests)
+
+            // Check if the activity is an instance of MainActivityAdmin
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).switchToGuestMode();
                 ((MainActivity) getActivity()).replaceFragment(new LandingFragment());

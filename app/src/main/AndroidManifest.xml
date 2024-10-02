@@ -43,7 +43,6 @@
         <activity android:name=".NutriHomeFragment"/>
         <activity android:name=".BookingHistoryFragment"/>
 
-
     </application>
 
 </manifest>

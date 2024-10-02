@@ -2,6 +2,8 @@ package com.example.dietandnutritionapplication;
 
 import android.content.Context;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class LoginController {
     public LoginController(){
 
@@ -17,4 +19,5 @@ public class LoginController {
             throw new IllegalArgumentException("Context must be an instance of MainActivity");
         }
     }
+
 }

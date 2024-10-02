@@ -17,6 +17,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -409,6 +411,7 @@ public class UserAccountEntity {
                     Toast.makeText(context, "Error querying username: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     public void fetchUserProfile(String userId, final UserProfileCallback callback) {
         db.collection("Users")

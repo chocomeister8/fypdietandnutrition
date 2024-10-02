@@ -1,14 +1,9 @@
 package com.example.dietandnutritionapplication;
 
-import static android.app.PendingIntent.getActivity;
-
-import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
-import android.content.Context;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -70,78 +65,6 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new LandingFragment());
 
     }
-        public void createFAQ(String category, String question, String answer, String dateCreated){
-            FAQ faqcreate = new FAQ();
-            faqcreate.setCategory(category);
-            faqcreate.setQuestion(question);
-            faqcreate.setAnswer(answer);
-            faqcreate.setDateCreated(dateCreated);
-            faqArray.add(faqcreate);
-        }
-
-        public void createAdminAccount(String firstname,String lastname,String username, String password,String phNum,String dob,String email,String gender, String role) {
-            Admin adminCreate = new Admin();
-            adminCreate.setUsername(username);
-            adminCreate.setPhoneNumber(phNum);
-            adminCreate.setPassword(password);
-            adminCreate.setRole(role);
-            adminCreate.setFirstName(firstname);
-            adminCreate.setLastName(lastname);
-            adminCreate.setDob(dob);
-            adminCreate.setEmail(email);
-            adminCreate.setGender(gender);
-            accountArray.add(adminCreate);
-        }
-
-    public Task<AuthResult> createUserAccount(Context context, String firstname, String username, String dob, String email, String phNum, String gender, String password) {
-        return mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Get the newly created user
-                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                        if (firebaseUser != null) {
-                            String userId = firebaseUser.getUid(); // Unique ID for the user
-
-                            // Create a new user object with additional fields
-                            User userCreate = new User();
-                            userCreate.setFirstName(firstname);
-                            userCreate.setUsername(username);
-                            userCreate.setDob(dob);
-                            userCreate.setEmail(email);
-                            userCreate.setPhoneNumber(phNum);
-                            userCreate.setGender(gender);
-                            userCreate.setPassword(password); // Ideally, don't store raw passwords!
-
-                            // Save additional user data to Firestore
-                            FirebaseFirestore db = FirebaseFirestore.getInstance();
-                            db.collection("Users").document(userId).set(userCreate)
-                                    .addOnCompleteListener(task1 -> {
-                                        if (task1.isSuccessful()) {
-                                            // Data successfully saved
-                                            Log.d("Firestore", "User profile saved successfully");
-                                            Toast.makeText(context, "Account registered", Toast.LENGTH_SHORT).show();
-                                            // You need to implement replaceFragment() method properly
-                                            replaceFragment(new LandingFragment());
-                                        } else {
-                                            // Handle failure to save data in Firestore
-                                            Log.e("Firestore", "Failed to save user profile", task1.getException());
-                                            Toast.makeText(context, "Failed to register account in Firestore", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                        }
-                    } else {
-                        // Handle user registration failure
-                        Log.e("Auth", "User registration failed", task.getException());
-                        Toast.makeText(context, "Account registration failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-    }
-        public ArrayList<FAQ> getFAQArray() {
-
-            return faqArray;
-        }
-
 
     public void switchToAdminMode() {
         isAdminMode = true;

@@ -40,6 +40,7 @@ public class viewAccountsFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
     }
 
@@ -60,9 +61,11 @@ public class viewAccountsFragment extends Fragment {
         viewAccountsController.retrieveAccounts(new UserAccountEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Profile> accounts) {
-                profiles.clear(); // Clear the current list
-                profiles.addAll(accounts); // Add the fetched accounts
-                adapter.notifyDataSetChanged(); // Notify the adapter about the new data
+                profiles.clear();
+                profiles.addAll(accounts);
+                originalProfiles.clear();
+                originalProfiles.addAll(accounts);
+                adapter.notifyDataSetChanged();
             }
 
             @Override

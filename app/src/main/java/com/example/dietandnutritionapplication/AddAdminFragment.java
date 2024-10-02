@@ -162,6 +162,8 @@ public class AddAdminFragment extends Fragment {
                 }
                 AddAdminController addAdminController = new AddAdminController();
                 addAdminController.checkRegisterAdmin(firstName, lastName,  userName, dob, email, phone, selectedGender, password, date, getActivity());
+
+                redirectToViewAllAccounts();
             }
 
         });

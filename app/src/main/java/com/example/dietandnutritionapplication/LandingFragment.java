@@ -23,14 +23,12 @@ public class LandingFragment extends Fragment {
         ImageView nutriImageView = view.findViewById(R.id.nutriimg);
         ImageView adminImageView = view.findViewById(R.id.adminimg);
 
-        // Set up click listeners for each role
         userImageView.setOnClickListener(v -> {
             // Switch to guest mode
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).switchToGuestMode();
             }
         });
-
 
         nutriImageView.setOnClickListener(v -> {
             // Switch to nutri mode (for nutritionists as guests)

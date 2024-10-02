@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -72,10 +73,11 @@ public class LoginFragment extends Fragment {
                 String enteredPassword = passwordEditText.getText().toString();
 
                 LoginController loginController = new LoginController();
-                loginController.checkLogin(enteredUsername, enteredPassword, getActivity());
 
+                loginController.checkLogin(enteredUsername, enteredPassword, getActivity());
             }
         });
+
 
         return view;
     }
