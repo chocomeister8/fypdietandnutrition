@@ -90,13 +90,13 @@
         <TextView
             android:id="@+id/forgotPW"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="14dp"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
             android:text="Forget password?"
             android:textColor="#913DA6"
-            android:textSize="12sp"
-            android:layout_marginBottom="16dp" />
+            android:textSize="12sp" />
 
         <!-- Log In Button -->
         <Button

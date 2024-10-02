@@ -25,7 +25,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class LoginFragment extends Fragment {
     private EditText usernameEditText, passwordEditText;
     private Button loginButton;
-    private TextView regiesterText;
+    private TextView forgetPasswordTextView;
     private FirebaseFirestore db;
 
     public LoginFragment() {
@@ -45,6 +45,7 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.login, container, false);
         usernameEditText = view.findViewById(R.id.firstName);
         passwordEditText = view.findViewById(R.id.editTextTextPassword);
+        TextView forgetPW = view.findViewById(R.id.forgotPW);
         loginButton = view.findViewById(R.id.loginbutton);
 
         TextView myTextView = view.findViewById(R.id.noregis);
@@ -54,6 +55,13 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((MainActivity) getActivity()).replaceFragment(new URegisterFragment());
+            }
+        });
+
+        forgetPW.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).replaceFragment(new ForgetPasswordFragment());
             }
         });
 
