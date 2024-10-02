@@ -24,7 +24,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.OnRecipeClickListener {
+public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter.OnRecipeClickListener {
 
     private FirebaseFirestore db;
     private RecyclerView recipesRecyclerView;
@@ -35,7 +35,7 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nav_recipes_status, container, false);
+        View view = inflater.inflate(R.layout.nav_pending_recipes, container, false);
 
         // Initialize Firestore and RecyclerView
         db = FirebaseFirestore.getInstance();
@@ -69,8 +69,8 @@ public class NavRecipesStatusFragment extends Fragment implements RecipeAdapter.
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
         button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
         button_favourite.setOnClickListener(v -> navigateToFragment(new NavFavouriteRecipesFragment()));
-        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
-        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
+        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
+        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
     }
 

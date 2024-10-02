@@ -12,15 +12,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +26,6 @@ import java.util.Random;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NavVegetarianRecipesFragment extends Fragment {
 
@@ -125,14 +120,14 @@ public class NavVegetarianRecipesFragment extends Fragment {
 
         button_personalise_recipes.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavPersonaliseRecipesFragment())
+                    .replace(R.id.frame_layout, new NavCommunityRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });
 
         button_recipes_status.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavRecipesStatusFragment())
+                    .replace(R.id.frame_layout, new NavPendingRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });

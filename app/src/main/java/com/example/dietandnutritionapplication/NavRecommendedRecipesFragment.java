@@ -55,12 +55,11 @@ public class NavRecommendedRecipesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.nav_recommended_recipes, container, false);
 
         firestore = FirebaseFirestore.getInstance();
         fetchUserCalorieGoal();
-
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.nav_recommended_recipes, container, false);
 
         // Initialize buttons using view.findViewById
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
@@ -115,8 +114,8 @@ public class NavRecommendedRecipesFragment extends Fragment {
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
         button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
         button_favourite.setOnClickListener(v -> navigateToFragment(new NavFavouriteRecipesFragment()));
-        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
-        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
+        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
+        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
         button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 

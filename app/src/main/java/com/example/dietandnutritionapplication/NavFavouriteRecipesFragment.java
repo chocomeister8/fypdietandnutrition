@@ -54,7 +54,7 @@ public class NavFavouriteRecipesFragment extends Fragment {
         button_personalise_recipes.setOnClickListener(v -> {
             // Replace current fragment with NavFavouriteRecipesFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavPersonaliseRecipesFragment())
+                    .replace(R.id.frame_layout, new NavCommunityRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });
@@ -62,7 +62,7 @@ public class NavFavouriteRecipesFragment extends Fragment {
         button_recipes_status.setOnClickListener(v -> {
             // Replace current fragment with NavRecipesStatusFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavRecipesStatusFragment())
+                    .replace(R.id.frame_layout, new NavPendingRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });

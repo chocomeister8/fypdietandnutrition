@@ -59,7 +59,7 @@ public class RecipesFolderFragment extends Fragment {
 
         button_recipes_status.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavRecipesStatusFragment())
+                    .replace(R.id.frame_layout, new NavPendingRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });

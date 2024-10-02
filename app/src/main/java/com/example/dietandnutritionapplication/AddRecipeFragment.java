@@ -236,7 +236,7 @@ public class AddRecipeFragment extends Fragment {
 
                     // Redirect to NavRecipesStatusFragment
                     requireActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frame_layout, new NavRecipesStatusFragment())
+                            .replace(R.id.frame_layout, new NavPendingRecipesFragment())
                             .addToBackStack(null)  // Optional: Add to back stack
                             .commit();
 

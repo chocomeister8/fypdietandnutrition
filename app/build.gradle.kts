@@ -63,5 +63,6 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("com.google.mlkit:image-labeling:17.0.7")
     implementation ("com.google.android.gms:play-services-tasks:18.0.2")
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
 }
 

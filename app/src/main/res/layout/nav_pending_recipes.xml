@@ -110,7 +110,7 @@
 
                 <Button
                     android:id="@+id/button_all_recipes"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:clickable="true"
@@ -122,8 +122,21 @@
                     android:textSize="11dp" />
 
                 <Button
+                    android:id="@+id/button_recommendRecipes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="For you"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
+                    android:textSize="11dp" />
+
+                <Button
                     android:id="@+id/button_vegetarian"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:clickable="true"
@@ -136,7 +149,7 @@
 
                 <Button
                     android:id="@+id/button_favourite"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:clickable="true"
@@ -155,7 +168,7 @@
                     android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="Personalise Recipes"
+                    android:text="Community Recipes"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="10dp" />
@@ -168,20 +181,7 @@
                     android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="Recipes Status"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="11dp" />
-
-                <Button
-                    android:id="@+id/button_recommendRecipes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Recommended Recipes"
+                    android:text="Pending Recipes"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="11dp" />

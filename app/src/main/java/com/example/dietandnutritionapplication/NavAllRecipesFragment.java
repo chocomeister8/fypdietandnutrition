@@ -106,8 +106,8 @@ public class NavAllRecipesFragment extends Fragment {
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
         button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
         button_favourite.setOnClickListener(v -> navigateToFragment(new NavFavouriteRecipesFragment()));
-        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavPersonaliseRecipesFragment()));
-        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavRecipesStatusFragment()));
+        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
+        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
         button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 

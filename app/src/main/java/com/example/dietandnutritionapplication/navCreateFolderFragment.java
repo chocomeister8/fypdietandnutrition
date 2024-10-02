@@ -1,7 +1,6 @@
 package com.example.dietandnutritionapplication;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,11 +122,12 @@ public class navCreateFolderFragment extends Fragment {
     private List<Folder> getDefaultFolders() {
         List<Folder> defaultFolders = new ArrayList<>();
         defaultFolders.add(new Folder("All Recipes", false, NavAllRecipesFragment.class));
-        defaultFolders.add(new Folder("Favourite Recipes", false, NavFavouriteRecipesFragment.class));
+        defaultFolders.add(new Folder("For You", false, NavRecommendedRecipesFragment.class));
         defaultFolders.add(new Folder("Vegetarian", false, NavVegetarianRecipesFragment.class));
-        defaultFolders.add(new Folder("Personalise Recipes", false, NavPersonaliseRecipesFragment.class));
-        defaultFolders.add(new Folder("Recipes Status", false, NavRecipesStatusFragment.class));
-        defaultFolders.add(new Folder("Recommended Recipes", false, NavRecommendedRecipesFragment.class));
+        defaultFolders.add(new Folder("Favourite Recipes", false, NavFavouriteRecipesFragment.class));
+        defaultFolders.add(new Folder("Community Recipes", false, NavCommunityRecipesFragment.class));
+        defaultFolders.add(new Folder("Pending Recipes", false, NavPendingRecipesFragment.class));
+
         return defaultFolders;
     }
 
