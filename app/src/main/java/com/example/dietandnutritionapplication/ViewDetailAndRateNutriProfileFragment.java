@@ -76,21 +76,7 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
         reviewsListView = view.findViewById(R.id.listView);
         adapter = new AppReviewController(getContext(), reviews);
         reviewsListView.setAdapter(adapter);
-//        ViewDetailAndRateNutriProfileController viewDetailAndRateNutriProfileController = new ViewDetailAndRateNutriProfileController();
-//        viewDetailAndRateNutriProfileController.retrieveRatings(new NutritionistRatingEntity.DataCallback() {
-//            @Override
-//            public void onSuccess(ArrayList<AppRatingsReviews> ratingList) {
-//                reviews.clear();
-//                reviews.addAll(ratingList);
-//                adapter.notifyDataSetChanged();
-//                filterAllButton.setText("All (" + reviews.size() + ")");
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//                Toast.makeText(getContext(), "Failed to retrieve ratings: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
+
         ViewDetailAndRateNutriProfileController viewDetailAndRateNutriProfileController = new ViewDetailAndRateNutriProfileController();
         viewDetailAndRateNutriProfileController.retrieveRatingsByNutritionist(usernameNutri, new NutritionistRatingEntity.DataCallback() {
             @Override
@@ -98,6 +84,7 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
                 reviews.clear();
                 reviews.addAll(ratingList);
                 adapter.notifyDataSetChanged(); // Refresh UI
+                filterAllButton.setText("All (" + reviews.size() + ")");
             }
 
             @Override
