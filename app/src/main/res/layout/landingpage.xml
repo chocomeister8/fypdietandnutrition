@@ -92,29 +92,5 @@
         app:layout_constraintHorizontal_bias="0.478"
         app:layout_constraintStart_toStartOf="@+id/nutriimg" />
 
-    <ImageView
-        android:id="@+id/adminimg"
-        android:layout_width="125dp"
-        android:layout_height="125dp"
-        android:layout_marginTop="388dp"
-        android:clickable="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout2"
-        app:srcCompat="@drawable/admin_icon" />
-
-    <TextView
-        android:id="@+id/admintext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Admin"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/adminimg"
-        app:layout_constraintEnd_toEndOf="@+id/adminimg"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="@+id/adminimg" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
