@@ -2,7 +2,6 @@ package com.example.dietandnutritionapplication;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ public class ConsultationController {
 
     }
     // Method to retrieve consultations from Firestore
-    public void retrieveConsultations(final ConsultationCallback callback) {
+    public void retrieveNutri(final UserAccountEntity.DataCallback callback) {
         db.collection("consultations")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -32,7 +31,7 @@ public class ConsultationController {
                             Consultation consultation = new Consultation(date, clientName, status);
                             consultationList.add(consultation);
                         }
-                        callback.onSuccess(consultationList);
+                        //callback.onSuccess(consultationList);
                     } else {
                         callback.onFailure(task.getException());
                     }

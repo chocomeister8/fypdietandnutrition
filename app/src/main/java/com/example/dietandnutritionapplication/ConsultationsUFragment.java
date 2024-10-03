@@ -4,14 +4,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,16 +28,12 @@ public class ConsultationsUFragment extends Fragment {
 
     private ListView nutritionistListView;
     private List<Nutritionist> nutritionistList;
-//    private UserConsultationsController adapter;
+    //    private UserConsultationsController adapter;
     private FirebaseFirestore db;
     ArrayList<Profile> nutriAccounts = new ArrayList<>();
     private ProfileAdapter adapter;
     private NutriProfileAdapter nutriProfileAdapter;
     private NutriAdapterTest nutriAdapterTest;
-    ArrayList<Profile> originalProfiles = new ArrayList<>();
-    private EditText searchBar;
-    private String selectedRole = "All Users";
-    private String searchText = "";
 
     @Nullable
     @Override
@@ -50,8 +43,6 @@ public class ConsultationsUFragment extends Fragment {
 
         // Initialize the ListView
         nutritionistListView = view.findViewById(R.id.nutritionist_list_view);
-        searchBar = view.findViewById(R.id.search_bar);
-
 
         // Initialize the list of nutritionists
         nutritionistList = new ArrayList<>();
@@ -68,8 +59,7 @@ public class ConsultationsUFragment extends Fragment {
             public void onSuccess(ArrayList<Profile> accounts) {
                 nutriAccounts.clear(); // Clear the current list
                 nutriAccounts.addAll(accounts); // Add the fetched accounts
-                originalProfiles.clear();
-                originalProfiles.addAll(accounts);
+
                 nutriProfileAdapter.notifyDataSetChanged();
             }
 
@@ -78,65 +68,32 @@ public class ConsultationsUFragment extends Fragment {
                 Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
             }
         });
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+        // Fetch nutritionists from Firestore
+//        loadNutritionistsFromFirestore();
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchText = s.toString(); // Update search text
-                filterProfiles(); // Apply combined filter
-            }
+//        Bitmap janeBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
+//        Bitmap johnBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
+//        // Add dummy data (replace with real data source)
 
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-        nutritionistListView.setOnItemClickListener((parent, view1, position, id) -> {
-            Profile selectedProfile = nutriAccounts.get(position); // Get the selected profile
-
-            // Create a new instance of AccountFragment and pass the selected profile
-            ViewDetailAndRateNutriProfileFragment nutriAccountFragment = new ViewDetailAndRateNutriProfileFragment();
-
-            // Create a bundle to pass data
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("selectedProfile", selectedProfile); // Pass the profile object (make sure Profile implements Serializable)
-            nutriAccountFragment.setArguments(bundle);
-
-            // Replace the current fragment with AccountFragment
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, nutriAccountFragment) // Make sure to replace with the correct container ID
-                    .addToBackStack(null) // Add to back stack so you can navigate back
-                    .commit();
-        });
-
+        // Handle item clicks
+//        nutritionistListView.setOnItemClickListener((parent, view1, position, id) -> {
+//            Nutritionist selectedNutritionist = nutritionistList.get(position);
+//            // Create an instance of NutriViewProfileFragment
+//            NutriViewProfileFragment profileFragment = new NutriViewProfileFragment();
+//
+//            // Create a bundle to pass the email
+//            Bundle args = new Bundle();
+//            args.putString("email", selectedNutritionist.getEmail());
+//            profileFragment.setArguments(args);
+//
+//            // Replace the current fragment with NutriViewProfileFragment
+//            requireActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame_layout, profileFragment)
+//                    .addToBackStack(null)
+//                    .commit();
+//        });
 
         return view;
     }
-    private void filterProfiles() {
-        ArrayList<Profile> filteredProfiles = new ArrayList<>();
 
-        for (Profile profile : originalProfiles) {
-            boolean matchesRole = selectedRole.equals("All Users") ||
-                    (profile instanceof Admin && selectedRole.equals("Admin")) ||
-                    (profile instanceof Nutritionist && selectedRole.equals("Nutritionist")) ||
-                    (profile instanceof User && selectedRole.equals("User"));
-
-            boolean matchesName = searchText.isEmpty() || (
-                    (profile instanceof Admin && ((Admin) profile).getUsername().toLowerCase().contains(searchText.toLowerCase())) ||
-                            (profile instanceof Nutritionist && ((Nutritionist) profile).getFullName().toLowerCase().contains(searchText.toLowerCase())) ||
-                            (profile instanceof User && ((User) profile).getUsername().toLowerCase().contains(searchText.toLowerCase()))
-            );
-
-            // Add to filtered list only if it matches both the role and the name
-            if (matchesRole && matchesName) {
-                filteredProfiles.add(profile);
-            }
-        }
-
-        nutriAccounts.clear();
-        nutriAccounts.addAll(filteredProfiles);
-        nutriProfileAdapter.notifyDataSetChanged(); // Refresh the adapter
-    }
 }

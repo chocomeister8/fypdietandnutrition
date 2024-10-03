@@ -16,13 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ConsultationNFragment extends Fragment {
 
@@ -31,14 +27,11 @@ public class ConsultationNFragment extends Fragment {
     private List<String> availableSlotsList;
     private SlotsAdapter slotsAdapter;
     private String selectedDate = "", selectedTime = "";
-    private FirebaseFirestore firestore;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_consultation_slots, container, false);
-
-        firestore = FirebaseFirestore.getInstance();
 
         // Initialize buttons
         Button button_booking_history = view.findViewById(R.id.booking_history);
@@ -56,16 +49,14 @@ public class ConsultationNFragment extends Fragment {
         availableSlotsList = new ArrayList<>();
 
         // Add some hard-coded available time slots
-//        availableSlotsList.add("10/10/2024, 09:00");
-//        availableSlotsList.add("10/10/2024, 10:00");
-//        availableSlotsList.add("11/10/2024, 14:00");
-//        availableSlotsList.add("12/10/2024, 16:00");
+        availableSlotsList.add("10/10/2024, 09:00");
+        availableSlotsList.add("10/10/2024, 10:00");
+        availableSlotsList.add("11/10/2024, 14:00");
+        availableSlotsList.add("12/10/2024, 16:00");
 
         slotsAdapter = new SlotsAdapter(availableSlotsList);
         recyclerViewSlots.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewSlots.setAdapter(slotsAdapter);
-
-
 
         // Date Picker
         datePickerButton.setOnClickListener(v -> {
@@ -98,7 +89,6 @@ public class ConsultationNFragment extends Fragment {
                 availableSlotsList.add(slot);
                 slotsAdapter.notifyDataSetChanged();
                 Toast.makeText(getContext(), "Slot added: " + slot, Toast.LENGTH_SHORT).show();
-                saveSlotToFirebase(slot);
                 selectedDate = "";
                 selectedTime = "";
                 datePickerButton.setText("Select Date");
@@ -130,23 +120,6 @@ public class ConsultationNFragment extends Fragment {
         });
 
         return view;
-    }
-
-    // Method to save slot to Firebase Firestore
-    private void saveSlotToFirebase(String slot) {
-        // Create a map of the data to be saved
-        Map<String, Object> slotData = new HashMap<>();
-        slotData.put("slot", slot);
-
-        // Save to Firestore under "available_slots" collection
-        firestore.collection("available_slots")
-                .add(slotData)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "Slot saved to Firestore", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to save slot: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
     }
 
     // RecyclerView Adapter for displaying the available slots
