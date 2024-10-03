@@ -93,6 +93,24 @@ public class ConsultationsUFragment extends Fragment {
             public void afterTextChanged(Editable s) {
             }
         });
+        nutritionistListView.setOnItemClickListener((parent, view1, position, id) -> {
+            Profile selectedProfile = nutriAccounts.get(position); // Get the selected profile
+
+            // Create a new instance of AccountFragment and pass the selected profile
+            ViewDetailAndRateNutriProfileFragment nutriAccountFragment = new ViewDetailAndRateNutriProfileFragment();
+
+            // Create a bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedProfile", selectedProfile); // Pass the profile object (make sure Profile implements Serializable)
+            nutriAccountFragment.setArguments(bundle);
+
+            // Replace the current fragment with AccountFragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, nutriAccountFragment) // Make sure to replace with the correct container ID
+                    .addToBackStack(null) // Add to back stack so you can navigate back
+                    .commit();
+        });
+
 
         return view;
     }
