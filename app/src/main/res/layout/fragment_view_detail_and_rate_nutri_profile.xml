@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ViewDetailAndRateNutriProfileFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="162dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/top_background"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/profile_pic"
+                    android:layout_width="163dp"
+                    android:layout_height="170dp"
+                    android:src="@drawable/profile"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+                    app:layout_constraintEnd_toEndOf="@+id/imageView4"
+                    app:layout_constraintHorizontal_bias="0.516"
+                    app:layout_constraintStart_toStartOf="@+id/imageView4"
+                    app:layout_constraintTop_toBottomOf="@+id/imageView4"
+                    app:layout_constraintVertical_bias="0.552" />
+
+                <TextView
+                    android:id="@+id/fullName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nutritionist 1"
+                    android:layout_marginTop="16dp"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@+id/profile_pic"
+                    app:layout_constraintStart_toStartOf="@+id/profile_pic"
+                    app:layout_constraintTop_toBottomOf="@+id/profile_pic" />
+
+                <TextView
+                    android:id="@+id/email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="zawlinhtike@gmail.com"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="@+id/fullName"
+                    app:layout_constraintStart_toStartOf="@+id/fullName"
+                    app:layout_constraintTop_toBottomOf="@+id/fullName" />
+
+                <TextView
+                    android:id="@+id/education"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Education - Certified from UK University"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="@+id/email"
+                    app:layout_constraintStart_toStartOf="@+id/email"
+                    app:layout_constraintTop_toBottomOf="@+id/email" />
+
+                <TextView
+                    android:id="@+id/bio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bio - Singapore"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="@+id/education"
+                    app:layout_constraintStart_toStartOf="@+id/education"
+                    app:layout_constraintTop_toBottomOf="@+id/education" />
+
+                <TextView
+                    android:id="@+id/phoneNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phone - 31"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="@+id/bio"
+                    app:layout_constraintStart_toStartOf="@+id/bio"
+                    app:layout_constraintTop_toBottomOf="@+id/bio" />
+
+                <TextView
+                    android:id="@+id/expertise"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expertise - Vegetarian"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="@+id/phoneNumber"
+                    app:layout_constraintStart_toStartOf="@+id/phoneNumber"
+                    app:layout_constraintTop_toBottomOf="@+id/phoneNumber" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    app:layout_constraintEnd_toEndOf="@+id/expertise"
+                    app:layout_constraintStart_toStartOf="@+id/expertise"
+                    app:layout_constraintTop_toBottomOf="@+id/expertise" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ratings &amp; Reviews"
+                android:textSize="24sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="18dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="32dp"/>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:columnCount="3"
+                android:rowCount="1"
+                android:gravity="center">
+
+                <!-- First Column: Rating and Out of 5 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="2"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingEnd="16dp">
+
+                    <TextView
+                        android:id="@+id/ratingTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="48sp"
+                        android:textColor="@color/black"
+                        android:gravity="center"
+                        android:text="0.0"/>
+
+                    <TextView
+                        android:id="@+id/ratingOutOfTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:gravity="center"
+                        android:text="Out of 5"/>
+
+                </LinearLayout>
+
+                <!-- Second Column: Filter All Button -->
+                <Button
+                    android:id="@+id/filterAllButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All (Total Reviews)"
+                    android:textColor="@color/black"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Third Column: Filter Star Spinner -->
+                <Spinner
+                    android:id="@+id/filterSortSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"/>
+
+            </GridLayout>
+
+            <ListView
+                android:id="@+id/reviewListView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="120dp"/>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

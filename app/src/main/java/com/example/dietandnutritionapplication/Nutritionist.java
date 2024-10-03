@@ -89,4 +89,8 @@ public class Nutritionist extends Profile {
     public String getName() {
         return firstName;
     }
+
+    public String getFullName() {
+        return this.getFirstName() + " " + this.getLastName(); // Combine first and last name
+    }
 }

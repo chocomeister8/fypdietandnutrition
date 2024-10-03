@@ -7,14 +7,14 @@
     android:layout_margin="8dp"
     android:elevation="4dp"
     app:cardCornerRadius="8dp"
-    app:cardBackgroundColor="#FFECB3">
+    app:cardBackgroundColor="#c3f7d1">
 
     <!-- Horizontal layout for items -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="#9DF8EA">
+        android:background="#c3f7d1">
 
         <ImageView
             android:id="@+id/imageView2"
