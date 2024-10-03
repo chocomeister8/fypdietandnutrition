@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class ForgetPasswordFragment extends Fragment {
 
     private EditText emailInput;
-    private Button resetPasswordButton;
+    private Button resetPasswordButton, backButton;
     private TextView messageTextView;
     private FirebaseAuth auth;
 
@@ -36,8 +36,9 @@ public class ForgetPasswordFragment extends Fragment {
         emailInput = view.findViewById(R.id.emailInput);
         resetPasswordButton = view.findViewById(R.id.resetPasswordButton);
         messageTextView = view.findViewById(R.id.messageTextView);
+        backButton = view.findViewById(R.id.Backbutton); // Initialize back button
 
-        // Set onClickListener for the button
+        // Set onClickListener for the reset password button
         resetPasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,6 +64,21 @@ public class ForgetPasswordFragment extends Fragment {
             }
         });
 
-        return view;  // Return the inflated layout
+        // Set onClickListener for the back button
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Check if there are any fragments in the back stack
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    // Pop the current fragment from the back stack
+                    getParentFragmentManager().popBackStack();
+                } else {
+                    // Optionally finish the activity if there are no fragments to go back to
+                    requireActivity().finish(); // Comment or remove this line if you don't want to exit the app
+                }
+            }
+        });
+
+        return view; // Return the inflated layout
     }
 }

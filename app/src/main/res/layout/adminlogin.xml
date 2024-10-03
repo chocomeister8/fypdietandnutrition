@@ -37,10 +37,12 @@
         android:id="@+id/adminimg"
         android:layout_width="125dp"
         android:layout_height="125dp"
+        android:layout_marginTop="8dp"
         android:clickable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:srcCompat="@drawable/admin_icon"
-        tools:layout_editor_absoluteX="142dp" />
+        app:srcCompat="@drawable/admin_icon" />
 
     <!-- Title TextView -->
     <TextView
