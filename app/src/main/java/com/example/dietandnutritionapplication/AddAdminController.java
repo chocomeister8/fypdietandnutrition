@@ -18,7 +18,7 @@ public class AddAdminController {
 
                         // Ensure context is MainActivity before casting
                         if (context instanceof MainActivity) {
-                            ((MainActivity) context).replaceFragment(new LandingFragment());
+                            ((MainActivity) context).replaceFragment(new AdminHomeFragment());
                         } else {
                             Toast.makeText(context, "Error: Context is not an instance of MainActivity", Toast.LENGTH_SHORT).show();
                         }

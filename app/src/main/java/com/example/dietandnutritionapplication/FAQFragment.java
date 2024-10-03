@@ -98,6 +98,9 @@ public class FAQFragment extends Fragment{
                 originalFAQ.addAll(faqs); // Store fetched profiles in the original list
                 faq.clear(); // Clear the filtering list
                 faq.addAll(faqs); // Store profiles for filtering
+
+                sortFAQByDate(true);
+
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
 
@@ -129,13 +132,14 @@ public class FAQFragment extends Fragment{
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterFAQbyTitle(s.toString()); // Filter profiles as the user types
+                filterAndSortFAQ(s.toString()); // Filter profiles as the user types
             }
 
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
+
 
         FAQListView.setOnItemClickListener((parent, view1, position, id) -> {
             FAQ selectedFAQ = faq.get(position); // Get the selected FAQ
@@ -157,6 +161,30 @@ public class FAQFragment extends Fragment{
         return view;
     }
 
+    private void filterAndSortFAQ(String searchText) {
+        // First, filter the FAQ list based on the search text
+        ArrayList<FAQ> filteredfaqs = new ArrayList<>();
+        for (FAQ faqs : originalFAQ) {
+            if (faqs instanceof FAQ) {
+                FAQ searchedFAQ = (FAQ) faqs;
+                if (searchedFAQ.getQuestion().toLowerCase().contains(searchText.toLowerCase())) {
+                    filteredfaqs.add(searchedFAQ);
+                }
+            }
+        }
+
+        // Clear the current faq list and add the filtered ones
+        faq.clear();
+        faq.addAll(filteredfaqs);
+
+        // Now, sort the filtered list based on the spinner selection
+        boolean latestToOldest = filterFAQspinner.getSelectedItemPosition() == 0;
+        sortFAQByDate(latestToOldest);
+
+        // Notify adapter of data changes
+        adapter.notifyDataSetChanged();
+    }
+
     private void sortFAQByDate(final boolean latestToOldest) {
         faq.sort(new Comparator<FAQ>() {
             @Override
@@ -170,19 +198,5 @@ public class FAQFragment extends Fragment{
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
-    }
-    private void filterFAQbyTitle(String searchText) {
-        ArrayList<FAQ> filteredfaqs = new ArrayList<>();
-        for (FAQ faqs : originalFAQ) {
-            if (faqs instanceof FAQ) {
-                FAQ searchedFAQ = (FAQ) faqs;
-                if (searchedFAQ.getQuestion().toLowerCase().contains(searchText.toLowerCase())) {
-                    filteredfaqs.add(searchedFAQ);
-                }
-            }
-        }
-        faq.clear();
-        faq.addAll(filteredfaqs);
-        adapter.notifyDataSetChanged();
     }
 }

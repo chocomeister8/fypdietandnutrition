@@ -48,17 +48,7 @@ public class AdminHomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.adminhomepage, container, false);
         faqCountTextView = view.findViewById(R.id.faqcount);
         barChart = view.findViewById(R.id.accountBarchart);
-
-        ImageView logoutImage = view.findViewById(R.id.right_icon);
-        logoutImage.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-
-            // Check if the activity is an instance of MainActivityAdmin
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToGuestMode();
-                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
-            }
-        });
+        ImageView logoutImage = view.findViewById(R.id.logout_button);
 
         // Find the buttons in the layout
         Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);
@@ -251,12 +241,12 @@ public class AdminHomeFragment extends Fragment {
         }
     }
     private void setupUI(View view) {
-        ImageView logoutImage = view.findViewById(R.id.right_icon);
+        ImageView logoutImage = view.findViewById(R.id.logout_button);
         logoutImage.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToGuestMode();
-                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                ((MainActivity) getActivity()).hideBottomNavigationView();
+                ((MainActivity) getActivity()).replaceFragment(new AdminLoginFragment());
             }
         });
 
