@@ -114,7 +114,16 @@
                     app:layout_constraintTop_toBottomOf="@+id/expertise" />
 
 
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Button
+                android:id="@+id/bookButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Book Consultation"
+                android:textColor="@color/black"
+                android:layout_marginBottom="16dp"/>
             <TextView
                 android:id="@+id/titleTextView"
                 android:layout_width="wrap_content"
