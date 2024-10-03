@@ -9,7 +9,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserDiary {
 
@@ -19,60 +21,48 @@ public class UserDiary {
     private String thoughts;
     private String tags;
     private String username;
-    private String entryContent;
+    private String diaryID;
 
     public UserDiary() {
     }
 
-    public UserDiary(String entryContent) {
-        this.entryContent = entryContent;
-    }
-
-    // Constructor
-    public UserDiary(Timestamp entryDateTime, String mealType, String thoughts, String tags, String username) {
+    public UserDiary(Timestamp entryDateTime, String mealType, String thoughts, String tags, String username, String diaryID) {
         this.entryDateTime = entryDateTime;
         this.mealType = mealType;
         this.thoughts = thoughts;
         this.tags = tags;
         this.username = username;
+        this.diaryID = diaryID;
     }
 
-    // Getter for entryDateTime
     public Timestamp getEntryDateTime() {
         return entryDateTime;
     }
 
-    // Setter for entryDateTime
     public void setEntryDateTime(Timestamp entryDateTime) {
         this.entryDateTime = entryDateTime;
     }
 
-    // Getter for mealType
     public String getMealType() {
         return mealType;
     }
 
-    // Setter for mealType
     public void setMealType(String mealType) {
         this.mealType = mealType;
     }
 
-    // Getter for thoughts
     public String getThoughts() {
         return thoughts;
     }
 
-    // Setter for thoughts
     public void setThoughts(String thoughts) {
         this.thoughts = thoughts;
     }
 
-    // Getter for tags
     public String getTags() {
         return tags;
     }
 
-    // Setter for tags
     public void setTags(String tags) {
         this.tags = tags;
     }
@@ -81,22 +71,31 @@ public class UserDiary {
         return username;
     }
 
-    // Setter for tags
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getEntryContent() {
-        return entryContent;
+    public String getDiaryID() {
+        return diaryID;
     }
+
+    public void setDiaryID(String diaryID) {
+        this.diaryID = diaryID;
+    }
+
 
     public void saveDiaryEntry() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         db.collection("UserDiaries")
                 .add(this)
                 .addOnSuccessListener(documentReference -> {
-                    // Successfully added
+                    setDiaryID(documentReference.getId());
                     Log.d("UserDiary", "Diary entry added with ID: " + documentReference.getId());
+                    db.collection("UserDiaries").document(documentReference.getId())
+                            .update("diaryID", documentReference.getId())
+                            .addOnSuccessListener(aVoid -> Log.d("UserDiary", "DiaryID updated successfully"))
+                            .addOnFailureListener(e -> Log.w("UserDiary", "Error updating diaryID", e));
                 })
                 .addOnFailureListener(e -> {
                     // Handle the error
@@ -116,6 +115,7 @@ public class UserDiary {
                         entry.setMealType(document.getString("mealType"));
                         entry.setThoughts(document.getString("thoughts"));
                         entry.setTags(document.getString("tags"));
+                        entry.setDiaryID(document.getString("diaryID"));
 
                         // Convert the timestamp
                         Date date = document.getDate("entryDateTime");
@@ -135,4 +135,51 @@ public class UserDiary {
     public interface OnDiaryEntriesFetchedListener {
         void onDiaryEntriesFetched(List<UserDiary> diaryEntries);
     }
+
+    public void deleteDiaryEntry(String diaryID, UserDiaryFragment.OnEntryDeletedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("UserDiaries").document(diaryID)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    if (listener != null) {
+                        listener.onEntryDeleted(true); // Notify success
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (listener != null) {
+                        listener.onEntryDeleted(false); // Notify failure
+                    }
+                });
+    }
+
+    public void updateDiaryEntry(String diaryID, UserDiary updatedEntry, UserDiaryFragment.OnEntryUpdatedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        if (diaryID == null) {
+            Log.e("UserDiaryController", "Diary ID is null. Cannot update entry.");
+            if (listener != null) {
+                listener.onEntryUpdated(false);
+            }
+            return;
+        }
+
+        db.collection("UserDiaries")
+                .document(diaryID)
+                .set(updatedEntry)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("UserDiaryController", "Entry updated successfully.");
+                    if (listener != null) {
+                        listener.onEntryUpdated(true);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("UserDiaryController", "Error updating entry: ", e);
+                    if (listener != null) {
+                        listener.onEntryUpdated(false);
+                    }
+                });
+    }
+
+
 }

@@ -1,5 +1,7 @@
 package com.example.dietandnutritionapplication;
 
+import static java.security.AccessController.getContext;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -492,6 +494,22 @@ public class UserAccountEntity {
                     } else {
                         Toast.makeText(context, "Failed to retrieve username: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    public void saveProfileImageUriToFirestore(String imageUrl,Context context) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Log.d("ProfileImage", "entity");
+        // Save the image URL in Firestore under the user's profile
+        DocumentReference userRef = db.collection("Users").document(userId);
+        userRef.update("profileImageUrl", imageUrl)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(context, "Profile picture updated", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreError", "Failed to update profile picture: " + e.getMessage());
+                    Toast.makeText(context, "Failed to update profile picture", Toast.LENGTH_SHORT).show();
                 });
     }
 

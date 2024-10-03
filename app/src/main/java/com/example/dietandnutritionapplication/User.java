@@ -11,13 +11,14 @@ public class User extends Profile {
     private double currentHeight;
     private String activityLevel;
     private String dob;
+    private String profileImageUrl;
 
     public User(){
         this.setRole("user");
         this.setStatus("active");
     }
 
-    public User(String firstName, String lastName, String username, String phoneNumber, String password, String email, String gender, String role, String dateJoined, int calorieLimit, String dob, String dietaryPreference, String foodAllergies, String healthGoal, double currentWeight, double currentHeight, String activityLevel) {
+    public User(String firstName, String lastName, String username, String phoneNumber, String password, String email, String gender, String role, String dateJoined, int calorieLimit, String dob, String dietaryPreference, String foodAllergies, String healthGoal, double currentWeight, double currentHeight, String activityLevel, String profileImageUrl) {
         super(firstName, lastName, username, phoneNumber, password, email, gender, role, dateJoined);
         this.dob = dob;
         this.calorieLimit = calorieLimit;
@@ -27,6 +28,7 @@ public class User extends Profile {
         this.currentWeight = currentWeight;
         this.currentHeight = currentHeight;
         this.activityLevel = activityLevel;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public User(String username, String firstName, String lastName, String email,
@@ -102,4 +104,12 @@ public class User extends Profile {
     public String getDob() { return dob; }
 
     public void setDob(String dob) { this.dob = dob; }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

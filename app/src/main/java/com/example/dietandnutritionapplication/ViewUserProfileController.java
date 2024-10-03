@@ -29,6 +29,11 @@ public class ViewUserProfileController {
         userAccountEntity.getUserById(userId, callback);
     }
 
+    public void uploadProfilePic(String imageUrl,Context context) {
+        Log.d("UploadProfilePic", "Image URL: " + imageUrl);
+        userAccountEntity.saveProfileImageUriToFirestore(imageUrl, context);
+    }
+
     public void checkUserProfileCompletion(String userId, Context context, MainActivity mainActivity) {
        userAccountEntity.fetchUserProfile(userId, new UserAccountEntity.UserProfileCallback() {
             @Override

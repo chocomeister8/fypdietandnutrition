@@ -1,8 +1,13 @@
 package com.example.dietandnutritionapplication;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,8 +27,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +54,12 @@ public class ProfileUFragment extends Fragment {
 
     private String userId;
 
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri imageUri;
+    private ImageView profileImageView;
+    private Button uploadImageButton;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,6 +79,9 @@ public class ProfileUFragment extends Fragment {
             viewUserProfileController = new ViewUserProfileController((MainActivity) requireActivity());
             viewUserProfileController.checkUserProfileCompletion(userId, getContext(), (MainActivity) requireActivity());
             loadUserProfile();
+
+            uploadImageButton.setOnClickListener(v -> openFileChooser());
+
 
             saveButton.setOnClickListener(v -> updateProfile(currentUser.getUid()));
 
@@ -284,9 +301,82 @@ public class ProfileUFragment extends Fragment {
 
         saveButton = view.findViewById(R.id.save_button);
 
+        profileImageView = view.findViewById(R.id.profile_picture);
+        uploadImageButton = view.findViewById(R.id.upload_picture_button);
 
     }
 
+    private void openFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("ProfileImage", "onActivityResult called");
+
+        if (requestCode == PICK_IMAGE_REQUEST) {
+            Log.d("ProfileImage", "Image pick request received");
+
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                imageUri = data.getData();
+                Log.d("ProfileImage", "Image URI obtained: " + imageUri.toString());
+                profileImageView.setImageURI(imageUri); // Preview image
+
+                // Call the method to upload the image
+                uploadImageToFirebaseStorage();
+            } else {
+                Log.e("ProfileImage", "Result not OK or data is null");
+            }
+        } else {
+            Log.e("ProfileImage", "Unexpected request code: " + requestCode);
+        }
+    }
+
+    private void uploadImageToFirebaseStorage() {
+        if (imageUri != null) {
+            Log.d("ProfileImage", "Uploading image to Firebase Storage");
+
+            // Show a progress dialog or progress bar
+            ProgressDialog progressDialog = new ProgressDialog(getContext());
+            progressDialog.setTitle("Uploading Image");
+            progressDialog.setMessage("Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReference()
+                    .child("profile_pictures/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + ".jpg");
+
+            Log.d("ProfileImage", "Storage reference path: " + storageReference.getPath());
+
+
+            storageReference.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        Log.d("ProfileImage", "Image uploaded successfully");
+                        storageReference.getDownloadUrl()
+                                .addOnSuccessListener(uri -> {
+                                    Log.d("ProfileImage", "Download URL obtained: " + uri.toString());
+                                    viewUserProfileController.uploadProfilePic(uri.toString(), getContext());
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("ProfileImage", "Failed to get download URL: " + e.getMessage());
+                                    Toast.makeText(getContext(), "Failed to retrieve download URL", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnCompleteListener(task -> progressDialog.dismiss()); // Dismiss on completion
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("ProfileImage", "Failed to upload image: " + e.getMessage());
+                        Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss(); // Dismiss on failure
+                    });
+        } else {
+            Log.e("ProfileImage", "Image URI is null");
+            Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private String getDietaryPreferences() {
         StringBuilder preferences = new StringBuilder();
@@ -438,6 +528,13 @@ public class ProfileUFragment extends Fragment {
         dateOfBirthData.setText(user.getDob());
         phoneNumberData.setText(user.getPhoneNumber());
         emailAddressData.setText(user.getEmail());
+
+        if (user.getProfileImageUrl() != null) {
+            Glide.with(this)
+                    .load(user.getProfileImageUrl())
+                    .placeholder(R.drawable.profile)  // Fallback image
+                    .into(profileImageView);
+        }
 
         currentWeightData.setText(String.valueOf(user.getCurrentWeight()));
         currentHeightData.setText(String.valueOf(user.getCurrentHeight()));
