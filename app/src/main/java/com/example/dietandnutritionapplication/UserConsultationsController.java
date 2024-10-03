@@ -12,12 +12,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 public class UserConsultationsController extends ArrayAdapter<Nutritionist> {
 
+    private Context context;
+    private List<Nutritionist> nutritionists;
+
     public UserConsultationsController(Context context, List<Nutritionist> nutritionists) {
         super(context, R.layout.fragment_consultations_u, nutritionists);
+        this.context = context;
+        this.nutritionists = nutritionists;
     }
 
     @NonNull
@@ -34,24 +41,17 @@ public class UserConsultationsController extends ArrayAdapter<Nutritionist> {
         TextView name = convertView.findViewById(R.id.nutritionist_name);
         RatingBar rating = convertView.findViewById(R.id.nutritionist_rating);
         TextView info = convertView.findViewById(R.id.nutritionist_info);
+        name.setText(nutritionist.getName());
 
-        if (nutritionist != null) {
-            name.setText(nutritionist.getName());
-            rating.setRating(getRatingFromExpertise(nutritionist.getExpertise()));
-            info.setText(nutritionist.getBio());
-
-            // Set the profile picture
-            if (nutritionist.getProfilePicture() != null) {
-                profilePicture.setImageResource(R.drawable.profile);
-            } else {
-                // Handle case where profilePicture is null (optional)
-                profilePicture.setImageResource(R.drawable.profile); // Placeholder image
-            }
+        // Use Picasso to load the profile image into the ImageView
+        if (nutritionist.getProfilePicture() != null && !nutritionist.getProfilePicture().isEmpty()) {
+            Picasso.get().load(nutritionist.getProfilePicture()).into(profilePicture);
+        } else {
+            // Set a default placeholder image if the profile picture is missing
+            profilePicture.setImageResource(R.drawable.profile);
         }
 
-
-            // Return the completed view to render on screen
-            return convertView;
+        return convertView;
         }
 
 

@@ -37,11 +37,6 @@ public class PendingConsultationsFragment extends Fragment {
         pendingConsultationsRecyclerView = view.findViewById(R.id.pending_consultation_recycler_view);
         pendingConsultationsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Hardcoded data for the prototype
-        consultationList = new ArrayList<>();
-        consultationList.add(new Consultation("1 Oct 2024 (Tue), 10:00 AM", "Mr. John Doe", "Pending"));
-        consultationList.add(new Consultation("15 Oct 2024 (Tue), 2:00 PM", "Ms. Jane Smith", "Pending"));
-        consultationList.add(new Consultation("22 Oct 2024 (Tue), 4:00 PM", "Mr. Michael Lee", "Pending"));
 
         // Set up adapter
         PendingConsultationsAdapter adapter = new PendingConsultationsAdapter(consultationList);
