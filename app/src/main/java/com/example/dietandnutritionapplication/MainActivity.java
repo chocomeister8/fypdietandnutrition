@@ -1,6 +1,7 @@
 package com.example.dietandnutritionapplication;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -14,8 +15,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.dietandnutritionapplication.databinding.ActivityMainBinding;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.FirebaseApp;
@@ -43,11 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
         viewUserProfileController = new ViewUserProfileController(this);
 
-        Admin admin1 = new Admin();
-        admin1.setUsername("admin");
-        admin1.setPassword("admin123");
-        admin1.setRole("admin");
-        accountArray.add(admin1);
+        // Example of fetching user role
+        FirebaseUser user = mAuth.getCurrentUser();
+        String userRole = "guest"; // Default role
 
 
         // Initialize ViewBinding
@@ -58,17 +55,27 @@ public class MainActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-
         });
 
-        setupGuestNavigation();
-        replaceFragment(new LandingFragment());
+        // Navigate based on user role
+        switch (userRole) {
+            case "admin":
+                hideBottomNavigationView();
+                replaceFragment(new AdminLoginFragment());
+                break;
 
+            default: // guest or undefined role
+                setupGuestNavigation();
+                replaceFragment(new LandingFragment());
+                break;
+        }
     }
+
 
     public void switchToAdminMode() {
         isAdminMode = true;
         setupAdminNavigation();
+        showBottomNavigationView();
         replaceFragment(new AdminHomeFragment());
     }
 

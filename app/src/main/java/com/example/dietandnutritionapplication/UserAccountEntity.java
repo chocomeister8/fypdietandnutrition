@@ -7,7 +7,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -359,10 +358,11 @@ public class UserAccountEntity {
                                                                 String role = userDoc.getString("role");
                                                                 String username = userDoc.getString("username");
 
-                                                                // Save the username in SharedPreferences
+                                                                // Save the username and role in SharedPreferences
                                                                 SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
                                                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                                                 editor.putString("loggedInUserName", username);
+                                                                editor.putString("userRole", role); // Store role for future reference
                                                                 editor.apply();
 
                                                                 // Display login success message
@@ -411,7 +411,6 @@ public class UserAccountEntity {
                     Toast.makeText(context, "Error querying username: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     public void fetchUserProfile(String userId, final UserProfileCallback callback) {
         db.collection("Users")

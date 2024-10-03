@@ -8,6 +8,7 @@ public class LoginController {
     public LoginController(){
 
     }
+
     public void checkLogin(String enteredUsername, String enteredPassword, Context context) {
         UserAccountEntity userAccountEntity = new UserAccountEntity();
 
@@ -19,5 +20,4 @@ public class LoginController {
             throw new IllegalArgumentException("Context must be an instance of MainActivity");
         }
     }
-
 }

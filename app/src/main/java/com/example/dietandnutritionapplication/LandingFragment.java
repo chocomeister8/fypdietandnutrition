@@ -21,7 +21,6 @@ public class LandingFragment extends Fragment {
 
         ImageView userImageView = view.findViewById(R.id.userimg);
         ImageView nutriImageView = view.findViewById(R.id.nutriimg);
-        ImageView adminImageView = view.findViewById(R.id.adminimg);
 
         userImageView.setOnClickListener(v -> {
             // Switch to guest mode
@@ -37,12 +36,6 @@ public class LandingFragment extends Fragment {
             }
         });
 
-        adminImageView.setOnClickListener(v -> {
-            // Switch to admin mode
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
-            }
-        });
         userImageView.setOnClickListener(v -> {
             // Switch to admin mode
             if (getActivity() instanceof MainActivity) {
