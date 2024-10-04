@@ -20,7 +20,7 @@ public class Recipe implements Parcelable {
     private List<String> ingredientLines; // List of ingredients
     private double calories; // Calorie count
     private double totalWeight; // Total weight of the recipe in grams
-    private int totalTime; // Total cooking time in minutes
+    private int total_time; // Total cooking time in minutes
     private double caloriesPer100g; // New field for calories per 100g
 
     public Recipe() {
@@ -86,13 +86,17 @@ public class Recipe implements Parcelable {
     public void setCaloriesPer100g(double caloriesPer100g) {
         this.caloriesPer100g = caloriesPer100g;}
 
-    public int getTotalTime() {
-        return totalTime;
+    public int getTotal_Time() {
+        return total_time;
+    }
+
+    public void setTotal_Time(int total_time) {
+        this.total_time = total_time;
     }
 
     // Optionally, add a constructor
     public Recipe(String recipe_id, String userId, String label, String status, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
-                  List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int totalTime) {
+                  List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int total_Time) {
         this.recipe_id = recipe_id;
         this.userId = userId;
         this.label = label;
@@ -107,7 +111,7 @@ public class Recipe implements Parcelable {
         this.ingredientLines = ingredientLines;
         this.calories = calories;
         this.totalWeight = totalWeight;
-        this.totalTime = totalTime;
+        this.total_time = total_Time;
     }
 
     // Parcelable implementation for passing Recipe between fragments
@@ -126,7 +130,7 @@ public class Recipe implements Parcelable {
         ingredientLines = in.createStringArrayList();
         calories = in.readDouble();
         totalWeight = in.readDouble();
-        totalTime = in.readInt();
+        total_time = in.readInt();
     }
 
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
@@ -162,6 +166,6 @@ public class Recipe implements Parcelable {
         dest.writeStringList(ingredientLines);
         dest.writeDouble(calories);
         dest.writeDouble(totalWeight);
-        dest.writeInt(totalTime);
+        dest.writeInt(total_time);
     }
 }

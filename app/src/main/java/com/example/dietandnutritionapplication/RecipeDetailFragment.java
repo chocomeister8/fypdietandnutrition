@@ -56,7 +56,7 @@ public class RecipeDetailFragment extends Fragment {
             titleTextView.setText(recipe.getLabel());
             caloriesTextView.setText(String.format("%.1f kcal", recipe.getCalories()));
             weightTextView.setText(String.format("%.1f g", recipe.getTotalWeight())); // Set text
-            totalTimeTextView.setText(String.format("%d mins", recipe.getTotalTime()));
+            totalTimeTextView.setText(String.format("%d mins", recipe.getTotal_Time()));
             caloriesp100gTextView.setText(String.format("%.2f", recipe.getCaloriesPer100g()));
             mealTypeTextView.setText(String.join(", ", recipe.getMealType()));
             cuisineTypeTextView.setText(String.join(", ", recipe.getCuisineType()));

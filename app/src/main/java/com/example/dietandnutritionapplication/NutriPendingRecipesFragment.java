@@ -110,9 +110,23 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
 
     @Override
     public void onRecipeClick(Recipe recipe) {
-        String recipeId = recipe.getRecipe_id(); // Assuming you have a method to get ID
-        fetchUserRecipes(); // Call this method with the recipe ID
-    }
+        String recipeId = recipe.getRecipe_id(); // Get the recipe ID
 
+        // Create a new instance of NutriRecipeDetailsFragment
+        NutriRecipeDetailsFragment recipeDetailsFragment = new NutriRecipeDetailsFragment();
+
+        // Create a bundle to pass the recipe ID
+        Bundle args = new Bundle();
+        args.putString("recipeId", recipeId);
+
+        // Set the arguments for NutriRecipeDetailsFragment
+        recipeDetailsFragment.setArguments(args);
+
+        // Navigate to NutriRecipeDetailsFragment
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, recipeDetailsFragment)
+                .addToBackStack(null)  // Add to back stack to enable back navigation
+                .commit();
+    }
 
 }
