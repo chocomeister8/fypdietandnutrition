@@ -56,17 +56,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/relativeLayout7"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="20dp">
+            android:layout_marginEnd="8dp">
 
             <!-- Search Bar -->
+
+            <!-- Add Recipe Button -->
             <EditText
                 android:id="@+id/search_bar"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="9dp"
                 android:layout_toStartOf="@+id/add_recipe_button"
                 android:background="@drawable/rounded_search_bar_background"
                 android:drawableStart="@drawable/ic_search"
@@ -76,7 +79,6 @@
                 android:padding="10dp"
                 android:textColor="#000000" />
 
-            <!-- Add Recipe Button -->
             <Button
                 android:id="@+id/add_recipe_button"
                 android:layout_width="wrap_content"
@@ -99,7 +101,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="13dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="50dp"
             android:background="@drawable/rounded_search_bar_background">
 
             <LinearLayout
@@ -196,9 +198,11 @@
             android:layout_height="650dp"
             android:layout_below="@+id/relativeLayout6"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginStart="-10dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="2dp"
+            android:layout_marginBottom="50dp"
             android:layout_toEndOf="@+id/navigationBar"
             android:background="@drawable/recycler_view_bg"
             android:paddingTop="4dp"

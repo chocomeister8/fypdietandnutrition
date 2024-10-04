@@ -20,8 +20,8 @@ public class NutriRecipesFolderFragment extends Fragment {
 
         // Initialize buttons using view.findViewById
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
-        Button button_pending_recipes = view.findViewById(R.id.button_pending_recipes);
-        Button button_approved_recipes = view.findViewById(R.id.button_approved_recipes);
+/*        Button button_pending_recipes = view.findViewById(R.id.button_pending_recipes);
+        Button button_approved_recipes = view.findViewById(R.id.button_approved_recipes);*/
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> {
@@ -32,7 +32,7 @@ public class NutriRecipesFolderFragment extends Fragment {
                     .commit();
         });
 
-        button_pending_recipes.setOnClickListener(v -> {
+/*        button_pending_recipes.setOnClickListener(v -> {
             // Replace current fragment with NavVegetarianRecipesFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout, new NutriPendingRecipesFragment())
@@ -46,7 +46,7 @@ public class NutriRecipesFolderFragment extends Fragment {
                     .replace(R.id.frame_layout, new NutriApprovedRecipesFragment())
                     .addToBackStack(null)
                     .commit();
-        });
+        });*/
 
 
         return view;

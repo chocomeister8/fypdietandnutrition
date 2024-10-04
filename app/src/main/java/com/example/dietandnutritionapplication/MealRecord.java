@@ -1,10 +1,28 @@
 package com.example.dietandnutritionapplication;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+
+import retrofit2.Call;
 
 public class MealRecord {
     private String mealName;
@@ -127,5 +145,210 @@ public class MealRecord {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void fetchMealsLogged(String username, String selectedDateStr, OnMealsFetchedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Log.d("MealLogUFragment", "fetchMealsLogged() date:" + selectedDateStr);
+
+        db.collection("MealRecords")
+                .whereEqualTo("username", username)
+                .get()
+                .addOnCompleteListener(task -> {
+                    Log.d("MealLogUFragment", "fetching username and date " + username);
+                    if (task.isSuccessful()) {
+                        Log.d("MealLogUFragment", "task.isSuccessful()");
+                        List<MealRecord> mealRecords = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            MealRecord mealRecord = document.toObject(MealRecord.class);
+                            // Check if createdDate is a String and convert it to Timestamp or Date
+                            if (document.contains("createdDate")) {
+                                Object createdDateObj = document.get("createdDate");
+                                if (createdDateObj instanceof Timestamp) {
+                                    mealRecord.setCreatedDate((Timestamp) createdDateObj);
+                                } else if (createdDateObj instanceof String) {
+                                    // If it's a string, convert to Timestamp
+                                    String dateString = (String) createdDateObj;
+                                    try {
+                                        // Assuming the date is stored in a standard format, e.g., "yyyy-MM-dd"
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                        Date parsedDate = sdf.parse(dateString);
+                                        mealRecord.setCreatedDate(new Timestamp(parsedDate)); // Convert to Timestamp
+                                    } catch (ParseException e) {
+                                        Log.e("MealLogUFragment", "Error parsing date string: " + dateString, e);
+                                    }
+                                }
+                                if (isSameDate(mealRecord.getCreatedDate(), selectedDateStr)) {
+                                    mealRecords.add(mealRecord);
+                                }
+                            }
+                            listener.onMealsFetched(mealRecords);
+                        }
+                        Log.d("MealLogUFragment", "Fetched meal records: " + mealRecords.size());
+                    } else {
+                        Log.w("MealLogUFragment", "Error getting documents.", task.getException());
+                    }
+                });
+    }
+
+    private boolean isSameDate(Timestamp mealDate, String selectedDateStr) {
+        if (mealDate == null) return false;
+
+        try {
+            // Convert Timestamp to Date
+            Date date = mealDate.toDate();
+
+            // Create a calendar instance for Singapore timezone
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+            calendar.setTime(date);
+
+            // Format the date to "yyyy-MM-dd"
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            dateFormat.setTimeZone(calendar.getTimeZone()); // Set the formatter timezone to Singapore
+            String mealDateFormatted = dateFormat.format(calendar.getTime());
+
+            // Compare the formatted date with the selected date string
+            return selectedDateStr.equals(mealDateFormatted);
+        } catch (Exception e) {
+            Log.e("MealLogFragment", "Error formatting date: " + e.getMessage());
+            return false; // Return false in case of any formatting error
+        }
+    }
+
+    public void fetchUsernameAndCalorielimit(String userId, OnUsernameAndCalorieLimitFetchedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String username = documentSnapshot.getString("username");
+                        double calorieLimit = documentSnapshot.getDouble("calorieLimit");
+
+                        listener.onDataFetched(username, calorieLimit);
+                    } else {
+                        Log.d("User", "No such user document exists!");
+                        listener.onDataFetched(null, -1.0);
+                    }
+                });
+    }
+
+    public void calculateRemainingCalories(String userId, String selectedDate, OnRemainingCaloriesCalculatedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Log.d("CalorieTracking", "SelectedDate: " + selectedDate);
+
+        TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setTimeZone(singaporeTimeZone);
+
+        // Get the calorie limit for the user
+        db.collection("Users").document(userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    String username = document.getString("username");
+                    Log.d("CalorieTracking", "Username: " + username);
+                    int calorieLimit = document.getLong("calorieLimit").intValue();
+                    Log.d("CalorieTracking", "Daily Calorie Limit: " + calorieLimit);
+
+                    // Retrieve logged meals for today
+                    db.collection("MealRecords")
+                            .whereEqualTo("username", username)
+                            .get()
+                            .addOnCompleteListener(mealTask -> {
+                                if (mealTask.isSuccessful()) {
+                                    int totalCalories = 0;
+                                    for (DocumentSnapshot mealDocument : mealTask.getResult()) {
+                                        Log.d("CalorieTracking", "Meal Document: " + mealDocument.getId() + " - Calories: " + mealDocument.getDouble("calories") + " - Created Date: " + mealDocument.getTimestamp("createdDate"));
+                                        if (mealDocument.contains("calories") && mealDocument.contains("createdDate")) {
+                                            Timestamp createdDateTimestamp = mealDocument.getTimestamp("createdDate");
+                                            if (createdDateTimestamp != null) {
+                                                String createdDate = dateFormat.format(createdDateTimestamp.toDate());
+                                                Log.d("CalorieTracking", "Selected Date: " + selectedDate);
+                                                Log.d("CalorieTracking", "Meal Date: " + createdDate);
+                                                // Compare dates
+                                                if (createdDate.equals(selectedDate)) {
+                                                    double mealCalories = mealDocument.getDouble("calories");
+                                                    totalCalories += mealCalories; // Accumulate total calories
+                                                }
+                                            }
+                                        } else {
+                                            Log.w("CalorieTracking", "Calories or createdDate field missing in meal document");
+                                        }
+                                    }
+                                    double remainingCalories = calorieLimit - totalCalories;
+                                    Log.d("CalorieTracking", "Total Calories Consumed: " + totalCalories);
+                                    Log.d("CalorieTracking", "Remaining Calories: " + remainingCalories);
+
+                                    // Call the listener with the results
+
+                                    if (listener != null) {
+                                        listener.onRemainingCaloriesCalculated(calorieLimit, remainingCalories);
+                                    }
+
+                                } else {
+                                    Log.e("CalorieTracking", "Error retrieving meals: ", mealTask.getException());
+                                }
+                            });
+                } else {
+                    Log.e("CalorieTracking", "User document does not exist.");
+                }
+            } else {
+                Log.e("CalorieTracking", "Error fetching user data: ", task.getException());
+            }
+        });
+    }
+
+    public void storeMealData(String userId,String username, String mealName, String selectedMealType, String servingInfo, double adjustedCalories, double adjustedCarbohydrates, double adjustedProtein, double adjustedFat, String selectedDateStr){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
+
+        Map<String, Object> mealData = new HashMap<>();
+        mealData.put("mealName", mealName);
+        mealData.put("mealType", selectedMealType);
+        mealData.put("servingSize", servingInfo);
+        mealData.put("calories", adjustedCalories);
+        mealData.put("carbs", adjustedCalories);
+        mealData.put("proteins", adjustedProtein);
+        mealData.put("fats", adjustedFat);
+
+        try {
+            // Parse the string to a Date object and convert to Timestamp directly
+            Timestamp createdTimestamp = new Timestamp(sdf.parse(selectedDateStr));
+            mealData.put("createdDate", createdTimestamp);
+        } catch (ParseException e) {
+            Log.e("MealLogUFragment", "Error parsing date", e);
+            // Handle error (e.g., use current date if parsing fails)
+            mealData.put("createdDate", new Timestamp(new Date())); // Current date
+        }
+        mealData.put("modifiedDate", null);
+        mealData.put("username", username);
+
+        db.collection("MealRecords")
+                .add(mealData)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("MealLogUFragment", "Meal added with ID: " + documentReference.getId());
+                    //Toast.makeText(activity, "Meal added successfully", Toast.LENGTH_SHORT).show();
+
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("MealLogUFragment", "Error adding meal", e);
+                });
+    }
+
+    public interface OnMealsFetchedListener {
+        void onMealsFetched(List<MealRecord> mealRecords);
+    }
+
+    public interface OnUsernameAndCalorieLimitFetchedListener {
+        void onDataFetched(String username, double calorieLimit);
+    }
+
+
+    public interface OnRemainingCaloriesCalculatedListener {
+        void onRemainingCaloriesCalculated(double calorieLimit, double remainingCalories);
     }
 }
