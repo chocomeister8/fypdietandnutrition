@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -54,6 +56,33 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.1f", recipe.getCaloriesPer100g()));
 
+        // Check if user_ID is available
+        if (recipe.getuserId() != null && !recipe.getuserId().isEmpty()) {
+            // Fetch and display the username dynamically based on user_ID
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("Users").document(recipe.getuserId()).get()
+                    .addOnSuccessListener(userDoc -> {
+                        if (userDoc.exists()) {
+                            String username = userDoc.getString("username");  // Retrieve the username
+                            if (username != null && !username.isEmpty()) {
+                                holder.usernameViewText.setText(String.format("Recipe by: %s", username));  // Set the username in the TextView
+                            } else {
+                                holder.usernameViewText.setText("Recipe by: Unknown user");  // Set default if username is empty
+                            }
+                        } else {
+                            Log.d("RecipeAdapter", "No such user document for user ID: " + recipe.getuserId());
+                            holder.usernameViewText.setText("Recipe by: Unknown user");  // Set a default value if the user is not found
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("RecipeAdapter", "Error fetching user", e);  // Log the error if there's an issue
+                        holder.usernameViewText.setText("Error fetching user");  // Set an error message
+                    });
+        } else {
+            Log.d("RecipeAdapter", "No user_ID for recipe: " + recipe.getLabel());
+            holder.usernameViewText.setText("Recipe by: Online Sources");  // Handle case where user_ID is null or empty
+        }
+
         // Conditionally show or hide the status
         if (showStatus) {
             holder.statusViewText.setText("Status: " + recipe.getStatus());
@@ -77,6 +106,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         });
     }
 
+
+
     @Override
     public int getItemCount() {
         return recipeList.size();
@@ -84,7 +115,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     // ViewHolder class to represent each recipe item view
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, mealTypeTextView, cuisineTypeTextView, caloriesper100gTextView, weightTextView, statusViewText;
+        TextView titleTextView, mealTypeTextView, cuisineTypeTextView, caloriesper100gTextView, weightTextView, statusViewText, usernameViewText;
         ImageView imageView;
 
         public RecipeViewHolder(View itemView) {
@@ -97,6 +128,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             weightTextView = itemView.findViewById(R.id.recipe_weight); // Initialize the weight TextView
             imageView = itemView.findViewById(R.id.recipe_image);
             statusViewText = itemView.findViewById(R.id.status); // Initialize the status TextView
+            usernameViewText = itemView.findViewById(R.id.userName);
         }
     }
 }

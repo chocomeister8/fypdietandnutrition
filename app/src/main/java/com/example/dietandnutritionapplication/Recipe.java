@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Recipe implements Parcelable {
     private String recipe_id;
+    private String userId;
     private String label; // The title of the recipe
     private String status;
     private String image; // URL of the recipe image
@@ -30,6 +31,11 @@ public class Recipe implements Parcelable {
 
     public void setRecipe_id(String recipe_id) {
         this.recipe_id = recipe_id;}
+
+    public String getuserId(){ return userId;}
+
+    public void setUserId(String userId) {
+        this.userId = userId;}
 
     public String getStatus(){ return status;}
 
@@ -85,9 +91,10 @@ public class Recipe implements Parcelable {
     }
 
     // Optionally, add a constructor
-    public Recipe(String recipe_id, String label, String status, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
+    public Recipe(String recipe_id, String userId, String label, String status, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
                   List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int totalTime) {
         this.recipe_id = recipe_id;
+        this.userId = userId;
         this.label = label;
         this.status = status;
         this.image = image;
@@ -106,6 +113,7 @@ public class Recipe implements Parcelable {
     // Parcelable implementation for passing Recipe between fragments
     protected Recipe(Parcel in) {
         recipe_id = in.readString();
+        userId = in.readString();
         label = in.readString();
         status = in.readString();
         image = in.readString();
@@ -141,6 +149,7 @@ public class Recipe implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(recipe_id);
+        dest.writeString(userId);
         dest.writeString(label);
         dest.writeString(status);
         dest.writeString(image);

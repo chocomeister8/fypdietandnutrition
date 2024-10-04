@@ -87,6 +87,7 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
                             recipeList.clear(); // Clear the list before adding new data
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Recipe recipe = document.toObject(Recipe.class);
+                                User user = document.toObject(User.class);
                                 recipe.setRecipe_id(document.getId());
 
                                 // Calculate calories per 100g if total weight is available
@@ -112,4 +113,6 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
         String recipeId = recipe.getRecipe_id(); // Assuming you have a method to get ID
         fetchUserRecipes(); // Call this method with the recipe ID
     }
+
+
 }
