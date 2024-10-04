@@ -6,6 +6,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NutritionistRatingEntity {
     private FirebaseFirestore db;
@@ -122,6 +124,26 @@ public class NutritionistRatingEntity {
                     } else {
                         callback.onFailure(task.getException()); // Notify failure for other errors
                     }
+                });
+    }
+    public void storeNewReview(String title, String review, float star, String date, String username,String nutriName, final NutritionistRatingEntity.DataCallback callback) {
+        // Create a new review object
+        Map<String, Object> newReview = new HashMap<>();
+        newReview.put(FIELD_TITLE, title);
+        newReview.put(FIELD_REVIEW, review);
+        newReview.put(FIELD_STAR, star);
+        newReview.put(FIELD_DATE, date);
+        newReview.put(FIELD_USER, username);
+        newReview.put(FIELD_NutriName, nutriName);
+
+
+        // Store the review in Firestore
+        db.collection(COLLECTION_NAME).add(newReview)
+                .addOnSuccessListener(documentReference -> {
+                    callback.onSuccess(null); // Notify success
+                })
+                .addOnFailureListener(e -> {
+                    callback.onFailure(e); // Notify failure
                 });
     }
 }

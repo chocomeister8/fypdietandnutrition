@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,7 +49,12 @@ public class AppReviewsFragment extends Fragment {
                 reviews.clear();
                 reviews.addAll(ratingList);
                 adapter.notifyDataSetChanged();  // Refresh list
-                filterAllButton.setText("All (" + reviews.size() + ")");  // Update button text
+                filterAllButton.setText("All (" + reviews.size() + ")");
+                float averageRating = calculateAverageRating();
+                ratingTextView.setTextSize(25);
+                DecimalFormat decimalFormat = new DecimalFormat("#.#");
+                String ratingText = decimalFormat.format(averageRating);
+                ratingTextView.setText(ratingText);
 
                 // Log the size of the retrieved list
                 Log.d("AppReviewsFragment", "Number of reviews retrieved: " + ratingList.size());

@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,11 +27,12 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
     private Nutritionist selectedNutri;
     private List<AppRatingsReviews> reviews = new ArrayList<>();
     private ListView reviewsListView;
-    private Button filterAllButton;
+    private Button filterAllButton,rateButton;
     private Spinner filterSortSpinner;
     private TextView ratingTextView;
     private AppReviewController adapter;
     private String usernameNutri;
+    private String totalRatingString;
 
     // TODO: Rename and change types and number of parameters
     public static ViewDetailAndRateNutriProfileFragment newInstance(String param1, String param2) {
@@ -85,6 +87,11 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
                 reviews.addAll(ratingList);
                 adapter.notifyDataSetChanged(); // Refresh UI
                 filterAllButton.setText("All (" + reviews.size() + ")");
+                float averageRating = calculateAverageRating();
+                ratingTextView.setTextSize(25);
+                DecimalFormat decimalFormat = new DecimalFormat("#.#");
+                String ratingText = decimalFormat.format(averageRating);
+                ratingTextView.setText(ratingText);
             }
 
             @Override
@@ -100,6 +107,7 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
         filterAllButton = view.findViewById(R.id.filterAllButton);
         filterSortSpinner = view.findViewById(R.id.filterSortSpinner);
         ratingTextView = view.findViewById(R.id.ratingTextView);
+        rateButton = view.findViewById(R.id.rateButton);
 
         // Set the button text with total reviews count
         filterAllButton.setText("All (" + reviews.size() + ")");
@@ -113,10 +121,7 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
         filterSortSpinner.setAdapter(sortAdapter);
 
         // Set the average rating manually for now with HTML-like formatting
-        float averageRating = calculateAverageRating();
-        ratingTextView.setTextSize(25);
-        String ratingText = String.format("%.1f", averageRating);
-        ratingTextView.setText(ratingText);
+
 
         // Sort reviews by highest rating initially
         sortReviewsByRating();
@@ -155,6 +160,24 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
                 // Reset Spinner selection to default sorting option
                 filterSortSpinner.setSelection(0);
             }
+        });
+
+        rateButton.setOnClickListener(v -> {
+            // Create an instance of RateNutriFragment
+            RateNutriFragment rateNutriFragment = new RateNutriFragment();
+
+            // Create a bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedProfile", selectedProfile); // Pass the profile object
+
+            // Set the arguments for the new fragment
+            rateNutriFragment.setArguments(bundle);
+
+            // Replace the current fragment with RateNutriFragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, rateNutriFragment) // Make sure to replace with the correct container ID
+                    .addToBackStack(null) // Add to back stack so you can navigate back
+                    .commit();
         });
         return view;
     }
