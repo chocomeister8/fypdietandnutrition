@@ -19,8 +19,8 @@ public class NutriApprovedRecipesFragment extends Fragment {
 
         // Initialize buttons using view.findViewById
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
-        Button button_pending_recipes = view.findViewById(R.id.button_pending_recipes);
-        Button button_approved_recipes = view.findViewById(R.id.button_approved_recipes);
+        Button button_pending_recipes = view.findViewById(R.id.button_recipes_status);
+        Button button_approved_recipes = view.findViewById(R.id.button_approved);
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> {
