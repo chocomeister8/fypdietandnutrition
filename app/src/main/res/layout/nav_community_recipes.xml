@@ -54,9 +54,11 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_below="@+id/relativeLayout9"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/rounded_search_bar_background"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="10dp"
@@ -71,9 +73,11 @@
             android:layout_width="100dp"
             android:layout_height="650dp"
             android:layout_below="@+id/search_bar"
+            android:layout_alignParentBottom="true"
             android:layout_marginStart="4dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="50dp"
             android:background="@drawable/rounded_search_bar_background">
 
             <LinearLayout
@@ -170,8 +174,10 @@
             android:layout_height="650dp"
             android:layout_below="@+id/search_bar"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="2dp"
+            android:layout_marginBottom="50dp"
             android:background="@drawable/rounded_item_background"
             android:orientation="vertical"
             android:padding="5dp"><!-- Optional: Add background color for visibility -->

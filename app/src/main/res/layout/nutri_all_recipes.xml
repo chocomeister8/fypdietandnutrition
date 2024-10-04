@@ -139,7 +139,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="12dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="50dp"
             android:background="@drawable/rounded_search_bar_background">
 
             <LinearLayout
@@ -197,9 +197,11 @@
             android:layout_height="650dp"
             android:layout_below="@+id/linearLayout2"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_marginStart="-10dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="2dp"
+            android:layout_marginBottom="50dp"
             android:layout_toEndOf="@+id/navigationBar"
             android:background="@drawable/recycler_view_bg"
             android:paddingTop="4dp"
