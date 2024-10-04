@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,11 +17,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import retrofit2.Call;
@@ -45,6 +50,13 @@ public class userHomePageFragment extends Fragment {
             "lunch","dinner"
     );
 
+    private TextView carbsTextView, proteinsTextView, fatsTextView;
+    private int totalCarbs;
+    private int totalProteins;
+    private int totalFats;
+
+    private UserMealRecordController userMealRecordController;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,6 +64,13 @@ public class userHomePageFragment extends Fragment {
         View view = inflater.inflate(R.layout.user_homepage, container, false);
         firestore = FirebaseFirestore.getInstance();
         fetchUserCalorieGoal();
+
+        userMealRecordController = new UserMealRecordController();
+        carbsTextView = view.findViewById(R.id.carbohydrates_value);
+        proteinsTextView = view.findViewById(R.id.proteins_value);
+        fatsTextView = view.findViewById(R.id.fats_value);
+
+        getTodaysTotalMacronutrients(getUserId());
 
         ImageView reviewIcon = view.findViewById(R.id.reviewIcon);
         ImageView logoutIcon = view.findViewById(R.id.logout_icon);
@@ -104,7 +123,7 @@ public class userHomePageFragment extends Fragment {
         View.OnClickListener buttonClickListener = v -> {
             // Replace current fragment with MealLogPreviewFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new MealLogUFragment())
+                    .replace(R.id.frame_layout, new UserMealRecordFragment())
                     .addToBackStack(null)
                     .commit();
         };
@@ -200,6 +219,54 @@ public class userHomePageFragment extends Fragment {
                 .commit();
 
     }
+
+
+    public void getTodaysTotalMacronutrients(String userId) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String todayDateString = dateFormat.format(new Date());
+
+        userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
+            @Override
+            public void onDataFetched(String username, double calorieLimit) {
+                if (username != null) {
+                    userMealRecordController.fetchMealsLogged(username, todayDateString, new MealRecord.OnMealsFetchedListener() {
+                        @Override
+                        public void onMealsFetched(List<MealRecord> mealRecords) {
+                            if (mealRecords != null && !mealRecords.isEmpty()) {
+                                userMealRecordController.calculateRemainingCalories(userId, todayDateString, new MealRecord.OnRemainingCaloriesCalculatedListener() {
+                                    @Override
+                                    public void onRemainingCaloriesCalculated(double calorieLimit, double remainingCalories) {
+                                        totalCarbs = 0;
+                                        totalProteins = 0;
+                                        totalFats = 0;
+
+                                        // Calculate totals
+                                        for (MealRecord mealRecord : mealRecords) {
+                                            totalCarbs += mealRecord.getCarbs();
+                                            totalProteins += mealRecord.getProteins();
+                                            totalFats += mealRecord.getFats();
+                                        }
+
+                                        if (carbsTextView != null) carbsTextView.setText(totalCarbs + "g");
+
+                                        if (proteinsTextView != null) proteinsTextView.setText(totalProteins + "g");
+
+                                        if (fatsTextView != null) fatsTextView.setText(totalFats + "g");
+                                    }
+                                });
+                            } else {
+                                Log.w("MealLogFragment", "No meal records found.");
+                            }
+
+                        }
+                     });
+
+
+                }
+            }
+        });
+    }
+
 
     private void fetchRecipes(String query, String mealType, String dishType) {
         String app_id = "2c7710ea"; // Your Edamam API app ID

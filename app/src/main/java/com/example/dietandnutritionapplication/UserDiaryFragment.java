@@ -123,7 +123,7 @@ public class UserDiaryFragment extends Fragment {
                 List<UserDiary> filteredEntries = new ArrayList<>();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
                 Log.d("FilterDebug", "Selected Date: " + selectedDate);
-
+                Log.d("FilterDebug", "Fetched diary entries count: " + diaryEntries.size());
                 for (UserDiary entry : diaryEntries) {
                     if (entry.getEntryDateTime() != null) {
                         String entryDate = sdf.format(entry.getEntryDateTime());
@@ -137,9 +137,16 @@ public class UserDiaryFragment extends Fragment {
                     }
                 }
 
-                diaryEntriesContainer.removeAllViews();
-                for (UserDiary entry : filteredEntries) {
-                    addDiaryEntryView(entry);
+                if (filteredEntries.isEmpty()) {
+                    // Display a message indicating no entries found for the selected date
+                    TextView noEntriesTextView = new TextView(getContext()); // 'context' should be your activity or fragment context
+                    noEntriesTextView.setText("No entries found for the selected date. Click 'Clear Filter' to view all.");
+                    noEntriesTextView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    diaryEntriesContainer.addView(noEntriesTextView);
+                } else {
+                    for (UserDiary entry : filteredEntries) {
+                        addDiaryEntryView(entry);
+                    }
                 }
             }
         });
@@ -312,7 +319,7 @@ public class UserDiaryFragment extends Fragment {
             confirmDeleteDiaryEntry(diaryID, success -> {
                 if (success) {
                     Toast.makeText(getContext(), "Entry deleted successfully", Toast.LENGTH_SHORT).show();
-                    // Optionally refresh the diary entries view here
+                    fetchDiaryEntries();
                 } else {
                     Toast.makeText(getContext(), "Failed to delete entry", Toast.LENGTH_SHORT).show();
                 }
