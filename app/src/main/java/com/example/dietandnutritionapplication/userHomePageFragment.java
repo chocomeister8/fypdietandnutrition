@@ -159,7 +159,7 @@ public class userHomePageFragment extends Fragment {
         button_healthReport.setOnClickListener(v -> {
             // Replace current fragment with NavHealthReportFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new HealthReportFragment())
+                    .replace(R.id.frame_layout, new healthReportFragment())
                     .addToBackStack(null)
                     .commit();
         });
