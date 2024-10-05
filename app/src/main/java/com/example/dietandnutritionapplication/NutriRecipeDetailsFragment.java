@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,6 +22,8 @@ public class NutriRecipeDetailsFragment extends Fragment {
     private FirebaseFirestore db;
     private TextView labelTextView, caloriesTextView, cuisineTypeTextView, dishTypeTextView,
             mealTypeTextView, recipeIdTextView, statusTextView, totalWeightTextView, totalTimeTextView, userIdTextView;
+
+    private Button backButton, approveButton, rejectButton;
 
     @Nullable
     @Override
@@ -40,12 +45,27 @@ public class NutriRecipeDetailsFragment extends Fragment {
         totalTimeTextView = view.findViewById(R.id.totalTimeTextView);
         userIdTextView = view.findViewById(R.id.userIdTextView);
 
-        // Retrieve the recipe ID from the arguments
+        backButton = view.findViewById(R.id.backButton);
+        approveButton = view.findViewById(R.id.approveButton);
+        rejectButton = view.findViewById(R.id.rejectButton);
+
+        // Set an OnClickListener for the back button
+        backButton.setOnClickListener(v -> {
+            // Go back to the previous fragment
+            getActivity().onBackPressed();
+        });
+
         if (getArguments() != null) {
             String recipeId = getArguments().getString("recipeId");
 
             // Fetch the recipe details based on the recipe ID
             fetchRecipeDetails(recipeId);
+
+            // Set Approve Button OnClickListener
+            approveButton.setOnClickListener(v -> updateRecipeStatus(recipeId, "Approved"));
+
+            // Set Reject Button OnClickListener
+            rejectButton.setOnClickListener(v -> updateRecipeStatus(recipeId, "Rejected"));
         }
 
         return view;
@@ -83,4 +103,19 @@ public class NutriRecipeDetailsFragment extends Fragment {
                     // Handle failure
                 });
     }
+
+    private void updateRecipeStatus(String recipeId, String status) {
+        db.collection("Recipes").document(recipeId)
+                .update("status", status)
+                .addOnSuccessListener(aVoid -> {
+                    // Successfully updated status
+                    Toast.makeText(getActivity(), "Recipe " + status, Toast.LENGTH_SHORT).show();
+                    statusTextView.setText("Status: " + status); // Update the UI
+                })
+                .addOnFailureListener(e -> {
+                    // Handle failure
+                    Toast.makeText(getActivity(), "Failed to update recipe status", Toast.LENGTH_SHORT).show();
+                });
+    }
 }
+
