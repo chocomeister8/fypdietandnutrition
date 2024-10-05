@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -243,11 +244,23 @@ public class AdminHomeFragment extends Fragment {
     private void setupUI(View view) {
         ImageView logoutImage = view.findViewById(R.id.logout_button);
         logoutImage.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).hideBottomNavigationView();
-                ((MainActivity) getActivity()).replaceFragment(new AdminLoginFragment());
-            }
+            // Create an AlertDialog to confirm logout
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Confirm Logout")
+                    .setMessage("Are you sure you want to log out?")
+                    .setPositiveButton("Log out", (dialog, which) -> {
+                        // User confirmed to log out
+                        Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).switchToGuestMode();
+                            ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        // User cancelled the logout action
+                        dialog.dismiss();
+                    })
+                    .show();
         });
 
         Button viewAccountsButton = view.findViewById(R.id.viewAccountsButton);
