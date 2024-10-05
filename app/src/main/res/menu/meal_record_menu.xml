@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/update_meal"
+        android:title="Update Meal Record" />
+    <item
+        android:id="@+id/delete_meal"
+        android:title="Delete Meal Record" />
+</menu>

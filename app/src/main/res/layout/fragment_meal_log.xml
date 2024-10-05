@@ -295,7 +295,7 @@
                         android:textSize="16sp" />
 
                     <LinearLayout
-                        android:id="@+id/breakfastImageContainer"
+                        android:id="@+id/breakfastLinearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -308,6 +308,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:layout_gravity="center" />
+
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -339,7 +341,7 @@
                         android:textSize="16sp" />
 
                     <LinearLayout
-                        android:id="@+id/lunchImageContainer"
+                        android:id="@+id/lunchLinearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -351,6 +353,7 @@
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:layout_gravity="center" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -383,7 +386,7 @@
                         android:textSize="16sp" />
 
                     <LinearLayout
-                        android:id="@+id/dinnerImageContainer"
+                        android:id="@+id/dinnerLinearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -396,6 +399,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:layout_gravity="center" />
+
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -427,7 +432,7 @@
                         android:textSize="16sp"/>
 
                     <LinearLayout
-                        android:id="@+id/snackImageContainer"
+                        android:id="@+id/snackLinearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -440,6 +445,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="16sp"
                         android:layout_gravity="center" />
+
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

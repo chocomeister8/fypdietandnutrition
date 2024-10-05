@@ -1,9 +1,12 @@
 package com.example.dietandnutritionapplication;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,6 +39,7 @@ public class MealRecord {
     private Timestamp modifiedDate;
     private String servingSize;
     private String username;
+    private String mealRecordID;
 
     public MealRecord() {
     }
@@ -43,7 +47,7 @@ public class MealRecord {
     // Constructor
     public MealRecord(String mealName, double calories, String imageUrl, String mealType,
                       double carbs, double proteins, double fats, Timestamp createdDate,
-                      Timestamp modifiedDate, String servingSize, String username) {
+                      Timestamp modifiedDate, String servingSize, String username, String mealRecordID) {
         this.mealName = mealName;
         this.calories = calories;
         this.imageUrl = imageUrl; // Use the URL for the image
@@ -55,6 +59,7 @@ public class MealRecord {
         this.modifiedDate = modifiedDate;
         this.servingSize = servingSize;
         this.username = username;
+        this.mealRecordID = mealRecordID;
     }
 
     // Getters
@@ -102,6 +107,7 @@ public class MealRecord {
         return username; // Return the username
     }
 
+    public String getMealRecordID() {return mealRecordID;}
     // Setters
     public void setMealName(String mealName) {
         this.mealName = mealName;
@@ -145,6 +151,10 @@ public class MealRecord {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setMealRecordID(String mealRecordID) {
+        this.mealRecordID = mealRecordID;
     }
 
     public void fetchMealsLogged(String username, String selectedDateStr, OnMealsFetchedListener listener) {
@@ -311,9 +321,10 @@ public class MealRecord {
         mealData.put("mealType", selectedMealType);
         mealData.put("servingSize", servingInfo);
         mealData.put("calories", adjustedCalories);
-        mealData.put("carbs", adjustedCalories);
+        mealData.put("carbs", adjustedCarbohydrates);
         mealData.put("proteins", adjustedProtein);
         mealData.put("fats", adjustedFat);
+
 
         try {
             // Parse the string to a Date object and convert to Timestamp directly
@@ -330,6 +341,12 @@ public class MealRecord {
         db.collection("MealRecords")
                 .add(mealData)
                 .addOnSuccessListener(documentReference -> {
+                    setMealRecordID(documentReference.getId());
+                    db.collection("MealRecords").document(documentReference.getId())
+                            .update("mealRecordID", documentReference.getId())
+                            .addOnSuccessListener(aVoid -> Log.d("MealRecords", "ID updated successfully"))
+                            .addOnFailureListener(e -> Log.w("MealRecords", "Error updating ID", e));
+
                     Log.d("MealLogUFragment", "Meal added with ID: " + documentReference.getId());
                     //Toast.makeText(activity, "Meal added successfully", Toast.LENGTH_SHORT).show();
 
@@ -351,4 +368,57 @@ public class MealRecord {
     public interface OnRemainingCaloriesCalculatedListener {
         void onRemainingCaloriesCalculated(double calorieLimit, double remainingCalories);
     }
-}
+
+    public void deleteMealRecord(String mealRecordID, MealRecord.OnMealDeletedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("MealRecords").document(mealRecordID)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Notify that the meal was deleted successfully
+                        listener.onMealDeleted();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Notify if there was an error during the delete operation
+                        listener.onError(e.getMessage());
+                    }
+                });
+    }
+
+    public interface OnMealDeletedListener {
+        void onMealDeleted();
+        void onError(String error);
+    }
+
+
+    public void updateMealRecord(String mealRecordID, MealRecord mealRecord) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Map<String, Object> mealRecordMap = new HashMap<>();
+        mealRecordMap.put("mealType", mealRecord.getMealType());
+        mealRecordMap.put("servingSize", mealRecord.getServingSize());
+        mealRecordMap.put("calories", mealRecord.getCalories());
+        mealRecordMap.put("carbs", mealRecord.getCarbs());
+        mealRecordMap.put("proteins", mealRecord.getProteins());
+        mealRecordMap.put("fats", mealRecord.getFats());
+
+        Timestamp modifiedTimestamp = new Timestamp(new Date());
+        mealRecordMap.put("modifiedDate", modifiedTimestamp);
+
+        // If using Firebase Firestore
+        db.collection("MealRecords")
+                .document(mealRecordID) // Reference to the specific meal record by ID
+                .update(mealRecordMap)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("MealLogFragment", "Meal updated successfully: " + mealRecordID);
+                    // Toast or other feedback can be added here
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("MealLogFragment", "Error updating meal", e);
+                });
+    }}

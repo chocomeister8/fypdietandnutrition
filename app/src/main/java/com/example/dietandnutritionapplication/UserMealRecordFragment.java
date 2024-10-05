@@ -7,14 +7,17 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -27,6 +30,7 @@ import androidx.fragment.app.Fragment;
 
 import android.widget.ImageView;
 
+import java.sql.Time;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,6 +60,7 @@ import com.google.mlkit.vision.label.ImageLabeling;
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import android.Manifest;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import java.util.Map;
@@ -81,11 +86,6 @@ public class UserMealRecordFragment extends Fragment {
 
     private TextView calorieLimitTextView;
 
-    private LinearLayout breakfastImageContainer;
-    private LinearLayout lunchImageContainer;
-    private LinearLayout dinnerImageContainer;
-    private LinearLayout snackImageContainer;
-
     private CardView cardViewBreakfast;
     private CardView cardViewLunch;
     private CardView cardViewDinner;
@@ -110,6 +110,11 @@ public class UserMealRecordFragment extends Fragment {
     private int totalProteins;
     private int totalFats;
     private double totalCalories;
+
+    private LinearLayout breakfastLinearLayout;
+    private LinearLayout lunchLinearLayout;
+    private LinearLayout dinnerLinearLayout;
+    private LinearLayout snackLinearLayout;
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -139,9 +144,13 @@ public class UserMealRecordFragment extends Fragment {
         proteinsTextView = view.findViewById(R.id.proteins_value);
         fatsTextView = view.findViewById(R.id.fats_value);
 
+        breakfastLinearLayout = view.findViewById(R.id.breakfastLinearLayout);
+        lunchLinearLayout = view.findViewById(R.id.lunchLinearLayout);
+        dinnerLinearLayout = view.findViewById(R.id.dinnerLinearLayout);
+        snackLinearLayout = view.findViewById(R.id.snackLinearLayout);
+
         calorieLimitView = view.findViewById(R.id.progress_calorielimit);
         remainingCaloriesView = view.findViewById(R.id.progress_remainingcalorie);
-
 
         calendar = Calendar.getInstance();
 
@@ -155,32 +164,10 @@ public class UserMealRecordFragment extends Fragment {
             userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
                 @Override
                 public void onDataFetched(String username, double calorieLimit) {
-                    if (username != null) {
-                        // Fetch meals logged for the user
-                        userMealRecordController.fetchMealsLogged(username, selectedDateString, new MealRecord.OnMealsFetchedListener() {
-                            @Override
-                            public void onMealsFetched(List<MealRecord> mealRecords) {
-                                if (mealRecords != null && !mealRecords.isEmpty()) {
-                                    updateMealLogUI(mealRecords, selectedDateString, userId);  // Call the method with fetched data
-                                } else {
-                                    Log.w("MealLogFragment", "No meal records found.");
-                                }
-                            }
-                        });
-                        String selectedDate = dateTextView.getText().toString();
-                        userMealRecordController.calculateRemainingCalories(userId, selectedDate, new MealRecord.OnRemainingCaloriesCalculatedListener() {
-                            @Override
-                            public void onRemainingCaloriesCalculated(double calorieLimit, double remainingCalories) {
-                                updateCalorieDisplay(calorieLimit, remainingCalories);
-                            }
-                        });
-                        dateTextView.setOnClickListener(v -> showDatePickerDialog(username, userId));
-                    } else {
-                        Log.w("MealLogFragment", "Username not found, cannot fetch meals.");
-                    }
+                    updateDateTextView(calendar, username, userId);
+                    dateTextView.setOnClickListener(v -> showDatePickerDialog(username, userId));
                 }
             });
-
 
             mealOptionButton1 = view.findViewById(R.id.camera_icon);
             mealOptionButton2 = view.findViewById(R.id.snap_photo_text);
@@ -269,7 +256,7 @@ public class UserMealRecordFragment extends Fragment {
 
                         String selectedDate = dateTextView.getText().toString();
                         if (isFoodLabel(labelText)) {
-                            searchFoodInEdamam(userId, labelText, 100.00, "grams", selectedMealType, selectedDate);
+                            searchFoodInEdamam(userId, labelText, 100.00, "grams", selectedMealType, selectedDate, false, "");
 
 
                         }
@@ -332,7 +319,7 @@ public class UserMealRecordFragment extends Fragment {
 
                   String selectedDate = dateTextView.getText().toString();
                 // Call the function to search for the food and scale nutrients accordingly
-                searchFoodInEdamam(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate);
+                searchFoodInEdamam(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, false, "");
             } else {
                 // Handle empty serving size input (e.g., show an error)
                 Toast.makeText(requireContext(), "Please enter a valid serving size", Toast.LENGTH_SHORT).show();
@@ -343,7 +330,7 @@ public class UserMealRecordFragment extends Fragment {
         builder.create().show();
     }
 
-    public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate) {
+    public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID) {
         userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
             @Override
             public void onDataFetched(String username, double calorielimit) {
@@ -382,24 +369,33 @@ public class UserMealRecordFragment extends Fragment {
                                     String servingInfo = servingSize + " " + servingUnit;
 
                                     Log.d("FoodAPI", "Adjusted Calories: " + adjustedCalories);
-                                    userMealRecordController.storeMealData(userId, username, foodLabel, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDate);
-                                    userMealRecordController.fetchMealsLogged(username, selectedDateString, new MealRecord.OnMealsFetchedListener() {
-                                        @Override
-                                        public void onMealsFetched(List<MealRecord> mealRecords) {
-                                            if (mealRecords != null && !mealRecords.isEmpty()) {
-                                                userMealRecordController.calculateRemainingCalories(userId, selectedDate, new MealRecord.OnRemainingCaloriesCalculatedListener() {
-                                                    @Override
-                                                    public void onRemainingCaloriesCalculated(double calorieLimit, double remainingCalories) {
-                                                        updateCalorieDisplay(calorieLimit, remainingCalories);
-                                                        updateMealLogUI(mealRecords, selectedDateString, userId);
-                                                    }
-                                                });
+                                    boolean apiCallSuccessful = true;
 
-                                            } else {
-                                                Log.w("MealLogFragment", "No meal records found.");
-                                            }
+
+                                    if (apiCallSuccessful) {
+                                        // Check if it's an update or add operation
+                                        if (isUpdate) {
+                                            MealRecord mealRecord = new MealRecord(); // Initialize or fetch the mealRecord object
+                                            mealRecord.setMealType(selectedMealType); // Use the correct updated values
+                                            mealRecord.setServingSize(servingInfo);
+                                            mealRecord.setCalories(adjustedCalories); // Ensure to set the calories and other nutrients
+                                            mealRecord.setCarbs(adjustedCarbohydrates);
+                                            mealRecord.setProteins(adjustedProtein);
+                                            mealRecord.setFats(adjustedFat);
+
+                                            userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
+                                            Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            userMealRecordController.storeMealData(userId, username, foodLabel, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDate);
                                         }
-                                    });
+                                        refreshMealData();
+                                    } else {
+                                        // Handle the case where the API call was unsuccessful
+                                        Log.w("EdamamAPI", "API call failed for food: " + foodName);
+                                        Toast.makeText(getActivity(), "Failed to fetch nutritional data. Please try again.", Toast.LENGTH_SHORT).show();
+                                    }
+
+
                                 }
                             }
                         }
@@ -421,88 +417,296 @@ public class UserMealRecordFragment extends Fragment {
     private void updateMealLogUI(List<MealRecord> mealRecords, String selectedDateString, String userId) {
         Log.d("MealLogFragment", "Selected Date: " + selectedDateString);
 
+        breakfastLinearLayout.removeAllViews();
+        lunchLinearLayout.removeAllViews();
+        dinnerLinearLayout.removeAllViews();
+        snackLinearLayout.removeAllViews();
 
-                totalCarbs = 0;
-                totalProteins = 0;
-                totalFats = 0;
-                StringBuilder breakfastBuilder = new StringBuilder();
-                StringBuilder lunchBuilder = new StringBuilder();
-                StringBuilder dinnerBuilder = new StringBuilder();
-                StringBuilder snackBuilder = new StringBuilder();
+        totalCarbs = 0;
+        totalProteins = 0;
+        totalFats = 0;
 
-                // Clear previous meal entries (optional)
-                breakfastTextView.setText("");
-                lunchTextView.setText("");
-                dinnerTextView.setText("");
-                snackTextView.setText("");
-                Log.d("MealLogFragment", "Meal Records size: " + mealRecords.size());
+        breakfastTextView.setText("");
+        lunchTextView.setText("");
+        dinnerTextView.setText("");
+        snackTextView.setText("");
+        Log.d("MealLogFragment", "Meal Records size: " + mealRecords.size());
 
-                userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
-            @Override
-            public void onDataFetched(String username, double calorieLimit) {
-                for (MealRecord mealRecord : mealRecords) {
-                    String mealName = mealRecord.getMealName();
-                    double mealCalories = mealRecord.getCalories();
-                    double carbs = mealRecord.getCarbs();
-                    double proteins = mealRecord.getProteins();
-                    double fats = mealRecord.getFats();
-                    String servingsize = mealRecord.getServingSize();
+        for (MealRecord mealRecord : mealRecords) {
+            Log.d("MealLogFragment", "line432 Meal Records: " + mealRecord);
+            String mealName = mealRecord.getMealName();
+            double mealCalories = mealRecord.getCalories();
+            double carbs = mealRecord.getCarbs();
+            double proteins = mealRecord.getProteins();
+            double fats = mealRecord.getFats();
+            String servingsize = mealRecord.getServingSize();
 
-                    totalCarbs += carbs;
-                    totalProteins += proteins;
-                    totalFats += fats;
+            totalCarbs += carbs;
+            totalProteins += proteins;
+            totalFats += fats;
 
-                    // Log meal details
-                    Log.d("MealLogFragment", "Added meal: " + mealName + ", Calories: " + mealCalories + ", Carbs: " + carbs + ", Proteins: " + proteins + ", Fats: " + fats);
+            // Log meal details
+            Log.d("MealLogFragment", "Added meal: " + mealName + ", Calories: " + mealCalories + ", Carbs: " + carbs + ", Proteins: " + proteins + ", Fats: " + fats);
 
-                    // Format the meal entry
-                    DecimalFormat decimalFormat = new DecimalFormat("#");
-                    String formattedCalories = decimalFormat.format(mealCalories);
-                    String mealEntry = mealName + " - " + servingsize + " - " + formattedCalories + " Cal\n";  // New line for better formatting
+            // Format the meal entry
+            DecimalFormat decimalFormat = new DecimalFormat("#");
+            String formattedCalories = decimalFormat.format(mealCalories);
+            String mealEntry = mealName + " - " + servingsize + " - " + formattedCalories + " Cal\n";
 
-                    // Append meal entry to the appropriate StringBuilder based on meal type
-                    String mealType = mealRecord.getMealType();
-                    switch (mealType.toLowerCase()) {
-                        case "breakfast":
-                            breakfastBuilder.append(mealEntry);
-                            cardViewBreakfast.setVisibility(View.VISIBLE);
-                            break;
-                        case "lunch":
-                            lunchBuilder.append(mealEntry);
-                            cardViewLunch.setVisibility(View.VISIBLE);
-                            break;
-                        case "dinner":
-                            dinnerBuilder.append(mealEntry);
-                            cardViewDinner.setVisibility(View.VISIBLE);
-                            break;
-                        case "snack":
-                            snackBuilder.append(mealEntry);
-                            cardViewSnack.setVisibility(View.VISIBLE);
-                            break;
-                        default:
-                            Log.e("MealLogFragment", "Unknown meal type: " + mealType);
-                    }
+
+            LinearLayout mealEntryLayout = new LinearLayout(getContext());
+            mealEntryLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mealEntryLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            TextView mealEntryTextView = new TextView(getContext());
+            mealEntryTextView.setText(mealEntry);
+            mealEntryTextView.setTextSize(16);
+            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
+                    0, // width set to 0, weight will adjust its width
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1); // Weight = 1, takes most of the space
+            mealEntryTextView.setLayoutParams(textParams);
+            mealEntryLayout.addView(mealEntryTextView);
+
+            ImageView moreOptionsIcon = new ImageView(getContext());
+            moreOptionsIcon.setImageResource(R.drawable.baseline_more_vert_24);
+            moreOptionsIcon.setContentDescription("More Options");
+
+            mealEntryLayout.addView(moreOptionsIcon);
+
+
+            // Append meal entry to the appropriate StringBuilder based on meal type
+            String mealType = mealRecord.getMealType();
+            switch (mealType.toLowerCase()) {
+                case "breakfast":
+                    breakfastLinearLayout.addView(mealEntryLayout);
+                    cardViewBreakfast.setVisibility(View.VISIBLE);
+                    break;
+                case "lunch":
+                    lunchLinearLayout.addView(mealEntryLayout);
+                    cardViewLunch.setVisibility(View.VISIBLE);
+                    break;
+                case "dinner":
+                    dinnerLinearLayout.addView(mealEntryLayout);
+                    cardViewDinner.setVisibility(View.VISIBLE);
+                    break;
+                case "snack":
+                    snackLinearLayout.addView(mealEntryLayout);
+                    cardViewSnack.setVisibility(View.VISIBLE);
+                    break;
+                default:
+                    Log.e("MealLogFragment", "Unknown meal type: " + mealType);
+            }
+
+            moreOptionsIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Create a PopupMenu
+                    PopupMenu popup = new PopupMenu(getContext(), moreOptionsIcon);
+                    // Inflate the popup menu from a menu resource
+                    popup.getMenuInflater().inflate(R.menu.meal_record_menu, popup.getMenu());
+
+                    // Set a click listener for menu item clicks
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            String mealRecordID = mealRecord.getMealRecordID();
+                            switch (item.getItemId()) {
+                                case R.id.update_meal:
+                                    updateMealRecord(mealRecord, mealRecordID);
+                                    return true;
+                                case R.id.delete_meal:
+                                    String mealTypeD = mealRecord.getMealType();
+                                    deleteMealRecord(mealRecordID, mealTypeD);
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+
+                    // Show the popup menu
+                    popup.show();
                 }
+            });
 
-                // Set the text for each TextView after processing all meal records
-                breakfastTextView.setText(breakfastBuilder.toString());
-                lunchTextView.setText(lunchBuilder.toString());
-                dinnerTextView.setText(dinnerBuilder.toString());
-                snackTextView.setText(snackBuilder.toString());
 
-                if (carbsTextView != null) carbsTextView.setText(totalCarbs + "g");
-                Log.d("MealLogFragment", "Total Carbs: " + totalCarbs + "g");
-                if (proteinsTextView != null) proteinsTextView.setText(totalProteins + "g");
-                Log.d("MealLogFragment", "Total Proteins: " + totalProteins + "g");
-                if (fatsTextView != null) fatsTextView.setText(totalFats + "g");
-                Log.d("MealLogFragment", "Total Fats: " + totalFats + "g");
 
-                Log.d("MealLogFragment", "Finished updating meal log UI for user: " + userId);
+            if (carbsTextView != null) carbsTextView.setText(totalCarbs + "g");
+            Log.d("MealLogFragment", "Total Carbs: " + totalCarbs + "g");
+            if (proteinsTextView != null) proteinsTextView.setText(totalProteins + "g");
+            Log.d("MealLogFragment", "Total Proteins: " + totalProteins + "g");
+            if (fatsTextView != null) fatsTextView.setText(totalFats + "g");
+            Log.d("MealLogFragment", "Total Fats: " + totalFats + "g");
 
+            Log.d("MealLogFragment", "Finished updating meal log UI for user: " + userId);
+
+        }
+
+    }
+
+    private void updateMealRecord(MealRecord mealRecord, String mealRecordID) {
+        // Inflate the dialog layout
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View dialogView = inflater.inflate(R.layout.dialog_update_meal, null);
+
+        Spinner spinnerMealType = dialogView.findViewById(R.id.spinnerMealType);
+        EditText editTextServingSize = dialogView.findViewById(R.id.editTextServingSize);
+        Spinner servingUnitSpinner = dialogView.findViewById(R.id.servingUnitSpinner);
+
+        // Setup the Spinner for serving units (e.g., grams, cups, pieces)
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
+                R.array.serving_units_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        servingUnitSpinner.setAdapter(adapter);
+
+        String servingSizeWithUnit = mealRecord.getServingSize(); // e.g., "50.0 grams"
+        String[] sizeAndUnit = servingSizeWithUnit.split(" ", 2); // Split into two parts: size and unit
+
+        if (sizeAndUnit.length == 2) {
+            editTextServingSize.setText(sizeAndUnit[0]); // Set serving size (first part)
+            int unitPosition = adapter.getPosition(sizeAndUnit[1]); // Get the position of the unit
+            servingUnitSpinner.setSelection(unitPosition); // Set the spinner to the correct position
+        }
+
+        ArrayAdapter<CharSequence> mealadapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.meal_types_array, android.R.layout.simple_spinner_item);
+        mealadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMealType.setAdapter(mealadapter);
+
+        int spinnerPosition = mealadapter.getPosition(mealRecord.getMealType());
+        spinnerMealType.setSelection(spinnerPosition);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Update Meal Record")
+                .setView(dialogView)
+                .setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Retrieve updated information from input fields
+                        String updatedMealType = spinnerMealType.getSelectedItem().toString();
+                        String servingSizeText = editTextServingSize.getText().toString();
+                        double updatedServingSize = 0;
+                        try {
+                            updatedServingSize = Double.parseDouble(servingSizeText);
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(getActivity(), "Invalid serving size", Toast.LENGTH_SHORT).show();
+                            return; // Exit if the input is invalid
+                        }
+
+                        String updatedServingUnit = servingUnitSpinner.getSelectedItem().toString();
+                        String updatedServingSizeWithUnit = updatedServingSize + " " + updatedServingUnit; // Combine size and unit
+
+                        String previousServingSize = mealRecord.getServingSize();
+                        if (!previousServingSize.equals(updatedServingSizeWithUnit)) {
+                            String userId = getCurrentUserId();
+                            String selectedDate = dateTextView.getText().toString();
+                            String mealName = mealRecord.getMealName();
+                            searchFoodInEdamam(userId, mealName, updatedServingSize, updatedServingUnit, updatedMealType, selectedDate, true, mealRecordID);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss(); // Close the dialog without any action
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void deleteMealRecord(String mealRecordID, String mealTypeD) {
+        // Call the controller to delete the meal record from the database
+        userMealRecordController.deleteMealRecord(mealRecordID, new MealRecord.OnMealDeletedListener() {
+            @Override
+            public void onMealDeleted() {
+                // Show success message to the user
+                Toast.makeText(getActivity(), "Meal deleted successfully", Toast.LENGTH_SHORT).show();
+                refreshMealData();
+                checkAndHideEmptyMealTypeCard(mealTypeD);
+                Log.d("MealLogFragment", "After refresh - " + mealTypeD);
+            }
+
+            @Override
+            public void onError(String error) {
+                // Show error message if the delete operation fails
+                Toast.makeText(getActivity(), "Error deleting meal: " + error, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void checkAndHideEmptyMealTypeCard(String mealType) {
+        // Based on the meal type, check the respective LinearLayout
+        if (TextUtils.isEmpty(breakfastTextView.getText())) {
+            cardViewBreakfast.setVisibility(View.GONE);
+        } else {
+            cardViewBreakfast.setVisibility(View.VISIBLE);
+        }
+
+        if (TextUtils.isEmpty(lunchTextView.getText())) {
+            cardViewLunch.setVisibility(View.GONE);
+        } else {
+            cardViewLunch.setVisibility(View.VISIBLE);
+        }
+
+        if (TextUtils.isEmpty(dinnerTextView.getText())) {
+            cardViewDinner.setVisibility(View.GONE);
+        } else {
+            cardViewDinner.setVisibility(View.VISIBLE);
+        }
+
+        if (TextUtils.isEmpty(snackTextView.getText())) {
+            cardViewSnack.setVisibility(View.GONE);
+        } else {
+            cardViewSnack.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void refreshMealData() {
+        userMealRecordController.fetchUsernameAndCalorieLimit(getCurrentUserId(), new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
+            @Override
+            public void onDataFetched(String username, double calorielimit) {
+                if (username != null) {
+                    fetchMealsAndUpdateUI(username);
+                } else {
+                    Log.e("MealLogFragment", "Username not fetched or doesn't exist");
+                }
+            }
+        });
+    }
+
+    private void fetchMealsAndUpdateUI(String username) {
+        TextView dateTextView = getView().findViewById(R.id.dateTextView);
+
+        String selectedDateString = dateTextView.getText().toString();
+
+        userMealRecordController.fetchMealsLogged(username, selectedDateString, new MealRecord.OnMealsFetchedListener() {
+            @Override
+            public void onMealsFetched(List<MealRecord> mealRecords) {
+                if (mealRecords != null && !mealRecords.isEmpty()) {
+                    calculateAndDisplayRemainingCalories(mealRecords);
+                } else {
+                    Log.w("MealLogFragment", "No meal records found.");
+                }
+            }
+        });
+    }
+
+    private void calculateAndDisplayRemainingCalories(List<MealRecord> mealRecords) {
+        TextView dateTextView = getView().findViewById(R.id.dateTextView);
+
+        String selectedDateString = dateTextView.getText().toString();
+
+        userMealRecordController.calculateRemainingCalories(getCurrentUserId(), selectedDateString, new MealRecord.OnRemainingCaloriesCalculatedListener() {
+            @Override
+            public void onRemainingCaloriesCalculated(double calorieLimit, double remainingCalories) {
+                updateCalorieDisplay(calorieLimit, remainingCalories);
+                updateMealLogUI(mealRecords, selectedDateString, getCurrentUserId());
+            }
+        });
+    }
 
     private void clearMealLogUI() {
         // Reset the totals
@@ -606,14 +810,15 @@ public class UserMealRecordFragment extends Fragment {
                 if (mealRecords != null && !mealRecords.isEmpty()) {
                     Log.d("MealLogFragment", "updateDateTextView Fetched " + mealRecords.size() + " meals for date: " + formattedDate);
 
-                    updateMealLogUI(mealRecords, formattedDate, userId);
+
                 } else {
                     Log.w("MealLogFragment", "updateDateTextView No meal records found.");
                     clearMealLogUI();
                 }
-
+                updateMealLogUI(mealRecords, formattedDate, userId);
             }
         });
+
         userMealRecordController.calculateRemainingCalories(userId, formattedDate, new MealRecord.OnRemainingCaloriesCalculatedListener() {
             @Override
             public void onRemainingCaloriesCalculated(double calorieLimit, double remainingCalories) {

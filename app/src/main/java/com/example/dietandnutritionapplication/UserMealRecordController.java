@@ -38,6 +38,16 @@ public class UserMealRecordController {
         mealRecord.fetchUsernameAndCalorielimit(userId, listener);
     }
 
+    public void deleteMealRecord(String mealRecordID, MealRecord.OnMealDeletedListener listener){
+        mealRecord.deleteMealRecord(mealRecordID, listener);;
+    }
+
+    public void updateMealRecord(String mealRecordID, MealRecord mealRecord){
+        mealRecord.updateMealRecord(mealRecordID, mealRecord);;
+    }
+
+
+
 
 
 }
