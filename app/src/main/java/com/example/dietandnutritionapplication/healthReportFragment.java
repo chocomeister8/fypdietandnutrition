@@ -58,7 +58,7 @@ public class healthReportFragment extends Fragment {
         buttonMonthly = view.findViewById(R.id.button_monthly);
         selectedDateTextView = view.findViewById(R.id.selected_date);
         adviceTextView = view.findViewById(R.id.health_advice_text);
-        averageCarbs = view.findViewById(R.id.averageCarbs); // Changed to averageCarbs
+        averageCarbs = view.findViewById(R.id.averageCarbs);
         averageProteins = view.findViewById(R.id.averageProtein);
         averageFats = view.findViewById(R.id.averageFats);
         pieChart = view.findViewById(R.id.pie_chart);
@@ -85,8 +85,6 @@ public class healthReportFragment extends Fragment {
                 }
             }
         });
-
-        adviceTextView = view.findViewById(R.id.health_advice_text); // Initialize TextView for advice
 
         return view;
     }
@@ -115,10 +113,14 @@ public class healthReportFragment extends Fragment {
         datePickerDialog.show();
     }
 
-    // Method to display the selected month using an AlertDialog
+    // Method to display the selected month and year using an AlertDialog
     private void showMonthPickerDialog() {
         String[] months = {"January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"};
+
+        // Fetch current year
+        Calendar calendar = Calendar.getInstance();
+        final int year = calendar.get(Calendar.YEAR);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Select a Month");
@@ -127,11 +129,9 @@ public class healthReportFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String selectedMonth = months[which];
-                selectedDateTextView.setText(selectedMonth);
-                // Fetch current year
-                Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                fetchMonthlyData(selectedMonth, year); // Fetch data for the selected month
+                String selectedMonthYear = selectedMonth + " " + year;
+                selectedDateTextView.setText(selectedMonthYear);
+                fetchMonthlyData(selectedMonth, year);  // Fetch data for the selected month and year
             }
         });
 
@@ -146,7 +146,6 @@ public class healthReportFragment extends Fragment {
         dialog.show();
     }
 
-    // Method to fetch nutritional data for the selected date
     private void fetchNutritionalData(String selectedDate) {
         try {
             // Convert selectedDate from "dd/MM/yyyy" to Date
@@ -156,37 +155,36 @@ public class healthReportFragment extends Fragment {
 
             // Fetch data where createdDate equals the timestamp
             db.collection("MealRecords")
-                    .whereEqualTo("createdDate", timestamp) // Using Timestamp
+                    .whereEqualTo("createdDate", timestamp)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            double totalCarbs = 0; // Changed to totalCarbs
+                            double totalCarbs = 0;
                             double totalProteins = 0;
                             double totalFats = 0;
-                            int count = 0;
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
-                                totalCarbs += (double) data.get("carbs"); // Changed to carbs
+                                totalCarbs += (double) data.get("carbs");
                                 totalProteins += (double) data.get("proteins");
                                 totalFats += (double) data.get("fats");
-                                count++;
                             }
 
-                            if (count > 0) {
-                                double avgCarbs = totalCarbs / count; // Changed to avgCarbs
-                                double avgProteins = totalProteins / count;
-                                double avgFats = totalFats / count;
+                            // Check if there are records found
+                            if (task.getResult().size() > 0) {
+                                // Display totals
+                                averageCarbs.setText(String.format("%.2f", totalCarbs));
+                                averageProteins.setText(String.format("%.2f", totalProteins));
+                                averageFats.setText(String.format("%.2f", totalFats));
 
-                                averageCarbs.setText(String.format("%.2f", avgCarbs)); // Changed to averageCarbs
-                                averageProteins.setText(String.format("%.2f", avgProteins));
-                                averageFats.setText(String.format("%.2f", avgFats));
-                                updatePieChart(avgCarbs, avgProteins, avgFats); // Changed to avgCarbs
+                                // Update Pie Chart with total values
+                                updatePieChart(totalCarbs, totalProteins, totalFats);
 
-                                // Generate nutritional advice based on averages
-                                generateNutritionalAdvice((float) avgProteins, (float) avgCarbs, (float) avgFats); // Changed to include avgCarbs
+                                // Generate nutritional advice based on the totals
+                                generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
                             } else {
-                                Toast.makeText(getContext(), "No records found for the selected date.", Toast.LENGTH_SHORT).show();
+                                // Reset display when no data found
+                                resetDisplay();
                             }
                         } else {
                             Toast.makeText(getContext(), "Error fetching data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -197,8 +195,6 @@ public class healthReportFragment extends Fragment {
             Toast.makeText(getContext(), "Error parsing date: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
-
-    // Method to fetch nutritional data for the selected month
     private void fetchMonthlyData(String selectedMonth, int year) {
         try {
             // Set the start and end dates for the month
@@ -211,38 +207,37 @@ public class healthReportFragment extends Fragment {
             Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
 
             db.collection("MealRecords")
-                    .whereGreaterThanOrEqualTo("createdDate", startTimestamp) // Using Timestamp
-                    .whereLessThanOrEqualTo("createdDate", endTimestamp) // Using Timestamp
+                    .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
+                    .whereLessThanOrEqualTo("createdDate", endTimestamp)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            double totalCarbs = 0; // Changed to totalCarbs
+                            double totalCarbs = 0;
                             double totalProteins = 0;
                             double totalFats = 0;
-                            int count = 0;
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
-                                totalCarbs += (double) data.get("carbs"); // Changed to carbs
+                                totalCarbs += (double) data.get("carbs");
                                 totalProteins += (double) data.get("proteins");
                                 totalFats += (double) data.get("fats");
-                                count++;
                             }
 
-                            if (count > 0) {
-                                double avgCarbs = totalCarbs / count; // Changed to avgCarbs
-                                double avgProteins = totalProteins / count;
-                                double avgFats = totalFats / count;
+                            // Check if there are records found
+                            if (task.getResult().size() > 0) {
+                                // Display totals
+                                averageCarbs.setText(String.format("%.2f", totalCarbs));
+                                averageProteins.setText(String.format("%.2f", totalProteins));
+                                averageFats.setText(String.format("%.2f", totalFats));
 
-                                averageCarbs.setText(String.format("%.2f", avgCarbs)); // Changed to averageCarbs
-                                averageProteins.setText(String.format("%.2f", avgProteins));
-                                averageFats.setText(String.format("%.2f", avgFats));
-                                updatePieChart(avgCarbs, avgProteins, avgFats); // Changed to avgCarbs
+                                // Update Pie Chart with total values
+                                updatePieChart(totalCarbs, totalProteins, totalFats);
 
-                                // Generate nutritional advice based on averages
-                                generateNutritionalAdvice((float) avgProteins, (float) avgCarbs, (float) avgFats); // Changed to include avgCarbs
+                                // Generate nutritional advice based on the totals
+                                generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
                             } else {
-                                Toast.makeText(getContext(), "No records found for the selected month.", Toast.LENGTH_SHORT).show();
+                                // Reset display when no data found
+                                resetDisplay();
                             }
                         } else {
                             Toast.makeText(getContext(), "Error fetching data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -250,9 +245,26 @@ public class healthReportFragment extends Fragment {
                     });
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(getContext(), "Error fetching monthly data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error parsing month: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+    // Method to reset the display when no data is found
+    private void resetDisplay() {
+        // Reset text fields
+        averageCarbs.setText("0.00");
+        averageProteins.setText("0.00");
+        averageFats.setText("0.00");
+
+        // Clear the pie chart
+        pieChart.clear();
+        pieChart.invalidate();
+
+        // Clear nutritional advice
+        adviceTextView.setText("");
+    }
+
+
 
     // Helper method to get month number from month name
     private int getMonthNumber(String month) {
@@ -282,13 +294,18 @@ public class healthReportFragment extends Fragment {
             case "December":
                 return 12;
             default:
-                return 0;
+                return 0; // Invalid month
         }
     }
 
-    // Method to update the PieChart
-    private void updatePieChart(double avgCarbs, double avgProteins, double avgFats) {
-        PieDataSet dataSet = new PieDataSet(getPieEntries(avgCarbs, avgProteins, avgFats), "Nutritional Breakdown");
+    // Method to update the pie chart
+    private void updatePieChart(double carbs, double proteins, double fats) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry((float) carbs, "Carbohydrates"));
+        entries.add(new PieEntry((float) proteins, "Proteins"));
+        entries.add(new PieEntry((float) fats, "Fats"));
+
+        PieDataSet dataSet = new PieDataSet(entries, "Nutritional Composition");
         dataSet.setColors(new int[]{
                 Color.parseColor("#A8DAB5"), // Soft Green
                 Color.parseColor("#A2C2E6"), // Soft Blue
@@ -297,34 +314,25 @@ public class healthReportFragment extends Fragment {
 
         PieData pieData = new PieData(dataSet);
         pieChart.setData(pieData);
-        pieChart.invalidate();
+        pieChart.invalidate(); // refresh the chart
     }
 
-    // Method to get PieEntries for PieChart
-    private ArrayList<PieEntry> getPieEntries(double avgCarbs, double avgProteins, double avgFats) {
-        ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry((float) avgCarbs, "Carbs")); // Changed to avgCarbs
-        entries.add(new PieEntry((float) avgProteins, "Proteins"));
-        entries.add(new PieEntry((float) avgFats, "Fats"));
-        return entries;
-    }
-
-    // Method to generate nutritional advice based on averages
-    private void generateNutritionalAdvice(float avgProteins, float avgCarbs, float avgFats) {
+    // Method to generate nutritional advice based on the averages of carbs, proteins, and fats
+    private void generateNutritionalAdvice(float totalProteins, float totalCarbs, float totalFats) {
         String advice = "";
-        if (avgCarbs < 200) {
+        if (totalCarbs < 200) {
             advice += "Increase your carb intake for balanced energy. ";
         } else {
             advice += "Your carb intake is good. ";
         }
 
-        if (avgProteins < 50) {
+        if (totalProteins < 50) {
             advice += "Consider adding more protein to your diet. ";
         } else {
             advice += "Your protein intake is sufficient. ";
         }
 
-        if (avgFats > 70) {
+        if (totalFats > 70) {
             advice += "Try to reduce your fat intake for better health. ";
         } else {
             advice += "Your fat intake is within a healthy range. ";
