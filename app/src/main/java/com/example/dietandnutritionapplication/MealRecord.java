@@ -40,6 +40,7 @@ public class MealRecord {
     private String servingSize;
     private String username;
     private String mealRecordID;
+    private String userId;
 
     public MealRecord() {
     }
@@ -47,7 +48,7 @@ public class MealRecord {
     // Constructor
     public MealRecord(String mealName, double calories, String imageUrl, String mealType,
                       double carbs, double proteins, double fats, Timestamp createdDate,
-                      Timestamp modifiedDate, String servingSize, String username, String mealRecordID) {
+                      Timestamp modifiedDate, String servingSize, String username, String mealRecordID, String userId) {
         this.mealName = mealName;
         this.calories = calories;
         this.imageUrl = imageUrl; // Use the URL for the image
@@ -60,6 +61,7 @@ public class MealRecord {
         this.servingSize = servingSize;
         this.username = username;
         this.mealRecordID = mealRecordID;
+        this.userId = userId;
     }
 
     // Getters
@@ -100,15 +102,19 @@ public class MealRecord {
     }
 
     public String getServingSize() {
-        return servingSize; // Return the serving size
+        return servingSize;
     }
 
     public String getUsername() {
-        return username; // Return the username
+        return username;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public String getMealRecordID() {return mealRecordID;}
-    // Setters
+
     public void setMealName(String mealName) {
         this.mealName = mealName;
     }
@@ -151,6 +157,10 @@ public class MealRecord {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public void setMealRecordID(String mealRecordID) {
@@ -336,6 +346,7 @@ public class MealRecord {
             mealData.put("createdDate", new Timestamp(new Date())); // Current date
         }
         mealData.put("modifiedDate", null);
+        mealData.put("userId", userId);
         mealData.put("username", username);
 
         db.collection("MealRecords")
