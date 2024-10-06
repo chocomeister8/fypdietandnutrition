@@ -75,8 +75,6 @@ public class UserMealRecordFragment extends Fragment {
     private TextView dateTextView;
     private Calendar calendar;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
-
     private static final int REQUEST_CAMERA_PERMISSION = 100;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private ActivityResultLauncher<Intent> takePictureLauncher;
@@ -156,9 +154,9 @@ public class UserMealRecordFragment extends Fragment {
 
         if (currentUser != null) {
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
-            String selectedDateString = dateFormat.format(calendar.getTime());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+            String selectedDateString = sdf.format(calendar.getTime());
             dateTextView.setText(selectedDateString);
 
             userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
@@ -798,6 +796,8 @@ public class UserMealRecordFragment extends Fragment {
 
     private void updateDateTextView(Calendar calendar, String username, String userId) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+
         String formattedDate = dateFormat.format(calendar.getTime());
         dateTextView.setText(formattedDate);
 
@@ -840,6 +840,7 @@ public class UserMealRecordFragment extends Fragment {
     }
 
     private void showDatePickerDialog(String username, String userId) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 getContext(),
                 (view, year, month, dayOfMonth) -> {
