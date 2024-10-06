@@ -16,35 +16,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="end">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
             <TextView
-                android:id="@+id/editTextView"
-                android:layout_width="wrap_content"
+                android:id="@+id/diaryTitle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Edit"
-                android:textColor="@android:color/black"
-                android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
-                android:clickable="true"/>
+                android:layout_weight="1"
+                android:text="Diary Entry Title"
+                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/deleteTextView"
+            <!-- More options icon aligned to the right -->
+            <ImageView
+                android:id="@+id/moreOptionsIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="x"
-                android:textColor="@android:color/holo_red_light"
-                android:paddingBottom="8dp"
-                android:clickable="true"
-                android:textSize="20sp"/>
+                android:src="@drawable/baseline_more_vert_24"
+                android:contentDescription="More Options"
+                android:clickable="true" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/diaryTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Diary Entry Title"
-            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/diaryDescription"
