@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import java.util.TimeZone;
 import com.google.firebase.Timestamp;
 
 import android.app.DatePickerDialog;
@@ -38,7 +39,7 @@ import android.app.AlertDialog;
 public class healthReportFragment extends Fragment {
 
     private Button buttonDaily, buttonMonthly;
-    private TextView selectedDateTextView, adviceTextView, averageCarbs, averageProteins, averageFats;
+    private TextView selectedDateTextView, adviceTextView, averageCalories, averageProteins, averageFats;
     private PieChart pieChart;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -58,7 +59,7 @@ public class healthReportFragment extends Fragment {
         buttonMonthly = view.findViewById(R.id.button_monthly);
         selectedDateTextView = view.findViewById(R.id.selected_date);
         adviceTextView = view.findViewById(R.id.health_advice_text);
-        averageCarbs = view.findViewById(R.id.averageCarbs);
+        averageCalories = view.findViewById(R.id.averageCalories);  // Updated to include calories
         averageProteins = view.findViewById(R.id.averageProtein);
         averageFats = view.findViewById(R.id.averageFats);
         pieChart = view.findViewById(R.id.pie_chart);
@@ -150,21 +151,42 @@ public class healthReportFragment extends Fragment {
         try {
             // Convert selectedDate from "dd/MM/yyyy" to Date
             SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy");
+            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Use UTC time zone for parsing
             Date date = inputFormat.parse(selectedDate);
-            Timestamp timestamp = new Timestamp(date);
 
-            // Fetch data where createdDate equals the timestamp
+            // Set the start timestamp for the day (00:00:00 UTC)
+            Calendar startCalendar = Calendar.getInstance();
+            startCalendar.setTime(date);
+            startCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            startCalendar.set(Calendar.MINUTE, 0);
+            startCalendar.set(Calendar.SECOND, 0);
+            startCalendar.set(Calendar.MILLISECOND, 0);
+            Timestamp startTimestamp = new Timestamp(startCalendar.getTime());
+
+            // Set the end timestamp for the day (23:59:59.999 UTC)
+            Calendar endCalendar = Calendar.getInstance();
+            endCalendar.setTime(date);
+            endCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            endCalendar.set(Calendar.MINUTE, 59);
+            endCalendar.set(Calendar.SECOND, 59);
+            endCalendar.set(Calendar.MILLISECOND, 999);
+            Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
+
+            // Fetch data for the day using a range
             db.collection("MealRecords")
-                    .whereEqualTo("createdDate", timestamp)
+                    .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
+                    .whereLessThan("createdDate", endTimestamp)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            double totalCalories = 0;  // Added variable for total calories
                             double totalCarbs = 0;
                             double totalProteins = 0;
                             double totalFats = 0;
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
+                                totalCalories += (double) data.get("calories");  // Fetch calories from database
                                 totalCarbs += (double) data.get("carbs");
                                 totalProteins += (double) data.get("proteins");
                                 totalFats += (double) data.get("fats");
@@ -173,12 +195,12 @@ public class healthReportFragment extends Fragment {
                             // Check if there are records found
                             if (task.getResult().size() > 0) {
                                 // Display totals
-                                averageCarbs.setText(String.format("%.2f", totalCarbs));
+                                averageCalories.setText(String.format("%.2f", totalCalories));  // Display calories
                                 averageProteins.setText(String.format("%.2f", totalProteins));
                                 averageFats.setText(String.format("%.2f", totalFats));
 
                                 // Update Pie Chart with total values
-                                updatePieChart(totalCarbs, totalProteins, totalFats);
+                                updatePieChart(totalCarbs, totalProteins, totalFats);  // Update PieChart with carbs, proteins, and fats
 
                                 // Generate nutritional advice based on the totals
                                 generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
@@ -195,6 +217,7 @@ public class healthReportFragment extends Fragment {
             Toast.makeText(getContext(), "Error parsing date: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
     private void fetchMonthlyData(String selectedMonth, int year) {
         try {
             // Set the start and end dates for the month
@@ -208,16 +231,18 @@ public class healthReportFragment extends Fragment {
 
             db.collection("MealRecords")
                     .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
-                    .whereLessThanOrEqualTo("createdDate", endTimestamp)
+                    .whereLessThan("createdDate", endTimestamp)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            double totalCalories = 0;  // Added variable for total calories
                             double totalCarbs = 0;
                             double totalProteins = 0;
                             double totalFats = 0;
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
+                                totalCalories += (double) data.get("calories");  // Fetch calories from database
                                 totalCarbs += (double) data.get("carbs");
                                 totalProteins += (double) data.get("proteins");
                                 totalFats += (double) data.get("fats");
@@ -226,12 +251,12 @@ public class healthReportFragment extends Fragment {
                             // Check if there are records found
                             if (task.getResult().size() > 0) {
                                 // Display totals
-                                averageCarbs.setText(String.format("%.2f", totalCarbs));
+                                averageCalories.setText(String.format("%.2f", totalCalories));  // Display calories
                                 averageProteins.setText(String.format("%.2f", totalProteins));
                                 averageFats.setText(String.format("%.2f", totalFats));
 
                                 // Update Pie Chart with total values
-                                updatePieChart(totalCarbs, totalProteins, totalFats);
+                                updatePieChart(totalCarbs, totalProteins, totalFats);  // Update PieChart with carbs, proteins, and fats
 
                                 // Generate nutritional advice based on the totals
                                 generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
@@ -245,100 +270,92 @@ public class healthReportFragment extends Fragment {
                     });
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(getContext(), "Error parsing month: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error processing month: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Method to reset the display when no data is found
-    private void resetDisplay() {
-        // Reset text fields
-        averageCarbs.setText("0.00");
-        averageProteins.setText("0.00");
-        averageFats.setText("0.00");
-
-        // Clear the pie chart
-        pieChart.clear();
-        pieChart.invalidate();
-
-        // Clear nutritional advice
-        adviceTextView.setText("");
-    }
-
-
-
-    // Helper method to get month number from month name
+    // Method to convert month name to month number
     private int getMonthNumber(String month) {
-        switch (month) {
-            case "January":
-                return 1;
-            case "February":
-                return 2;
-            case "March":
-                return 3;
-            case "April":
-                return 4;
-            case "May":
-                return 5;
-            case "June":
-                return 6;
-            case "July":
-                return 7;
-            case "August":
-                return 8;
-            case "September":
-                return 9;
-            case "October":
-                return 10;
-            case "November":
-                return 11;
-            case "December":
-                return 12;
-            default:
-                return 0; // Invalid month
+        String[] months = {"January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"};
+        for (int i = 0; i < months.length; i++) {
+            if (months[i].equals(month)) {
+                return i + 1; // Month number starts from 1
+            }
         }
+        return -1; // Return -1 if month not found
     }
 
-    // Method to update the pie chart
-    private void updatePieChart(double carbs, double proteins, double fats) {
-        ArrayList<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry((float) carbs, "Carbohydrates"));
-        entries.add(new PieEntry((float) proteins, "Proteins"));
-        entries.add(new PieEntry((float) fats, "Fats"));
+    // Method to update the PieChart
+    private void updatePieChart(double totalCarbs, double totalProteins, double totalFats) {
+        // Calculate total grams of macronutrients
+        double totalMacronutrients = totalCarbs + totalProteins + totalFats;
 
-        PieDataSet dataSet = new PieDataSet(entries, "Nutritional Composition");
+        // Prepare pie chart entries based on grams
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        if (totalMacronutrients > 0) { // Ensure no division by zero
+            entries.add(new PieEntry((float) (totalCarbs / totalMacronutrients * 100), "Carbs"));
+            entries.add(new PieEntry((float) (totalProteins / totalMacronutrients * 100), "Proteins"));
+            entries.add(new PieEntry((float) (totalFats / totalMacronutrients * 100), "Fats"));
+        } else {
+            // Handle the case where there are no macronutrients to avoid empty pie chart
+            entries.add(new PieEntry(0, "No Data"));
+        }
+
+        PieDataSet dataSet = new PieDataSet(entries, "Nutritional Breakdown");
         dataSet.setColors(new int[]{
                 Color.parseColor("#A8DAB5"), // Soft Green
                 Color.parseColor("#A2C2E6"), // Soft Blue
                 Color.parseColor("#F4A3A3")  // Soft Red
         });
-
         PieData pieData = new PieData(dataSet);
         pieChart.setData(pieData);
-        pieChart.invalidate(); // refresh the chart
+        pieChart.invalidate(); // Refresh the chart
     }
 
-    // Method to generate nutritional advice based on the averages of carbs, proteins, and fats
-    private void generateNutritionalAdvice(float totalProteins, float totalCarbs, float totalFats) {
-        String advice = "";
-        if (totalCarbs < 200) {
-            advice += "Increase your carb intake for balanced energy. ";
+
+
+    // Method to generate nutritional advice based on totals
+    private void generateNutritionalAdvice(float proteins, float carbs, float fats) {
+        StringBuilder advice = new StringBuilder();
+
+        // Advising on protein intake
+        if (proteins < 50) {
+            advice.append("Increase protein intake for muscle growth. Include lean meats, fish, eggs, dairy, legumes, and nuts. ");
+        } else if (proteins <= 100) {
+            advice.append("Your protein intake is adequate. Keep including protein sources for overall health. ");
         } else {
-            advice += "Your carb intake is good. ";
+            advice.append("Your protein intake is high. Consider moderating your protein sources to avoid health issues. ");
         }
 
-        if (totalProteins < 50) {
-            advice += "Consider adding more protein to your diet. ";
+        // Advising on carbohydrate intake
+        if (carbs < 130) {
+            advice.append("Add more carbohydrates for energy, focusing on whole grains, fruits, and vegetables. ");
+        } else if (carbs <= 300) {
+            advice.append("Your carbohydrate intake is healthy. Choose complex carbs for sustained energy. ");
         } else {
-            advice += "Your protein intake is sufficient. ";
+            advice.append("Your carbohydrate intake may be too high. Limit processed sugars and refined carbs. ");
         }
 
-        if (totalFats > 70) {
-            advice += "Try to reduce your fat intake for better health. ";
+        // Advising on fat intake
+        if (fats > 70) {
+            advice.append("Reduce fat intake for heart health. Choose healthy fats like avocados and nuts while limiting saturated and trans fats. ");
+        } else if (fats <= 70) {
+            advice.append("Your fat intake is balanced. Include healthy fats in moderation for brain function. ");
         } else {
-            advice += "Your fat intake is within a healthy range. ";
+            advice.append("Your fat intake is low. Incorporate healthy fats into your diet for overall health. ");
         }
 
-        adviceTextView.setText(advice);
+        adviceTextView.setText(advice.toString());
+    }
+
+
+    // Method to reset display
+    private void resetDisplay() {
+        averageCalories.setText("0.00");  // Reset calories
+        averageProteins.setText("0.00");
+        averageFats.setText("0.00");
+        pieChart.clear();
+        adviceTextView.setText("");
     }
 }
-
