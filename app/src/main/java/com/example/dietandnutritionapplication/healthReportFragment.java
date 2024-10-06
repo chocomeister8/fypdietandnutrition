@@ -59,7 +59,7 @@ public class healthReportFragment extends Fragment {
         buttonMonthly = view.findViewById(R.id.button_monthly);
         selectedDateTextView = view.findViewById(R.id.selected_date);
         adviceTextView = view.findViewById(R.id.health_advice_text);
-        averageCalories = view.findViewById(R.id.averageCalories);  // Updated to include calories
+        averageCalories = view.findViewById(R.id.averageCalories);
         averageProteins = view.findViewById(R.id.averageProtein);
         averageFats = view.findViewById(R.id.averageFats);
         pieChart = view.findViewById(R.id.pie_chart);
@@ -149,9 +149,8 @@ public class healthReportFragment extends Fragment {
 
     private void fetchNutritionalData(String selectedDate) {
         try {
-            // Convert selectedDate from "dd/MM/yyyy" to Date
             SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Use UTC time zone for parsing
+            inputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
             Date date = inputFormat.parse(selectedDate);
 
             // Set the start timestamp for the day (00:00:00 UTC)
@@ -172,10 +171,15 @@ public class healthReportFragment extends Fragment {
             endCalendar.set(Calendar.MILLISECOND, 999);
             Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
 
-            // Fetch data for the day using a range
+            // Get the current user and their username
+            FirebaseUser user = auth.getCurrentUser();
+            String username = user != null ? user.getDisplayName() : null; // Assuming username is stored in displayName
+
+            // Fetch data for the day using a range, filtering by username
             db.collection("MealRecords")
                     .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
                     .whereLessThan("createdDate", endTimestamp)
+                    //.whereEqualTo("username", username) // Filter by username
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -186,10 +190,12 @@ public class healthReportFragment extends Fragment {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
-                                totalCalories += (double) data.get("calories");  // Fetch calories from database
-                                totalCarbs += (double) data.get("carbs");
-                                totalProteins += (double) data.get("proteins");
-                                totalFats += (double) data.get("fats");
+                                if (data != null) { // Check if data is not null
+                                    totalCalories += (double) data.get("calories");  // Fetch calories from database
+                                    totalCarbs += (double) data.get("carbs");
+                                    totalProteins += (double) data.get("proteins");
+                                    totalFats += (double) data.get("fats");
+                                }
                             }
 
                             // Check if there are records found
@@ -209,81 +215,89 @@ public class healthReportFragment extends Fragment {
                                 resetDisplay();
                             }
                         } else {
-                            Toast.makeText(getContext(), "Error fetching data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Error fetching nutritional data.", Toast.LENGTH_SHORT).show();
                         }
                     });
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(getContext(), "Error parsing date: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Error parsing date.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void fetchMonthlyData(String selectedMonth, int year) {
-        try {
-            // Set the start and end dates for the month
-            Calendar startCalendar = Calendar.getInstance();
-            startCalendar.set(year, getMonthNumber(selectedMonth) - 1, 1, 0, 0, 0);
-            Timestamp startTimestamp = new Timestamp(startCalendar.getTime());
+    private void fetchMonthlyData(String month, int year) {
+        // Convert month name to number
+        int monthNumber = getMonthNumber(month);
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.set(year, monthNumber - 1, 1, 0, 0, 0); // Set to the first day of the month
+        Timestamp startTimestamp = new Timestamp(startCalendar.getTime());
 
-            Calendar endCalendar = Calendar.getInstance();
-            endCalendar.set(year, getMonthNumber(selectedMonth) - 1, endCalendar.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59);
-            Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.set(year, monthNumber, 1, 0, 0, 0); // Set to the first day of the next month
+        Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
 
-            db.collection("MealRecords")
-                    .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
-                    .whereLessThan("createdDate", endTimestamp)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            double totalCalories = 0;  // Added variable for total calories
-                            double totalCarbs = 0;
-                            double totalProteins = 0;
-                            double totalFats = 0;
+        FirebaseUser user = auth.getCurrentUser();
+        String username = user != null ? user.getDisplayName() : null; // Assuming username is stored in displayName
 
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
-                                totalCalories += (double) data.get("calories");  // Fetch calories from database
+        db.collection("MealRecords")
+                .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
+                .whereLessThan("createdDate", endTimestamp)
+                //.whereEqualTo("username", username) // Filter by username
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        double totalCalories = 0; // Added variable for total calories
+                        double totalCarbs = 0;
+                        double totalProteins = 0;
+                        double totalFats = 0;
+
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
+                            if (data != null) { // Check if data is not null
+                                totalCalories += (double) data.get("calories"); // Fetch calories from database
                                 totalCarbs += (double) data.get("carbs");
                                 totalProteins += (double) data.get("proteins");
                                 totalFats += (double) data.get("fats");
                             }
-
-                            // Check if there are records found
-                            if (task.getResult().size() > 0) {
-                                // Display totals
-                                averageCalories.setText(String.format("%.2f", totalCalories));  // Display calories
-                                averageProteins.setText(String.format("%.2f", totalProteins));
-                                averageFats.setText(String.format("%.2f", totalFats));
-
-                                // Update Pie Chart with total values
-                                updatePieChart(totalCarbs, totalProteins, totalFats);  // Update PieChart with carbs, proteins, and fats
-
-                                // Generate nutritional advice based on the totals
-                                generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
-                            } else {
-                                // Reset display when no data found
-                                resetDisplay();
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "Error fetching data: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                    });
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(getContext(), "Error processing month: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+
+                        // Check if there are records found
+                        if (task.getResult().size() > 0) {
+                            // Display totals
+                            averageCalories.setText(String.format("%.2f", totalCalories)); // Display calories
+                            averageProteins.setText(String.format("%.2f", totalProteins));
+                            averageFats.setText(String.format("%.2f", totalFats));
+
+                            // Update Pie Chart with total values
+                            updatePieChart(totalCarbs, totalProteins, totalFats); // Update PieChart with carbs, proteins, and fats
+
+                            // Generate nutritional advice based on the totals
+                            generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
+                        } else {
+                            // Reset display when no data found
+                            resetDisplay();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Error fetching monthly data.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    // Method to convert month name to month number
     private int getMonthNumber(String month) {
-        String[] months = {"January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"};
-        for (int i = 0; i < months.length; i++) {
-            if (months[i].equals(month)) {
-                return i + 1; // Month number starts from 1
-            }
+        switch (month) {
+            case "January": return 1;
+            case "February": return 2;
+            case "March": return 3;
+            case "April": return 4;
+            case "May": return 5;
+            case "June": return 6;
+            case "July": return 7;
+            case "August": return 8;
+            case "September": return 9;
+            case "October": return 10;
+            case "November": return 11;
+            case "December": return 12;
+            default: return -1; // Invalid month
         }
-        return -1; // Return -1 if month not found
     }
 
     // Method to update the PieChart
@@ -350,12 +364,11 @@ public class healthReportFragment extends Fragment {
     }
 
 
-    // Method to reset display
     private void resetDisplay() {
-        averageCalories.setText("0.00");  // Reset calories
-        averageProteins.setText("0.00");
-        averageFats.setText("0.00");
+        averageCalories.setText("N/A");
+        averageProteins.setText("N/A");
+        averageFats.setText("N/A");
         pieChart.clear();
-        adviceTextView.setText("");
+        adviceTextView.setText("No data available for this date.");
     }
 }
