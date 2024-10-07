@@ -4,6 +4,11 @@ import static java.security.AccessController.getContext;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -165,7 +170,8 @@ public class UserAccountEntity {
                 document.getString("email"),
                 document.getString("gender"),
                 document.getString("role"),
-                document.getString("dateJoined")
+                document.getString("dateJoined"),
+                document.getString("profilePicture")
         );
     }
 
@@ -451,6 +457,11 @@ public class UserAccountEntity {
         void onFailure(String errorMessage);
     }
 
+    public interface AdminFetchCallback {
+        void onAdminFetched(Admin admin);
+        void onFailure(String errorMessage);
+    }
+
     public void getUserById(String userId, UserFetchCallback callback) {
         DocumentReference docRef = db.collection("Users").document(userId);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
@@ -466,6 +477,24 @@ public class UserAccountEntity {
             }
         }).addOnFailureListener(e -> callback.onFailure(e.getMessage()));
     }
+
+
+    public void getAdminById(String adminId, AdminFetchCallback callback) {
+        DocumentReference docRef = db.collection("Users").document(adminId);
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                Admin admin = documentSnapshot.toObject(Admin.class);
+                if (admin != null) {
+                    callback.onAdminFetched(admin);
+                } else {
+                    callback.onFailure("Admin data is null");
+                }
+            } else {
+                callback.onFailure("Admin does not exist");
+            }
+        }).addOnFailureListener(e -> callback.onFailure(e.getMessage()));
+    }
+
 
     public void updateUserProfile(String userId, Map<String, Object> updatedFields, UserProfileUpdateCallback callback) {
         db.collection("Users") // Replace with your Firestore collection name
@@ -512,5 +541,29 @@ public class UserAccountEntity {
                     Toast.makeText(context, "Failed to update profile picture", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
+    public void updateAdminProfile(String adminId, Map<String, Object> updatedFields, AdminProfileUpdateCallback callback) {
+
+        db.collection("Users")
+                .document(adminId)
+                .update(updatedFields)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(e -> {
+                    Log.e("UserAccountEntity", "Error updating user profile", e);
+                    callback.onFailure(e.getMessage());
+                });
+    }
+
+    public interface AdminProfileUpdateCallback {
+        void onSuccess();
+        void onFailure(String errorMessage);
+    }
+
+    public interface UpdateCallback {
+        void onSuccess();
+        void onFailure(String errorMessage);
+    }
+
 
 }
