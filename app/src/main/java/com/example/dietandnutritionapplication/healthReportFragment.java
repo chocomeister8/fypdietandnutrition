@@ -46,6 +46,8 @@ public class healthReportFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private String userId;
+    private TextView averageCarbs; // Add this line
+
 
     @Nullable
     @Override
@@ -69,6 +71,9 @@ public class healthReportFragment extends Fragment {
             averageProteins = view.findViewById(R.id.averageProtein);
             averageFats = view.findViewById(R.id.averageFats);
             pieChart = view.findViewById(R.id.pie_chart);
+            averageCarbs = view.findViewById(R.id.averageCarbs); // Add this line
+
+
 
             // Set button listeners
             buttonDaily.setOnClickListener(new View.OnClickListener() {
@@ -190,14 +195,12 @@ public class healthReportFragment extends Fragment {
             // Get the current user and their username
             FirebaseUser user = auth.getCurrentUser();
             String userId = user != null ? user.getUid() : null;
-            //String username = user != null ? user.getDisplayName() : null;
 
             Log.d("NutritionalData", "User ID: " + userId);
 
             // Fetch data for the day using a range, filtering by username
             db.collection("MealRecords")
                     .whereEqualTo("userId", userId)
-                    //.whereEqualTo("username", username) // Filter by username
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -205,6 +208,8 @@ public class healthReportFragment extends Fragment {
                             double totalCarbs = 0;
                             double totalProteins = 0;
                             double totalFats = 0;
+                            boolean hasRecordsForSelectedDate = false; // Flag to check for records
+
                             Log.d("NutritionalData", "Query successful, processing results...");
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
@@ -224,6 +229,7 @@ public class healthReportFragment extends Fragment {
                                             totalCarbs += (double) data.get("carbs");
                                             totalProteins += (double) data.get("proteins");
                                             totalFats += (double) data.get("fats");
+                                            hasRecordsForSelectedDate = true; // Set flag to true if records are found
 
                                             Log.d("NutritionalData", "Total Calories: " + totalCalories);
                                             Log.d("NutritionalData", "Total Carbs: " + totalCarbs);
@@ -232,14 +238,13 @@ public class healthReportFragment extends Fragment {
                                         }
                                     }
                                 }
-
-
                             }
 
                             // Check if there are records found
-                            if (task.getResult().size() > 0) {
+                            if (hasRecordsForSelectedDate) {
                                 // Display totals
-                                averageCalories.setText(String.format("%.2f", totalCalories));  // Display calories
+                                averageCalories.setText(String.format("%.2f", totalCalories));
+                                averageCarbs.setText(String.format("%.2f", totalCarbs));// Display calories
                                 averageProteins.setText(String.format("%.2f", totalProteins));
                                 averageFats.setText(String.format("%.2f", totalFats));
 
@@ -249,8 +254,9 @@ public class healthReportFragment extends Fragment {
                                 // Generate nutritional advice based on the totals
                                 generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
                             } else {
-                                // Reset display when no data found
+                                // Reset display and show no record message
                                 resetDisplay();
+                                adviceTextView.setText("No record for today.");
                             }
                         } else {
                             Log.e("FirestoreError", "Error fetching nutritional data", task.getException());
@@ -263,35 +269,26 @@ public class healthReportFragment extends Fragment {
         }
     }
 
+
     private void fetchMonthlyData(String month, int year) {
         // Convert month name to number
         int monthNumber = getMonthNumber(month);
         Log.d("FetchMonthlyData", "Month Number: " + monthNumber);
-        /*Calendar startCalendar = Calendar.getInstance();
-        startCalendar.set(year, monthNumber - 1, 1, 0, 0, 0); // Set to the first day of the month
-        Timestamp startTimestamp = new Timestamp(startCalendar.getTime());
-        Log.d("FetchMonthlyData", "Start Timestamp: " + startTimestamp);
-        Calendar endCalendar = Calendar.getInstance();
-        endCalendar.set(year, monthNumber, 1, 0, 0, 0); // Set to the first day of the next month
-        Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
-        Log.d("FetchMonthlyData", "End Timestamp: " + endTimestamp);
-        FirebaseUser user = auth.getCurrentUser();
-        String username = user != null ? user.getDisplayName() : null; // Assuming username is stored in displayName
-        Log.d("FetchMonthlyData", "Current User: " + username);*/
+
         db.collection("MealRecords")
                 .whereEqualTo("userId", userId)
-                //.whereEqualTo("username", username) // Filter by username
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        double totalCalories = 0; // Added variable for total calories
+                        double totalCalories = 0;
                         double totalCarbs = 0;
                         double totalProteins = 0;
                         double totalFats = 0;
+                        boolean recordsFound = false; // Flag to check if any records are found
 
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
-                            if (data != null) { // Check if data is not null
+                            if (data != null) {
                                 Timestamp createdDate = (Timestamp) data.get("createdDate");
                                 if (createdDate != null) {
                                     Calendar calendar = Calendar.getInstance();
@@ -300,11 +297,12 @@ public class healthReportFragment extends Fragment {
                                     int documentYear = calendar.get(Calendar.YEAR);
 
                                     // Check if the month and year match the selected values
-                                    if (documentMonth == monthNumber) {
-                                        totalCalories += (double) data.get("calories"); // Fetch calories from database
+                                    if (documentMonth == monthNumber && documentYear == year) {
+                                        totalCalories += (double) data.get("calories");
                                         totalCarbs += (double) data.get("carbs");
                                         totalProteins += (double) data.get("proteins");
                                         totalFats += (double) data.get("fats");
+                                        recordsFound = true; // Set flag to true if a record is found
                                     }
                                 }
                             }
@@ -313,21 +311,24 @@ public class healthReportFragment extends Fragment {
                         Log.d("FetchMonthlyData", "Total Carbs: " + totalCarbs);
                         Log.d("FetchMonthlyData", "Total Proteins: " + totalProteins);
                         Log.d("FetchMonthlyData", "Total Fats: " + totalFats);
-                        // Check if there are records found
-                        if (task.getResult().size() > 0) {
+
+                        // Check if any records were found
+                        if (recordsFound) {
                             // Display totals
-                            averageCalories.setText(String.format("%.2f", totalCalories)); // Display calories
+                            averageCalories.setText(String.format("%.2f", totalCalories));
+                            averageCarbs.setText(String.format("%.2f", totalCarbs));
                             averageProteins.setText(String.format("%.2f", totalProteins));
                             averageFats.setText(String.format("%.2f", totalFats));
 
                             // Update Pie Chart with total values
-                            updatePieChart(totalCarbs, totalProteins, totalFats); // Update PieChart with carbs, proteins, and fats
+                            updatePieChart(totalCarbs, totalProteins, totalFats);
 
                             // Generate nutritional advice based on the totals
                             generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats);
                         } else {
-                            // Reset display when no data found
+                            // Display message for no records found
                             resetDisplay();
+                            Toast.makeText(getContext(), "No records found for " + month + " " + year, Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Log.e("FirestoreError", "Error fetching monthly data", task.getException());
@@ -335,6 +336,7 @@ public class healthReportFragment extends Fragment {
                     }
                 });
     }
+
 
     private int getMonthNumber(String month) {
         switch (month) {
@@ -421,6 +423,7 @@ public class healthReportFragment extends Fragment {
     private void resetDisplay() {
         averageCalories.setText("N/A");
         averageProteins.setText("N/A");
+        averageCarbs.setText("N/A");
         averageFats.setText("N/A");
         pieChart.clear();
         adviceTextView.setText("No data available for this date.");
