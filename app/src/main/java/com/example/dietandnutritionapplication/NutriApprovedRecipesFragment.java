@@ -57,6 +57,7 @@ public class NutriApprovedRecipesFragment extends Fragment {
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
         Button button_pending_recipes = view.findViewById(R.id.button_recipes_status);
         Button button_approved_recipes = view.findViewById(R.id.button_approved);
+        Button button_rejected_recipes = view.findViewById(R.id.button_rejected);
 
         searchEditText = view.findViewById(R.id.search_recipe);
 
@@ -99,6 +100,15 @@ public class NutriApprovedRecipesFragment extends Fragment {
         button_approved_recipes.setOnClickListener(v -> {
             // Refresh the current fragment to fetch approved recipes again
             fetchApprovedRecipes();
+//            fetchRejectedRecipes();
+        });
+
+        button_rejected_recipes.setOnClickListener(v -> {
+            // Replace current fragment with NutriPendingRecipesFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NutriRejectedRecipesFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
 
         return view;
@@ -177,6 +187,39 @@ public class NutriApprovedRecipesFragment extends Fragment {
 
         db.collection("Recipes")
                 .whereEqualTo("status", "Approved") // Filter to get only recipes with status "Pending"
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            recipeList.clear(); // Clear the list before adding new data
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Recipe recipe = document.toObject(Recipe.class);
+                                User user = document.toObject(User.class);
+                                recipe.setRecipe_id(document.getId());
+
+                                // Calculate calories per 100g if total weight is available
+                                double caloriesPer100g = recipe.getCaloriesPer100g();
+                                if (recipe.getTotalWeight() > 0) {
+                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                                }
+                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                                recipeList.add(recipe); // Add the recipe to the list
+                            }
+                            // Notify the adapter of data changes
+                            recipesAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private void fetchRejectedRecipes() {
+
+        db.collection("Recipes")
+                .whereEqualTo("status", "Rejected") // Filter to get only recipes with status "Pending"
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

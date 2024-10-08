@@ -25,7 +25,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapter.OnRecipeClickListener {
+public class NutriRejectedRecipesFragment extends Fragment implements RecipeAdapter.OnRecipeClickListener {
     private FirebaseFirestore db;
     private RecyclerView recipesRecyclerView;
     private RecipeAdapter recipesAdapter;
@@ -35,7 +35,7 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nutri_pending_recipes_status, container, false);
+        View view = inflater.inflate(R.layout.fragment_nutri_rejected_recipes, container, false);
 
         // Initialize Firestore and RecyclerView
         db = FirebaseFirestore.getInstance();
@@ -48,7 +48,7 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
 
 
         // Fetch recipes from Firestore
-        fetchUserRecipes(); // Call method to fetch all recipes
+        fetchRejectedRecipes(); // Call method to fetch all recipes
         Log.d(TAG, "Recipe list size: " + recipeList.size());
 
         // Setup buttons
@@ -67,7 +67,6 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NutriAllRecipesFragment()));
         button_approved_recipes.setOnClickListener(v -> navigateToFragment(new NutriApprovedRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NutriPendingRecipesFragment()));
-        button_rejected_recipes.setOnClickListener(v -> navigateToFragment(new NutriRejectedRecipesFragment()));
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -113,7 +112,7 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
     private void fetchRejectedRecipes() {
 
         db.collection("Recipes")
-                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
+                .whereEqualTo("status", "Rejected") // Filter to get only recipes with status "Pending"
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
