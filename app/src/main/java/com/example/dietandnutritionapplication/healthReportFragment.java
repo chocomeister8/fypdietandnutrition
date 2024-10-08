@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import java.util.Locale;
 import java.util.TimeZone;
 import com.google.firebase.Timestamp;
 
@@ -7,6 +8,7 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +45,7 @@ public class healthReportFragment extends Fragment {
     private PieChart pieChart;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+    private String userId;
 
     @Nullable
     @Override
@@ -53,39 +56,48 @@ public class healthReportFragment extends Fragment {
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
 
-        // Initialize views
-        buttonDaily = view.findViewById(R.id.button_daily);
-        buttonMonthly = view.findViewById(R.id.button_monthly);
-        selectedDateTextView = view.findViewById(R.id.selected_date);
-        adviceTextView = view.findViewById(R.id.health_advice_text);
-        averageCalories = view.findViewById(R.id.averageCalories);
-        averageProteins = view.findViewById(R.id.averageProtein);
-        averageFats = view.findViewById(R.id.averageFats);
-        pieChart = view.findViewById(R.id.pie_chart);
+        if (user != null) {
+            userId = user.getUid();
+            // Initialize views
+            buttonDaily = view.findViewById(R.id.button_daily);
+            buttonMonthly = view.findViewById(R.id.button_monthly);
+            selectedDateTextView = view.findViewById(R.id.selected_date);
+            adviceTextView = view.findViewById(R.id.health_advice_text);
+            averageCalories = view.findViewById(R.id.averageCalories);
+            averageProteins = view.findViewById(R.id.averageProtein);
+            averageFats = view.findViewById(R.id.averageFats);
+            pieChart = view.findViewById(R.id.pie_chart);
 
-        // Set button listeners
-        buttonDaily.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isUserAuthenticated()) {
-                    showDatePickerDialog();
-                } else {
-                    Toast.makeText(getContext(), "Please log in to access your health report.", Toast.LENGTH_SHORT).show();
+            // Set button listeners
+            buttonDaily.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isUserAuthenticated()) {
+                        showDatePickerDialog();
+                    } else {
+                        Toast.makeText(getContext(), "Please log in to access your health report.", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
 
-        buttonMonthly.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isUserAuthenticated()) {
-                    showMonthPickerDialog();
-                } else {
-                    Toast.makeText(getContext(), "Please log in to access your health report.", Toast.LENGTH_SHORT).show();
+            buttonMonthly.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isUserAuthenticated()) {
+                        showMonthPickerDialog();
+                    } else {
+                        Toast.makeText(getContext(), "Please log in to access your health report.", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+            fetchTodaysReport();
+        } else {
+            // User is not logged in
+            Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
+        }
+
 
         return view;
     }
@@ -99,6 +111,7 @@ public class healthReportFragment extends Fragment {
     // Method to show DatePickerDialog for daily selection
     private void showDatePickerDialog() {
         Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -147,38 +160,43 @@ public class healthReportFragment extends Fragment {
         dialog.show();
     }
 
+    private void fetchTodaysReport() {
+        // Get today's date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        String todayDate = sdf.format(new Date()); // Get today's date as a string
+
+        // Update the selected date TextView
+        selectedDateTextView.setText(todayDate);
+
+        // Fetch nutritional data for today
+        fetchNutritionalData(todayDate); // Call your existing method to fetch data
+    }
+
     private void fetchNutritionalData(String selectedDate) {
         try {
-            SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy");
-            inputFormat.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));
-            Date date = inputFormat.parse(selectedDate);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+            Date parsedSelectedDate = sdf.parse(selectedDate);
 
-            // Set the start timestamp for the day (00:00:00 UTC)
-            Calendar startCalendar = Calendar.getInstance();
-            startCalendar.setTime(date);
-            startCalendar.set(Calendar.HOUR_OF_DAY, 0);
-            startCalendar.set(Calendar.MINUTE, 0);
-            startCalendar.set(Calendar.SECOND, 0);
-            startCalendar.set(Calendar.MILLISECOND, 0);
-            Timestamp startTimestamp = new Timestamp(startCalendar.getTime());
+            // Convert the parsed Date to a Timestamp
+            Timestamp selectedDateTimestamp = new Timestamp(parsedSelectedDate);
 
-            // Set the end timestamp for the day (23:59:59.999 UTC)
-            Calendar endCalendar = Calendar.getInstance();
-            endCalendar.setTime(date);
-            endCalendar.set(Calendar.HOUR_OF_DAY, 23);
-            endCalendar.set(Calendar.MINUTE, 59);
-            endCalendar.set(Calendar.SECOND, 59);
-            endCalendar.set(Calendar.MILLISECOND, 999);
-            Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
+            Calendar selectedCalendar = Calendar.getInstance();
+            selectedCalendar.setTime(parsedSelectedDate);
+
+            Log.d("NutritionalData", "selectedDateTimestamp: " + selectedCalendar);
 
             // Get the current user and their username
             FirebaseUser user = auth.getCurrentUser();
-            String username = user != null ? user.getDisplayName() : null; // Assuming username is stored in displayName
+            String userId = user != null ? user.getUid() : null;
+            //String username = user != null ? user.getDisplayName() : null;
+
+            Log.d("NutritionalData", "User ID: " + userId);
 
             // Fetch data for the day using a range, filtering by username
             db.collection("MealRecords")
-                    .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
-                    .whereLessThan("createdDate", endTimestamp)
+                    .whereEqualTo("userId", userId)
                     //.whereEqualTo("username", username) // Filter by username
                     .get()
                     .addOnCompleteListener(task -> {
@@ -187,15 +205,35 @@ public class healthReportFragment extends Fragment {
                             double totalCarbs = 0;
                             double totalProteins = 0;
                             double totalFats = 0;
-
+                            Log.d("NutritionalData", "Query successful, processing results...");
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
                                 if (data != null) { // Check if data is not null
-                                    totalCalories += (double) data.get("calories");  // Fetch calories from database
-                                    totalCarbs += (double) data.get("carbs");
-                                    totalProteins += (double) data.get("proteins");
-                                    totalFats += (double) data.get("fats");
+                                    // Get createdDate from the document
+                                    Timestamp createdDate = document.getTimestamp("createdDate");
+                                    if (createdDate != null) {
+                                        // Create a calendar instance from the createdDate
+                                        Calendar createdCalendar = Calendar.getInstance();
+                                        createdCalendar.setTime(createdDate.toDate());
+
+                                        // Compare only the year, month, and day
+                                        if (selectedCalendar.get(Calendar.YEAR) == createdCalendar.get(Calendar.YEAR) &&
+                                                selectedCalendar.get(Calendar.MONTH) == createdCalendar.get(Calendar.MONTH) &&
+                                                selectedCalendar.get(Calendar.DAY_OF_MONTH) == createdCalendar.get(Calendar.DAY_OF_MONTH)) {
+                                            totalCalories += (double) data.get("calories");  // Fetch calories from database
+                                            totalCarbs += (double) data.get("carbs");
+                                            totalProteins += (double) data.get("proteins");
+                                            totalFats += (double) data.get("fats");
+
+                                            Log.d("NutritionalData", "Total Calories: " + totalCalories);
+                                            Log.d("NutritionalData", "Total Carbs: " + totalCarbs);
+                                            Log.d("NutritionalData", "Total Proteins: " + totalProteins);
+                                            Log.d("NutritionalData", "Total Fats: " + totalFats);
+                                        }
+                                    }
                                 }
+
+
                             }
 
                             // Check if there are records found
@@ -215,6 +253,7 @@ public class healthReportFragment extends Fragment {
                                 resetDisplay();
                             }
                         } else {
+                            Log.e("FirestoreError", "Error fetching nutritional data", task.getException());
                             Toast.makeText(getContext(), "Error fetching nutritional data.", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -227,20 +266,20 @@ public class healthReportFragment extends Fragment {
     private void fetchMonthlyData(String month, int year) {
         // Convert month name to number
         int monthNumber = getMonthNumber(month);
-        Calendar startCalendar = Calendar.getInstance();
+        Log.d("FetchMonthlyData", "Month Number: " + monthNumber);
+        /*Calendar startCalendar = Calendar.getInstance();
         startCalendar.set(year, monthNumber - 1, 1, 0, 0, 0); // Set to the first day of the month
         Timestamp startTimestamp = new Timestamp(startCalendar.getTime());
-
+        Log.d("FetchMonthlyData", "Start Timestamp: " + startTimestamp);
         Calendar endCalendar = Calendar.getInstance();
         endCalendar.set(year, monthNumber, 1, 0, 0, 0); // Set to the first day of the next month
         Timestamp endTimestamp = new Timestamp(endCalendar.getTime());
-
+        Log.d("FetchMonthlyData", "End Timestamp: " + endTimestamp);
         FirebaseUser user = auth.getCurrentUser();
         String username = user != null ? user.getDisplayName() : null; // Assuming username is stored in displayName
-
+        Log.d("FetchMonthlyData", "Current User: " + username);*/
         db.collection("MealRecords")
-                .whereGreaterThanOrEqualTo("createdDate", startTimestamp)
-                .whereLessThan("createdDate", endTimestamp)
+                .whereEqualTo("userId", userId)
                 //.whereEqualTo("username", username) // Filter by username
                 .get()
                 .addOnCompleteListener(task -> {
@@ -253,13 +292,27 @@ public class healthReportFragment extends Fragment {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             HashMap<String, Object> data = (HashMap<String, Object>) document.getData();
                             if (data != null) { // Check if data is not null
-                                totalCalories += (double) data.get("calories"); // Fetch calories from database
-                                totalCarbs += (double) data.get("carbs");
-                                totalProteins += (double) data.get("proteins");
-                                totalFats += (double) data.get("fats");
+                                Timestamp createdDate = (Timestamp) data.get("createdDate");
+                                if (createdDate != null) {
+                                    Calendar calendar = Calendar.getInstance();
+                                    calendar.setTime(createdDate.toDate());
+                                    int documentMonth = calendar.get(Calendar.MONTH) + 1; // Month is 0-based
+                                    int documentYear = calendar.get(Calendar.YEAR);
+
+                                    // Check if the month and year match the selected values
+                                    if (documentMonth == monthNumber) {
+                                        totalCalories += (double) data.get("calories"); // Fetch calories from database
+                                        totalCarbs += (double) data.get("carbs");
+                                        totalProteins += (double) data.get("proteins");
+                                        totalFats += (double) data.get("fats");
+                                    }
+                                }
                             }
                         }
-
+                        Log.d("FetchMonthlyData", "Total Calories: " + totalCalories);
+                        Log.d("FetchMonthlyData", "Total Carbs: " + totalCarbs);
+                        Log.d("FetchMonthlyData", "Total Proteins: " + totalProteins);
+                        Log.d("FetchMonthlyData", "Total Fats: " + totalFats);
                         // Check if there are records found
                         if (task.getResult().size() > 0) {
                             // Display totals
@@ -277,6 +330,7 @@ public class healthReportFragment extends Fragment {
                             resetDisplay();
                         }
                     } else {
+                        Log.e("FirestoreError", "Error fetching monthly data", task.getException());
                         Toast.makeText(getContext(), "Error fetching monthly data.", Toast.LENGTH_SHORT).show();
                     }
                 });
