@@ -16,6 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +28,8 @@ public class NutriHomeFragment extends Fragment {
     private RecyclerView bookingsRecyclerView;
     private Button addBookingButton;
     private List<String> bookingsList;
+    private FirebaseFirestore firestore;
+    private BookingsAdapter adapter;
 
     @Nullable
     @Override
@@ -39,16 +44,22 @@ public class NutriHomeFragment extends Fragment {
         bookingsRecyclerView = view.findViewById(R.id.bookings_recycler_view);
         addBookingButton = view.findViewById(R.id.add_booking_button);
 
+        firestore = FirebaseFirestore.getInstance();
+
         // Hardcoded bookings list for prototype
         bookingsList = new ArrayList<>();
-        bookingsList.add("Booking 1: John Doe - 10/10/2024");
-        bookingsList.add("Booking 2: Jane Smith - 12/10/2024");
-        bookingsList.add("Booking 3: Mark Johnson - 14/10/2024");
+        adapter = new BookingsAdapter(bookingsList);
+
+//        bookingsList.add("Booking 1: John Doe - 10/10/2024");
+//        bookingsList.add("Booking 2: Jane Smith - 12/10/2024");
+//        bookingsList.add("Booking 3: Mark Johnson - 14/10/2024");
 
         // Set up RecyclerView with hardcoded data
         bookingsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        BookingsAdapter adapter = new BookingsAdapter(bookingsList);
+//        BookingsAdapter adapter = new BookingsAdapter(bookingsList);
         bookingsRecyclerView.setAdapter(adapter);
+
+        fetchBookingsFromFirestore();
 
         // Add booking button (prototype action)
         addBookingButton.setOnClickListener(v -> {
@@ -106,6 +117,30 @@ public class NutriHomeFragment extends Fragment {
 
         return view;
     }
+
+    private void fetchBookingsFromFirestore() {
+        firestore.collection("Consultation_slots").get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    bookingsList.clear();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Slot slot = document.toObject(Slot.class);
+
+                        // Create a string to display in the RecyclerView
+                        String bookingInfo = "Nutritionist: " + slot.getNutritionistName() +
+                                "\nDate: " + slot.getDate() +
+                                "\nTime: " + slot.getTime() +
+                                "\nStatus: " + slot.getStatus();
+
+                        // Add the formatted string to the bookings list
+                        bookingsList.add(bookingInfo);
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to fetch bookings", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     // RecyclerView Adapter for hardcoded bookings
     private static class BookingsAdapter extends RecyclerView.Adapter<BookingsAdapter.BookingViewHolder> {

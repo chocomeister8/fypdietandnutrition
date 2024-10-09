@@ -16,6 +16,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -27,6 +30,7 @@ public class ConsultationNFragment extends Fragment {
     private List<String> availableSlotsList;
     private SlotsAdapter slotsAdapter;
     private String selectedDate = "", selectedTime = "";
+    private FirebaseFirestore firestore;
 
     @Nullable
     @Override
@@ -38,6 +42,7 @@ public class ConsultationNFragment extends Fragment {
         Button button_consultationSlot = view.findViewById(R.id.consultation_slot);
         Button button_pendingConsultation = view.findViewById(R.id.pending_consultation);
 
+        firestore = FirebaseFirestore.getInstance();
 
         // Initialize views
         datePickerButton = view.findViewById(R.id.date_picker_button);
@@ -49,14 +54,16 @@ public class ConsultationNFragment extends Fragment {
         availableSlotsList = new ArrayList<>();
 
         // Add some hard-coded available time slots
-        availableSlotsList.add("10/10/2024, 09:00");
-        availableSlotsList.add("10/10/2024, 10:00");
-        availableSlotsList.add("11/10/2024, 14:00");
-        availableSlotsList.add("12/10/2024, 16:00");
+//        availableSlotsList.add("10/10/2024, 09:00");
+//        availableSlotsList.add("10/10/2024, 10:00");
+//        availableSlotsList.add("11/10/2024, 14:00");
+//        availableSlotsList.add("12/10/2024, 16:00");
 
         slotsAdapter = new SlotsAdapter(availableSlotsList);
         recyclerViewSlots.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewSlots.setAdapter(slotsAdapter);
+
+        fetchSlotsFromFirestore();
 
         // Date Picker
         datePickerButton.setOnClickListener(v -> {
@@ -85,10 +92,16 @@ public class ConsultationNFragment extends Fragment {
         // Save Button Click
         saveButton.setOnClickListener(v -> {
             if (!selectedDate.isEmpty() && !selectedTime.isEmpty()) {
-                String slot = selectedDate + ", " + selectedTime;
-                availableSlotsList.add(slot);
-                slotsAdapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Slot added: " + slot, Toast.LENGTH_SHORT).show();
+                String consultationId = firestore.collection("Consultation_slots").document().getId(); // Generate unique ID
+                String date = selectedDate;
+                String time = selectedTime;
+                String nutritionistName = "Dr. Jane Doe"; // Replace with dynamic value based on logged-in user
+                String status = "Pending"; // Default status
+
+                saveSlotToFirestore(consultationId, date, time, nutritionistName, status);
+//                availableSlotsList.add(slot);
+//                slotsAdapter.notifyDataSetChanged();
+                Toast.makeText(getContext(), "Slot added: " + date + time, Toast.LENGTH_SHORT).show();
                 selectedDate = "";
                 selectedTime = "";
                 datePickerButton.setText("Select Date");
@@ -121,6 +134,41 @@ public class ConsultationNFragment extends Fragment {
 
         return view;
     }
+
+    private void fetchSlotsFromFirestore() {
+        firestore.collection("Consultation_slots").get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    availableSlotsList.clear();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String date = document.getString("date");
+                        String time = document.getString("time");
+                        String nutritionistName = document.getString("nutritionistName");
+                        if (date != null && time != null && nutritionistName != null) {
+                            availableSlotsList.add(date + ", " + time + " - " + nutritionistName);
+                        }
+                    }
+                    slotsAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to fetch slots", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void saveSlotToFirestore(String consultationId, String date, String time, String nutritionistName, String status) {
+        Slot slot = new Slot(consultationId, date, time, nutritionistName, status);
+
+        // Save slot data to Firestore
+        firestore.collection("Consultation_slots").add(slot)
+                .addOnSuccessListener(documentReference -> {
+                    availableSlotsList.add(date + ", " + time + " - " + nutritionistName); // Display the date, time, and nutritionist in the list
+                    slotsAdapter.notifyDataSetChanged();
+                    Toast.makeText(getContext(), "Slot added: " + date + ", " + time, Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to save slot", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     // RecyclerView Adapter for displaying the available slots
     private static class SlotsAdapter extends RecyclerView.Adapter<SlotsAdapter.SlotViewHolder> {
