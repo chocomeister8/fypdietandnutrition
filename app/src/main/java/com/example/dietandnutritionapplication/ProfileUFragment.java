@@ -2,13 +2,18 @@ package com.example.dietandnutritionapplication;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +30,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -33,6 +40,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -260,8 +269,6 @@ public class ProfileUFragment extends Fragment {
             }
         });
 
-
-
         return view;
     }
 
@@ -301,37 +308,39 @@ public class ProfileUFragment extends Fragment {
 
         saveButton = view.findViewById(R.id.save_button);
 
-        profileImageView = view.findViewById(R.id.profile_picture);
+        profileImageView = view.findViewById(R.id.imageView);
         uploadImageButton = view.findViewById(R.id.upload_picture_button);
 
     }
 
     private void openFileChooser() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("ProfileImage", "onActivityResult called");
 
-        if (requestCode == PICK_IMAGE_REQUEST) {
-            Log.d("ProfileImage", "Image pick request received");
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            Uri selectedImageUri = data.getData();
 
-            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-                imageUri = data.getData();
-                Log.d("ProfileImage", "Image URI obtained: " + imageUri.toString());
-                profileImageView.setImageURI(imageUri); // Preview image
+            // Check if the URI is not null
+            if (selectedImageUri != null) {
+                // Take persistable permission
+                final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                getContext().getContentResolver().takePersistableUriPermission(selectedImageUri, takeFlags);
 
-                // Call the method to upload the image
-                uploadImageToFirebaseStorage();
-            } else {
-                Log.e("ProfileImage", "Result not OK or data is null");
+                // Set the image in the ImageView
+                profileImageView.setImageURI(selectedImageUri);
+
+                // Store the URI for later use
+                imageUri = selectedImageUri;
             }
-        } else {
-            Log.e("ProfileImage", "Unexpected request code: " + requestCode);
         }
     }
 
@@ -529,12 +538,28 @@ public class ProfileUFragment extends Fragment {
         phoneNumberData.setText(user.getPhoneNumber());
         emailAddressData.setText(user.getEmail());
 
-        if (user.getProfileImageUrl() != null) {
-            Glide.with(this)
-                    .load(user.getProfileImageUrl())
-                    .placeholder(R.drawable.profile)  // Fallback image
-                    .into(profileImageView);
+        if (user != null && profileImageView != null) {
+            String profileImageUrl = user.getProfileImageUrl();
+
+            if (profileImageUrl != null) {
+                Glide.with(this)
+                        .load(profileImageUrl)
+                        .placeholder(R.drawable.profile)  // Placeholder if the image is loading
+                        .into(profileImageView);  // Ensure profileImageView is not null
+            } else {
+                // If the URL is null, set a default image or placeholder
+                profileImageView.setImageResource(R.drawable.profile);
+            }
+        } else {
+            // Log an error or handle the null case accordingly
+            if (user == null) {
+                Log.e("ProfileUFragment", "User object is null");
+            }
+            if (profileImageView == null) {
+                Log.e("ProfileUFragment", "ImageView is null");
+            }
         }
+
 
         currentWeightData.setText(String.valueOf(user.getCurrentWeight()));
         currentHeightData.setText(String.valueOf(user.getCurrentHeight()));

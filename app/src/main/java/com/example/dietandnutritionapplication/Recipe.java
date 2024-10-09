@@ -168,4 +168,44 @@ public class Recipe implements Parcelable {
         dest.writeDouble(totalWeight);
         dest.writeInt(total_time);
     }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setCalories(double calories) {
+        this.calories = calories;
+    }
+
+    public void setTotalWeight(double totalWeight) {
+        this.totalWeight = totalWeight;
+    }
+
+    public void setMealType(List<String> mealType) {
+        this.mealType = mealType;
+    }
+
+    public void setCuisineType(List<String> cuisineType) {
+        this.cuisineType = cuisineType;
+    }
+
+    public void setDishType(List<String> dishType) {
+        this.dishType = dishType;
+    }
+
+    public void setDietLabels(List<String> dietLabels) {
+        this.dietLabels = dietLabels;
+    }
+
+    public void setHealthLabels(List<String> healthLabels) {
+        this.healthLabels = healthLabels;
+    }
+
+    public void setImage(String imageUrl) {
+        this.image = imageUrl;
+    }
+
+    public void setIngredientLines(List<String> ingredients) {
+        this.ingredientLines = ingredients;
+    }
 }

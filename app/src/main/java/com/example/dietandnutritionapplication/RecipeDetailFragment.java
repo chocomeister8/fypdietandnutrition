@@ -8,23 +8,33 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.HashMap;
+import java.util.Map;
+
+
 
 public class RecipeDetailFragment extends Fragment {
-
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     private Recipe recipe;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_details, container, false);
+
 
         // Get the recipe from the bundle
         if (getArguments() != null) {
@@ -166,6 +176,10 @@ public class RecipeDetailFragment extends Fragment {
                         .commit();
             }
         });
+        AddFavouriteRecipeController addFavouriteRecipeController =new AddFavouriteRecipeController();
+
+        Button saveButton = view.findViewById(R.id.addFavouriteButton);
+        saveButton.setOnClickListener(v -> addFavouriteRecipeController.checkAddFavouriteRecipe(recipe,getContext()));
 
         return view;
     }
@@ -177,5 +191,6 @@ public class RecipeDetailFragment extends Fragment {
         }
         return bulletList.toString();
     }
+
 
 }

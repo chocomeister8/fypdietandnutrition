@@ -1,6 +1,11 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -12,24 +17,21 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class NavAllRecipesFragment extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouriteRecipesController.OnFavoriteRecipesRetrievedListener {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList;
@@ -47,12 +49,17 @@ public class NavAllRecipesFragment extends Fragment {
             "chicken", "beef", "steak", "fish", "soup", "lamb", "pasta", "potato", "burger", "curry", "shrimp", "bacon", "fried", "grilled", "smoked", "salmon"
     );
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nav_all_recipes, container, false);
 
-        // Initialize views
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_view_favourite_recipes, container, false);
+
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
         Button button_vegetarian = view.findViewById(R.id.button_vegetarian);
         Button button_favourite = view.findViewById(R.id.button_favourite);
@@ -74,7 +81,8 @@ public class NavAllRecipesFragment extends Fragment {
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+//        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        fetchFavoriteRecipes();
 
         // Setup spinners
         mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
@@ -99,7 +107,7 @@ public class NavAllRecipesFragment extends Fragment {
             filterRecipes();
         } else {
             // Fetch recipes with default random query if no arguments exist
-            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+//            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
         }
 
         // Set up button click listeners
@@ -117,7 +125,6 @@ public class NavAllRecipesFragment extends Fragment {
 
         return view;
     }
-
 
     private void setupSpinners() {
         // Set up meal type spinner
@@ -142,8 +149,8 @@ public class NavAllRecipesFragment extends Fragment {
         Log.d("FilterRecipes", "Search Query: " + searchQuery + ", Meal Type: " + selectedMealType + ", Dish Type: " + selectedDishType);
 
         // Call fetchRecipes with all current parameters
-        fetchRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
-                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
+//        fetchRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
+//                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
     }
 
     private void setupSpinnerListeners() {
@@ -199,7 +206,7 @@ public class NavAllRecipesFragment extends Fragment {
         searchEditText.setText(""); // This will clear the search bar
 
         // Fetch recipes with a random query
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+//        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -227,52 +234,83 @@ public class NavAllRecipesFragment extends Fragment {
 
     }
 
-    private void fetchRecipes(String query, String mealType, String dishType) {
-        String app_id = "2c7710ea"; // Your Edamam API app ID
-        String app_key = "97f5e9187c865600f74e2baa358a9efb";
-        String type = "public";
-
-        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-
-        // Assuming the API requires meal type and dish type as separate parameters
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType, null);
-
-        call.enqueue(new Callback<RecipeResponse>() {
-            @Override
-            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
-
-                    // Debugging: Log the number of recipes fetched
-                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
-
-                    // Clear previous recipes
-                    recipeList.clear();
-
-                    for (RecipeResponse.Hit hit : hits) {
-                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
-
-                        double caloriesPer100g = recipe.getCaloriesPer100g();
-                        if (recipe.getTotalWeight() > 0) {
-                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                        }
-                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-
-                        recipeList.add(recipe);
-                    }
-
-                    recipeAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RecipeResponse> call, Throwable t) {
-                Log.e("Fetch Recipes", "Error: " + t.getMessage());
-            }
-        });
+    private void fetchFavoriteRecipes() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            NavFavouriteRecipesController controller = new NavFavouriteRecipesController();
+            controller.retrieveFavoriteRecipes(userId, getContext(), this);
+            // Pass 'this' to the controller
+        } else {
+            Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
+        }
     }
+
+    @Override
+    public void onFavoriteRecipesRetrieved(ArrayList<Recipe> recipes) {
+        recipeList.clear(); // Clear previous recipes
+        recipeList.addAll(recipes); // Add new recipes
+
+        // Notify the adapter about data changes
+        recipeAdapter.notifyDataSetChanged();
+
+        Toast.makeText(getContext(), "Recipes retrieved successfully!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(Exception e) {
+        // Handle error
+        Toast.makeText(getContext(), "Failed to retrieve recipes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+
+
+//    private void fetchRecipes(String query, String mealType, String dishType) {
+//        String app_id = "2c7710ea"; // Your Edamam API app ID
+//        String app_key = "97f5e9187c865600f74e2baa358a9efb";
+//        String type = "public";
+//
+//        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
+//
+//        // Assuming the API requires meal type and dish type as separate parameters
+//        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType, null);
+//
+//        call.enqueue(new Callback<RecipeResponse>() {
+//            @Override
+//            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+//
+//                    // Debugging: Log the number of recipes fetched
+//                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
+//
+//                    // Clear previous recipes
+//                    recipeList.clear();
+//
+//                    for (RecipeResponse.Hit hit : hits) {
+//                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
+//
+//                        double caloriesPer100g = recipe.getCaloriesPer100g();
+//                        if (recipe.getTotalWeight() > 0) {
+//                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+//                        }
+//                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+//
+//                        recipeList.add(recipe);
+//                    }
+//
+//                    recipeAdapter.notifyDataSetChanged();
+//                } else {
+//                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<RecipeResponse> call, Throwable t) {
+//                Log.e("Fetch Recipes", "Error: " + t.getMessage());
+//            }
+//        });
+//    }
 
 
     private String getRandomSimpleFoodSearch() {
