@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,6 +236,9 @@ public class AddRecipeFragment extends Fragment {
                     // Show success toast
                     Toast.makeText(getContext(), "Recipe added successfully!", Toast.LENGTH_SHORT).show();
 
+                    sendNotification(userId, uniqueRecipeId);
+
+
                     // Redirect to NavRecipesStatusFragment
                     requireActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.frame_layout, new NavPendingRecipesFragment())
@@ -255,4 +260,25 @@ public class AddRecipeFragment extends Fragment {
             return null; // User not logged in
         }
     }
+
+    private void sendNotification(String userId, String recipeId) {
+
+    Map<String, Object> notificationData = new HashMap<>();
+    notificationData.put("userId", userId);
+    notificationData.put("message", "Your recipe (ID: " + recipeId + ") has been submitted and is waiting for approval.");
+    notificationData.put("type", "Recipe Submission");
+
+    Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
+    notificationData.put("timestamp", entryDateTime);
+
+        db.collection("Notifications")
+                .add(notificationData) // Use add() to create a new document
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Notification", "Notification sent successfully: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to send notification: " + e.getMessage());
+                });
+    }
+
 }
