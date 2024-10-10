@@ -13,28 +13,26 @@ import java.util.List;
 
 public class Notification {
 
-    private String title;
+    private String notificationId;
     private String message;
     private Timestamp date;
     private String type;
     private String userId;
+    private boolean isRead;
 
     // Constructor
-    public Notification(String title, String message, Timestamp date, String type, String userId) {
-        this.title = title;
+    public Notification(String notificationId, String message, Timestamp date, String type, String userId, boolean isRead) {
+        this.notificationId = notificationId;
         this.message = message;
         this.date = date;
         this.type = type;
         this.userId = userId;
+        this.isRead = isRead;
     }
 
     // Getters and Setters
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public String getNotificationId() {
+        return notificationId;
     }
 
     public String getMessage() {
@@ -65,27 +63,47 @@ public class Notification {
         return userId;
     }
 
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
+    }
+
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 
     public void fetchNotification(String userId, OnNotificationsFetchedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Notifications")
-                .whereEqualTo("userId", userId) // Assuming you want to fetch entries for the logged-in user
+                .whereEqualTo("userId", userId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Notification> notifications = new ArrayList<>();
                     for (DocumentSnapshot document : queryDocumentSnapshots) {
-                        // Retrieve data from each document and create Notification objects
+                        String notificationId = document.getString("notificationId");
                         String type = document.getString("type");
                         String message = document.getString("message");
                         Timestamp date = document.getDate("timestamp") != null ?
                                 new Timestamp(document.getDate("timestamp").getTime()) : null;
                         String notificationUserId = document.getString("userId");
+                        boolean isRead = document.getBoolean("isRead") != null && document.getBoolean("isRead");
+
+                        Collections.sort(notifications, (n1, n2) -> {
+                            if (n1.getDate() == null && n2.getDate() == null) return 0;
+                            if (n1.getDate() == null) return 1;
+                            if (n2.getDate() == null) return -1;
+                            return n2.getDate().compareTo(n1.getDate()); // Newest to oldest
+                        });
 
                         // Create a new Notification object and add it to the list
-                        Notification notification = new Notification(type, message, date, type, notificationUserId);
+                        Notification notification = new Notification(notificationId, message, date, type, notificationUserId, isRead);
                         notifications.add(notification);
                     }
                     // Notify the listener with the fetched notifications

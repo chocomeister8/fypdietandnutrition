@@ -267,14 +267,24 @@ public class AddRecipeFragment extends Fragment {
     notificationData.put("userId", userId);
     notificationData.put("message", "Your recipe (ID: " + recipeId + ") has been submitted and is waiting for approval.");
     notificationData.put("type", "Recipe Submission");
-
+    notificationData.put("isRead", false);
     Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
     notificationData.put("timestamp", entryDateTime);
 
         db.collection("Notifications")
                 .add(notificationData) // Use add() to create a new document
                 .addOnSuccessListener(documentReference -> {
-                    Log.d("Notification", "Notification sent successfully: " + documentReference.getId());
+                    String notificationId = documentReference.getId(); // Get the document ID
+
+                    // Now update the document to include the ID as a field
+                    db.collection("Notifications").document(notificationId)
+                            .update("notificationId", notificationId) // Store the document ID
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Notification", "Notification added with ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Notification", "Error updating notification ID", e);
+                            });
                 })
                 .addOnFailureListener(e -> {
                     Log.e("Notification", "Failed to send notification: " + e.getMessage());

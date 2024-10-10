@@ -60,7 +60,7 @@ public class NotificationUFragment extends Fragment {
                         noNotificationsTextView.setVisibility(View.GONE);
 
                         if (adapter == null) {
-                            adapter = new NotificationAdapter(notifications);
+                            adapter = new NotificationAdapter(notifications, getContext());
                             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                             recyclerView.setAdapter(adapter);
                         } else {
