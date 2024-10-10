@@ -9,10 +9,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ViewConsultationDetailsFragment extends Fragment {
+    private FirebaseFirestore db;
+    private ArrayList<Consultation> consultationList2 = new ArrayList<>();
+    private ConsultationAdapter consultationAdapter;
     private Profile selectedProfile;
     private Nutritionist selectedNutri;
     private ListView consultationListView;
@@ -22,9 +31,10 @@ public class ViewConsultationDetailsFragment extends Fragment {
     private Button bookConsultationButton;
     private TextView consultationIdTextView, nutritionistNameTextView, clientNameTextView, detailsTextView, dateTextView, timeTextView, statusTextView;
 
-    public static ViewConsultationDetailsFragment newInstance(Consultation consultation) {
+    public static ViewConsultationDetailsFragment newInstance(Profile profile) {
         ViewConsultationDetailsFragment fragment = new ViewConsultationDetailsFragment();
         Bundle args = new Bundle();
+        args.putSerializable("selectedProfile", profile); // Pass the Profile object
         fragment.setArguments(args);
         return fragment;
     }
@@ -32,9 +42,12 @@ public class ViewConsultationDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            selectedConsultation = (Consultation) getArguments().getSerializable("selectedConsultation");
-//        }
+        if (getArguments() != null) {
+            selectedProfile = (Profile) getArguments().getSerializable("selectedProfile");
+            if (selectedProfile instanceof Nutritionist) {
+                selectedNutri = (Nutritionist) selectedProfile; // Cast to Nutritionist if applicable
+            }
+        }
     }
 
     @Override
@@ -55,14 +68,41 @@ public class ViewConsultationDetailsFragment extends Fragment {
         TextView phonenumberTextView = view.findViewById(R.id.phoneNumber);
         TextView expertiseTextView = view.findViewById(R.id.expertise);
 
-//        if (selectedNutri != null) {
-//            fullNameTextView.setText("Full Name - " + selectedNutri.getFullName());
-//            emailTextView.setText("Email - " + selectedNutri.getEmail());
-//            educationTextView.setText("Education - " + selectedNutri.getEducation());
-//            bioTextView.setText("Bio - "+ selectedNutri.getBio());
-//            phonenumberTextView.setText("Phone - "+ selectedNutri.getPhoneNumber());
-//            expertiseTextView.setText("Expertise - " + selectedNutri.getExpertise());
-//        }
+        if (selectedNutri != null) {
+            fullNameTextView.setText("Full Name - " + selectedNutri.getFullName());
+            emailTextView.setText("Email - " + selectedNutri.getEmail());
+            educationTextView.setText("Education - " + selectedNutri.getEducation());
+            bioTextView.setText("Bio - "+ selectedNutri.getBio());
+            phonenumberTextView.setText("Phone - "+ selectedNutri.getPhoneNumber());
+            expertiseTextView.setText("Expertise - " + selectedNutri.getExpertise());
+        }
+        else {
+            Toast.makeText(getContext(), "Hahahaa", Toast.LENGTH_SHORT).show();
+        }
+
+        consultationListView = view.findViewById(R.id.consultationListView);
+        db = FirebaseFirestore.getInstance();
+
+        consultationAdapter = new ConsultationAdapter(requireContext(), consultationList2);
+        consultationListView.setAdapter(consultationAdapter);
+        ConsultationEntity consultationEntity = new ConsultationEntity();
+        consultationEntity.retrieveCons(new ConsultationEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Consultation> consultationList) {
+
+                Toast.makeText(getContext(), "Success to load accounts.", Toast.LENGTH_SHORT).show();
+
+                consultationList2.clear(); // Clear the current list
+                consultationList2.addAll(consultationList);
+//                consultationAdapter.setConsultationList(consultationList);// Add the fetched consultations
+                consultationAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+            }
+        });
 //        usernameNutri = selectedNutri.getUsername();
 
 //        consultationListView = view.findViewById(R.id.consultationListView);
@@ -90,37 +130,37 @@ public class ViewConsultationDetailsFragment extends Fragment {
 //            statusTextView.setText(selectedConsultation.getStatus());
 //        }
 
-        ConsultationController consultationController = new ConsultationController();
-        consultationController.retrieveConsultations(new ConsultationEntity.DataCallback() { // Use ConsultationController.DataCallback here
-
-            @Override
-            public void onSuccess(ArrayList<Consultation> consultationList) {
-                if (consultationList != null && !consultationList.isEmpty()) {
-                    // Fetch the first consultation from the list (you can change the index if needed)
-                    Consultation consultation = consultationList.get(0);
-
-                    // Populate TextViews with the consultation details
-                    consultationIdTextView.setText(String.valueOf(consultation.getId()));
-                    nutritionistNameTextView.setText(consultation.getNutritionistName());
-                    clientNameTextView.setText(consultation.getClientName());
-                    dateTextView.setText(consultation.getDate());
-                    timeTextView.setText(consultation.getTime());
-                    statusTextView.setText(consultation.getStatus());
-                } else {
-                    // Handle the case where the list is empty or null
-                    Log.e("Consultation", "No consultations found.");
-                }
-                consultations.clear();
-                consultations.addAll(consultationList);
-//                adapter.notifyDataSetChanged(); // Refresh UI
-
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e("Firestore", "Failed to retrieve consultation details", e);
-            }
-        });
+//        ConsultationController consultationController = new ConsultationController();
+//        consultationController.retrieveConsultations(new ConsultationEntity.DataCallback() { // Use ConsultationController.DataCallback here
+//
+//            @Override
+//            public void onSuccess(ArrayList<Consultation> consultationList) {
+//                if (consultationList != null && !consultationList.isEmpty()) {
+//                    // Fetch the first consultation from the list (you can change the index if needed)
+//                    Consultation consultation = consultationList.get(0);
+//
+//                    // Populate TextViews with the consultation details
+//                    consultationIdTextView.setText(String.valueOf(consultation.getId()));
+//                    nutritionistNameTextView.setText(consultation.getNutritionistName());
+//                    clientNameTextView.setText(consultation.getClientName());
+//                    dateTextView.setText(consultation.getDate());
+//                    timeTextView.setText(consultation.getTime());
+//                    statusTextView.setText(consultation.getStatus());
+//                } else {
+//                    // Handle the case where the list is empty or null
+//                    Log.e("Consultation", "No consultations found.");
+//                }
+//                consultations.clear();
+//                consultations.addAll(consultationList);
+////                adapter.notifyDataSetChanged(); // Refresh UI
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Exception e) {
+//                Log.e("Firestore", "Failed to retrieve consultation details", e);
+//            }
+//        });
 
 
 

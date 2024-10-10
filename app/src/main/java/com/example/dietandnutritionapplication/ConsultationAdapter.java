@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ConsultationAdapter extends BaseAdapter {
 
@@ -19,7 +18,8 @@ public class ConsultationAdapter extends BaseAdapter {
     public ConsultationAdapter(Context context, ArrayList<Consultation> consultationList) {
         super();
         this.context = context;
-        this.consultationList = new ArrayList<>();
+        this.consultationList = consultationList; // Initialize with the provided list
+        this.inflater = LayoutInflater.from(context); // Initialize inflater here
     }
 
     @Override
@@ -40,17 +40,15 @@ public class ConsultationAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        consultationList.clear();
 
         // Reuse the convertView if possible, to save memory
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.consultation_item, parent, false);
+            convertView = inflater.inflate(R.layout.consultation_item, parent, false);
             viewHolder = new ViewHolder();
             // Initialize the views
             viewHolder.consultationIdTextView = convertView.findViewById(R.id.consultation_id);
             viewHolder.nutritionistNameTextView = convertView.findViewById(R.id.nutritionist_name);
             viewHolder.clientNameTextView = convertView.findViewById(R.id.client_name);
-//          viewHolder.detailsTextView = convertView.findViewById(R.id.details);
             viewHolder.dateTextView = convertView.findViewById(R.id.date);
             viewHolder.timeTextView = convertView.findViewById(R.id.time);
             viewHolder.statusTextView = convertView.findViewById(R.id.status);
@@ -63,11 +61,9 @@ public class ConsultationAdapter extends BaseAdapter {
         Consultation currentConsultation = consultationList.get(position);
 
         // Set data to the views
-        String size = String.valueOf(consultationList.size());
         viewHolder.consultationIdTextView.setText(currentConsultation.getConsultationId());
         viewHolder.nutritionistNameTextView.setText(currentConsultation.getNutritionistName());
         viewHolder.clientNameTextView.setText(currentConsultation.getClientName());
-//      viewHolder.detailsTextView.setText(currentConsultation.getDetails());
         viewHolder.dateTextView.setText(currentConsultation.getDate());
         viewHolder.timeTextView.setText(currentConsultation.getTime());
         viewHolder.statusTextView.setText(currentConsultation.getStatus());
@@ -75,11 +71,17 @@ public class ConsultationAdapter extends BaseAdapter {
         return convertView;
     }
 
+    // Method to update the consultation list and notify the adapter
+    public void setConsultationList(ArrayList<Consultation> consultations) {
+        this.consultationList.clear(); // Clear the old data
+        this.consultationList.addAll(consultations); // Add the new data
+        notifyDataSetChanged(); // Notify that the data has changed
+    }
+
     static class ViewHolder {
         TextView consultationIdTextView;
         TextView nutritionistNameTextView;
         TextView clientNameTextView;
-        TextView detailsTextView;
         TextView dateTextView;
         TextView timeTextView;
         TextView statusTextView;

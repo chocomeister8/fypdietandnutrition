@@ -1,5 +1,7 @@
 package com.example.dietandnutritionapplication;
 
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,6 +47,30 @@ public class ConsultationEntity {
                             callback.onFailure(new Exception("QuerySnapshot is null"));
                         }
                     } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    public void retrieveCons(DataCallback callback) {
+        db.collection("Consultation_slots") // Ensure this matches your Firestore collection
+                .get()
+                .addOnCompleteListener(task -> {
+                    consultationList.clear(); // Clear existing list
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null) {
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                Consultation consultation = createSlotFromDocument(document);
+                                consultationList.add(consultation);
+                            }
+                            callback.onSuccess(consultationList);
+                        } else {
+                            callback.onFailure(new Exception("QuerySnapshot is null"));
+                        }
+                    } else {
+                        // Log the actual exception for better error diagnosis
+                        Log.e("ConsultationEntity", "Failed to retrieve consultations: ", task.getException());
                         callback.onFailure(task.getException());
                     }
                 });

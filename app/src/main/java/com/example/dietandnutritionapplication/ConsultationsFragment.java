@@ -3,6 +3,7 @@ package com.example.dietandnutritionapplication;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class ConsultationsFragment extends Fragment {
 
     private ListView consultationListView;
     private ArrayList<Consultation> consultationList = new ArrayList<>();
+    private ArrayList<Consultation> consultationList2 = new ArrayList<>();
     private FirebaseFirestore db;
     private ConsultationAdapter consultationAdapter;
     private ArrayList<Consultation> originalConsultations = new ArrayList<>(); // unfilter list
@@ -60,30 +62,49 @@ public class ConsultationsFragment extends Fragment {
         viewNutriButton = view.findViewById(R.id.view_nutri);
         viewConsultationButton = view.findViewById(R.id.booking_consultation);
 
-        consultationList = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
 
+//        Consultation consultation1 = new Consultation("123","John Wick","ahmoytan1956","123456","time","pending");
+//        consultationList.add(consultation1);
         // Set up the ConsultationAdapter to bind data to the ListView
-        consultationAdapter = new ConsultationAdapter(requireContext(), consultationList);
+        consultationAdapter = new ConsultationAdapter(requireContext(), consultationList2);
         consultationListView.setAdapter(consultationAdapter);
-
-        // Fetch consultations from Firebase Firestore
-        ConsultationController consultationController = new ConsultationController();
-        consultationController.retrieveConsultations(new ConsultationEntity.DataCallback() {
+        ConsultationEntity consultationEntity = new ConsultationEntity();
+        consultationEntity.retrieveCons(new ConsultationEntity.DataCallback() {
             @Override
-            public void onSuccess(ArrayList<Consultation> consultations) {
-                consultationList.clear(); // Clear the current list
-                consultationList.addAll(consultations); // Add the fetched consultations
-                originalConsultations.clear();
-                originalConsultations.addAll(consultations);
+            public void onSuccess(ArrayList<Consultation> consultationList) {
+
+                Toast.makeText(getContext(), "Success to load accounts.", Toast.LENGTH_SHORT).show();
+
+                consultationList2.clear(); // Clear the current list
+                consultationList2.addAll(consultationList);
+//                consultationAdapter.setConsultationList(consultationList);// Add the fetched consultations
                 consultationAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(getContext(), "Failed to load consultations.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Fetch consultations from Firebase Firestore
+//        ConsultationController consultationController = new ConsultationController();
+//        consultationController.retrieveConsultations(new ConsultationEntity.DataCallback() {
+//            @Override
+//            public void onSuccess(ArrayList<Consultation> consultations) {
+//                consultationList.clear(); // Clear the current list
+//                consultationList.addAll(consultations); // Add the fetched consultations
+//                originalConsultations.clear();
+//                originalConsultations.addAll(consultations);
+//                consultationAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onFailure(Exception e) {
+//                Toast.makeText(getContext(), "Failed to load consultations.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         // Search functionality
         searchBar.addTextChangedListener(new TextWatcher() {
@@ -93,7 +114,7 @@ public class ConsultationsFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 searchText = s.toString();
-                filterConsultations(); // Filter consultations based on the search text
+//                filterConsultations(); // Filter consultations based on the search text
             }
 
             @Override
@@ -101,21 +122,21 @@ public class ConsultationsFragment extends Fragment {
         });
 
         // Handle consultation item clicks
-        consultationListView.setOnItemClickListener((parent, view1, position, id) -> {
-            Consultation selectedConsultation = consultationList.get(position);
-
-            // Create a new instance of ViewConsultationDetailsFragment and pass the selected consultation
-            ViewConsultationDetailsFragment consultationDetailsFragment = new ViewConsultationDetailsFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("selectedConsultation", selectedConsultation);
-            consultationDetailsFragment.setArguments(bundle);
-
-            // Replace the current fragment with ViewConsultationDetailsFragment
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, consultationDetailsFragment)
-                    .addToBackStack(null) // Add to back stack so you can navigate back
-                    .commit();
-        });
+//        consultationListView.setOnItemClickListener((parent, view1, position, id) -> {
+//            Consultation selectedConsultation = consultationList.get(position);
+//
+//            // Create a new instance of ViewConsultationDetailsFragment and pass the selected consultation
+//            ViewConsultationDetailsFragment consultationDetailsFragment = new ViewConsultationDetailsFragment();
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("selectedConsultation", selectedConsultation);
+//            consultationDetailsFragment.setArguments(bundle);
+//
+//            // Replace the current fragment with ViewConsultationDetailsFragment
+//            getActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame_layout, consultationDetailsFragment)
+//                    .addToBackStack(null) // Add to back stack so you can navigate back
+//                    .commit();
+//        });
 
         viewNutriButton.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
@@ -152,5 +173,4 @@ public class ConsultationsFragment extends Fragment {
         consultationList.addAll(filteredConsultations);
         consultationAdapter.notifyDataSetChanged(); // Refresh the adapter
     }
-
 }

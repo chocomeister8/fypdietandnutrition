@@ -183,16 +183,37 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
         });
 
 // Set up the button click listener
-        bookConsultationButton.setOnClickListener(v -> {
-//            ViewConsultationDetailsFragment viewConsultationDetailsFragment = new ViewConsultationDetailsFragment();
+//        bookConsultationButton.setOnClickListener(v -> {
+////            ViewConsultationDetailsFragment viewConsultationDetailsFragment = new ViewConsultationDetailsFragment();
+////
+////            Bundle bundle = new Bundle();
+////            bundle.putSerializable("selectedProfile", selectedProfile);
+////            viewConsultationDetailsFragment.setArguments(bundle);
 //
 //            Bundle bundle = new Bundle();
 //            bundle.putSerializable("selectedProfile", selectedProfile);
-//            viewConsultationDetailsFragment.setArguments(bundle);
+//
+//            requireActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame_layout, new ViewConsultationDetailsFragment())
+//                    .addToBackStack(null)
+//                    .commit();
+//        });
 
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new ViewConsultationDetailsFragment())
-                    .addToBackStack(null)
+        bookConsultationButton.setOnClickListener(v -> {
+            // Create an instance of RateNutriFragment
+            ViewConsultationDetailsFragment viewConsultationDetailsFragment = new ViewConsultationDetailsFragment();
+
+            // Create a bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedProfile", selectedProfile); // Pass the profile object
+
+            // Set the arguments for the new fragment
+            viewConsultationDetailsFragment.setArguments(bundle);
+
+            // Replace the current fragment with RateNutriFragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, viewConsultationDetailsFragment) // Make sure to replace with the correct container ID
+                    .addToBackStack(null) // Add to back stack so you can navigate back
                     .commit();
         });
 

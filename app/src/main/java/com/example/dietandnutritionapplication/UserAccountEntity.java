@@ -100,6 +100,7 @@ public class UserAccountEntity {
                 });
     }
 
+
     public void retrieveNutritionists(final DataCallback callback) {
         db.collection("Users").get()
                 .addOnCompleteListener(task -> {
