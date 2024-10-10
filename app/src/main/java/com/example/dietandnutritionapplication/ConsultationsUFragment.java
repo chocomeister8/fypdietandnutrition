@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -41,6 +44,7 @@ public class ConsultationsUFragment extends Fragment {
     private EditText searchBar;
     private String selectedRole = "All Users";
     private String searchText = "";
+    private Button viewNutriButton, viewConsultationButton;
 
     @Nullable
     @Override
@@ -51,7 +55,8 @@ public class ConsultationsUFragment extends Fragment {
         // Initialize the ListView
         nutritionistListView = view.findViewById(R.id.nutritionist_list_view);
         searchBar = view.findViewById(R.id.search_bar);
-
+        viewNutriButton = view.findViewById(R.id.view_nutri);
+        viewConsultationButton = view.findViewById(R.id.booking_consultation);
 
         // Initialize the list of nutritionists
         nutritionistList = new ArrayList<>();
@@ -107,6 +112,25 @@ public class ConsultationsUFragment extends Fragment {
                     .addToBackStack(null) // Add to back stack so you can navigate back
                     .commit();
         });
+
+        viewNutriButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ConsultationsUFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        viewConsultationButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ConsultationsFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+//        viewConsultationButton.setOnClickListener(v -> {
+//            if (getActivity() instanceof MainActivity) {
+//                ((MainActivity) getActivity()).replaceFragment(new ConsultationsFragment());
+//            }
+//        });
 
         return view;
     }
