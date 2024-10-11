@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
     tools:context=".ProfileUFragment">
 
@@ -67,30 +68,30 @@
 
             <!-- Profile Picture and Upload Button -->
             <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/CircularImage" />
+
+            <Button
+                android:id="@+id/upload_picture_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:text="Upload Picture"
+                android:textColor="@android:color/black"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="140dp"
-                    android:visibility="visible"
-                    android:src="@drawable/profile"
-                    android:scaleType="fitCenter"/>
-
-
-                <Button
-                    android:id="@+id/upload_picture_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Upload Picture"
-                    android:textColor="@android:color/black"
-                    android:layout_marginTop="8dp"/>
-
-            </LinearLayout>
-            <!-- Text Fields with Titles -->
+        <!-- Text Fields with Titles -->
 
             <TextView
                 android:layout_width="match_parent"

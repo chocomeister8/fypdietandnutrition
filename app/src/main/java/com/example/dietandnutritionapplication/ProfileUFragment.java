@@ -72,7 +72,7 @@ public class ProfileUFragment extends Fragment {
     private Uri imageUri;
     private ImageView profileImageView;
     private Button uploadImageButton;
-
+    private static final int REQUEST_CODE_PERMISSIONS = 1001;
 
     @Nullable
     @Override
@@ -95,7 +95,6 @@ public class ProfileUFragment extends Fragment {
             loadUserProfile();
 
             uploadImageButton.setOnClickListener(v -> openFileChooser());
-
 
             saveButton.setOnClickListener(v -> updateProfile(currentUser.getUid()));
 
@@ -333,7 +332,6 @@ public class ProfileUFragment extends Fragment {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
@@ -344,18 +342,22 @@ public class ProfileUFragment extends Fragment {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             Uri selectedImageUri = data.getData();
 
-            // Check if the URI is not null
             if (selectedImageUri != null) {
-                // Take persistable permission
-                final int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                getContext().getContentResolver().takePersistableUriPermission(selectedImageUri, takeFlags);
-
-                // Set the image in the ImageView
-                profileImageView.setImageURI(selectedImageUri);
+                Glide.with(getContext())
+                        .load(selectedImageUri)
+                        .into(profileImageView);
 
                 // Store the URI for later use
                 imageUri = selectedImageUri;
+                Log.d("ProfileImage", "Selected image URI: " + selectedImageUri.toString());
+
+                uploadImageToFirebaseStorage();
+            } else {
+                Log.e("ProfileImage", "Selected image URI is null");
+                Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
             }
+        } else {
+            Log.e("ProfileImage", "Image selection failed or request code mismatch");
         }
     }
 
@@ -373,9 +375,6 @@ public class ProfileUFragment extends Fragment {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReference()
                     .child("profile_pictures/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + ".jpg");
-
-            Log.d("ProfileImage", "Storage reference path: " + storageReference.getPath());
-
 
             storageReference.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> {
