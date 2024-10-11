@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of fetching user role
         FirebaseUser user = mAuth.getCurrentUser();
-        String userRole = "guest"; // Default role
+        String userRole = "admin"; // Default role
 
 
         // Initialize ViewBinding
