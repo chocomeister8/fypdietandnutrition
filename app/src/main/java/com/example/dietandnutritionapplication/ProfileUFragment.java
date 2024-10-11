@@ -77,7 +77,7 @@ public class ProfileUFragment extends Fragment {
 
     private NotificationUController notificationUController;
     private TextView notificationBadgeTextView;
-    
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -493,7 +493,7 @@ public class ProfileUFragment extends Fragment {
                 try {
                     currentWeight = Double.parseDouble(currentWeightData.getText().toString());
                 } catch (NumberFormatException e) {
-                    currentWeight = 0; // or handle it as needed
+                    currentWeight = 0;
                     Toast.makeText(getContext(), "Invalid weight input", Toast.LENGTH_SHORT).show();
                 }
 
@@ -501,7 +501,7 @@ public class ProfileUFragment extends Fragment {
                 try {
                     currentHeight = Double.parseDouble(currentHeightData.getText().toString());
                 } catch (NumberFormatException e) {
-                    currentHeight = 0; // or handle it as needed
+                    currentHeight = 0;
                     Toast.makeText(getContext(), "Invalid height input", Toast.LENGTH_SHORT).show();
                 }
 
@@ -790,23 +790,22 @@ public class ProfileUFragment extends Fragment {
     private void validateHealthGoal(double weight, double height, String healthGoal) {
         double bmi = calculateBMI(weight, height);
 
-        // Define BMI threshold (e.g., 18.5 is the lower limit for a healthy weight)
+
         double bmiThreshold = 18.5;
 
-        // Check if the user's BMI is below the threshold and they selected "Lose Weight"
-        if (bmi < bmiThreshold && "Lose Weight".equals(healthGoal)) {
+
+        if (bmi < bmiThreshold && ("Lose Weight".equals(healthGoal) || "Slowly Lose Weight".equals(healthGoal))) {
             new AlertDialog.Builder(getContext())
                     .setTitle("BMI Warning")
                     .setMessage("Your BMI is below the recommended range. Losing weight is not recommended. Do you want to reselect your health goal?")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            // Reset the health goal spinner to the default selection
-                            healthGoalsSpinner.setSelection(0);  // Assuming 0 is the default "Select your health goal"
+
+                            healthGoalsSpinner.setSelection(0);
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            // User chose not to change their selection, do nothing
                             dialog.dismiss();
                         }
                     })

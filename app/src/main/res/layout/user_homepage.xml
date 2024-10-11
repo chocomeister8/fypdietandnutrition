@@ -141,7 +141,7 @@
                         android:layout_height="50dp"
                         android:layout_margin="4dp"
                         android:background="@android:color/transparent"
-                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:drawableTop="@drawable/baseline_diary_24"
                         android:padding="3dp"/>
 
                     <TextView
@@ -200,7 +200,7 @@
                         android:layout_height="45dp"
                         android:layout_margin="4dp"
                         android:background="@android:color/transparent"
-                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:drawableTop="@drawable/baseline_consultations_24"
                         android:padding="3dp"/>
 
                     <TextView
@@ -225,7 +225,7 @@
                         android:layout_height="45dp"
                         android:layout_margin="4dp"
                         android:background="@android:color/transparent"
-                        android:drawableTop="@drawable/baseline_recipes_24"
+                        android:drawableTop="@drawable/baseline_report_24"
                         android:padding="3dp"/>
 
                     <TextView
@@ -295,7 +295,7 @@
         <!-- Empty Row 2 -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:background="@drawable/rounded_item_background">
 
@@ -307,15 +307,22 @@
                 android:padding="16dp"
                 android:layout_gravity="start|top" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:layout_marginTop="14dp">
 
             <!-- Macronutrients info (Carbohydrates, Proteins, Fats) below ProgressBar -->
-            <LinearLayout
-                android:id="@+id/nutrients_info"
-                android:layout_width="379dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="14dp"
-                android:padding="10dp">
+                <LinearLayout
+                    android:id="@+id/nutrients_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="15dp"
+                    android:padding="10dp">
 
 
                 <!-- Carbohydrates Column -->
@@ -401,7 +408,18 @@
 
             </LinearLayout>
 
+                <Button
+                    android:id="@+id/button_MealLog1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Log Meal"
+                    android:textColor="@android:color/black"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp" />
 
+    </LinearLayout>
         </FrameLayout>
 
         <!-- Empty Row 3 -->
@@ -417,21 +435,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Today's Details"
+                android:text=""
                 android:textColor="#000000"
                 android:padding="16dp"
                 android:layout_gravity="start|top" />
 
-            <!-- Text below Camera Icon -->
-            <Button
-                android:id="@+id/button_MealLog1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Log Meal"
-                android:textColor="@android:color/black"
-                android:textSize="12sp"
-                android:textAlignment="center"
-                android:layout_marginBottom="16dp" />
+
+
         </LinearLayout>
 
             <LinearLayout
