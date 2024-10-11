@@ -115,6 +115,7 @@ public class UserMealRecordFragment extends Fragment {
     private String selectedMealType;
 
     private UserMealRecordController userMealRecordController;
+    private NotificationUController notificationUController;
 
     private int totalCarbs;
     private int totalProteins;
@@ -125,6 +126,8 @@ public class UserMealRecordFragment extends Fragment {
     private LinearLayout lunchLinearLayout;
     private LinearLayout dinnerLinearLayout;
     private LinearLayout snackLinearLayout;
+
+    private TextView notificationBadgeTextView;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -141,6 +144,29 @@ public class UserMealRecordFragment extends Fragment {
 
         dateTextView = view.findViewById(R.id.dateTextView);
         calorieLimitTextView = view.findViewById(R.id.progress_calorielimit);
+
+        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+        notificationUController = new NotificationUController();
+        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+            @Override
+            public void onNotificationsFetched(List<Notification> notifications) {
+                // Notifications can be processed if needed
+
+                // After fetching notifications, count them
+                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                    @Override
+                    public void onCountFetched(int count) {
+                        if (count > 0) {
+                            notificationBadgeTextView.setText(String.valueOf(count));
+                            notificationBadgeTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            notificationBadgeTextView.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+        });
 
         cardViewBreakfast = view.findViewById(R.id.breakfastCard);
         cardViewLunch = view.findViewById(R.id.lunchCard);
@@ -165,6 +191,15 @@ public class UserMealRecordFragment extends Fragment {
         remainingCaloriesView = view.findViewById(R.id.progress_remainingcalorie);
 
         calendar = Calendar.getInstance();
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
 
         if (currentUser != null) {
 

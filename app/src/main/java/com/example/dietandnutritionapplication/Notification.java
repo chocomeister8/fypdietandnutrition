@@ -119,4 +119,36 @@ public class Notification {
         void onNotificationsFetched(List<Notification> notifications);
     }
 
+
+
+    public interface OnNotificationCountFetchedListener {
+        void onCountFetched(int count);
+    }
+
+    public void countNotification(String userId, OnNotificationCountFetchedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Notifications")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int unreadCount = 0;
+
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+
+                        boolean isRead = document.getBoolean("isRead");
+                        if (!isRead) {
+                            unreadCount++;
+                        }
+                    }
+
+                    listener.onCountFetched(unreadCount);
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Notification", "Error fetching count notifications", e);
+                    listener.onCountFetched(0);
+                });
+    }
+
+
+
 }

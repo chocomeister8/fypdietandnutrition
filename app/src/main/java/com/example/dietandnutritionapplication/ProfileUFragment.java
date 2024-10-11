@@ -51,6 +51,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ProfileUFragment extends Fragment {
 
@@ -74,6 +75,9 @@ public class ProfileUFragment extends Fragment {
     private Button uploadImageButton;
     private static final int REQUEST_CODE_PERMISSIONS = 1001;
 
+    private NotificationUController notificationUController;
+    private TextView notificationBadgeTextView;
+    
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -101,6 +105,29 @@ public class ProfileUFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "No user logged in", Toast.LENGTH_SHORT).show();
         }
+
+        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+        notificationUController = new NotificationUController();
+        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+            @Override
+            public void onNotificationsFetched(List<Notification> notifications) {
+                // Notifications can be processed if needed
+
+                // After fetching notifications, count them
+                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                    @Override
+                    public void onCountFetched(int count) {
+                        if (count > 0) {
+                            notificationBadgeTextView.setText(String.valueOf(count));
+                            notificationBadgeTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            notificationBadgeTextView.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+        });
 
 
         ImageView notiImage = view.findViewById(R.id.noti_icon);
@@ -733,20 +760,23 @@ public class ProfileUFragment extends Fragment {
 
         switch (healthGoal) {
             case "Lose Weight":
-                dailyCalories -= 500;
+                dailyCalories *= 0.80;
                 break;
-            case "Build Muscle":
-                dailyCalories += 300;
+            case "Slowly Lose Weight":
+                dailyCalories *= 0.90;
                 break;
             case "Maintain Current Weight":
-                // No change in calories
                 break;
-            case "Improve Endurance":
-            case "Improve Flexibility":
+            case "Build Muscle (Moderate Gain)":
+                dailyCalories += 300;
+                break;
+            case "Build Muscle (Aggressive Gain)":
+                dailyCalories += 500;
                 break;
             default:
                 break;
         }
+
 
         return dailyCalories;
     }

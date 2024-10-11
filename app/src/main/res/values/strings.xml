@@ -46,10 +46,10 @@
     <string-array name="health_goals_array">
         <item>Select your health goal</item>
         <item>Lose Weight</item>
-        <item>Build Muscle</item>
-        <item>Improve Endurance</item>
+        <item>Slowly Lose Weight</item>
         <item>Maintain Current Weight</item>
-        <item>Improve Flexibility</item>
+        <item>Build Muscle (Moderate Gain)</item>
+        <item>Build Muscle (Aggressive Gain)</item>
 
     </string-array>
 

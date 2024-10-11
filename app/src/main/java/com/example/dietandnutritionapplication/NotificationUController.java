@@ -1,5 +1,7 @@
 package com.example.dietandnutritionapplication;
 
+import android.util.Log;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,5 +15,13 @@ public class NotificationUController {
 
         notification = new Notification("","", defaultDate, "", "", false);
         notification.fetchNotification(userId, listener);
+    }
+
+    public void countNotifications(String userId, Notification.OnNotificationCountFetchedListener listener) {
+        if (notification != null) {
+            notification.countNotification(userId, listener);
+        } else {
+            Log.e("NotificationUController", "Notification object is not initialized");
+        }
     }
 }

@@ -51,11 +51,12 @@ public class NotificationUFragment extends Fragment {
                 @Override
                 public void onNotificationsFetched(List<Notification> notifications) {
                     if (notifications.isEmpty()) {
-                        // If no notifications, show the "No Notifications" message
+
                         recyclerView.setVisibility(View.GONE);
                         noNotificationsTextView.setVisibility(View.VISIBLE);
+
                     } else {
-                        // If notifications are available, set up the RecyclerView
+
                         recyclerView.setVisibility(View.VISIBLE);
                         noNotificationsTextView.setVisibility(View.GONE);
 
@@ -66,6 +67,7 @@ public class NotificationUFragment extends Fragment {
                         } else {
                             adapter.updateNotifications(notifications);
                         }
+
                     }
                 }
             });
