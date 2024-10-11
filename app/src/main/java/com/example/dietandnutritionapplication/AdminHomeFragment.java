@@ -253,7 +253,7 @@ public class AdminHomeFragment extends Fragment {
                         Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).switchToGuestMode();
-                            ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                            ((MainActivity) getActivity()).replaceFragment(new AdminLoginFragment());
                         }
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> {

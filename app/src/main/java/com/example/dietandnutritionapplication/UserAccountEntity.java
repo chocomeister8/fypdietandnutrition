@@ -357,6 +357,15 @@ public class UserAccountEntity {
                         DocumentSnapshot document = task.getResult().getDocuments().get(0);
                         String email = document.getString("email"); // Assume email is stored in Firestore
 
+                        // Check the status of the user
+                        String status = document.getString("status"); // Retrieve the status field
+
+                        // If the status is not "active", show an error message and return early
+                        if (!"active".equalsIgnoreCase(status)) {
+                            Toast.makeText(context, "Account deactivated. Please contact the admin.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
                         // Sign in the user using FirebaseAuth
                         auth.signInWithEmailAndPassword(email, enteredPassword)
                                 .addOnCompleteListener(authTask -> {
@@ -430,6 +439,7 @@ public class UserAccountEntity {
                     Toast.makeText(context, "Error querying username: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     public void fetchUserProfile(String userId, final UserProfileCallback callback) {
         db.collection("Users")
