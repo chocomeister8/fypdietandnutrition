@@ -3,9 +3,11 @@ package com.example.dietandnutritionapplication;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -18,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -476,20 +479,37 @@ public class ProfileUFragment extends Fragment {
                     Toast.makeText(getContext(), "Invalid height input", Toast.LENGTH_SHORT).show();
                 }
 
-                if (dob.isEmpty() || currentWeight == 0 || currentHeight == 0 || activityLevel.isEmpty()) {
-                    Toast.makeText(getContext(), "Please complete all required fields (DOB, weight, height, activity level).", Toast.LENGTH_SHORT).show();
+
+                if (dob.isEmpty() || currentWeight == 0 || currentHeight == 0 ||
+                        "Select your activity level".equals(activityLevel) ||
+                        "Select your health goal".equals(healthGoals)) {
+                    Toast.makeText(getContext(), "Please complete all required fields (DOB, weight, height, activity level, health goal).", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                healthGoalsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String selectedHealthGoal = parent.getItemAtPosition(position).toString();
+
+                        validateHealthGoal(currentUser.getCurrentWeight(), currentUser.getCurrentHeight(), selectedHealthGoal);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
 
                 boolean recalculateCalorieLimit = !dob.equals(currentUser.getDob()) ||
                         currentWeight != currentUser.getCurrentWeight() ||
                         currentHeight != currentUser.getCurrentHeight() ||
-                        !activityLevel.equals(currentUser.getActivityLevel());
+                        !activityLevel.equals(currentUser.getActivityLevel())||
+                        !healthGoals.equals(currentUser.getHealthGoal());
 
                 int calorieLimit = currentUser.getCalorieLimit();
 
                 if (recalculateCalorieLimit) {
-                    double calorieGoal = calculateCalorieGoal(dob, currentWeight, currentHeight, activityLevel);
+                    double calorieGoal = calculateCalorieGoal(dob, currentWeight, currentHeight, activityLevel, healthGoals);
                     calorieLimit = (int) calorieGoal;
                     Log.d("Debug", "Recalculated Calorie Goal: " + calorieGoal);
                     Log.d("Debug", "Calorie Limit (int): " + calorieLimit);
@@ -661,7 +681,7 @@ public class ProfileUFragment extends Fragment {
         }
     }
 
-    private double calculateCalorieGoal(String dob, double weight, double height, String activityLevel) {
+    private double calculateCalorieGoal(String dob, double weight, double height, String activityLevel, String healthGoal) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date birthDate = null;
         try {
@@ -710,8 +730,62 @@ public class ProfileUFragment extends Fragment {
                 activityFactor = 1.2; // Default to sedentary
         }
 
-        return bmr * activityFactor;  // Return the caloric limit
+        double dailyCalories = bmr * activityFactor;
+
+        switch (healthGoal) {
+            case "Lose Weight":
+                dailyCalories -= 500;
+                break;
+            case "Build Muscle":
+                dailyCalories += 300;
+                break;
+            case "Maintain Current Weight":
+                // No change in calories
+                break;
+            case "Improve Endurance":
+            case "Improve Flexibility":
+                break;
+            default:
+                break;
+        }
+
+        return dailyCalories;
     }
+
+    private double calculateBMI(double weight, double height) {
+        // Convert height from cm to meters
+        height = height / 100;
+        return weight / (height * height);
+    }
+
+    private void validateHealthGoal(double weight, double height, String healthGoal) {
+        double bmi = calculateBMI(weight, height);
+
+        // Define BMI threshold (e.g., 18.5 is the lower limit for a healthy weight)
+        double bmiThreshold = 18.5;
+
+        // Check if the user's BMI is below the threshold and they selected "Lose Weight"
+        if (bmi < bmiThreshold && "Lose Weight".equals(healthGoal)) {
+            new AlertDialog.Builder(getContext())
+                    .setTitle("BMI Warning")
+                    .setMessage("Your BMI is below the recommended range. Losing weight is not recommended. Do you want to reselect your health goal?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Reset the health goal spinner to the default selection
+                            healthGoalsSpinner.setSelection(0);  // Assuming 0 is the default "Select your health goal"
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // User chose not to change their selection, do nothing
+                            dialog.dismiss();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+    }
+
 
 
 }
