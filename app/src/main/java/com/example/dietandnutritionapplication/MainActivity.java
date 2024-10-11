@@ -2,6 +2,7 @@ package com.example.dietandnutritionapplication;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of fetching user role
         FirebaseUser user = mAuth.getCurrentUser();
-        String userRole = "admin"; // Default role
+        String userRole = "guest"; // Default role
 
 
         // Initialize ViewBinding

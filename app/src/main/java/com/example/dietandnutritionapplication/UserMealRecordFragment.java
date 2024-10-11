@@ -407,9 +407,12 @@ public class UserMealRecordFragment extends Fragment {
                                     double referenceFat = food.getNutrients().getFat();
                                     double referenceCarbohydrates = food.getNutrients().getCarbohydrates();
 
+
+                                    String imageURL = food.getImage();
                                     Log.d("FoodAPI", "Food Label: " + foodLabel);
                                     Log.d("FoodAPI", "Reference Calories: " + referenceCalories);
                                     Log.d("FoodAPI", "Selected Date: " + selectedDate);
+                                    Log.d("FoodAPI", "Image URL: " + imageURL);
 
                                     double scaleFactor = servingSize / 100.0; // Assuming Edamam data is per 100 grams
 
@@ -433,6 +436,7 @@ public class UserMealRecordFragment extends Fragment {
                                             mealRecord.setCarbs(adjustedCarbohydrates);
                                             mealRecord.setProteins(adjustedProtein);
                                             mealRecord.setFats(adjustedFat);
+                                            mealRecord.setImageUrl(imageURL);
 
                                             userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
                                             Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
@@ -518,6 +522,7 @@ public class UserMealRecordFragment extends Fragment {
             // Load the image into the ImageView using Glide
             Glide.with(getContext())
                     .load(imageUrl)
+                    .placeholder(R.drawable.baseline_image_not_supported_24)
                     .into(mealImageView);
 
             mealEntryLayout.addView(mealImageView);
