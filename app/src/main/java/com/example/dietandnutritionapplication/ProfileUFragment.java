@@ -33,6 +33,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -97,6 +99,16 @@ public class ProfileUFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "No user logged in", Toast.LENGTH_SHORT).show();
         }
+
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
 
         ImageView logoutImage = view.findViewById(R.id.logout_icon);
         logoutImage.setOnClickListener(v -> {

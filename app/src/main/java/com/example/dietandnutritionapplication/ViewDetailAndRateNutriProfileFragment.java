@@ -25,9 +25,10 @@ import java.util.List;
 public class ViewDetailAndRateNutriProfileFragment extends Fragment {
     private Profile selectedProfile;
     private Nutritionist selectedNutri;
+    private Consultation selectedConsultation;
     private List<AppRatingsReviews> reviews = new ArrayList<>();
     private ListView reviewsListView;
-    private Button filterAllButton,rateButton;
+    private Button filterAllButton,rateButton,bookConsultationButton;
     private Spinner filterSortSpinner;
     private TextView ratingTextView;
     private AppReviewController adapter;
@@ -108,6 +109,7 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
         filterSortSpinner = view.findViewById(R.id.filterSortSpinner);
         ratingTextView = view.findViewById(R.id.ratingTextView);
         rateButton = view.findViewById(R.id.rateButton);
+        bookConsultationButton = view.findViewById(R.id.bookButton);
 
         // Set the button text with total reviews count
         filterAllButton.setText("All (" + reviews.size() + ")");
@@ -179,6 +181,42 @@ public class ViewDetailAndRateNutriProfileFragment extends Fragment {
                     .addToBackStack(null) // Add to back stack so you can navigate back
                     .commit();
         });
+
+// Set up the button click listener
+//        bookConsultationButton.setOnClickListener(v -> {
+////            ViewConsultationDetailsFragment viewConsultationDetailsFragment = new ViewConsultationDetailsFragment();
+////
+////            Bundle bundle = new Bundle();
+////            bundle.putSerializable("selectedProfile", selectedProfile);
+////            viewConsultationDetailsFragment.setArguments(bundle);
+//
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("selectedProfile", selectedProfile);
+//
+//            requireActivity().getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.frame_layout, new ViewConsultationDetailsFragment())
+//                    .addToBackStack(null)
+//                    .commit();
+//        });
+
+        bookConsultationButton.setOnClickListener(v -> {
+            // Create an instance of RateNutriFragment
+            ViewConsultationDetailsFragment viewConsultationDetailsFragment = new ViewConsultationDetailsFragment();
+
+            // Create a bundle to pass data
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedProfile", selectedProfile); // Pass the profile object
+
+            // Set the arguments for the new fragment
+            viewConsultationDetailsFragment.setArguments(bundle);
+
+            // Replace the current fragment with RateNutriFragment
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, viewConsultationDetailsFragment) // Make sure to replace with the correct container ID
+                    .addToBackStack(null) // Add to back stack so you can navigate back
+                    .commit();
+        });
+
         return view;
     }
 

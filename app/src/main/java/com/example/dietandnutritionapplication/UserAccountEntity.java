@@ -52,6 +52,11 @@ public class UserAccountEntity {
         void onFailure(Exception e);
     }
 
+//    public interface UserProfileUpdateCallback {
+//        void onSuccess();
+//        void onFailure(String errorMessage);
+//    }
+
     public void retrieveAndClassifyUsers(final DataCallback callback) {
         db.collection("Users").get()
                 .addOnCompleteListener(task -> {
@@ -94,6 +99,7 @@ public class UserAccountEntity {
                     }
                 });
     }
+
 
     public void retrieveNutritionists(final DataCallback callback) {
         db.collection("Users").get()
@@ -504,6 +510,51 @@ public class UserAccountEntity {
                 .addOnFailureListener(e -> {
                     Log.e("UserAccountEntity", "Error updating user profile", e);
                     callback.onFailure(e.getMessage());
+                });
+    }
+
+    public void suspendUserProfileByUsername(String username, UserProfileUpdateCallback callback) {
+        if (username == null) {
+            Log.e("UserAccountEntity", "Username cannot be null");
+            callback.onFailure("Invalid input: Username cannot be null");
+            return;
+        }
+
+        // Define the hard-coded updates for status
+        final Map<String, Object> updatedFields = new HashMap<>();
+        updatedFields.put("status", "deactivated"); // Change status to inactive
+
+        Log.d("UserAccountEntity", "Attempting to suspend user: " + username);
+
+        db.collection("Users") // Replace with your Firestore collection name
+                .whereEqualTo("username", username) // Query to find the user by username
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        if (task.getResult() != null && !task.getResult().isEmpty()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("UserAccountEntity", "User found: " + document.getId());
+
+                                db.collection("Users").document(document.getId())
+                                        .update(updatedFields)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d("UserAccountEntity", "User profile updated successfully.");
+                                            callback.onSuccess();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("UserAccountEntity", "Error updating user profile", e);
+                                            callback.onFailure(e.getMessage());
+                                        });
+                                break; // Exit the loop after updating the first match
+                            }
+                        } else {
+                            Log.e("UserAccountEntity", "User not found for username: " + username);
+                            callback.onFailure("User not found");
+                        }
+                    } else {
+                        Log.e("UserAccountEntity", "Query failed: " + task.getException());
+                        callback.onFailure("Query failed: " + task.getException().getMessage());
+                    }
                 });
     }
 

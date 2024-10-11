@@ -278,7 +278,7 @@
         </androidx.cardview.widget.CardView>
 
         <Button
-            android:id="@+id/updateProfile"
+            android:id="@+id/suspendUserButton"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"

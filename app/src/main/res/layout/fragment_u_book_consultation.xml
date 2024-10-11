@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+
     >
 
     <!-- Header Layout -->
@@ -134,7 +135,7 @@
 
     <!-- ListView for Nutritionists -->
     <ListView
-        android:id="@+id/nutritionist_list_view"
+        android:id="@+id/available_slots_list_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"

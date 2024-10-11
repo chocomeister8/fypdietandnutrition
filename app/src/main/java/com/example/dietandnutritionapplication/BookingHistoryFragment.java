@@ -2,6 +2,7 @@ package com.example.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +26,10 @@ public class BookingHistoryFragment extends Fragment {
 
     private RecyclerView bookingConsultationsRecyclerView;
     private List<Consultation> consultationList;
+    private BookingConsultationsAdapter adapter;
 
-    @SuppressLint("MissingInflatedId")
+    private FirebaseFirestore db;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -37,16 +44,23 @@ public class BookingHistoryFragment extends Fragment {
         bookingConsultationsRecyclerView = view.findViewById(R.id.booking_consultation_recycler_view);
         bookingConsultationsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Hardcoded data for the prototype
+//        // Hardcoded data for the prototype
         consultationList = new ArrayList<>();
-        consultationList.add(new Consultation("6 Oct 2024 (Sun), 3:30 PM", "Ms. Tee Zhi Xi", "Confirmed"));
-        consultationList.add(new Consultation("20 Nov 2024 (Sun), 7:30 PM", "Mr. Goh Xiao Ming", "Confirmed"));
-        consultationList.add(new Consultation("17 Nov 2024 (Sun), 4:30 PM", "Mr. Alex", "Confirmed"));
-        consultationList.add(new Consultation("8 Dec 2024 (Sun), 10:30 AM", "Ms. Vivian", "Confirmed"));
+        adapter = new BookingConsultationsAdapter(consultationList);
+        bookingConsultationsRecyclerView.setAdapter(adapter);
+
+//        consultationList.add(new Consultation("6 Oct 2024 (Sun), 3:30 PM", "Ms. Tee Zhi Xi", "Confirmed"));
+//        consultationList.add(new Consultation("20 Nov 2024 (Sun), 7:30 PM", "Mr. Goh Xiao Ming", "Confirmed"));
+//        consultationList.add(new Consultation("17 Nov 2024 (Sun), 4:30 PM", "Mr. Alex", "Confirmed"));
+//        consultationList.add(new Consultation("8 Dec 2024 (Sun), 10:30 AM", "Ms. Vivian", "Confirmed"));
 
         // Set up adapter
         BookingConsultationsAdapter adapter = new BookingConsultationsAdapter(consultationList);
         bookingConsultationsRecyclerView.setAdapter(adapter);
+
+        db = FirebaseFirestore.getInstance();
+
+        fetchConsultationSlots();
 
         button_booking_history.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
@@ -73,6 +87,30 @@ public class BookingHistoryFragment extends Fragment {
         return view;
     }
 
+    // Fetch consultation slots from Firestore
+    private void fetchConsultationSlots() {
+        CollectionReference consultationsRef = db.collection("Consultation_slots");
+
+        consultationsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                consultationList.clear();  // Clear the list before adding new items
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    // Get data from the document
+                    String dateTime = document.getString("dateTime");
+                    String clientName = document.getString("clientName");
+                    String status = document.getString("status");
+
+                    // Add the fetched consultation to the list
+                    consultationList.add(new Consultation(dateTime, clientName, status));
+                }
+                // Notify the adapter that data has changed
+                adapter.notifyDataSetChanged();
+            } else {
+                // Handle the error
+                 Log.d("FirestoreError", "Error getting documents: ", task.getException());
+            }
+        });
+    }
 
     // Consultation data model
     private static class Consultation {

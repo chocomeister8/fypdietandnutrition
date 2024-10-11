@@ -4,21 +4,28 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AccountDetailsFragment extends Fragment {
 
-    private Profile selectedProfile; // Declare selectedProfile at class level
+    private Profile selectedProfile;// Declare selectedProfile at class level
+    private SuspendUserController suspendUserController;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.view_account_details, container, false);
+        suspendUserController = new SuspendUserController();
 
         // Retrieve the profile from the arguments
         if (getArguments() != null) {
@@ -34,6 +41,7 @@ public class AccountDetailsFragment extends Fragment {
         TextView emailTextView = view.findViewById(R.id.email);
         TextView roleTextView = view.findViewById(R.id.role);
         TextView datejoinedTextView = view.findViewById(R.id.accountActiveSince);
+        Button suspendUserButton = view.findViewById(R.id.suspendUserButton);
 
 
         // Set the details in the UI
@@ -47,6 +55,17 @@ public class AccountDetailsFragment extends Fragment {
             roleTextView.setText(selectedProfile.getRole());
             datejoinedTextView.setText(selectedProfile.getRole());
         }
+
+        suspendUserButton.setOnClickListener(v -> {
+            if (selectedProfile != null) {
+                String usernameToSuspend = selectedProfile.getUsername();
+                String username = selectedProfile.getUsername();
+                suspendUserController.suspendUser(username); // Ensure suspendUserController is not null
+                Toast.makeText(getActivity(), "Suspended user: " + usernameToSuspend, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), "No user selected to suspend.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
     }

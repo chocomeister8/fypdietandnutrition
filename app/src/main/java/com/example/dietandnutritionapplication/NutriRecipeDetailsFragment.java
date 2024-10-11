@@ -1,6 +1,7 @@
 package com.example.dietandnutritionapplication;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,10 @@ import com.example.dietandnutritionapplication.R;
 import com.example.dietandnutritionapplication.Recipe;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NutriRecipeDetailsFragment extends Fragment {
 
@@ -105,17 +110,72 @@ public class NutriRecipeDetailsFragment extends Fragment {
     }
 
     private void updateRecipeStatus(String recipeId, String status) {
-        db.collection("Recipes").document(recipeId)
-                .update("status", status)
-                .addOnSuccessListener(aVoid -> {
-                    // Successfully updated status
-                    Toast.makeText(getActivity(), "Recipe " + status, Toast.LENGTH_SHORT).show();
-                    statusTextView.setText("Status: " + status); // Update the UI
-                })
-                .addOnFailureListener(e -> {
-                    // Handle failure
-                    Toast.makeText(getActivity(), "Failed to update recipe status", Toast.LENGTH_SHORT).show();
-                });
-    }
+
+        db.collection("Recipes").document(recipeId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String userId = documentSnapshot.getString("userId");
+
+                        db.collection("Recipes").document(recipeId)
+                                .update("status", status)
+                                .addOnSuccessListener(aVoid -> {
+
+                                    // Successfully updated status
+                                    Toast.makeText(getActivity(), "Recipe " + status, Toast.LENGTH_SHORT).show();
+                                    statusTextView.setText("Status: " + status); // Update the UI
+                                    sendNotification(userId, recipeId, status);
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle failure
+                                    Toast.makeText(getActivity(), "Failed to update recipe status", Toast.LENGTH_SHORT).show();
+                                });
+                }
+    })
+            .addOnFailureListener(e -> {
+        // Handle failure to fetch recipe
+        Toast.makeText(getActivity(), "Failed to fetch recipe", Toast.LENGTH_SHORT).show();
+    });
 }
 
+
+    private void sendNotification(String userId, String recipeId, String status) {
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("userId", userId);
+
+        if (status.equals("Approved")) {
+            notificationData.put("message", "Your recipe (ID: " + recipeId + ") has been " + status + " by the nutritionist.");
+        } else if (status.equals("Rejected")) {
+            notificationData.put("message", "Your recipe (ID: " + recipeId + ") has been " + status + " by the nutritionist.");
+        } else {
+            notificationData.put("message", "Your recipe (ID: " + recipeId + ") is still pending.");
+        }
+
+        notificationData.put("type", "Recipe Status Update");
+        notificationData.put("isRead", false);
+        // Add timestamp for when the notification is sent
+        Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
+        notificationData.put("timestamp", entryDateTime);
+
+        // Add notification data to Firestore
+        db.collection("Notifications")
+                .add(notificationData) // Use add() to create a new document
+                .addOnSuccessListener(documentReference -> {
+                    String notificationId = documentReference.getId(); // Get the document ID
+
+                    // Now update the document to include the ID as a field
+                    db.collection("Notifications").document(notificationId)
+                            .update("notificationId", notificationId) // Store the document ID
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Notification", "Notification added with ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Notification", "Error updating notification ID", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to send notification: " + e.getMessage());
+                });
+    }
+
+}
