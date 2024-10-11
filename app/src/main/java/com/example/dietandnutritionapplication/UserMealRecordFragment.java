@@ -1,11 +1,16 @@
 package com.example.dietandnutritionapplication;
+
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,10 +31,14 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import android.widget.ImageView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Time;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -47,12 +56,15 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.label.ImageLabel;
 import com.google.mlkit.vision.label.ImageLabeler;
@@ -113,6 +125,8 @@ public class UserMealRecordFragment extends Fragment {
     private LinearLayout lunchLinearLayout;
     private LinearLayout dinnerLinearLayout;
     private LinearLayout snackLinearLayout;
+
+    private static final int PICK_IMAGE_REQUEST = 1;
 
     @SuppressLint("MissingInflatedId")
     @Nullable
@@ -217,10 +231,11 @@ public class UserMealRecordFragment extends Fragment {
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
                     if (imageBitmap != null) {
                         Log.d("Debug", "Image captured successfully.");
+                        uploadImageToFirebaseStorage(imageBitmap, imageUrl -> {
 
-                        Bitmap scaledBitmap = downscaleBitmap(imageBitmap, 1024); // max size 1024
+                            performImageRecognition(getCurrentUserId(), selectedMealType, imageBitmap, imageUrl);
+                        });
 
-                        performImageRecognition(getCurrentUserId(), selectedMealType, scaledBitmap);
                     } else {
                         Log.e("Error", "Captured image bitmap is null.");
                         Toast.makeText(getActivity(), "Failed to capture image.", Toast.LENGTH_SHORT).show();
@@ -230,7 +245,47 @@ public class UserMealRecordFragment extends Fragment {
         }
     }
 
-    private void performImageRecognition(String userId, String selectedMealType, Bitmap bitmap) {
+    private void uploadImageToFirebaseStorage(Bitmap imageBitmap, OnImageUploadListener listener) {
+        // Create a file to save the bitmap
+        File file = new File(getContext().getCacheDir(), "meal_image.jpg");
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            // Compress the bitmap and save it to the file
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        } catch (IOException e) {
+            Log.e("Meal Record", "Failed to save bitmap to file: " + e.getMessage());
+            Toast.makeText(getContext(), "Failed to save image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get the Uri of the file
+        Uri imageUri = Uri.fromFile(file);
+
+        // Upload the image to Firebase Storage
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference()
+                .child("meal_Records/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + ".jpg");
+
+        storageReference.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    storageReference.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                listener.onImageUploaded(uri.toString());
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "Failed to retrieve download URL", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Meal Record", "Failed to upload image: " + e.getMessage());
+                    Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public interface OnImageUploadListener {
+        void onImageUploaded(String imageUrl);
+    }
+
+    private void performImageRecognition(String userId, String selectedMealType, Bitmap bitmap, String imageUrl) {
         InputImage image = InputImage.fromBitmap(bitmap, 0);
 
         ImageLabelerOptions options =
@@ -254,9 +309,7 @@ public class UserMealRecordFragment extends Fragment {
 
                         String selectedDate = dateTextView.getText().toString();
                         if (isFoodLabel(labelText)) {
-                            searchFoodInEdamam(userId, labelText, 100.00, "grams", selectedMealType, selectedDate, false, "");
-
-
+                            searchFoodInEdamam(userId, labelText, 100.00, "grams", selectedMealType, selectedDate, false, "", imageUrl);
                         }
                     }
                 })
@@ -314,10 +367,10 @@ public class UserMealRecordFragment extends Fragment {
                 String servingUnit = servingUnitSpinner.getSelectedItem().toString();
                 Log.d("MealLogFragment", "Serving Unit Selected: " + servingUnit);
                   Log.d("MealLogFragment", "Meal Type Selected: " + selectedMealType);
-
                   String selectedDate = dateTextView.getText().toString();
+                String imageURL = "url_of_the_uploaded_image";
                 // Call the function to search for the food and scale nutrients accordingly
-                searchFoodInEdamam(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, false, "");
+                searchFoodInEdamam(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, false, "", imageURL);
             } else {
                 // Handle empty serving size input (e.g., show an error)
                 Toast.makeText(requireContext(), "Please enter a valid serving size", Toast.LENGTH_SHORT).show();
@@ -328,7 +381,7 @@ public class UserMealRecordFragment extends Fragment {
         builder.create().show();
     }
 
-    public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID) {
+    public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
         userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
             @Override
             public void onDataFetched(String username, double calorielimit) {
@@ -384,7 +437,7 @@ public class UserMealRecordFragment extends Fragment {
                                             userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
                                             Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
                                         } else {
-                                            userMealRecordController.storeMealData(userId, username, foodLabel, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDate);
+                                            userMealRecordController.storeMealData(userId, username, foodLabel, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDate, imageURL);
                                         }
                                         refreshMealData();
                                     } else {
@@ -438,6 +491,7 @@ public class UserMealRecordFragment extends Fragment {
             double proteins = mealRecord.getProteins();
             double fats = mealRecord.getFats();
             String servingsize = mealRecord.getServingSize();
+            String imageUrl = mealRecord.getImageUrl();
 
             totalCarbs += carbs;
             totalProteins += proteins;
@@ -449,8 +503,6 @@ public class UserMealRecordFragment extends Fragment {
             // Format the meal entry
             DecimalFormat decimalFormat = new DecimalFormat("#");
             String formattedCalories = decimalFormat.format(mealCalories);
-            String mealEntry = mealName + " - " + servingsize + " - " + formattedCalories + " Cal\n";
-
 
             LinearLayout mealEntryLayout = new LinearLayout(getContext());
             mealEntryLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -458,19 +510,42 @@ public class UserMealRecordFragment extends Fragment {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
 
-            TextView mealEntryTextView = new TextView(getContext());
-            mealEntryTextView.setText(mealEntry);
-            mealEntryTextView.setTextSize(16);
+            ImageView mealImageView = new ImageView(getContext());
+            mealImageView.setLayoutParams(new LinearLayout.LayoutParams(160, 160)); // Slightly larger size (e.g., 120x120)
+            mealImageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // Adjust scale type
+            mealImageView.setPadding(8, 0, 8, 0);
+
+            // Load the image into the ImageView using Glide
+            Glide.with(getContext())
+                    .load(imageUrl)
+                    .into(mealImageView);
+
+            mealEntryLayout.addView(mealImageView);
+
+            LinearLayout textLayout = new LinearLayout(getContext());
+            textLayout.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
-                    0, // width set to 0, weight will adjust its width
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 1); // Weight = 1, takes most of the space
-            mealEntryTextView.setLayoutParams(textParams);
-            mealEntryLayout.addView(mealEntryTextView);
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            textLayout.setLayoutParams(textParams);
+            textLayout.setPadding(25, 0, 0, 0);
+
+            TextView titleTextView = new TextView(getContext());
+            titleTextView.setText(mealName);
+            titleTextView.setTextSize(16);
+            textLayout.addView(titleTextView);
+
+            // Calories TextView
+            TextView caloriesTextView = new TextView(getContext());
+            caloriesTextView.setText(formattedCalories + " Cal");
+            caloriesTextView.setTextSize(14);
+            textLayout.addView(caloriesTextView);
+
+            mealEntryLayout.addView(textLayout);
 
             ImageView moreOptionsIcon = new ImageView(getContext());
             moreOptionsIcon.setImageResource(R.drawable.baseline_more_vert_24);
             moreOptionsIcon.setContentDescription("More Options");
-
             mealEntryLayout.addView(moreOptionsIcon);
 
 
@@ -601,7 +676,7 @@ public class UserMealRecordFragment extends Fragment {
                             String userId = getCurrentUserId();
                             String selectedDate = dateTextView.getText().toString();
                             String mealName = mealRecord.getMealName();
-                            searchFoodInEdamam(userId, mealName, updatedServingSize, updatedServingUnit, updatedMealType, selectedDate, true, mealRecordID);
+                            searchFoodInEdamam(userId, mealName, updatedServingSize, updatedServingUnit, updatedMealType, selectedDate, true, mealRecordID, "");
                         }
                     }
                 })

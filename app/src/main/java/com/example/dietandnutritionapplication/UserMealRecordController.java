@@ -1,5 +1,6 @@
 package com.example.dietandnutritionapplication;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
@@ -30,8 +31,8 @@ public class UserMealRecordController {
         mealRecord.fetchMealsLogged(username, selectedDateStr, listener);
     }
 
-    public void storeMealData(String userId,String username, String mealName, String selectedMealType, String servingInfo, double adjustedCalories, double adjustedCarbohydrates, double adjustedProtein, double adjustedFat, String selectedDateStr){
-        mealRecord.storeMealData(userId, username, mealName, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDateStr);;
+    public void storeMealData(String userId,String username, String mealName, String selectedMealType, String servingInfo, double adjustedCalories, double adjustedCarbohydrates, double adjustedProtein, double adjustedFat, String selectedDateStr, String imageURL){
+        mealRecord.storeMealData(userId, username, mealName, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDateStr, imageURL);;
     }
 
     public void fetchUsernameAndCalorieLimit(String userId, MealRecord.OnUsernameAndCalorieLimitFetchedListener listener) {
@@ -45,9 +46,5 @@ public class UserMealRecordController {
     public void updateMealRecord(String mealRecordID, MealRecord mealRecord){
         mealRecord.updateMealRecord(mealRecordID, mealRecord);;
     }
-
-
-
-
 
 }
