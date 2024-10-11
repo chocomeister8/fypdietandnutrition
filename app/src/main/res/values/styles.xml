@@ -1,0 +1,12 @@
+<resources>
+
+    <style name="CircularImage">
+        <item name="cornerSize">70dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance</item>
+    </style>
+
+    <style name="ShapeAppearance">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">70dp</item>
+    </style>
+</resources>

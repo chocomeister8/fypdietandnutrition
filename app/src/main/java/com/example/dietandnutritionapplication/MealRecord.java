@@ -1,5 +1,8 @@
 package com.example.dietandnutritionapplication;
 
+import static android.app.PendingIntent.getActivity;
+
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -10,6 +13,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -51,7 +55,7 @@ public class MealRecord {
                       Timestamp modifiedDate, String servingSize, String username, String mealRecordID, String userId) {
         this.mealName = mealName;
         this.calories = calories;
-        this.imageUrl = imageUrl; // Use the URL for the image
+        this.imageUrl = imageUrl;
         this.mealType = mealType;
         this.carbs = carbs;
         this.proteins = proteins;
@@ -320,7 +324,7 @@ public class MealRecord {
         });
     }
 
-    public void storeMealData(String userId,String username, String mealName, String selectedMealType, String servingInfo, double adjustedCalories, double adjustedCarbohydrates, double adjustedProtein, double adjustedFat, String selectedDateStr){
+    public void storeMealData(String userId,String username, String mealName, String selectedMealType, String servingInfo, double adjustedCalories, double adjustedCarbohydrates, double adjustedProtein, double adjustedFat, String selectedDateStr, String imageUrl){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -334,7 +338,7 @@ public class MealRecord {
         mealData.put("carbs", adjustedCarbohydrates);
         mealData.put("proteins", adjustedProtein);
         mealData.put("fats", adjustedFat);
-
+        mealData.put("imageUrl", imageUrl);
 
         try {
             // Parse the string to a Date object and convert to Timestamp directly
@@ -432,4 +436,5 @@ public class MealRecord {
                 .addOnFailureListener(e -> {
                     Log.w("MealLogFragment", "Error updating meal", e);
                 });
-    }}
+    }
+}

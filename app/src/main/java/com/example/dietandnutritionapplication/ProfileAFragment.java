@@ -2,6 +2,7 @@ package com.example.dietandnutritionapplication;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -33,7 +34,7 @@ public class ProfileAFragment extends Fragment {
     private Admin adminProfile;
     private Button saveButton, uploadImageButton;
     private Spinner genderSpinner;
-    private ImageView imageView;
+    private ImageView adminImageView;
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imageUri;
@@ -61,6 +62,7 @@ public class ProfileAFragment extends Fragment {
             emailData = view.findViewById(R.id.email);
             uploadImageButton = view.findViewById(R.id.upload_picture_button);
             saveButton = view.findViewById(R.id.save_button);
+            adminImageView = view.findViewById(R.id.imageView);
 
             //adminProfile = new Admin("Weiss", "Low", "admin123", "81889009", "weiss@gmail.com", "Male", "admin", "11-09-2024");
             viewAdminProfileController = new ViewAdminProfileController((MainActivity) requireActivity());
@@ -95,31 +97,36 @@ public class ProfileAFragment extends Fragment {
     }
 
     private void openFileChooser() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("ProfileImage", "onActivityResult called");
 
-        if (requestCode == PICK_IMAGE_REQUEST) {
-            Log.d("ProfileImage", "Image pick request received");
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            Uri selectedImageUri = data.getData();
 
-            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
-                imageUri = data.getData();
-                Log.d("ProfileImage", "Image URI obtained: " + imageUri.toString());
-                imageView.setImageURI(imageUri);
+            if (selectedImageUri != null) {
+                Glide.with(getContext())
+                        .load(selectedImageUri)
+                        .into(adminImageView);
 
-                // Call the method to upload the image
+                // Store the URI for later use
+                imageUri = selectedImageUri;
+                Log.d("ProfileImage", "Selected image URI: " + selectedImageUri.toString());
+
                 uploadImageToFirebaseStorage();
             } else {
-                Log.e("ProfileImage", "Result not OK or data is null");
+                Log.e("ProfileImage", "Selected image URI is null");
+                Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Log.e("ProfileImage", "Unexpected request code: " + requestCode);
+            Log.e("ProfileImage", "Image selection failed or request code mismatch");
         }
     }
 
@@ -137,9 +144,6 @@ public class ProfileAFragment extends Fragment {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReference()
                     .child("profile_pictures/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + ".jpg");
-
-            Log.d("ProfileImage", "Storage reference path: " + storageReference.getPath());
-
 
             storageReference.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> {
@@ -179,7 +183,7 @@ public class ProfileAFragment extends Fragment {
             Glide.with(this)
                     .load(admin.getProfileImageUrl())
                     .placeholder(R.drawable.profile)
-                    .into(imageView);
+                    .into(adminImageView);
         }
 
     }

@@ -2,6 +2,7 @@ package com.example.dietandnutritionapplication;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 

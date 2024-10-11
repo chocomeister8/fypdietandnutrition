@@ -75,12 +75,15 @@ public class UserAccountEntity {
                                     case "user":
                                         User user = createUserFromDocument(document);
                                         users.add(user);
+                                        user.setStatus(document.getString("status"));
                                         accounts.add(user);
                                         break;
                                     case "admin":
                                         Admin admin = createAdminFromDocument(document);
                                         admins.add(admin);
+                                        admin.setStatus(document.getString("status"));
                                         accounts.add(admin);
+
                                         break;
                                     case "nutritionist":
                                         Nutritionist nutritionist = createNutritionistFromDocument(document);
@@ -164,6 +167,7 @@ public class UserAccountEntity {
         user.setCurrentWeight(document.getDouble("currentWeight"));
         user.setCurrentHeight(document.getDouble("currentHeight"));
         user.setActivityLevel(document.getString("activityLevel"));
+        user.setStatus(document.getString("status"));
         return user;
     }
 
@@ -178,6 +182,7 @@ public class UserAccountEntity {
                 document.getString("role"),
                 document.getString("dateJoined"),
                 document.getString("profilePicture")
+
         );
     }
 

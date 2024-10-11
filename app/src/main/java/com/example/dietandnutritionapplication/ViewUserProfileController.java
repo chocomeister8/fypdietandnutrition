@@ -58,10 +58,18 @@ public class ViewUserProfileController {
     }
 
     public boolean isProfileIncomplete(User user) {
-        return user.getCurrentWeight() == 0 || user.getCurrentHeight() == 0 ||
-                user.getActivityLevel() == null || user.getFoodAllergies() == null ||
-                user.getHealthGoal() == null || user.getDietaryPreference() == null;
+        return user.getCurrentWeight() == 0 ||
+                user.getCurrentHeight() == 0 ||
+                user.getActivityLevel() == null ||
+                user.getActivityLevel().equals("Select your activity level") ||
+                user.getHealthGoal() == null ||
+                user.getActivityLevel() == "" ||
+                user.getHealthGoal() == "" ||
+                user.getHealthGoal().equals("Select your health goal") ||
+                user.getDietaryPreference() == null;
     }
+
+
 
     public void updateUserProfile(String userId, User updatedUser, Context context) {
         userAccountEntity.getUserById(userId, new UserAccountEntity.UserFetchCallback() {

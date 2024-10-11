@@ -53,7 +53,7 @@ public class AccountDetailsFragment extends Fragment {
             genderTextView.setText(selectedProfile.getGender());
             emailTextView.setText(selectedProfile.getEmail());
             roleTextView.setText(selectedProfile.getRole());
-            datejoinedTextView.setText(selectedProfile.getRole());
+            datejoinedTextView.setText(selectedProfile.getDateJoined());
         }
 
         suspendUserButton.setOnClickListener(v -> {
