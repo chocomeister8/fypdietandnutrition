@@ -16,10 +16,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RecipeDetailFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -49,6 +49,8 @@ public class RecipeDetailFragment extends Fragment {
         TextView ingredientsTextView = view.findViewById(R.id.detail_ingredients);
         ImageView imageView = view.findViewById(R.id.detail_image);
         Button backButton = view.findViewById(R.id.back_button);
+        Button saveButton = view.findViewById(R.id.addFavouriteButton);
+        Button addToFolderButton = view.findViewById(R.id.addToFolder);
         TextView healthLabelsTextView = view.findViewById(R.id.detail_health_labels);
         TextView viewMoreHealthLabels = view.findViewById(R.id.view_more_health_labels);
         TextView viewLessHealthLabels = view.findViewById(R.id.view_less_health_labels);
@@ -149,75 +151,21 @@ public class RecipeDetailFragment extends Fragment {
                     .commit();
         });
 
-        AddFavouriteRecipeController addFavouriteRecipeController =new AddFavouriteRecipeController();
-
-        Button saveButton = view.findViewById(R.id.addFavouriteButton);
-        saveButton.setOnClickListener(v -> addFavouriteRecipeController.checkAddFavouriteRecipe(recipe,getContext()));
-
-
+        AddFavouriteRecipeController addFavouriteRecipeController = new AddFavouriteRecipeController();
+        saveButton.setOnClickListener(v -> addFavouriteRecipeController.checkAddFavouriteRecipe(recipe, getContext()));
 
         // Add to folder functionality
-        Button addToFolderButton = view.findViewById(R.id.addToFolder);
-        addToFolderButton.setOnClickListener(v -> showAddToFolderDialog());
+        addToFolderButton.setOnClickListener(v -> {
+            // Create an instance of AddToFolderFragment
+            AddToFolderFragment addToFolderFragment = new AddToFolderFragment(recipe);
+
+            // Call the method to show the dialog
+            addToFolderFragment.showAddToFolderDialog(getActivity());
+        });
+
 
         return view;
     }
-
-    private void showAddToFolderDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Enter Folder Name");
-
-        final EditText folderNameInput = new EditText(getActivity());
-        builder.setView(folderNameInput);
-
-        builder.setPositiveButton("Add", (dialog, which) -> {
-            String folderName = folderNameInput.getText().toString();
-            if (!folderName.isEmpty()) {
-                // Call method to add the recipe to the specified folder
-                addRecipeToFolder(folderName);
-            } else {
-                // Handle empty input (optional)
-                folderNameInput.setError("Folder name cannot be empty");
-            }
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void addRecipeToFolder(String folderName) {
-        // Check if the folder exists in Firestore
-        db.collection("RecipesFolders")
-                .document(folderName)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                        // Folder exists, add the recipe to the folder
-                        db.collection("RecipesFolders")
-                                .document(folderName)
-                                .collection("folderName")
-                                .add(recipe)
-                                .addOnSuccessListener(aVoid -> {
-                                    // Show a message indicating success
-                                    Toast.makeText(getContext(), "Recipe added to " + folderName, Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Handle any errors when adding the recipe
-                                    Toast.makeText(getContext(), "Failed to add recipe: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
-                    } else {
-                        // Folder does not exist, show an error message
-                        Toast.makeText(getContext(), "Folder does not exist: " + folderName, Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    // Handle any errors when checking the folder
-                    Toast.makeText(getContext(), "Error checking folder: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
-
 
     private String formatAsBulletList(List<String> items) {
         StringBuilder bulletList = new StringBuilder();
