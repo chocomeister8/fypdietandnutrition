@@ -1,11 +1,12 @@
 package com.example.dietandnutritionapplication;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,15 +16,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import com.google.firebase.firestore.FirebaseFirestore;
-import java.util.HashMap;
-import java.util.Map;
-
-
 
 public class RecipeDetailFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -34,7 +30,6 @@ public class RecipeDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe_details, container, false);
-
 
         // Get the recipe from the bundle
         if (getArguments() != null) {
@@ -59,7 +54,6 @@ public class RecipeDetailFragment extends Fragment {
         TextView viewLessHealthLabels = view.findViewById(R.id.view_less_health_labels);
         TextView viewMoreIngredients = view.findViewById(R.id.view_more_ingredients);
         TextView viewLessIngredients = view.findViewById(R.id.view_less_ingredients);
-
 
         // Set recipe details
         if (recipe != null) {
@@ -134,55 +128,96 @@ public class RecipeDetailFragment extends Fragment {
             int spinner1Value = getArguments().getInt("spinner1_value", 0);
             int spinner2Value = getArguments().getInt("spinner2_value", 0);
 
+            Fragment fragment;
             if ("all".equals(source)) {
-                // Pass the search and spinner values back to NavAllRecipesFragment
-                NavAllRecipesFragment fragment = new NavAllRecipesFragment();
-                Bundle args = new Bundle();
-                args.putString("search_query", searchQuery);
-                args.putInt("spinner1_value", spinner1Value);
-                args.putInt("spinner2_value", spinner2Value);
-                fragment.setArguments(args);
-
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, fragment)
-                        .addToBackStack(null)
-                        .commit();
+                fragment = new NavAllRecipesFragment();
             } else if ("vegetarian".equals(source)) {
-                // Pass the search and spinner values back to NavVegetarianRecipesFragment
-                NavVegetarianRecipesFragment fragment = new NavVegetarianRecipesFragment();
-                Bundle args = new Bundle();
-                args.putString("search_query", searchQuery);
-                args.putInt("spinner1_value", spinner1Value);
-                args.putInt("spinner2_value", spinner2Value);
-                fragment.setArguments(args);
-
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, fragment)
-                        .addToBackStack(null)
-                        .commit();
+                fragment = new NavVegetarianRecipesFragment();
+            } else { // "recommended"
+                fragment = new NavRecommendedRecipesFragment();
             }
-            else if ("recommended".equals(source)) {
-                // Pass the search and spinner values back to NavVegetarianRecipesFragment
-                NavRecommendedRecipesFragment fragment = new NavRecommendedRecipesFragment();
-                Bundle args = new Bundle();
-                args.putString("search_query", searchQuery);
-                args.putInt("spinner1_value", spinner1Value);
-                args.putInt("spinner2_value", spinner2Value);
-                fragment.setArguments(args);
 
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, fragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+            Bundle args = new Bundle();
+            args.putString("search_query", searchQuery);
+            args.putInt("spinner1_value", spinner1Value);
+            args.putInt("spinner2_value", spinner2Value);
+            fragment.setArguments(args);
+
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
+
         AddFavouriteRecipeController addFavouriteRecipeController =new AddFavouriteRecipeController();
 
         Button saveButton = view.findViewById(R.id.addFavouriteButton);
         saveButton.setOnClickListener(v -> addFavouriteRecipeController.checkAddFavouriteRecipe(recipe,getContext()));
 
+
+
+        // Add to folder functionality
+        Button addToFolderButton = view.findViewById(R.id.addToFolder);
+        addToFolderButton.setOnClickListener(v -> showAddToFolderDialog());
+
         return view;
     }
+
+    private void showAddToFolderDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Enter Folder Name");
+
+        final EditText folderNameInput = new EditText(getActivity());
+        builder.setView(folderNameInput);
+
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String folderName = folderNameInput.getText().toString();
+            if (!folderName.isEmpty()) {
+                // Call method to add the recipe to the specified folder
+                addRecipeToFolder(folderName);
+            } else {
+                // Handle empty input (optional)
+                folderNameInput.setError("Folder name cannot be empty");
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void addRecipeToFolder(String folderName) {
+        // Check if the folder exists in Firestore
+        db.collection("RecipesFolders")
+                .document(folderName)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                        // Folder exists, add the recipe to the folder
+                        db.collection("RecipesFolders")
+                                .document(folderName)
+                                .collection("folderName")
+                                .add(recipe)
+                                .addOnSuccessListener(aVoid -> {
+                                    // Show a message indicating success
+                                    Toast.makeText(getContext(), "Recipe added to " + folderName, Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle any errors when adding the recipe
+                                    Toast.makeText(getContext(), "Failed to add recipe: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        // Folder does not exist, show an error message
+                        Toast.makeText(getContext(), "Folder does not exist: " + folderName, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle any errors when checking the folder
+                    Toast.makeText(getContext(), "Error checking folder: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     private String formatAsBulletList(List<String> items) {
         StringBuilder bulletList = new StringBuilder();
@@ -191,6 +226,4 @@ public class RecipeDetailFragment extends Fragment {
         }
         return bulletList.toString();
     }
-
-
 }

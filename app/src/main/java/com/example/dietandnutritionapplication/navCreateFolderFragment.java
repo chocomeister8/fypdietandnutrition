@@ -214,22 +214,28 @@ public class navCreateFolderFragment extends Fragment {
 
             // Set click listener to the folder name
             holder.folderName.setOnClickListener(v -> {
-                // Check if the target fragment is not null
+                // Navigate to predefined fragment for default folders
                 if (folder.getTargetFragment() != null) {
-                    // Navigate to the target fragment
                     Fragment fragment = null;
                     try {
-                        // Cast to Class<? extends Fragment>
                         fragment = (Fragment) folder.getTargetFragment().newInstance(); // Create an instance of the target fragment
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     if (fragment != null) {
                         // Replace the current fragment with the target fragment
-                        ((MainActivity) v.getContext()).replaceFragment(fragment); // Assuming you have a method to replace fragments
+                        ((MainActivity) v.getContext()).replaceFragment(fragment); // Assuming MainActivity has replaceFragment method
                     }
                 } else {
-                    Toast.makeText(v.getContext(), "No action defined for this folder.", Toast.LENGTH_SHORT).show();
+                    // Handle user-created folders
+                    Bundle args = new Bundle();
+                    args.putString("folder_name", folder.getFolderName()); // Pass folder name as argument
+
+                    // Navigate to a generic fragment for user-created folders
+                    NavUserFolderFragment userFolderFragment = new NavUserFolderFragment();
+                    userFolderFragment.setArguments(args); // Pass the folder name to the fragment
+
+                    ((MainActivity) v.getContext()).replaceFragment(userFolderFragment); // Replace with the generic fragment
                 }
             });
 
@@ -239,6 +245,7 @@ public class navCreateFolderFragment extends Fragment {
                 holder.deleteButton.setOnClickListener(v -> deleteListener.onFolderDelete(folder));
             }
         }
+
 
 
         @Override
@@ -253,7 +260,7 @@ public class navCreateFolderFragment extends Fragment {
 
             public FolderViewHolder(@NonNull View itemView) {
                 super(itemView);
-                folderName = itemView.findViewById(R.id.folder_name);
+                folderName = itemView.findViewById(R.id.folder_button);
                 deleteButton = itemView.findViewById(R.id.delete_button);
             }
         }
