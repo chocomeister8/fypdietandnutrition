@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
@@ -110,6 +111,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public int getItemCount() {
         return recipeList.size();
     }
+
+    // Method to update the recipe list and notify the adapter
+    public void updateRecipeList(List<Recipe> newRecipeList) {
+        this.recipeList = new ArrayList<>(newRecipeList); // Create a new list to avoid modifying the original list
+        notifyDataSetChanged(); // Notify the adapter to refresh the views
+    }
+
 
     // ViewHolder class to represent each recipe item view
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {

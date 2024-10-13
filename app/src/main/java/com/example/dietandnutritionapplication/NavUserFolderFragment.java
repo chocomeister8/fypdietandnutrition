@@ -20,14 +20,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class NavUserFolderFragment extends Fragment {
 
@@ -38,19 +35,14 @@ public class NavUserFolderFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList;
+    private List<Recipe> originalRecipeList; // Keep a copy of the original recipe list
     private EditText searchEditText;
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
 
-    private final Random random = new Random();
-
     // Define your meal types and dish types
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
-
-    private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "steak", "fish", "soup", "lamb", "pasta", "potato", "burger", "curry", "shrimp", "bacon", "fried", "grilled", "smoked", "salmon"
-    );
 
     @Nullable
     @Override
@@ -67,11 +59,7 @@ public class NavUserFolderFragment extends Fragment {
 
         // Initialize views for All Recipes functionality
         initializeViews(view);
-
-        // Fetch recipes
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
-
-        // Restore previous search and spinner selections if available
+        loadRecipes(); // Load recipes based on the folder
         restorePreviousState();
 
         // Set up button click listeners
@@ -87,6 +75,7 @@ public class NavUserFolderFragment extends Fragment {
 
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
+        originalRecipeList = new ArrayList<>(); // Initialize the original list
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
@@ -153,6 +142,34 @@ public class NavUserFolderFragment extends Fragment {
         });
     }
 
+    private void loadRecipes() {
+        // Fetch the recipes from Firestore based on the folder name
+        fetchRecipesFromDataSource(folderName);
+    }
+
+    private void fetchRecipesFromDataSource(String folder) {
+        // Reference to Firestore
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Fetch recipes from Firestore based on the folder name
+        db.collection("recipes") // Replace with your actual collection name
+                .whereEqualTo("folder", folder) // Filter by folder name
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        recipeList.clear(); // Clear the existing list
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Recipe recipe = document.toObject(Recipe.class); // Assuming Recipe class is set up for Firestore
+                            recipeList.add(recipe); // Add recipe to the list
+                        }
+                        originalRecipeList = new ArrayList<>(recipeList); // Keep a copy of the original list
+                        recipeAdapter.updateRecipeList(recipeList); // Update the adapter
+                    } else {
+                        Log.d("NavUserFolderFragment", "Error getting documents: ", task.getException());
+                    }
+                });
+    }
+
     private void restorePreviousState() {
         if (getArguments() != null) {
             String savedSearchQuery = getArguments().getString("search_query", "");
@@ -170,31 +187,41 @@ public class NavUserFolderFragment extends Fragment {
     }
 
     private void filterRecipes() {
-        String searchQuery = searchEditText.getText().toString().trim();
-        String selectedMealType = mealTypeSpinner.getSelectedItem() != null ? mealTypeSpinner.getSelectedItem().toString() : "--Select Meal Type--";
-        String selectedDishType = dishTypeSpinner.getSelectedItem() != null ? dishTypeSpinner.getSelectedItem().toString() : "--Select Dish Type--";
+        String searchQuery = searchEditText.getText().toString().trim().toLowerCase();
+        String selectedMealType = mealTypeSpinner.getSelectedItem().toString();
+        String selectedDishType = dishTypeSpinner.getSelectedItem().toString();
 
-        Log.d("FilterRecipes", "Search Query: " + searchQuery + ", Meal Type: " + selectedMealType + ", Dish Type: " + selectedDishType);
+        List<Recipe> filteredList = new ArrayList<>();
 
-        fetchRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
-                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
+        for (Recipe recipe : originalRecipeList) {
+            boolean matchesSearchQuery = recipe.getName().toLowerCase().contains(searchQuery);
+            boolean matchesMealType = selectedMealType.equals("--Select Meal Type--") || recipe.getMealType().equals(selectedMealType);
+            boolean matchesDishType = selectedDishType.equals("--Select Dish Type--") || recipe.getDishType().equals(selectedDishType);
+
+            if (matchesSearchQuery && matchesMealType && matchesDishType) {
+                filteredList.add(recipe);
+            }
+        }
+
+        // Update the adapter with the filtered list
+        recipeAdapter.updateRecipeList(filteredList);
     }
 
     private void setupButtonListeners(View view) {
-
         Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
 
-
         button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
-        clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
+        clearFiltersButton.setOnClickListener(v -> clearFilters());
     }
 
-    private void clearFiltersAndFetchRandomRecipes() {
+    private void clearFilters() {
         mealTypeSpinner.setSelection(0); // Reset meal type spinner
         dishTypeSpinner.setSelection(0); // Reset dish type spinner
         searchEditText.setText(""); // Clear search bar
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null); // Fetch random recipes
+
+        // Reset the recipe list to original and notify adapter
+        recipeAdapter.updateRecipeList(originalRecipeList);
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -208,67 +235,9 @@ public class NavUserFolderFragment extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putParcelable("selected_recipe", recipe);
         bundle.putString("source", "all");
-        bundle.putString("search_query", searchEditText.getText().toString());
-        bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());
-        bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());
-
-        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        bundle.putString("folder_name", folderName);
+        Fragment recipeDetailFragment = new RecipeDetailFragment();
         recipeDetailFragment.setArguments(bundle);
-
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, recipeDetailFragment)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    private void fetchRecipes(String query, String mealType, String dishType) {
-        String app_id = "2c7710ea"; // Your Edamam API app ID
-        String app_key = "97f5e9187c865600f74e2baa358a9efb";
-        String type = "public";
-
-        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-
-        // Assuming the API requires meal type and dish type as separate parameters
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType, null);
-
-        call.enqueue(new Callback<RecipeResponse>() {
-            @Override
-            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
-
-                    // Debugging: Log the number of recipes fetched
-                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
-
-                    // Clear previous recipes
-                    recipeList.clear();
-
-                    for (RecipeResponse.Hit hit : hits) {
-                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
-
-                        double caloriesPer100g = recipe.getCaloriesPer100g();
-                        if (recipe.getTotalWeight() > 0) {
-                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                        }
-                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-
-                        recipeList.add(recipe);
-                    }
-
-                    recipeAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RecipeResponse> call, Throwable t) {
-                Log.e("Fetch Recipes", "Error: " + t.getMessage());
-            }
-        });
-    }
-
-    private String getRandomSimpleFoodSearch() {
-        return simpleFoodSearches.get(random.nextInt(simpleFoodSearches.size()));
+        navigateToFragment(recipeDetailFragment);
     }
 }

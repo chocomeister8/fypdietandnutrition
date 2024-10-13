@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import java.util.List;
 
 public class Recipe implements Parcelable {
+    private String name; // Name of the recipe
+    private String folder; // Folder to which the recipe belongs
     private String recipe_id;
     private String userId;
     private String label; // The title of the recipe
@@ -94,6 +96,7 @@ public class Recipe implements Parcelable {
         this.total_time = total_time;
     }
 
+
     // Optionally, add a constructor
     public Recipe(String recipe_id, String userId, String label, String status, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
                   List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int total_Time) {
@@ -112,7 +115,20 @@ public class Recipe implements Parcelable {
         this.calories = calories;
         this.totalWeight = totalWeight;
         this.total_time = total_Time;
+        this.name = name;
+        this.folder = folder;
     }
+
+    // Getter for the name
+    public String getName() {
+        return name;
+    }
+
+    // Getter for the folder
+    public String getFolder() {
+        return folder;
+    }
+
 
     // Parcelable implementation for passing Recipe between fragments
     protected Recipe(Parcel in) {
@@ -131,6 +147,10 @@ public class Recipe implements Parcelable {
         calories = in.readDouble();
         totalWeight = in.readDouble();
         total_time = in.readInt();
+        name = in.readString();
+        folder = in.readString();
+            // Read other fields from the Parcel
+
     }
 
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
@@ -167,7 +187,11 @@ public class Recipe implements Parcelable {
         dest.writeDouble(calories);
         dest.writeDouble(totalWeight);
         dest.writeInt(total_time);
+        dest.writeString(name);
+        dest.writeString(folder);
     }
+
+
 
     public void setLabel(String label) {
         this.label = label;

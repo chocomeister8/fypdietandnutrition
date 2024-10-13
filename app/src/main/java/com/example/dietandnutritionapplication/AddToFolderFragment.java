@@ -58,7 +58,6 @@ public class AddToFolderFragment extends Fragment {
         builder.show();
     }
 
-    // Method to check if the folder exists
     private void checkFolderExists(String folderName, @NonNull Context context) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
@@ -68,25 +67,32 @@ public class AddToFolderFragment extends Fragment {
             return;
         }
 
-        // Log the folder name being checked
-        Log.d(TAG, "Checking existence of folder: " + folderName);
+        // Log the folder name and user ID being checked
+        Log.d(TAG, "Checking existence of folder: " + folderName + " for user: " + userId);
 
+        // Query the collection to check if a document with the userId and folderName fields exists
         db.collection("RecipesFolders")
-                .document(folderName)
+                .whereEqualTo("folderName", folderName)  // Match the folder name field
+                .whereEqualTo("user_id", userId)  // Match the user ID field
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document != null && document.exists()) {
-                            // If the folder exists, add the recipe to the folder
+                        // Check if any documents were returned
+                        if (!task.getResult().isEmpty()) {
+                            Toast.makeText(context, "Recipes existed", Toast.LENGTH_SHORT).show();
                             addRecipeToFolder(folderName, context);
                         } else {
+                            // Folder doesn't exist
                             Toast.makeText(context, "Folder does not exist.", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        // Log the error message
-                        Log.e(TAG, "Error checking folder existence: " + task.getException().getMessage());
-                        Toast.makeText(context, "Error checking folder existence: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        // Log the task failure and any potential error
+                        if (task.getException() != null) {
+                            Log.e(TAG, "Error checking folder existence: " + task.getException().getMessage());
+                        } else {
+                            Log.e(TAG, "Error checking folder existence: Task failed without an exception.");
+                        }
+                        Toast.makeText(context, "Error checking folder existence. Please try again.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -109,11 +115,11 @@ public class AddToFolderFragment extends Fragment {
             return;
         }
 
-        // Create a RecipeFolder object
+        // Create a RecipeFolder object (assuming you have such a class to handle folder structure)
         RecipeFolder folder = new RecipeFolder(userId, folderName, recipe);
 
-        // Save the folder to Firestore
-        db.collection("RecipesFolders")
+        // Save the folder to Firestore under the user's folder collection
+        db.collection("RecipesFoldersStoring")
                 .document(folderName) // Use folder name as document ID
                 .set(folder) // Set the folder object
                 .addOnSuccessListener(aVoid -> {
