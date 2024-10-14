@@ -13,11 +13,11 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.example.dietandnutritionapplication.LandingFragment;
-import com.example.dietandnutritionapplication.LoginFragment;
-import com.example.dietandnutritionapplication.MainActivity;
-import com.example.dietandnutritionapplication.R;
-import com.example.dietandnutritionapplication.URegisterFragment;
+import com.fyp.dietandnutritionapplication.LandingFragment;
+import com.fyp.dietandnutritionapplication.LoginFragment;
+import com.fyp.dietandnutritionapplication.MainActivity;
+import com.fyp.dietandnutritionapplication.R;
+import com.fyp.dietandnutritionapplication.URegisterFragment;
 
 /**
  * A simple {@link Fragment} subclass.

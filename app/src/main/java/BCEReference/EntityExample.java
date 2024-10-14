@@ -1,7 +1,7 @@
 package BCEReference;
 
-import com.example.dietandnutritionapplication.Profile;
-import com.example.dietandnutritionapplication.User;
+import com.fyp.dietandnutritionapplication.Profile;
+import com.fyp.dietandnutritionapplication.User;
 
 import java.util.ArrayList;
 
