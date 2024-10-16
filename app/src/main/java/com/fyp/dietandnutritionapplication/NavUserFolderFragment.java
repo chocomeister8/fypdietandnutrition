@@ -74,10 +74,23 @@ public class NavUserFolderFragment extends Fragment {
         setupSearchBar();
     }
 
+//    private void loadRecipes() {
+//        // Fetch the recipes from Firestore based on the folder name
+//        RecipesEntity recipesEntity = new RecipesEntity();
+//        recipesEntity.fetchRecipesFromFolder(folderName, new RecipesEntity.OnRecipesFetchedListener() {
+//            @Override
+//            public void onRecipesFetched(ArrayList<Recipe> fetchedRecipes) {
+//                recipeList.clear(); // Clear the current recipe list
+//                recipeList.addAll(fetchedRecipes); // Add fetched recipes
+//                originalRecipeList = new ArrayList<>(recipeList); // Keep a copy of the original list
+//                recipeAdapter.updateRecipeList(recipeList); // Notify the adapter to update
+//            }
+//        });
+//    }
+
     private void loadRecipes() {
-        // Fetch the recipes from Firestore based on the folder name
-        RecipesEntity recipesEntity = new RecipesEntity();
-        recipesEntity.fetchRecipesFromFolder(folderName, new RecipesEntity.OnRecipesFetchedListener() {
+        NavUserFolderController controller = new NavUserFolderController(folderName);
+        controller.checkFetchRecipesFolder(new NavUserFolderController.OnRecipesFetchedListener() {
             @Override
             public void onRecipesFetched(ArrayList<Recipe> fetchedRecipes) {
                 recipeList.clear(); // Clear the current recipe list
