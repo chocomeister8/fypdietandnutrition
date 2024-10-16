@@ -13,11 +13,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class BMIRecordAdapter extends RecyclerView.Adapter<BMIRecordAdapter.BMIViewHolder> {
+public class BMIRecordFragment extends RecyclerView.Adapter<BMIRecordFragment.BMIViewHolder> {
 
-    private List<BMIDetail> bmiList;
+    private List<BMIEntity> bmiList;
 
-    public BMIRecordAdapter(List<BMIDetail> bmiList) {
+    public BMIRecordFragment(List<BMIEntity> bmiList) {
         this.bmiList = bmiList;
     }
 
@@ -30,7 +30,7 @@ public class BMIRecordAdapter extends RecyclerView.Adapter<BMIRecordAdapter.BMIV
 
     @Override
     public void onBindViewHolder(@NonNull BMIViewHolder holder, int position) {
-        BMIDetail bmiDetail = bmiList.get(position);
+        BMIEntity bmiDetail = bmiList.get(position);
         holder.bmiTextView.setText(String.format("BMI: %.1f", bmiDetail.getBmi()));
         holder.timestampTextView.setText(formatDate(bmiDetail.getTimestamp()));
     }

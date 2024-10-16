@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -156,7 +155,7 @@ public class userHomePageFragment extends Fragment {
         button_bmiCalculator.setOnClickListener(v -> {
             // Replace current fragment with NavRecipesStatusFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BMICalculatorFragment())
+                    .replace(R.id.frame_layout, new BMICalculatorController())
                     .addToBackStack(null)
                     .commit();
         });

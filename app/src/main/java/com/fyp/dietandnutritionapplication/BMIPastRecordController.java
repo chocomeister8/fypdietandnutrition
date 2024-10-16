@@ -15,21 +15,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BMIPastRecordFragment extends Fragment {
+public class BMIPastRecordController extends Fragment {
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private RecyclerView recyclerView;
-    private BMIRecordAdapter adapter;
-    private List<BMIDetail> bmiList;
+    private BMIRecordFragment adapter;
+    private List<BMIEntity> bmiList;
 
     // Constructor to accept local BMI list
-    public BMIPastRecordFragment(List<BMIDetail> localBmiList) {
+    public BMIPastRecordController(List<BMIEntity> localBmiList) {
         this.bmiList = localBmiList != null ? localBmiList : new ArrayList<>();
     }
 
@@ -44,7 +43,7 @@ public class BMIPastRecordFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         recyclerView = view.findViewById(R.id.bmiRecord_recycler_view);
-        adapter = new BMIRecordAdapter(bmiList);
+        adapter = new BMIRecordFragment(bmiList);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -74,7 +73,7 @@ public class BMIPastRecordFragment extends Fragment {
                             double bmi = document.getDouble("bmi");
                             long timestamp = document.getLong("timestamp");
                             // Add to the local list
-                            bmiList.add(new BMIDetail(bmi, timestamp, userId));
+                            bmiList.add(new BMIEntity(bmi, timestamp, userId));
                         }
                         adapter.notifyDataSetChanged(); // Notify the adapter to refresh the view
                     } else {

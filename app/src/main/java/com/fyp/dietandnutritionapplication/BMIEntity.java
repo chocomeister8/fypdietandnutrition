@@ -4,12 +4,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class BMIDetail {
+public class BMIEntity {
     private double bmi;
     private long timestamp;
     private String id;
 
-    public BMIDetail(double bmi, long timestamp, String id) {
+    public BMIEntity(double bmi, long timestamp, String id) {
         this.bmi = bmi;
         this.timestamp = timestamp;
         this.id = id;

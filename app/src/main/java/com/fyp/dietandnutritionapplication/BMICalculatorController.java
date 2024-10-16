@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BMICalculatorFragment extends Fragment {
+public class BMICalculatorController extends Fragment {
 
     private EditText heightInput, weightInput, ageInput;
     private TextView bmiResultValue, bmrValue, calorieValue, bmiAdvice;
@@ -32,7 +32,7 @@ public class BMICalculatorFragment extends Fragment {
     private String selectedGender = ""; // No default gender
     private FirebaseAuth auth;
     private FirebaseFirestore db;
-    private List<BMIDetail> bmiList = new ArrayList<>(); // Initialize the BMI list
+    private List<BMIEntity> bmiList = new ArrayList<>(); // Initialize the BMI list
 
     @Nullable
     @Override
@@ -73,7 +73,7 @@ public class BMICalculatorFragment extends Fragment {
         calculateButton.setOnClickListener(v -> calculateBMIAndBMR());
 
         pastRecordButton.setOnClickListener(v -> {
-            BMIPastRecordFragment pastRecordFragment = new BMIPastRecordFragment(bmiList);
+            BMIPastRecordController pastRecordFragment = new BMIPastRecordController(bmiList);
             getActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, pastRecordFragment)
@@ -149,7 +149,7 @@ public class BMICalculatorFragment extends Fragment {
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(requireContext(), "BMI record added.", Toast.LENGTH_SHORT).show();
                     // Add the new record to the local list
-                    bmiList.add(new BMIDetail(bmi, System.currentTimeMillis(), userId));
+                    bmiList.add(new BMIEntity(bmi, System.currentTimeMillis(), userId));
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(requireContext(), "Error adding BMI record: " + e.getMessage(), Toast.LENGTH_SHORT).show();
