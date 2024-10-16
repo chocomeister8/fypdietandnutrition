@@ -296,5 +296,4 @@ public class AddAdminFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-
 }
