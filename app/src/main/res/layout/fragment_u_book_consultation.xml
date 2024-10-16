@@ -30,7 +30,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginStart="16dp"
             android:layout_marginTop="20dp"
-            android:text="View Nutritionist"
+            android:text="My Consultation"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -70,7 +70,6 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="View Nutritionist"
-                android:textStyle="bold"
                 android:textAlignment="viewStart"
                 android:textColor="#333333"
                 android:textSize="11sp" />
@@ -87,6 +86,7 @@
                 android:text="My Consultation"
                 android:textAlignment="viewStart"
                 android:textColor="#333333"
+                android:textStyle="bold"
                 android:textSize="11sp" />
 
         </LinearLayout>
