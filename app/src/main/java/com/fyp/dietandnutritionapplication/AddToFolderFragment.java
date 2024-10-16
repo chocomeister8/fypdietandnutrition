@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class AddToFolderFragment extends Fragment {
@@ -78,7 +80,7 @@ public class AddToFolderFragment extends Fragment {
                     if (task.isSuccessful()) {
                         // Check if any documents were returned
                         if (!task.getResult().isEmpty()) {
-                            Toast.makeText(context, "Recipes existed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Folder exists.", Toast.LENGTH_SHORT).show();
                             addRecipeToFolder(folderName, context);
                         } else {
                             // Folder doesn't exist
@@ -96,38 +98,52 @@ public class AddToFolderFragment extends Fragment {
                 });
     }
 
-    // Method to add the recipe to the specified folder
     public void addRecipeToFolder(String folderName, @NonNull Context context) {
-        // Get the current user's ID
         FirebaseAuth auth = FirebaseAuth.getInstance();
         String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
 
-        // Check if userId is null (user is not logged in)
         if (userId == null) {
             Toast.makeText(context, "Error: User is not logged in.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Check if the recipe is not null
         if (recipe == null) {
             Toast.makeText(context, "Error: Recipe is null.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create a RecipeFolder object (assuming you have such a class to handle folder structure)
-        RecipeFolder folder = new RecipeFolder(userId, folderName, recipe);
+        // Reference to the folder in Firestore
+        DocumentReference folderRef = db.collection("RecipesFoldersStoring").document(folderName);
 
-        // Save the folder to Firestore under the user's folder collection
-        db.collection("RecipesFoldersStoring")
-                .document(folderName) // Use folder name as document ID
-                .set(folder) // Set the folder object
-                .addOnSuccessListener(aVoid -> {
-                    // Show success message
-                    Toast.makeText(context, "Recipe added to folder!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    // Show error message
-                    Toast.makeText(context, "Error adding recipe to folder: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        // Get the existing folder document
+        folderRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                RecipeFolder folder;
+
+                if (document.exists()) {
+                    // Folder exists, retrieve it
+                    folder = document.toObject(RecipeFolder.class);
+                    if (folder != null) {
+                        folder.addRecipe(recipe); // Add the new recipe
+                    }
+                } else {
+                    // Folder does not exist, create a new one
+                    folder = new RecipeFolder(userId, folderName);
+                    folder.addRecipe(recipe);
+                }
+
+                // Save the updated folder back to Firestore
+                folderRef.set(folder)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(context, "Recipe added to folder!", Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(context, "Error adding recipe to folder: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                Toast.makeText(context, "Error retrieving folder: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
