@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    >
+    android:background="@color/white">
 
     <!-- Header Layout -->
     <RelativeLayout
@@ -43,54 +42,6 @@
             android:src="@drawable/baseline_menu_24" />
     </RelativeLayout>
 
-    <!-- Sidebar Layout -->
-    <FrameLayout
-        android:id="@+id/navigationBar"
-        android:layout_width="125dp"
-        android:layout_height="300dp"
-        android:layout_marginStart="16dp"
-        android:background="@drawable/rounded_search_bar_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout5"
-        app:layout_constraintVertical_bias="0.03">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/view_nutri"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="View Nutritionist"
-                android:textStyle="bold"
-                android:textAlignment="viewStart"
-                android:textColor="#333333"
-                android:textSize="11sp" />
-
-
-            <Button
-                android:id="@+id/booking_consultation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="My Consultation"
-                android:textAlignment="viewStart"
-                android:textColor="#333333"
-                android:textSize="11sp" />
-
-        </LinearLayout>
-    </FrameLayout>
-
     <!-- Search Bar -->
     <EditText
         android:id="@+id/search_bar"
@@ -98,25 +49,11 @@
         android:layout_height="wrap_content"
         android:hint="Search"
         android:inputType="text"
-        app:layout_constraintStart_toEndOf="@id/navigationBar"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/relativeLayout5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp" />
-
-    <!-- Spinner for Specialization -->
-    <Spinner
-        android:id="@+id/specialization_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@id/navigationBar"
-        app:layout_constraintTop_toBottomOf="@id/search_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:entries="@array/specializations_array"
-        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp" />
 
     <!-- Search Button -->
@@ -125,24 +62,71 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Search"
-        app:layout_constraintStart_toEndOf="@id/navigationBar"
-        app:layout_constraintTop_toBottomOf="@id/specialization_spinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_bar"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp" />
 
+    <!-- Horizontal Menu Bar -->
+    <LinearLayout
+        android:id="@+id/navigationBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/rounded_search_bar_background"
+        app:layout_constraintTop_toBottomOf="@id/searchButton">
+
+        <Button
+            android:id="@+id/view_nutri"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="View Nutritionist"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/booking_consultation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="My Consultation"
+            android:textAlignment="center"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:textSize="11sp" />
+    </LinearLayout>
+
     <!-- ListView for Nutritionists -->
     <ListView
-        android:id="@+id/nutritionist_list_view"
+        android:id="@+id/available_slots_list_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@id/navigationBar"
-        app:layout_constraintTop_toBottomOf="@id/searchButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/navigationBar"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

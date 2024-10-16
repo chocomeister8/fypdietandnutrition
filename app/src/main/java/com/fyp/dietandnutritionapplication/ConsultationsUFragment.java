@@ -53,7 +53,7 @@ public class ConsultationsUFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_consultations_u, container, false);
 
         // Initialize the ListView
-        nutritionistListView = view.findViewById(R.id.nutritionist_list_view);
+        nutritionistListView = view.findViewById(R.id.available_slots_list_view);
         searchBar = view.findViewById(R.id.search_bar);
         viewNutriButton = view.findViewById(R.id.view_nutri);
         viewConsultationButton = view.findViewById(R.id.booking_consultation);
