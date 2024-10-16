@@ -42,7 +42,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
-                android:text="Personalise Recipes"
+                android:text="Community recipes"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />

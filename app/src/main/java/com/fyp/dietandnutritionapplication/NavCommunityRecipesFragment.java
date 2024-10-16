@@ -9,16 +9,57 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class NavCommunityRecipesFragment extends Fragment {
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class NavCommunityRecipesFragment extends Fragment implements RecipeAdapter.OnRecipeClickListener {
+
+    private FirebaseFirestore db;
+    private RecyclerView recipesRecyclerView;
+    private RecipeAdapter recipesAdapter;
+    private List<Recipe> recipeList = new ArrayList<>();
+    private ViewRecipesController viewRecipesController;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.nav_community_recipes, container, false);
+        View view = inflater.inflate(R.layout.nav_pending_recipes, container, false);
 
-        // Initialize buttons using view.findViewById
+        // Initialize Firestore and RecyclerView
+        db = FirebaseFirestore.getInstance();
+        recipesRecyclerView = view.findViewById(R.id.recipe_status_recycle_view);
+        recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Initialize adapter with an empty list and set it to the RecyclerView
+        recipesAdapter = new RecipeAdapter(recipeList, this, false);
+        recipesRecyclerView.setAdapter(recipesAdapter);
+
+        ViewRecipesController viewRecipesController = new ViewRecipesController();
+
+        setupNavigationButtons(view);
+
+        String currentUserId = getCurrentUserId(); // Get the current user ID
+
+        // Fetch pending recipes for the current user and update the UI accordingly
+        viewRecipesController.fetchAllApprovedRecipes(new ViewRecipesController.OnRecipesFetchedListener() {
+            @Override
+            public void onRecipesFetched(List<Recipe> fetchedRecipes) {
+                recipeList.clear();
+                recipeList.addAll(fetchedRecipes);
+                recipesAdapter.notifyDataSetChanged(); // Notify adapter of data change
+            }
+        });
+
+        return view;
+    }
+
+    private void setupNavigationButtons(View view) {
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
         Button button_vegetarian = view.findViewById(R.id.button_vegetarian);
         Button button_favourite = view.findViewById(R.id.button_favourite);
@@ -27,55 +68,26 @@ public class NavCommunityRecipesFragment extends Fragment {
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
 
         // Set up button click listeners to navigate between fragments
-        button_all_recipes.setOnClickListener(v -> {
-            // Replace current fragment with NavAllRecipesFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavAllRecipesFragment())
-                    .addToBackStack(null)  // Add to back stack to enable back navigation
-                    .commit();
-        });
+        button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
+        button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
+        button_favourite.setOnClickListener(v -> navigateToFragment(new NavFavouriteRecipesFragment()));
+        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
+        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
+        button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
+    }
 
-        button_vegetarian.setOnClickListener(v -> {
-            // Replace current fragment with NavVegetarianRecipesFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavVegetarianRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+    private void navigateToFragment(Fragment fragment) {
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack(null)  // Add to back stack to enable back navigation
+                .commit();
+    }
 
-        button_favourite.setOnClickListener(v -> {
-            // Replace current fragment with NavFavouriteRecipesFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavFavouriteRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+    private String getCurrentUserId() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
 
-        button_personalise_recipes.setOnClickListener(v -> {
-            // Replace current fragment with NavFavouriteRecipesFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavCommunityRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        button_recipes_status.setOnClickListener(v -> {
-            // Replace current fragment with NavRecipesStatusFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavPendingRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-
-        button_recommendedRecipes.setOnClickListener(v -> {
-            // Replace current fragment with NavRecipesStatusFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavRecommendedRecipesFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        return view;
+    public void onRecipeClick(Recipe recipe) {
+        // Handle recipe click if necessary
     }
 }

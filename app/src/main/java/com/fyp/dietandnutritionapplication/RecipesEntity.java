@@ -1,11 +1,14 @@
 package com.fyp.dietandnutritionapplication;
 
+import static androidx.fragment.app.FragmentManager.TAG;
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -20,6 +23,9 @@ public class RecipesEntity {
 
     // Firestore instance
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private RecipeAdapter recipesAdapter;
+    private List<Recipe> recipeList = new ArrayList<>();
 
     public RecipesEntity() {
         // Default constructor
@@ -125,6 +131,74 @@ public class RecipesEntity {
                 })
                 .addOnFailureListener(e -> {
                     Log.e("RecipesEntity", "Error adding recipe", e);
+                });
+    }
+
+    public void fetchUserPendingRecipes(String userId, OnRecipesFetchedListener listener) {
+        db.collection("Recipes")
+                .whereEqualTo("userId", userId) // Filter to get only the recipes by the current user
+                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            ArrayList<Recipe> recipeList = new ArrayList<>(); // Temporary list to store recipes
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Recipe recipe = document.toObject(Recipe.class);
+                                recipe.setRecipe_id(document.getId());
+
+                                // Calculate calories per 100g if total weight is available
+                                double caloriesPer100g = recipe.getCaloriesPer100g();
+                                if (recipe.getTotalWeight() > 0) {
+                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                                }
+                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                                recipeList.add(recipe); // Add the recipe to the temporary list
+                            }
+
+                            // Pass the fetched recipes to the listener
+                            listener.onRecipesFetched(recipeList);
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
+
+    public void fetchAllApprovedRecipes(OnRecipesFetchedListener listener) {
+        db.collection("Recipes")
+                .whereEqualTo("status", "Approved") // Filter to get only recipes with status "Approved"
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            ArrayList<Recipe> recipeList = new ArrayList<>(); // Temporary list to store recipes
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Recipe recipe = document.toObject(Recipe.class);
+                                recipe.setRecipe_id(document.getId());
+
+                                // Calculate calories per 100g if total weight is available
+                                double caloriesPer100g = recipe.getCaloriesPer100g();
+                                if (recipe.getTotalWeight() > 0) {
+                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                                }
+                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                                recipeList.add(recipe); // Add the recipe to the temporary list
+                            }
+
+                            // Pass the fetched recipes to the listener
+                            listener.onRecipesFetched(recipeList);
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                            listener.onRecipesFetched(new ArrayList<>()); // Pass an empty list in case of failure
+                        }
+                    }
                 });
     }
 }

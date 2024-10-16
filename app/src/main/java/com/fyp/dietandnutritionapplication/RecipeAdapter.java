@@ -1,5 +1,7 @@
 package com.fyp.dietandnutritionapplication;
 
+import static android.content.ContentValues.TAG;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +47,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
         // Get the recipe at the current position
         Recipe recipe = recipeList.get(position);
-
+        Log.d(TAG, "Binding Recipe: " + recipe.getLabel()); // Log the title being bound
         // Set the recipe title
         holder.titleTextView.setText(recipe.getLabel());
 
