@@ -43,7 +43,7 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
         recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize adapter with an empty list and set it to the RecyclerView
-        recipesAdapter = new RecipeAdapter(recipeList, this, true);
+        recipesAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recipesRecyclerView.setAdapter(recipesAdapter);
 
 
@@ -79,6 +79,20 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
                 .replace(R.id.frame_layout, fragment)
                 .addToBackStack(null)  // Add to back stack to enable back navigation
                 .commit();
+    }
+
+    private void openRecipeDetailFragment(Recipe recipe) {
+        // From NavAllRecipesFragment
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("selected_recipe", recipe);  // Assuming selectedRecipe is the clicked recipe object
+
+        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        recipeDetailFragment.setArguments(bundle);
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, recipeDetailFragment)
+                .addToBackStack(null)
+                .commit();
+
     }
 
     private void fetchUserRecipes() {

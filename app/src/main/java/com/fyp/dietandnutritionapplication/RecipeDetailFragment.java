@@ -2,6 +2,7 @@ package com.fyp.dietandnutritionapplication;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,6 @@ public class RecipeDetailFragment extends Fragment {
         TextView caloriesTextView = view.findViewById(R.id.detail_calories);
         TextView weightTextView = view.findViewById(R.id.detail_total_weight);
         TextView caloriesp100gTextView = view.findViewById(R.id.detail_calories_p100g);
-        TextView totalTimeTextView = view.findViewById(R.id.detail_total_time);
         TextView mealTypeTextView = view.findViewById(R.id.detail_meal_type);
         TextView cuisineTypeTextView = view.findViewById(R.id.detail_cuisine_type);
         TextView dishTypeTextView = view.findViewById(R.id.detail_dish_type);
@@ -61,14 +61,14 @@ public class RecipeDetailFragment extends Fragment {
         if (recipe != null) {
             titleTextView.setText(recipe.getLabel());
             caloriesTextView.setText(String.format("%.1f kcal", recipe.getCalories()));
-            weightTextView.setText(String.format("%.1f g", recipe.getTotalWeight())); // Set text
-            totalTimeTextView.setText(String.format("%d mins", recipe.getTotal_Time()));
+            weightTextView.setText(String.format("%.1f g", recipe.getTotalWeight()));
             caloriesp100gTextView.setText(String.format("%.2f", recipe.getCaloriesPer100g()));
             mealTypeTextView.setText(String.join(", ", recipe.getMealType()));
             cuisineTypeTextView.setText(String.join(", ", recipe.getCuisineType()));
             dishTypeTextView.setText(String.join(", ", recipe.getDishType()));
             dietLabelsTextView.setText(String.join(", ", recipe.getDietLabels()));
             healthLabelsTextView.setText(String.join(", ", recipe.getHealthLabels()));
+
 
             Picasso.get().load(recipe.getImage()).into(imageView);
 
