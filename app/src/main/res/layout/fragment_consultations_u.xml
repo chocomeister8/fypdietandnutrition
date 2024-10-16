@@ -110,7 +110,6 @@
             android:text="My Consultation"
             android:textAlignment="center"
             android:textColor="#333333"
-            android:textStyle="bold"
             android:textSize="11sp" />
     </LinearLayout>
 
