@@ -11,8 +11,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class RecipesEntity {
 
@@ -97,5 +99,32 @@ public class RecipesEntity {
     // Callback interface for fetching recipes
     public interface OnRecipesFetchedListener {
         void onRecipesFetched(ArrayList<Recipe> recipeList);
+    }
+
+    public void AddRecipe(Recipe recipe) {
+        String uniqueRecipeId = UUID.randomUUID().toString(); // Generate unique ID
+
+        Map<String, Object> recipeData = new HashMap<>();
+
+        recipeData.put("recipe_id", uniqueRecipeId);
+        recipeData.put("label", recipe.getLabel());
+        recipeData.put("calories", recipe.getCalories());
+        recipeData.put("totalWeight", recipe.getTotalWeight());
+        recipeData.put("total_time", recipe.getTotal_Time());
+        recipeData.put("mealType", recipe.getMealType());
+        recipeData.put("cuisineType", recipe.getCuisineType());
+        recipeData.put("dishType", recipe.getDishType());
+        recipeData.put("ingredientsList", recipe.getIngredientLines());
+        recipeData.put("userId", recipe.getuserId());
+        recipeData.put("status", recipe.getStatus());
+
+        // Store the recipe in Firestore
+        db.collection("Recipes").document(uniqueRecipeId).set(recipeData)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("RecipesEntity", "Recipe successfully added with ID: " + uniqueRecipeId);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("RecipesEntity", "Error adding recipe", e);
+                });
     }
 }

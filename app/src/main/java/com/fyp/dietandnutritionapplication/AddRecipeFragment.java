@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -36,11 +38,15 @@ public class AddRecipeFragment extends Fragment {
 
     private FirebaseFirestore db;
 
+    private AddRecipeController addRecipeController;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_recipe, container, false);
+
+        addRecipeController = new AddRecipeController();
 
         recipeTitleInput = view.findViewById(R.id.recipe_title);
         caloriesInput = view.findViewById(R.id.recipe_calories);
@@ -132,7 +138,6 @@ public class AddRecipeFragment extends Fragment {
     }
 
     // Save Recipe Data to Firestore
-    // Save Recipe Data to Firestore
     private void saveRecipeToFirestore() {
 
         String recipeTitle = recipeTitleInput.getText().toString();
@@ -191,7 +196,7 @@ public class AddRecipeFragment extends Fragment {
         List<String> dishTypes = getSelectedCheckboxes(dishTypeCheckboxes, false);
 
         // Collect dynamic ingredients
-        List<Map<String, String>> ingredientsList = new ArrayList<>();
+        List<String> ingredientsList = new ArrayList<>(); // Change to List<String>
         int ingredientCount = ingredientsSection.getChildCount();
         for (int i = 0; i < ingredientCount; i++) {
             View ingredientRow = ingredientsSection.getChildAt(i);
@@ -203,52 +208,27 @@ public class AddRecipeFragment extends Fragment {
                 String ingredientName = ingredientNameInput.getText().toString();
                 String ingredientWeight = ingredientWeightInput.getText().toString();
 
+                // Check if both fields are filled
                 if (!ingredientName.isEmpty() && !ingredientWeight.isEmpty()) {
-                    Map<String, String> ingredientMap = new HashMap<>();
-                    ingredientMap.put("name", ingredientName);
-                    ingredientMap.put("weight", ingredientWeight);
-                    ingredientsList.add(ingredientMap);
+                    // Format the ingredient as a string (e.g., "ingredientName: ingredientWeight")
+                    String ingredientString = ingredientName + ": " + ingredientWeight;
+                    ingredientsList.add(ingredientString); // Add the formatted string to the list
                 }
             }
         }
 
-        // Create a recipe data map
-        Map<String, Object> recipeData = new HashMap<>();
-        String uniqueRecipeId = UUID.randomUUID().toString(); // Generate a unique ID
-        recipeData.put("recipe_id", uniqueRecipeId); // Add the unique ID to the recipe data
-        recipeData.put("label", recipeTitle); // Add recipe title
-        recipeData.put("calories", calories); // Add calories
-        recipeData.put("totalWeight", weight); // Add weight
-        recipeData.put("total_time", totalTime); // Add total time
-        recipeData.put("mealType", mealTypes); // Store mealTypes as a List<String>
-        recipeData.put("cuisineType", cuisineTypes); // Store cuisineTypes as a List<String>
-        recipeData.put("dishType", dishTypes); // Store dishTypes as a List<String>
-        recipeData.put("ingredientsList", ingredientsList); // Store ingredients as a list of maps
-        recipeData.put("userId", userId); // Add the current user's ID to the recipe data
-        recipeData.put("status", status);
+        AddRecipeController addRecipeController = new AddRecipeController();
+        addRecipeController.addRecipe(recipeTitle, calories, weight, totalTime, mealTypes, cuisineTypes, dishTypes, ingredientsList, userId, status);
 
-        // Add data to Firestore
-        db.collection("Recipes")
-                .document(uniqueRecipeId) // Use the unique ID as the document ID
-                .set(recipeData) // Use set() to create or overwrite the document
-                .addOnSuccessListener(documentReference -> {
-                    // Show success toast
-                    Toast.makeText(getContext(), "Recipe added successfully!", Toast.LENGTH_SHORT).show();
+        redirectToViewPendingRecipes();
+    }
 
-                    sendNotification(userId, uniqueRecipeId);
-
-
-                    // Redirect to NavRecipesStatusFragment
-                    requireActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frame_layout, new NavPendingRecipesFragment())
-                            .addToBackStack(null)  // Optional: Add to back stack
-                            .commit();
-
-                })
-                .addOnFailureListener(e -> {
-                    // Show failure toast
-                    Toast.makeText(getContext(), "Failed to add recipe: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+    private void redirectToViewPendingRecipes(){
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_layout, new NavPendingRecipesFragment()); // Use your container ID
+        fragmentTransaction.addToBackStack(null); // Optional: Add to back stack
+        fragmentTransaction.commit();
     }
 
     // Method to retrieve the current user's ID from Firebase Authentication

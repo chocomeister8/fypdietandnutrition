@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.List;
+import java.util.Map;
 
 public class Recipe implements Parcelable {
     private String name; // Name of the recipe
@@ -40,6 +41,8 @@ public class Recipe implements Parcelable {
         this.userId = userId;}
 
     public String getStatus(){ return status;}
+
+    public void setStatus(String status){ this.status = status;}
 
     public String getLabel() {
         return label;
