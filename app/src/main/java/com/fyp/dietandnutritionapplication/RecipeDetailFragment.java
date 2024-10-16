@@ -1,11 +1,15 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebViewFragment;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -56,6 +60,7 @@ public class RecipeDetailFragment extends Fragment {
         TextView viewLessHealthLabels = view.findViewById(R.id.view_less_health_labels);
         TextView viewMoreIngredients = view.findViewById(R.id.view_more_ingredients);
         TextView viewLessIngredients = view.findViewById(R.id.view_less_ingredients);
+        TextView instructionsLink = view.findViewById(R.id.detail_instructions_link);
 
         // Set recipe details
         if (recipe != null) {
@@ -68,6 +73,7 @@ public class RecipeDetailFragment extends Fragment {
             dishTypeTextView.setText(String.join(", ", recipe.getDishType()));
             dietLabelsTextView.setText(String.join(", ", recipe.getDietLabels()));
             healthLabelsTextView.setText(String.join(", ", recipe.getHealthLabels()));
+            instructionsLink.setText(recipe.getUrl());
 
 
             Picasso.get().load(recipe.getImage()).into(imageView);
@@ -122,6 +128,37 @@ public class RecipeDetailFragment extends Fragment {
                 viewLessIngredients.setVisibility(View.GONE);
                 viewMoreIngredients.setVisibility(View.VISIBLE);
             });
+
+            instructionsLink.setText("View Instructions"); // Set fixed text for the link
+            if (recipe != null) {
+                Log.d("RecipeDetailsFragment", "Recipe found: " + recipe.getLabel());
+                Log.d("RecipeDetailsFragment", "Instructions: " + (recipe.getUrl() != null ? recipe.getUrl() : "Instructions are null"));
+            } else {
+                Log.d("RecipeDetailsFragment", "No recipe found in bundle.");
+            }
+            instructionsLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("RecipeDetailsFragment", "Instructions link clicked"); // Logging click event
+
+                    // Assuming recipe.getUrl() returns the instructions URL
+                    String instructionsUrl = recipe.getUrl();
+
+                    if (instructionsUrl != null && !instructionsUrl.isEmpty()) {
+                        // Create an instance of the WebViewFragment
+                        RecipeInstructionsFragment recipeInstructionsFragment = RecipeInstructionsFragment.newInstance(instructionsUrl);
+
+                        // Replace the current fragment with the WebViewFragment
+                        requireActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame_layout, recipeInstructionsFragment) // Make sure 'frame_layout' is your container ID
+                                .addToBackStack(null) // Allows back navigation
+                                .commit();
+                    } else {
+                        Toast.makeText(getActivity(), "No instructions available.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
         }
 
         backButton.setOnClickListener(v -> {
@@ -145,10 +182,7 @@ public class RecipeDetailFragment extends Fragment {
             args.putInt("spinner2_value", spinner2Value);
             fragment.setArguments(args);
 
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, fragment)
-                    .addToBackStack(null)
-                    .commit();
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         AddFavouriteRecipeController addFavouriteRecipeController = new AddFavouriteRecipeController();

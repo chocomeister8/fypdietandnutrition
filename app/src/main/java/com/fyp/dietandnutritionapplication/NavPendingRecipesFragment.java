@@ -50,8 +50,9 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
 
         setupNavigationButtons(view);
 
+        String userId = getCurrentUserId(); // Get the current user ID
         // Fetch pending recipes for the current user and update the UI accordingly
-        viewRecipesController.fetchAllApprovedRecipes(new ViewRecipesController.OnRecipesFetchedListener() {
+        viewRecipesController.fetchPendingRecipesForUser(userId, new ViewRecipesController.OnRecipesFetchedListener() {
             @Override
             public void onRecipesFetched(List<Recipe> fetchedRecipes) {
                 recipeList.clear();

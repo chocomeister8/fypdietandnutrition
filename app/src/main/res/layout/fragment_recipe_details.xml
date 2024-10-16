@@ -309,6 +309,17 @@
                 android:layout_marginBottom="16dp"
                 android:background="@android:color/darker_gray" />
 
+            <TextView
+                android:id="@+id/detail_instructions_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:text="View Instructions"
+                android:textColor="@android:color/holo_blue_dark"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="visible"/>
+
             <LinearLayout
                 android:id="@+id/button_container"
                 android:layout_width="wrap_content"
