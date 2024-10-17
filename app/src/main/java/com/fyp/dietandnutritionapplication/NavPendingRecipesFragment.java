@@ -30,7 +30,7 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
     private RecyclerView recipesRecyclerView;
     private RecipeAdapter recipesAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
-
+    private ViewRecipesController viewRecipesController;
 
     @Nullable
     @Override
@@ -43,16 +43,23 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
         recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize adapter with an empty list and set it to the RecyclerView
-        recipesAdapter = new RecipeAdapter(recipeList, this, true);
+        recipesAdapter = new RecipeAdapter(recipeList, this, false);
         recipesRecyclerView.setAdapter(recipesAdapter);
 
+        ViewRecipesController viewRecipesController = new ViewRecipesController();
 
-        // Fetch recipes from Firestore
-        fetchUserRecipes(); // Call method to fetch all recipes
-        Log.d(TAG, "Recipe list size: " + recipeList.size());
+        setupNavigationButtons(view);
 
-        // Setup buttons
-        setupNavigationButtons(view); // Move button setup to a separate method for cleanliness
+        String userId = getCurrentUserId(); // Get the current user ID
+        // Fetch pending recipes for the current user and update the UI accordingly
+        viewRecipesController.fetchPendingRecipesForUser(userId, new ViewRecipesController.OnRecipesFetchedListener() {
+            @Override
+            public void onRecipesFetched(List<Recipe> fetchedRecipes) {
+                recipeList.clear();
+                recipeList.addAll(fetchedRecipes);
+                recipesAdapter.notifyDataSetChanged(); // Notify adapter of data change
+            }
+        });
 
         return view;
     }
@@ -81,47 +88,13 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
                 .commit();
     }
 
-    private void fetchUserRecipes() {
-        String currentUserId = getCurrentUserId(); // Method to retrieve current user ID
-
-        db.collection("Recipes")
-                .whereEqualTo("userId", currentUserId) // Filter to get only the recipes by the current user
-                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            recipeList.clear(); // Clear the list before adding new data
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Recipe recipe = document.toObject(Recipe.class);
-                                recipe.setRecipe_id(document.getId());
-
-                                // Calculate calories per 100g if total weight is available
-                                double caloriesPer100g = recipe.getCaloriesPer100g();
-                                if (recipe.getTotalWeight() > 0) {
-                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                                }
-                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-
-                                recipeList.add(recipe); // Add the recipe to the list
-                            }
-                            // Notify the adapter of data changes
-                            recipesAdapter.notifyDataSetChanged();
-                        } else {
-                            Log.w(TAG, "Error getting documents.", task.getException());
-                        }
-                    }
-                });
+    private String getCurrentUserId() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
     @Override
     public void onRecipeClick(Recipe recipe) {
-        String recipeId = recipe.getRecipe_id(); // Assuming you have a method to get ID
-        fetchUserRecipes(); // Call this method with the recipe ID
-    }
-
-    private String getCurrentUserId() {
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // Handle recipe click if necessary
     }
 }
+

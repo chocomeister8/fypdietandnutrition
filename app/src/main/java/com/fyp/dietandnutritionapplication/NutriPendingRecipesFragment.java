@@ -48,7 +48,7 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
 
 
         // Fetch recipes from Firestore
-        fetchUserRecipes(); // Call method to fetch all recipes
+        fetchPendingRecipes(); // Call method to fetch all recipes
         Log.d(TAG, "Recipe list size: " + recipeList.size());
 
         // Setup buttons
@@ -76,72 +76,50 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
                 .addToBackStack(null)  // Add to back stack to enable back navigation
                 .commit();
     }
-
-    private void fetchUserRecipes() {
-
-        db.collection("Recipes")
-                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            recipeList.clear(); // Clear the list before adding new data
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Recipe recipe = document.toObject(Recipe.class);
-                                User user = document.toObject(User.class);
-                                recipe.setRecipe_id(document.getId());
-
-                                // Calculate calories per 100g if total weight is available
-                                double caloriesPer100g = recipe.getCaloriesPer100g();
-                                if (recipe.getTotalWeight() > 0) {
-                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                                }
-                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-
-                                recipeList.add(recipe); // Add the recipe to the list
-                            }
-                            // Notify the adapter of data changes
-                            recipesAdapter.notifyDataSetChanged();
-                        } else {
-                            Log.w(TAG, "Error getting documents.", task.getException());
-                        }
-                    }
-                });
+    private void fetchPendingRecipes() {
+        NutriPendingRecipesController pendingRecipesController = new NutriPendingRecipesController();
+        pendingRecipesController.fetchPendingRecipes(new NutriPendingRecipesController.RecipesFetchedCallback() {
+            @Override
+            public void onRecipesFetched(ArrayList<Recipe> fetchedRecipes) {
+                recipeList.clear(); // Clear the existing list
+                recipeList.addAll(fetchedRecipes); // Add fetched recipes to the list
+                recipesAdapter.notifyDataSetChanged(); // Notify adapter of changes
+            }
+        });
     }
 
-    private void fetchRejectedRecipes() {
-
-        db.collection("Recipes")
-                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            recipeList.clear(); // Clear the list before adding new data
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Recipe recipe = document.toObject(Recipe.class);
-                                User user = document.toObject(User.class);
-                                recipe.setRecipe_id(document.getId());
-
-                                // Calculate calories per 100g if total weight is available
-                                double caloriesPer100g = recipe.getCaloriesPer100g();
-                                if (recipe.getTotalWeight() > 0) {
-                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                                }
-                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-
-                                recipeList.add(recipe); // Add the recipe to the list
-                            }
-                            // Notify the adapter of data changes
-                            recipesAdapter.notifyDataSetChanged();
-                        } else {
-                            Log.w(TAG, "Error getting documents.", task.getException());
-                        }
-                    }
-                });
-    }
+//    private void fetchUserRecipes() {
+//
+//        db.collection("Recipes")
+//                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onComplete(Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            recipeList.clear(); // Clear the list before adding new data
+//                            for (QueryDocumentSnapshot document : task.getResult()) {
+//                                Recipe recipe = document.toObject(Recipe.class);
+//                                User user = document.toObject(User.class);
+//                                recipe.setRecipe_id(document.getId());
+//
+//                                // Calculate calories per 100g if total weight is available
+//                                double caloriesPer100g = recipe.getCaloriesPer100g();
+//                                if (recipe.getTotalWeight() > 0) {
+//                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+//                                }
+//                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+//
+//                                recipeList.add(recipe); // Add the recipe to the list
+//                            }
+//                            // Notify the adapter of data changes
+//                            recipesAdapter.notifyDataSetChanged();
+//                        } else {
+//                            Log.w(TAG, "Error getting documents.", task.getException());
+//                        }
+//                    }
+//                });
+//    }
 
     @Override
     public void onRecipeClick(Recipe recipe) {
