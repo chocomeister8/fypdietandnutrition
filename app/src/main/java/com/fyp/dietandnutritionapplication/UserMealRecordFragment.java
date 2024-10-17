@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -37,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -353,51 +355,131 @@ public class UserMealRecordFragment extends Fragment {
         remainingCaloriesView.setText("Remaining: \n" + formattedRemainingCalories);
     }
 
-    private void handleEnterManually(String userId, String selectedMealType) {
-        // Create a dialog to enter meal details
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Enter Meal Details");
+    private void handleFoodNameInput(String userId, String selectedMealType) {
+        // Prompt for Food Name
+        AlertDialog.Builder foodNameBuilder = new AlertDialog.Builder(requireContext());
+        foodNameBuilder.setTitle("Enter Food Name");
 
-        // Inflate a custom view for the dialog
+        // Inflate custom view for food name input
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.user_enter_meal, null);
-        builder.setView(dialogView);
+        View foodNameDialogView = inflater.inflate(R.layout.user_enter_food_name, null);
+        foodNameBuilder.setView(foodNameDialogView);
+
+        // Find food name input field
+        EditText foodNameInput = foodNameDialogView.findViewById(R.id.food_name_input);
+
+        foodNameBuilder.setPositiveButton("Next", (dialog, which) -> {
+            String foodName = foodNameInput.getText().toString();
+            if (!foodName.isEmpty()) {
+                Log.d("MealLogFragment", "Food Name Entered: " + foodName);
+
+                // After food name is entered, proceed to fetch serving units
+                fetchFoodServingUnits(userId, selectedMealType, foodName);
+            } else {
+                Toast.makeText(requireContext(), "Please enter a valid food name", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        foodNameBuilder.setNegativeButton("Cancel", null);
+        foodNameBuilder.create().show();
+    }
+
+    private void fetchFoodServingUnits(String userId, String selectedMealType, String foodName) {
+
+        EdamamApiService apiService = ApiClient.getRetrofitInstance().create(EdamamApiService.class);
+        String appId = "997e8d42";
+        String appKey = "4483ab153d93c4a64d6f156fcffa78ff";
+        Call<FoodResponse> call = apiService.parseFood(appId, appKey, foodName);
+
+        call.enqueue(new retrofit2.Callback<FoodResponse>() {
+            @Override
+            public void onResponse(Call<FoodResponse> call, retrofit2.Response<FoodResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<FoodResponse.Hint> hints = response.body().getHints();
+                    if (hints != null && !hints.isEmpty()) {
+                        // Get the Food object from the first hint
+                        FoodResponse.Hint hint = hints.get(0);
+                        FoodResponse.Food food = hint.getFood();
+                        List<FoodResponse.Measure> measures = hint.getMeasures();
+                        Log.d("MealLogFragment", "Measures: " + measures);
+                        if (measures != null && !measures.isEmpty()) {
+                            for (int j = 0; j < measures.size(); j++) {
+                                FoodResponse.Measure measure = measures.get(j);
+                                Log.d("MealLogFragment", "Measure " + j + ": ");
+                                Log.d("MealLogFragment", "Measure Label: " + measure.getLabel());
+                                Log.d("MealLogFragment", "Measure Weight: " + measure.getWeight());
+                            }
+                        }
+                        // Check if measures are not null and populate the list of serving units
+                        if (measures != null && !measures.isEmpty()) {
+                            List<String> servingUnits = new ArrayList<>();
+                            for (FoodResponse.Measure measure : measures) {
+                                servingUnits.add(measure.getLabel()); // Add available serving units to the list
+                            }
+                            Log.d("MealLogFragment", "Available Serving Units: " + servingUnits.toString());
+
+                            // Proceed to show dialog for selecting serving unit and entering size
+                            handleServingInput(userId, selectedMealType, foodName, servingUnits);
+                        } else {
+                            Toast.makeText(requireContext(), "No serving units found for: " + foodName, Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(requireContext(), "No food hints found for: " + foodName, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.e("MealLogFragment", "API call unsuccessful, check response.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FoodResponse> call, Throwable t) {
+                Log.e("MealLogFragment", "Error fetching food data", t);
+            }
+        });
+    }
+
+    private void handleServingInput(String userId, String selectedMealType, String foodName, List<String> servingUnits) {
+        // Prompt for Serving Unit and Size
+        AlertDialog.Builder servingBuilder = new AlertDialog.Builder(requireContext());
+        servingBuilder.setTitle("Enter Serving Details");
+
+        // Inflate custom view for serving unit and size input
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View servingDialogView = inflater.inflate(R.layout.user_enter_serving, null);
+        servingBuilder.setView(servingDialogView);
 
         // Find views in the custom layout
-        EditText foodNameInput = dialogView.findViewById(R.id.food_name_input);
-        EditText servingSizeInput = dialogView.findViewById(R.id.serving_size_input);
-        Spinner servingUnitSpinner = dialogView.findViewById(R.id.serving_unit_spinner);
+        Spinner servingUnitSpinner = servingDialogView.findViewById(R.id.serving_unit_spinner);
+        EditText servingSizeInput = servingDialogView.findViewById(R.id.serving_size_input);
 
-        // Setup the Spinner for serving units (e.g., grams, cups, pieces)
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
-                R.array.serving_units_array, android.R.layout.simple_spinner_item);
+        // Populate the Spinner with dynamically fetched serving units
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, servingUnits);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         servingUnitSpinner.setAdapter(adapter);
 
-        builder.setPositiveButton("Add", (dialog, which) -> {
-            String foodName = foodNameInput.getText().toString();
-            Log.d("MealLogFragment", "Food Name Entered: " + foodName);
-            // Ensure the serving size input is not empty before parsing
-            String servingSizeStr = servingSizeInput.getText().toString();
-            if (!servingSizeStr.isEmpty()) {
-                double servingSize = Double.parseDouble(servingSizeStr); // Convert to double
-                Log.d("MealLogFragment", "Serving Size Entered: " + servingSize);
 
-                String servingUnit = servingUnitSpinner.getSelectedItem().toString();
-                Log.d("MealLogFragment", "Serving Unit Selected: " + servingUnit);
-                  Log.d("MealLogFragment", "Meal Type Selected: " + selectedMealType);
-                  String selectedDate = dateTextView.getText().toString();
+        servingBuilder.setPositiveButton("Add", (dialog, which) -> {
+            String selectedServingUnit = servingUnitSpinner.getSelectedItem().toString();
+            String servingSizeStr = servingSizeInput.getText().toString();
+
+            // Ensure the user enters a valid serving size
+            if (!servingSizeStr.isEmpty()) {
+                double servingSize = Double.parseDouble(servingSizeStr);
+
+                Log.d("MealLogFragment", "Serving Size Entered: " + servingSize);
+                Log.d("MealLogFragment", "Serving Unit Selected: " + selectedServingUnit);
+
+                String selectedDate =  dateTextView.getText().toString();
                 String imageURL = "url_of_the_uploaded_image";
                 // Call the function to search for the food and scale nutrients accordingly
-                searchFoodInEdamam(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, false, "", imageURL);
+                searchFoodInEdamam(userId, foodName, servingSize, selectedServingUnit, selectedMealType, selectedDate, false, "", imageURL);
             } else {
-                // Handle empty serving size input (e.g., show an error)
                 Toast.makeText(requireContext(), "Please enter a valid serving size", Toast.LENGTH_SHORT).show();
             }
         });
 
-        builder.setNegativeButton("Cancel", null);
-        builder.create().show();
+        servingBuilder.setNegativeButton("Cancel", null);
+        servingBuilder.create().show();
     }
 
     public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
@@ -416,61 +498,99 @@ public class UserMealRecordFragment extends Fragment {
                         @Override
                         public void onResponse(Call<FoodResponse> call, retrofit2.Response<FoodResponse> response) {
                             if (response.isSuccessful() && response.body() != null) {
+                                Log.d("FoodAPI", "Full API Response: " + response.body().toString());
+
                                 List<FoodResponse.Hint> hints = response.body().getHints();
-                                Log.d("FoodAPI", "API call successful, hints received: " + hints.size());
-                                if (!hints.isEmpty()) {
-                                    FoodResponse.Food food = hints.get(0).getFood();
-                                    String foodLabel = food.getLabel();
-                                    double referenceCalories = food.getNutrients().getCalories();
-                                    double referenceProtein = food.getNutrients().getProtein();
-                                    double referenceFat = food.getNutrients().getFat();
-                                    double referenceCarbohydrates = food.getNutrients().getCarbohydrates();
+                                if (hints != null && !hints.isEmpty()) {
+                                    FoodResponse.Hint hint = hints.get(0);
+                                    FoodResponse.Food food = hint.getFood();
+                                    if (food != null) {
+                                        // Correctly access the measures list from Hint, not Food
+                                        List<FoodResponse.Measure> measures = hints.get(0).getMeasures();
+                                        if (measures != null && !measures.isEmpty()) {
+                                            for (FoodResponse.Measure measure : measures) {
+                                                if (measure.getLabel().equalsIgnoreCase(servingUnit)) {
+                                                    double referenceWeight = measure.getWeight();
+                                                    if (referenceWeight == 0) {
+                                                        Log.e("FoodAPI", "Reference weight is zero, cannot scale nutrients.");
+                                                        return;
+                                                    }
+
+                                                    double scaleFactor = (servingSize * referenceWeight) / 100;
+
+                                                    // Extract and adjust nutrients
+                                                    FoodResponse.Nutrients nutrients = food.getNutrients();
+
+                                                    if (nutrients != null) {
+                                                        // Log all nutrient values from the API response
+                                                        Log.d("FoodAPI", "Nutrient values from Edamam:");
+                                                        Log.d("FoodAPI", "Calories: " + nutrients.getCalories());
+                                                        Log.d("FoodAPI", "Carbs: " + nutrients.getCarbohydrates());
+                                                        Log.d("FoodAPI", "Protein: " + nutrients.getProtein());
+                                                        Log.d("FoodAPI", "Fat: " + nutrients.getFat());
+                                                        Log.d("FoodAPI", "Fiber: " + nutrients.getFiber());
+
+                                                    }
+                                                    if (nutrients == null) {
+                                                        Log.e("FoodAPI", "Nutrients are missing from the API response.");
+                                                        return;
+                                                    }
+                                                    String imageURL = food.getImage();
+                                                    if (imageURL == null) {
+                                                        Log.e("FoodDebug", "Image URL is null for food: " + food.getLabel());
+                                                    } else {
+                                                        Log.d("FoodDebug", "Image URL: " + imageURL);
+                                                    }
+                                                    double adjustedCalories = nutrients.getCalories() * scaleFactor;
+                                                    double adjustedProtein = nutrients.getProtein() * scaleFactor;
+                                                    double adjustedFat = nutrients.getFat() * scaleFactor;
+                                                    double adjustedCarbohydrates = nutrients.getCarbohydrates() * scaleFactor;
+                                                    double adjustedFiber = nutrients.getFiber() * scaleFactor;
+
+                                                    // Log all the nutrients for verification
+                                                    Log.d("FoodAPI", "Adjusted Calories: " + adjustedCalories);
+                                                    Log.d("FoodAPI", "Adjusted Protein: " + adjustedProtein);
+                                                    Log.d("FoodAPI", "Adjusted Fat: " + adjustedFat);
+                                                    Log.d("FoodAPI", "Adjusted Carbs: " + adjustedCarbohydrates);
+                                                    Log.d("FoodAPI", "Adjusted Fiber: " + adjustedFiber);
+
+                                                    boolean apiCallSuccessful = true;
 
 
-                                    String imageURL = food.getImage();
-                                    Log.d("FoodAPI", "Food Label: " + foodLabel);
-                                    Log.d("FoodAPI", "Reference Calories: " + referenceCalories);
-                                    Log.d("FoodAPI", "Selected Date: " + selectedDate);
-                                    Log.d("FoodAPI", "Image URL: " + imageURL);
+                                                    if (apiCallSuccessful) {
+                                                    if (isUpdate) {
+                                                        MealRecord mealRecord = new MealRecord();
+                                                        mealRecord.setMealType(selectedMealType);
+                                                        mealRecord.setServingSize(servingSize + " " + servingUnit);
+                                                        mealRecord.setCalories(adjustedCalories);
+                                                        mealRecord.setProteins(adjustedProtein);
+                                                        mealRecord.setFats(adjustedFat);
+                                                        mealRecord.setCarbs(adjustedCarbohydrates);
+                                                        mealRecord.setFiber(adjustedFiber);
+                                                        mealRecord.setImageUrl(imageURL);
 
-                                    double scaleFactor = servingSize / 100.0; // Assuming Edamam data is per 100 grams
-
-                                    double adjustedCalories = referenceCalories * scaleFactor;
-                                    double adjustedProtein = referenceProtein * scaleFactor;
-                                    double adjustedFat = referenceFat * scaleFactor;
-                                    double adjustedCarbohydrates = referenceCarbohydrates * scaleFactor;
-                                    String servingInfo = servingSize + " " + servingUnit;
-
-                                    Log.d("FoodAPI", "Adjusted Calories: " + adjustedCalories);
-                                    boolean apiCallSuccessful = true;
-
-
-                                    if (apiCallSuccessful) {
-                                        // Check if it's an update or add operation
-                                        if (isUpdate) {
-                                            MealRecord mealRecord = new MealRecord(); // Initialize or fetch the mealRecord object
-                                            mealRecord.setMealType(selectedMealType); // Use the correct updated values
-                                            mealRecord.setServingSize(servingInfo);
-                                            mealRecord.setCalories(adjustedCalories); // Ensure to set the calories and other nutrients
-                                            mealRecord.setCarbs(adjustedCarbohydrates);
-                                            mealRecord.setProteins(adjustedProtein);
-                                            mealRecord.setFats(adjustedFat);
-                                            mealRecord.setImageUrl(imageURL);
-
-                                            userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
-                                            Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
+                                                        userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
+                                                        Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
+                                                    } else {
+                                                        userMealRecordController.storeMealData(userId, username, foodName, selectedMealType,
+                                                                servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein,
+                                                                adjustedFat, adjustedFiber, selectedDate, imageURL);
+                                                    }
+                                                    refreshMealData();
+                                                  }
+                                                }
+                                            }
                                         } else {
-                                            userMealRecordController.storeMealData(userId, username, foodLabel, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDate, imageURL);
+                                            Log.e("FoodAPI", "'measures' is null or empty for food: " + foodName);
                                         }
-                                        refreshMealData();
                                     } else {
-                                        // Handle the case where the API call was unsuccessful
-                                        Log.w("EdamamAPI", "API call failed for food: " + foodName);
-                                        Toast.makeText(getActivity(), "Failed to fetch nutritional data. Please try again.", Toast.LENGTH_SHORT).show();
+                                        Log.e("FoodAPI", "'food' object is null in the hint for food: " + foodName);
                                     }
-
-
+                                } else {
+                                    Log.e("FoodAPI", "'hints' is null or empty for food: " + foodName);
                                 }
+                            } else {
+                                Log.e("FoodAPI", "API response unsuccessful or empty.");
                             }
                         }
 
@@ -480,12 +600,10 @@ public class UserMealRecordFragment extends Fragment {
                         }
                     });
                 } else {
-                    Log.e("FoodAPI", "Username not fetched or doesn't exist");
-                    // Handle the error case, such as showing a message to the user
+                    Log.e("FoodAPI", "Username not fetched or doesn't exist.");
                 }
             }
         });
-
     }
 
     private void updateMealLogUI(List<MealRecord> mealRecords, String selectedDateString, String userId) {
@@ -536,12 +654,12 @@ public class UserMealRecordFragment extends Fragment {
             ImageView mealImageView = new ImageView(getContext());
             mealImageView.setLayoutParams(new LinearLayout.LayoutParams(160, 160)); // Slightly larger size (e.g., 120x120)
             mealImageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // Adjust scale type
-            mealImageView.setPadding(8, 0, 8, 0);
-
+            mealImageView.setPadding(8, 0, 8, 16);
+            Log.d("MealLogFragment", "Loading image from URL: " + imageUrl);
             // Load the image into the ImageView using Glide
             Glide.with(getContext())
                     .load(imageUrl)
-                    .placeholder(R.drawable.baseline_image_not_supported_24)
+                    .placeholder(R.drawable.foodimage)
                     .into(mealImageView);
 
             mealEntryLayout.addView(mealImageView);
@@ -555,7 +673,7 @@ public class UserMealRecordFragment extends Fragment {
             textLayout.setPadding(25, 0, 0, 0);
 
             TextView titleTextView = new TextView(getContext());
-            titleTextView.setText(mealName);
+            titleTextView.setText(mealName + " (" + servingsize + ")");
             titleTextView.setTextSize(16);
             textLayout.addView(titleTextView);
 
@@ -652,21 +770,6 @@ public class UserMealRecordFragment extends Fragment {
         EditText editTextServingSize = dialogView.findViewById(R.id.editTextServingSize);
         Spinner servingUnitSpinner = dialogView.findViewById(R.id.servingUnitSpinner);
 
-        // Setup the Spinner for serving units (e.g., grams, cups, pieces)
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
-                R.array.serving_units_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        servingUnitSpinner.setAdapter(adapter);
-
-        String servingSizeWithUnit = mealRecord.getServingSize(); // e.g., "50.0 grams"
-        String[] sizeAndUnit = servingSizeWithUnit.split(" ", 2); // Split into two parts: size and unit
-
-        if (sizeAndUnit.length == 2) {
-            editTextServingSize.setText(sizeAndUnit[0]); // Set serving size (first part)
-            int unitPosition = adapter.getPosition(sizeAndUnit[1]); // Get the position of the unit
-            servingUnitSpinner.setSelection(unitPosition); // Set the spinner to the correct position
-        }
-
         ArrayAdapter<CharSequence> mealadapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.meal_types_array, android.R.layout.simple_spinner_item);
         mealadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -675,43 +778,108 @@ public class UserMealRecordFragment extends Fragment {
         int spinnerPosition = mealadapter.getPosition(mealRecord.getMealType());
         spinnerMealType.setSelection(spinnerPosition);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Update Meal Record")
-                .setView(dialogView)
-                .setPositiveButton("Update", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Retrieve updated information from input fields
-                        String updatedMealType = spinnerMealType.getSelectedItem().toString();
-                        String servingSizeText = editTextServingSize.getText().toString();
-                        double updatedServingSize = 0;
-                        try {
-                            updatedServingSize = Double.parseDouble(servingSizeText);
-                        } catch (NumberFormatException e) {
-                            Toast.makeText(getActivity(), "Invalid serving size", Toast.LENGTH_SHORT).show();
-                            return; // Exit if the input is invalid
-                        }
+        String servingSizeWithUnit = mealRecord.getServingSize(); // e.g., "50.0 grams"
+        String[] sizeAndUnit = servingSizeWithUnit.split(" ", 2); // Split into two parts: size and unit
+        if (sizeAndUnit.length == 2) {
+            editTextServingSize.setText(sizeAndUnit[0]); // Set serving size (first part)
+        }
 
-                        String updatedServingUnit = servingUnitSpinner.getSelectedItem().toString();
-                        String updatedServingSizeWithUnit = updatedServingSize + " " + updatedServingUnit; // Combine size and unit
+        // Fetch available serving measures from Edamam API for the food name
+        String foodName = mealRecord.getMealName();
+        String appId = "997e8d42";
+        String appKey = "4483ab153d93c4a64d6f156fcffa78ff";
 
-                        String previousServingSize = mealRecord.getServingSize();
-                        if (!previousServingSize.equals(updatedServingSizeWithUnit)) {
-                            String userId = getCurrentUserId();
-                            String selectedDate = dateTextView.getText().toString();
-                            String mealName = mealRecord.getMealName();
-                            searchFoodInEdamam(userId, mealName, updatedServingSize, updatedServingUnit, updatedMealType, selectedDate, true, mealRecordID, "");
+        EdamamApiService apiService = ApiClient.getRetrofitInstance().create(EdamamApiService.class);
+        Call<FoodResponse> call = apiService.parseFood(appId, appKey, foodName);
+
+        call.enqueue(new retrofit2.Callback<FoodResponse>() {
+            @Override
+            public void onResponse(Call<FoodResponse> call, retrofit2.Response<FoodResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<FoodResponse.Hint> hints = response.body().getHints();
+                    if (hints != null && !hints.isEmpty()) {
+                        // Get the Food object from the first hint
+                        FoodResponse.Hint hint = hints.get(0);
+                        FoodResponse.Food food = hint.getFood();
+                        List<FoodResponse.Measure> measures = hint.getMeasures();
+
+                        // Check if measures are not null and populate the list of serving units
+                        if (measures != null && !measures.isEmpty()) {
+                            List<String> servingUnits = new ArrayList<>();
+                            for (FoodResponse.Measure measure : measures) {
+                                servingUnits.add(measure.getLabel());
+                                Log.d("FoodAPI", "Serving Unit Label: " + measure.getLabel());
+                            }
+
+                            // Dynamically populate the servingUnitSpinner with available serving units
+                            ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(getActivity(),
+                                    android.R.layout.simple_spinner_item, servingUnits);
+                            unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            servingUnitSpinner.setAdapter(unitAdapter);
+
+                            // Set the spinner to the unit currently in the meal record
+                            if (sizeAndUnit.length == 2) {
+                                int unitPosition = unitAdapter.getPosition(sizeAndUnit[1]);
+                                if (unitPosition >= 0) {
+                                    servingUnitSpinner.setSelection(unitPosition); // Set spinner to the correct unit
+                                }
+                            }
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                            builder.setTitle("Update Meal Record")
+                                    .setView(dialogView)
+                                    .setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Retrieve updated information from input fields
+                                            String updatedMealType = spinnerMealType.getSelectedItem().toString();
+                                            String servingSizeText = editTextServingSize.getText().toString();
+                                            double updatedServingSize = 0;
+                                            try {
+                                                updatedServingSize = Double.parseDouble(servingSizeText);
+                                            } catch (NumberFormatException e) {
+                                                Toast.makeText(getActivity(), "Invalid serving size", Toast.LENGTH_SHORT).show();
+                                                return; // Exit if the input is invalid
+                                            }
+
+                                            String updatedServingUnit = servingUnitSpinner.getSelectedItem().toString();
+                                            String updatedServingSizeWithUnit = updatedServingSize + " " + updatedServingUnit; // Combine size and unit
+
+                                            String previousServingSize = mealRecord.getServingSize();
+                                            String previousMealType = mealRecord.getMealType();
+                                            if (!previousServingSize.equals(updatedServingSizeWithUnit) || !previousMealType.equals(updatedMealType)) {
+                                                String userId = getCurrentUserId();
+                                                String selectedDate = dateTextView.getText().toString();
+                                                String mealName = mealRecord.getMealName();
+                                                searchFoodInEdamam(userId, mealName, updatedServingSize, updatedServingUnit, updatedMealType, selectedDate, true, mealRecordID, "");
+                                                checkAndHideEmptyMealTypeCard(updatedMealType);
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss(); // Close the dialog without any action
+                                        }
+                                    })
+                                    .create()
+                                    .show();
+                         } else {
+                            Toast.makeText(getActivity(), "No serving units found for: " + foodName, Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        Toast.makeText(getActivity(), "No food hints found for: " + foodName, Toast.LENGTH_SHORT).show();
                     }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss(); // Close the dialog without any action
-                    }
-                })
-                .create()
-                .show();
+                } else {
+                    Log.e("MealLogFragment", "API response unsuccessful or empty.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FoodResponse> call, Throwable t) {
+                Log.e("MealLogFragment", "Error fetching food data: " + t.getMessage());
+            }
+        });
     }
 
     private void deleteMealRecord(String mealRecordID, String mealTypeD) {
@@ -879,7 +1047,7 @@ public class UserMealRecordFragment extends Fragment {
                                         break;
                                     case 1:
                                         // Handle entering manually
-                                        handleEnterManually(userId, selectedMealType); // Pass the selected meal type
+                                        handleFoodNameInput(userId, selectedMealType);
                                         break;
                                 }
                             }
