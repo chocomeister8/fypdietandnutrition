@@ -44,7 +44,7 @@ public class userHomePageFragment extends Fragment {
     private final Random random = new Random();
 
     private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "steak", "fish","lamb", "pasta","burger", "curry", "shrimp", "bacon", "fried", "grilled", "smoked", "salmon"
+            "chicken", "beef", "steak", "fish","lamb"
     );
 
     private List<String> mealtype = Arrays.asList(
@@ -279,7 +279,6 @@ public class userHomePageFragment extends Fragment {
             }
         });
     }
-
 
     private void fetchRecipes(String query, String mealType, String dishType) {
         String app_id = "2c7710ea"; // Your Edamam API app ID

@@ -38,7 +38,7 @@ public class NavRecommendedRecipesFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-    private List<Recipe> recipeList;
+    private List<Recipe> recipeList = new ArrayList<>();
     private EditText searchEditText;
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
@@ -46,7 +46,7 @@ public class NavRecommendedRecipesFragment extends Fragment {
     private final Random random = new Random();
 
     private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "noodles", "rice", "steak", "fish", "soup", "lamb", "pasta", "vegetable", "potato", "sandwich", "burger", "curry", "shrimp", "bacon", "mushroom"
+            "chicken", "beef", "steak", "fish","lamb"
     );
 
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
@@ -60,30 +60,12 @@ public class NavRecommendedRecipesFragment extends Fragment {
 
         firestore = FirebaseFirestore.getInstance();
         fetchUserCalorieGoal();
-
-        // Initialize buttons using view.findViewById
-        Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
-        Button button_vegetarian = view.findViewById(R.id.button_vegetarian);
-        Button button_favourite = view.findViewById(R.id.button_favourite);
-        Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
-        Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
-        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
-
-
-        searchEditText = view.findViewById(R.id.search_recipe);
-
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.recipe_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Initialize the recipe list and adapter
-        recipeList = new ArrayList<>();
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
-
-        // Fetch recipes
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        searchEditText = view.findViewById(R.id.search_recipe);
 
         // Setup spinners
         mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
@@ -110,6 +92,15 @@ public class NavRecommendedRecipesFragment extends Fragment {
             // Fetch recipes with default random query if no arguments exist
             fetchRecipes(getRandomSimpleFoodSearch(), null, null);
         }
+
+        // Initialize buttons using view.findViewById
+        Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
+        Button button_vegetarian = view.findViewById(R.id.button_vegetarian);
+        Button button_favourite = view.findViewById(R.id.button_favourite);
+        Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
+        Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
+        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
+        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
 
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
         button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
@@ -237,7 +228,6 @@ public class NavRecommendedRecipesFragment extends Fragment {
     }
 
     private void openRecipeDetailFragment(Recipe recipe) {
-        // From NavAllRecipesFragment
         Bundle bundle = new Bundle();
         bundle.putParcelable("selected_recipe", recipe);  // Assuming selectedRecipe is the clicked recipe object
         bundle.putString("source", "recommended");  // Pass "all" as the source

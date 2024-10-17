@@ -41,15 +41,9 @@ public class NavVegetarianRecipesFragment extends Fragment {
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
 
-
-    private static final String BASE_URL = "https://api.edamam.com/";
-    private static final String APP_ID = "your_app_id";  // Replace with your actual App ID
-    private static final String APP_KEY = "your_app_key";  // Replace with your actual App Key
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.nav_vegetarian_recipes, container, false);
 
         // Initialize RecyclerView and adapter

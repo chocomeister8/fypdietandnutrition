@@ -1,5 +1,7 @@
 package com.fyp.dietandnutritionapplication;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,7 +34,7 @@ public class NavAllRecipesFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-    private List<Recipe> recipeList;
+    private List<Recipe> recipeList = new ArrayList<>();
     private EditText searchEditText;
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
@@ -43,14 +45,46 @@ public class NavAllRecipesFragment extends Fragment {
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
 
-    private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "steak", "fish", "soup", "lamb", "pasta", "potato", "burger", "curry", "shrimp", "bacon", "fried", "grilled", "smoked", "salmon"
-    );
+    private List<String> simpleFoodSearches = Arrays.asList("chicken", "beef", "steak", "fish","lamb");
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.nav_all_recipes, container, false);
+
+        // Initialize RecyclerView
+        recyclerView = view.findViewById(R.id.recipe_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
+        recyclerView.setAdapter(recipeAdapter);
+        searchEditText = view.findViewById(R.id.search_recipe);
+
+        // Setup spinners
+        mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
+        dishTypeSpinner = view.findViewById(R.id.spinner_dish_type);
+        setupSpinners(); // Call to setup spinners
+
+        // Call the setup methods for listeners
+        setupSpinnerListeners(); // Call to setup spinner listeners
+        setupSearchBar(); // Call to setup search bar listeners
+
+        if (getArguments() != null) {
+            String savedSearchQuery = getArguments().getString("search_query", "");
+            int savedMealTypePos = getArguments().getInt("spinner1_value", 0);
+            int savedDishTypePos = getArguments().getInt("spinner2_value", 0);
+
+            searchEditText.setText(savedSearchQuery);
+            mealTypeSpinner.setSelection(savedMealTypePos);
+            dishTypeSpinner.setSelection(savedDishTypePos);
+
+        } else {
+            // Fetch recipes with default random query if no arguments exist
+            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        }
+
+        // Clear filters button logic
+        Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
+        clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
 
         // Initialize views
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
@@ -61,47 +95,6 @@ public class NavAllRecipesFragment extends Fragment {
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
         Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
 
-
-        searchEditText = view.findViewById(R.id.search_recipe);
-
-        // Initialize RecyclerView
-        recyclerView = view.findViewById(R.id.recipe_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Initialize the recipe list and adapter
-        recipeList = new ArrayList<>();
-        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
-        recyclerView.setAdapter(recipeAdapter);
-
-        // Fetch recipes
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
-
-        // Setup spinners
-        mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
-        dishTypeSpinner = view.findViewById(R.id.spinner_dish_type);
-        setupSpinners(); // Call to setup spinners
-
-        // Call the setup methods for listeners
-        setupSpinnerListeners(); // Call to setup spinner listeners
-        setupSearchBar(); // Call to setup search bar listenersv
-
-        if (getArguments() != null) {
-            String savedSearchQuery = getArguments().getString("search_query", "");
-            int savedMealTypePos = getArguments().getInt("spinner1_value", 0);
-            int savedDishTypePos = getArguments().getInt("spinner2_value", 0);
-
-            // Restore the saved search query and spinner selections
-            searchEditText.setText(savedSearchQuery);
-            mealTypeSpinner.setSelection(savedMealTypePos);
-            dishTypeSpinner.setSelection(savedDishTypePos);
-
-            // Apply the filters with the restored values
-            filterRecipes();
-        } else {
-            // Fetch recipes with default random query if no arguments exist
-            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
-        }
-
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
         button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
@@ -111,13 +104,9 @@ public class NavAllRecipesFragment extends Fragment {
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
         button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 
-        // Clear filters button logic
-        Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
-        clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
 
         return view;
     }
-
 
     private void setupSpinners() {
         // Set up meal type spinner
@@ -210,13 +199,13 @@ public class NavAllRecipesFragment extends Fragment {
     }
 
     private void openRecipeDetailFragment(Recipe recipe) {
-        // From NavAllRecipesFragment
+
         Bundle bundle = new Bundle();
-        bundle.putParcelable("selected_recipe", recipe);  // Assuming selectedRecipe is the clicked recipe object
-        bundle.putString("source", "all");  // Pass "all" as the source
-        bundle.putString("search_query", searchEditText.getText().toString());  // Pass the search query
-        bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner1
-        bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner2
+        bundle.putParcelable("selected_recipe", recipe);
+        bundle.putString("source", "all");
+        bundle.putString("search_query", searchEditText.getText().toString());
+        bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());
+        bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());
 
         RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
         recipeDetailFragment.setArguments(bundle);
@@ -224,7 +213,6 @@ public class NavAllRecipesFragment extends Fragment {
                 .replace(R.id.frame_layout, recipeDetailFragment)
                 .addToBackStack(null)
                 .commit();
-
     }
 
     private void fetchRecipes(String query, String mealType, String dishType) {
@@ -262,6 +250,7 @@ public class NavAllRecipesFragment extends Fragment {
                     }
 
                     recipeAdapter.notifyDataSetChanged();
+
                 } else {
                     Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
                 }
