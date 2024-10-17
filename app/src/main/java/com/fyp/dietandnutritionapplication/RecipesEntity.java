@@ -127,4 +127,35 @@ public class RecipesEntity {
                     Log.e("RecipesEntity", "Error adding recipe", e);
                 });
     }
+
+    public void fetchRejectedRecipes(OnRecipesFetchedListener listener) {
+        db.collection("Recipes")
+                .whereEqualTo("status", "Rejected") // Filter to get only rejected recipes
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            ArrayList<Recipe> recipeList = new ArrayList<>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Recipe recipe = document.toObject(Recipe.class);
+                                recipe.setRecipe_id(document.getId());
+
+                                // Calculate calories per 100g if total weight is available
+                                double caloriesPer100g = recipe.getCaloriesPer100g();
+                                if (recipe.getTotalWeight() > 0) {
+                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                                }
+                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                                recipeList.add(recipe); // Add the recipe to the list
+                            }
+                            // Pass the fetched recipes to the listener
+                            listener.onRecipesFetched(recipeList);
+                        } else {
+                            Log.w("Firestore", "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
 }
