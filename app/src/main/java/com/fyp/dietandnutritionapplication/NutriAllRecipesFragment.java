@@ -31,7 +31,7 @@ import retrofit2.Response;
 public class NutriAllRecipesFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-    private List<Recipe> recipeList;
+    private List<Recipe> recipeList = new ArrayList<>();;
     private EditText searchEditText;
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
@@ -43,7 +43,7 @@ public class NutriAllRecipesFragment extends Fragment {
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
 
     private List<String> simpleFoodSearches = Arrays.asList(
-            "chicken", "beef", "steak", "fish", "soup", "lamb", "pasta", "potato", "burger", "curry", "shrimp", "bacon", "fried", "grilled", "smoked", "salmon"
+            "chicken", "beef", "steak", "fish", "soup", "lamb"
     );
 
     @Nullable
@@ -64,7 +64,6 @@ public class NutriAllRecipesFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize the recipe list and adapter
-        recipeList = new ArrayList<>();
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
