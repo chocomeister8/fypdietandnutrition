@@ -109,9 +109,9 @@ public class NutriRejectedRecipesFragment extends Fragment implements RecipeAdap
 //    }
 
     private void fetchRejectedRecipes() {
-        // Fetch rejected recipes using the RecipesEntity class
-        RecipesEntity recipesEntity = new RecipesEntity();
-        recipesEntity.fetchRejectedRecipes(new RecipesEntity.OnRecipesFetchedListener() {
+        // Fetch rejected recipes using the controller
+        NutriRejectedRecipesController nutriRejectedRecipesController = new NutriRejectedRecipesController();
+        nutriRejectedRecipesController.fetchRejectedRecipes(new NutriRejectedRecipesController.OnRecipesFetchedListener() {
             @Override
             public void onRecipesFetched(ArrayList<Recipe> fetchedRecipes) {
                 recipeList.clear(); // Clear the existing list
