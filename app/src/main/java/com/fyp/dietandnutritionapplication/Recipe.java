@@ -25,6 +25,7 @@ public class Recipe implements Parcelable {
     private double totalWeight; // Total weight of the recipe in grams
     private int total_time; // Total cooking time in minutes
     private double caloriesPer100g; // New field for calories per 100g
+    private String instructions;
 
     public Recipe() {
     }
@@ -99,10 +100,14 @@ public class Recipe implements Parcelable {
         this.total_time = total_time;
     }
 
+    public String getInstructions() {
+        return instructions;
+    }
+
 
     // Optionally, add a constructor
     public Recipe(String recipe_id, String userId, String label, String status, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
-                  List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int total_Time) {
+                  List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int total_Time, String instructions) {
         this.recipe_id = recipe_id;
         this.userId = userId;
         this.label = label;
@@ -120,6 +125,7 @@ public class Recipe implements Parcelable {
         this.total_time = total_Time;
         this.name = name;
         this.folder = folder;
+        this.instructions = instructions;
     }
 
     // Getter for the name
@@ -152,6 +158,7 @@ public class Recipe implements Parcelable {
         total_time = in.readInt();
         name = in.readString();
         folder = in.readString();
+        instructions = in.readString();
             // Read other fields from the Parcel
 
     }
@@ -192,9 +199,8 @@ public class Recipe implements Parcelable {
         dest.writeInt(total_time);
         dest.writeString(name);
         dest.writeString(folder);
+        dest.writeString(instructions);
     }
-
-
 
     public void setLabel(String label) {
         this.label = label;
@@ -235,4 +241,6 @@ public class Recipe implements Parcelable {
     public void setIngredientLines(List<String> ingredients) {
         this.ingredientLines = ingredients;
     }
+
+    public void setInstructions(String instructions) {this.instructions = instructions; }
 }
