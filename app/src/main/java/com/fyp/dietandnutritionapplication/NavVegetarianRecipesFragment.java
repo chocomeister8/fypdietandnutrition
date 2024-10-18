@@ -116,7 +116,7 @@ public class NavVegetarianRecipesFragment extends Fragment {
 
         button_favourite.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NavFavouriteRecipesFragment())
+                    .replace(R.id.frame_layout, new ViewFavouriteRecipesFragment())
                     .addToBackStack(null)
                     .commit();
         });
