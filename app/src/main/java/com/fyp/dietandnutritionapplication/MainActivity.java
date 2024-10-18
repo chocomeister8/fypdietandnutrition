@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private boolean isAdminMode = false;
-    private ArrayList<Profile> accountArray = new ArrayList<>();
-    private ArrayList<FAQ> faqArray = new ArrayList<>();
     FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private ViewUserProfileController viewUserProfileController;
@@ -46,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of fetching user role
         FirebaseUser user = mAuth.getCurrentUser();
-        String userRole = "guest"; // Default role
+        String userRole = "admin"; // Default role
 
 
         // Initialize ViewBinding

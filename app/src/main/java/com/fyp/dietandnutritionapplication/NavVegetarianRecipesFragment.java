@@ -41,6 +41,9 @@ public class NavVegetarianRecipesFragment extends Fragment {
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
 
+    private boolean initialLoadDone = false;
+    private boolean isViewInitialized = false; // New flag to check if view is fully initialized
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,24 +62,30 @@ public class NavVegetarianRecipesFragment extends Fragment {
         dishTypeSpinner = view.findViewById(R.id.spinner_dish_type);
         setupSpinners(); // Call to setup spinners
 
-        // Call the setup methods for listeners
-        setupSpinnerListeners(); // Call to setup spinner listeners
-        setupSearchBar(); // Call to setup search bar listeners
+        if (savedInstanceState != null) {
+            String savedSearchQuery = savedInstanceState.getString("search_query", "");
+            int savedMealTypePos = savedInstanceState.getInt("spinner1_value", 0);
+            int savedDishTypePos = savedInstanceState.getInt("spinner2_value", 0);
 
-        if (getArguments() != null) {
-            String savedSearchQuery = getArguments().getString("search_query", "");
-            int savedMealTypePos = getArguments().getInt("spinner1_value", 0);
-            int savedDishTypePos = getArguments().getInt("spinner2_value", 0);
-
-            // Restore the saved search query and spinner selections
             searchEditText.setText(savedSearchQuery);
             mealTypeSpinner.setSelection(savedMealTypePos);
             dishTypeSpinner.setSelection(savedDishTypePos);
 
-            // Apply the filters with the restored values
+            // Fetch recipes based on restored state
             filterRecipes();
-        } else {
-            // Fetch recipes with default random query if no arguments exist
+
+        } else if (getArguments() != null) {
+            // Restore state from arguments (when returning from RecipeDetailFragment)
+            String savedSearchQuery = getArguments().getString("search_query", "");
+            int savedMealTypePos = getArguments().getInt("spinner1_value", 0);
+            int savedDishTypePos = getArguments().getInt("spinner2_value", 0);
+
+            searchEditText.setText(savedSearchQuery);
+            mealTypeSpinner.setSelection(savedMealTypePos);
+            dishTypeSpinner.setSelection(savedDishTypePos);
+
+        } else if (!initialLoadDone) {
+            // Fetch recipes with a default random query only if initial load is not done
             fetchRecipes(getRandomQuery(), null, null);
         }
 
@@ -133,6 +142,11 @@ public class NavVegetarianRecipesFragment extends Fragment {
                     .commit();
         });
 
+        setupSpinnerListeners();
+        setupSearchBar();
+
+        isViewInitialized = true;
+
         return view;
     }
 
@@ -167,23 +181,29 @@ public class NavVegetarianRecipesFragment extends Fragment {
         mealTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Call filterRecipes when meal type changes
-                filterRecipes();
+                // Only fetch recipes if the initial load is done and the view is fully initialized
+                if (initialLoadDone && isViewInitialized) {
+                    filterRecipes();
+                }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
         dishTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Call filterRecipes when dish type changes
-                filterRecipes();
+                // Only fetch recipes if the initial load is done and the view is fully initialized
+                if (initialLoadDone && isViewInitialized) {
+                    filterRecipes();
+                }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
     }
 
@@ -196,8 +216,10 @@ public class NavVegetarianRecipesFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // Call the method to filter recipes based on search input
-                filterRecipes(); // This now calls the combined filter method
+                // Only fetch recipes if the initial load is done and the view is fully initialized
+                if (initialLoadDone && isViewInitialized) {
+                    filterRecipes();
+                }
             }
 
             @Override
@@ -272,6 +294,13 @@ public class NavVegetarianRecipesFragment extends Fragment {
 
                     }
                     recipeAdapter.notifyDataSetChanged();
+
+                    if (!initialLoadDone) {
+                        setupSpinnerListeners();
+                        setupSearchBar();
+                        initialLoadDone = true; // Set flag to true after first fetch
+                    }
+
                 } else {
                     Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
                 }
