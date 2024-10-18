@@ -13,8 +13,8 @@ public class URegisterController {
         userAccountEntity.registerUser(firstName, lastName, userName, dob, email, phone, gender, password, datejoined, context,
                 new UserAccountEntity.RegisterCallback() {
                     @Override
-                    public void onSuccess() {
-                        Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show();
+                    public void onSuccess(String message) {
+                        Toast.makeText(context, "Registration successful, please verify your email!", Toast.LENGTH_SHORT).show();
 
                         // Ensure context is MainActivity before casting
                         if (context instanceof MainActivity) {
