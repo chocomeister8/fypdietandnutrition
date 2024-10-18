@@ -31,6 +31,7 @@ public class MealRecord {
     private double proteins;
     private double carbs;
     private double fats;
+    private double fiber;
     private Timestamp createdDate; // Date when the meal was logged
     private Timestamp modifiedDate;
     private String servingSize;
@@ -43,8 +44,9 @@ public class MealRecord {
 
     // Constructor
     public MealRecord(String mealName, double calories, String imageUrl, String mealType,
-                      double carbs, double proteins, double fats, Timestamp createdDate,
-                      Timestamp modifiedDate, String servingSize, String username, String mealRecordID, String userId) {
+                      double carbs, double proteins, double fats, double fiber,
+                      Timestamp createdDate, Timestamp modifiedDate, String servingSize,
+                      String username, String mealRecordID, String userId) {
         this.mealName = mealName;
         this.calories = calories;
         this.imageUrl = imageUrl;
@@ -52,6 +54,7 @@ public class MealRecord {
         this.carbs = carbs;
         this.proteins = proteins;
         this.fats = fats;
+        this.fiber = fiber;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
         this.servingSize = servingSize;
@@ -87,6 +90,10 @@ public class MealRecord {
 
     public double getFats() {
         return fats;
+    }
+
+    public double getFiber() {
+        return fiber;
     }
 
     public Timestamp getCreatedDate() {
@@ -137,6 +144,10 @@ public class MealRecord {
 
     public void setFats(double fats) {
         this.fats = fats;
+    }
+
+    public void setFiber(double fiber) {
+        this.fiber = fiber;
     }
 
     public void setCreatedDate(Timestamp createdDate) {
@@ -316,7 +327,9 @@ public class MealRecord {
         });
     }
 
-    public void storeMealData(String userId,String username, String mealName, String selectedMealType, String servingInfo, double adjustedCalories, double adjustedCarbohydrates, double adjustedProtein, double adjustedFat, String selectedDateStr, String imageUrl){
+    public void storeMealData(String userId, String username, String mealName, String selectedMealType,
+                              String servingInfo, double adjustedCalories, double adjustedCarbohydrates,
+                              double adjustedProtein, double adjustedFat, double adjustedFiber, String selectedDateStr, String imageURL) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -330,7 +343,8 @@ public class MealRecord {
         mealData.put("carbs", adjustedCarbohydrates);
         mealData.put("proteins", adjustedProtein);
         mealData.put("fats", adjustedFat);
-        mealData.put("imageUrl", imageUrl);
+        mealData.put("fiber", adjustedFiber);
+        mealData.put("imageUrl", imageURL);
 
         try {
             // Parse the string to a Date object and convert to Timestamp directly

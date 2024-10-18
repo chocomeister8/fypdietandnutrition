@@ -172,8 +172,11 @@ public class RecipeDetailFragment extends Fragment {
                 fragment = new NavAllRecipesFragment();
             } else if ("vegetarian".equals(source)) {
                 fragment = new NavVegetarianRecipesFragment();
-            } else { // "recommended"
+            } else if ("recommended".equals(source)){ // "recommended"
                 fragment = new NavRecommendedRecipesFragment();
+            }
+            else{
+                fragment = new userHomePageFragment();
             }
 
             Bundle args = new Bundle();

@@ -17,9 +17,15 @@ public class UserMealRecordController {
         mealRecord.fetchMealsLogged(username, selectedDateStr, listener);
     }
 
-    public void storeMealData(String userId,String username, String mealName, String selectedMealType, String servingInfo, double adjustedCalories, double adjustedCarbohydrates, double adjustedProtein, double adjustedFat, String selectedDateStr, String imageURL){
-        mealRecord.storeMealData(userId, username, mealName, selectedMealType, servingInfo, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, selectedDateStr, imageURL);;
+    public void storeMealData(String userId, String username, String mealName, String selectedMealType,
+                              String servingInfo, double adjustedCalories, double adjustedCarbohydrates,
+                              double adjustedProtein, double adjustedFat, double adjustedFiber, String selectedDateStr, String imageURL) {
+        mealRecord.storeMealData(userId, username, mealName, selectedMealType, servingInfo, adjustedCalories,
+                adjustedCarbohydrates, adjustedProtein, adjustedFat, adjustedFiber,
+                selectedDateStr, imageURL);
     }
+
+
 
     public void fetchUsernameAndCalorieLimit(String userId, MealRecord.OnUsernameAndCalorieLimitFetchedListener listener) {
         mealRecord.fetchUsernameAndCalorielimit(userId, listener);

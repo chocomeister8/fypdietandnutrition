@@ -18,11 +18,22 @@
     </string-array>
 
     <string-array name="serving_units_array">
-        <item>grams</item>
-        <item>cups</item>
-        <item>pieces</item>
-        <item>ounces</item>
-        <item>milliliters</item>
+        <item>Liter</item>
+        <item>Kilogram</item>
+        <item>Cup</item>
+        <item>Tablespoon</item>
+        <item>Teaspoon</item>
+        <item>Gram</item>
+        <item>Pound</item>
+        <item>Ounce</item>
+        <item>Pinch</item>
+        <item>Liter</item>
+        <item>Fluid ounce</item>
+        <item>Gallon</item>
+        <item>Pint</item>
+        <item>Quart</item>
+        <item>Milliliter</item>
+        <item>Drop</item>
     </string-array>
 
     <string-array name="meal_types_array">
