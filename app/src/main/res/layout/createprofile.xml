@@ -10,7 +10,7 @@
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#F4F1E1"
+        android:background="#F0F9F0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -58,7 +58,7 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="630dp"
-        android:background="#C2F4C3"
+        android:background="#F0F9F0"
         android:orientation="vertical"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"

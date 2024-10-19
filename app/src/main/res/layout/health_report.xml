@@ -3,43 +3,64 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#F0F9F0">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
         android:padding="16dp">
 
-        <ImageView
-            android:id="@+id/right_icon2"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_baseline_menu_24"
-            android:visibility="visible"
-            tools:visibility="visible" />
+            android:layout_gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="100dp"
-            android:layout_height="70dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/dietdietmusttry_logo" />
+            <ImageView
+                android:id="@+id/noti_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="320dp"
+                android:src="@drawable/baseline_notifications_24" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_centerHorizontal="true"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:text="Health Report" />
+            <TextView
+                android:id="@+id/notificationBadgeTextView"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/badge_background"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textAlignment="center"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="3dp" />
+        </FrameLayout>
+
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="100dp"
+                android:layout_height="70dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/dietdietmusttry_logo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Health Report"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
     </RelativeLayout>
 
-    <!-- Segmented Control (D,M) -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="40dp"

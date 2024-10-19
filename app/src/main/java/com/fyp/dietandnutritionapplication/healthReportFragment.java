@@ -1,5 +1,6 @@
 package com.fyp.dietandnutritionapplication;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import com.google.firebase.Timestamp;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +49,8 @@ public class healthReportFragment extends Fragment {
     private FirebaseAuth auth;
     private String userId;
     private TextView averageCarbs; // Add this line
+    private NotificationUController notificationUController;
+    private TextView notificationBadgeTextView;
 
 
     @Nullable
@@ -62,6 +66,7 @@ public class healthReportFragment extends Fragment {
 
         if (user != null) {
             userId = user.getUid();
+
             // Initialize views
             buttonDaily = view.findViewById(R.id.button_daily);
             buttonMonthly = view.findViewById(R.id.button_monthly);
@@ -73,7 +78,36 @@ public class healthReportFragment extends Fragment {
             pieChart = view.findViewById(R.id.pie_chart);
             averageCarbs = view.findViewById(R.id.averageCarbs); // Add this line
 
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
 
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            });
+
+            ImageView notiImage = view.findViewById(R.id.noti_icon);
+            notiImage.setOnClickListener(v -> {
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new NotificationUFragment())
+                        .addToBackStack(null)
+                        .commit();
+
+            });
 
             // Set button listeners
             buttonDaily.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +132,8 @@ public class healthReportFragment extends Fragment {
                 }
             });
             fetchTodaysReport();
+
+
         } else {
             // User is not logged in
             Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
