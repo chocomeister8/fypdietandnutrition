@@ -167,7 +167,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="255dp"
-        android:background="@drawable/bmi_background"
+        android:backgroundTint="#d2e2ad"
         android:padding="12dp"
         android:text="Calculate"
         android:textColor="@android:color/black" />

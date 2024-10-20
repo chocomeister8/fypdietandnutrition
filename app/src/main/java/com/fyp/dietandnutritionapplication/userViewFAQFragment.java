@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,8 @@ public class userViewFAQFragment extends Fragment {
     private ExpandableListView faqExpandableListView;
     private FAQExpandableListAdapter faqAdapter;
     private ViewFAQController viewFAQController;
+    private NotificationUController notificationUController;
+    private TextView notificationBadgeTextView;
 
     @Nullable
     @Override
@@ -31,6 +35,38 @@ public class userViewFAQFragment extends Fragment {
         // Initialize the ExpandableListView
         faqExpandableListView = view.findViewById(R.id.faqExpandableListView);
         viewFAQController = new ViewFAQController();
+
+        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+        notificationUController = new NotificationUController();
+        String userId = "";
+        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+            @Override
+            public void onNotificationsFetched(List<Notification> notifications) {
+                // Notifications can be processed if needed
+
+                // After fetching notifications, count them
+                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                    @Override
+                    public void onCountFetched(int count) {
+                        if (count > 0) {
+                            notificationBadgeTextView.setText(String.valueOf(count));
+                            notificationBadgeTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            notificationBadgeTextView.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+        });
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
 
         // Load FAQs
         loadFAQs();
