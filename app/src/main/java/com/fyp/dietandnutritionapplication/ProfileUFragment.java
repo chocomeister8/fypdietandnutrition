@@ -530,12 +530,12 @@ public class ProfileUFragment extends Fragment {
                         currentWeight != currentUser.getCurrentWeight() ||
                         currentHeight != currentUser.getCurrentHeight() ||
                         !activityLevel.equals(currentUser.getActivityLevel())||
-                        !healthGoals.equals(currentUser.getHealthGoal());
+                        !healthGoals.equals(currentUser.getHealthGoal()) || !gender.equals(currentUser.getGender());
 
                 int calorieLimit = currentUser.getCalorieLimit();
 
                 if (recalculateCalorieLimit) {
-                    double calorieGoal = calculateCalorieGoal(dob, currentWeight, currentHeight, activityLevel, healthGoals);
+                    double calorieGoal = calculateCalorieGoal(gender, dob, currentWeight, currentHeight, activityLevel, healthGoals);
                     calorieLimit = (int) calorieGoal;
                     Log.d("Debug", "Recalculated Calorie Goal: " + calorieGoal);
                     Log.d("Debug", "Calorie Limit (int): " + calorieLimit);
@@ -707,7 +707,7 @@ public class ProfileUFragment extends Fragment {
         }
     }
 
-    private double calculateCalorieGoal(String dob, double weight, double height, String activityLevel, String healthGoal) {
+    private double calculateCalorieGoal(String gender, String dob, double weight, double height, String activityLevel, String healthGoal) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date birthDate = null;
         try {
@@ -729,9 +729,15 @@ public class ProfileUFragment extends Fragment {
         }
 
         // Calculate BMR (Basal Metabolic Rate) based on weight, height, and age
-        double bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5; // Modify based on gender if needed
+        double bmr;
+        if ("Male".equalsIgnoreCase(gender)) {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+        } else if ("Female".equalsIgnoreCase(gender)) {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+        } else {
+            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 78;
+        }
 
-        // Activity multiplier
         double activityFactor;
         switch (activityLevel) {
             case "Sedentary: little or no exercise":
