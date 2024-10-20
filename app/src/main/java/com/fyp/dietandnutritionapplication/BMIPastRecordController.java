@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +28,8 @@ public class BMIPastRecordController extends Fragment {
     private RecyclerView recyclerView;
     private BMIRecordFragment adapter;
     private List<BMIEntity> bmiList;
+    private NotificationUController notificationUController;
+    private TextView notificationBadgeTextView;
 
     // Constructor to accept local BMI list
     public BMIPastRecordController(List<BMIEntity> localBmiList) {
@@ -47,6 +51,38 @@ public class BMIPastRecordController extends Fragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+        notificationUController = new NotificationUController();
+        String userId = "";
+        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+            @Override
+            public void onNotificationsFetched(List<Notification> notifications) {
+                // Notifications can be processed if needed
+
+                // After fetching notifications, count them
+                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                    @Override
+                    public void onCountFetched(int count) {
+                        if (count > 0) {
+                            notificationBadgeTextView.setText(String.valueOf(count));
+                            notificationBadgeTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            notificationBadgeTextView.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+        });
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
 
         // Fetch BMI records from Firestore
         fetchBMIRecords();

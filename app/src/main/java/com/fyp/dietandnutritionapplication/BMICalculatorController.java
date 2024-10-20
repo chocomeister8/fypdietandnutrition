@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +33,9 @@ public class BMICalculatorController extends Fragment {
     private String selectedGender = ""; // No default gender
     private FirebaseAuth auth;
     private FirebaseFirestore db;
-    private List<BMIEntity> bmiList = new ArrayList<>(); // Initialize the BMI list
+    private List<BMIEntity> bmiList = new ArrayList<>();
+    private NotificationUController notificationUController;
+    private TextView notificationBadgeTextView;// Initialize the BMI list
 
     @Nullable
     @Override
@@ -53,6 +56,38 @@ public class BMICalculatorController extends Fragment {
         buttonMale = view.findViewById(R.id.button_male);
         buttonFemale = view.findViewById(R.id.button_female);
         bmiAdvice = view.findViewById(R.id.bmi_advice);
+
+        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+        notificationUController = new NotificationUController();
+        String userId = "";
+        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+            @Override
+            public void onNotificationsFetched(List<Notification> notifications) {
+                // Notifications can be processed if needed
+
+                // After fetching notifications, count them
+                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                    @Override
+                    public void onCountFetched(int count) {
+                        if (count > 0) {
+                            notificationBadgeTextView.setText(String.valueOf(count));
+                            notificationBadgeTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            notificationBadgeTextView.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+        });
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
 
         // Set button backgrounds
         updateButtonBackground(buttonMale, false);

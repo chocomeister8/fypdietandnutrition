@@ -255,7 +255,7 @@ public class UserAccountEntity {
         user.sendEmailVerification()
                 .addOnCompleteListener(emailTask -> {
                     if (emailTask.isSuccessful()) {
-                        callback.onSuccess(); // Notify success after sending email
+                        callback.onSuccess("Registration successful! Please verify your email address."); // Notify success after sending email
                     } else {
                         callback.onFailure("Failed to send verification email: " + emailTask.getException().getMessage());
                     }
@@ -290,7 +290,7 @@ public class UserAccountEntity {
                             db.collection("Users").document(userId).set(userCreate)
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
-                                            callback.onSuccess();
+                                            sendVerificationEmail(firebaseUser, callback);
                                         } else {
                                             callback.onFailure("Failed to save user data");
                                         }
@@ -303,7 +303,7 @@ public class UserAccountEntity {
     }
 
     public interface RegisterCallback {
-        void onSuccess();
+        void onSuccess(String successMessage);
         void onFailure(String errorMessage);
     }
     public void addAdmin(String firstName, String lastName, String userName, String dob, String email, String phone, String gender, String password, String date, Context context, RegisterCallback callback) {
@@ -331,7 +331,7 @@ public class UserAccountEntity {
                             db.collection("Users").document(userId).set(adminCreate)
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
-                                            callback.onSuccess();
+                                            sendVerificationEmail(firebaseUser, callback);
                                         } else {
                                             callback.onFailure("Failed to save user data");
                                         }
@@ -370,56 +370,72 @@ public class UserAccountEntity {
                         auth.signInWithEmailAndPassword(email, enteredPassword)
                                 .addOnCompleteListener(authTask -> {
                                     if (authTask.isSuccessful()) {
-                                        // Authentication successful, retrieve additional user data from Firestore
+                                        // Authentication successful, check if email is verified
                                         FirebaseUser firebaseUser = auth.getCurrentUser();
                                         if (firebaseUser != null) {
-                                            String userId = firebaseUser.getUid();
+                                            if (firebaseUser.isEmailVerified()) {
+                                                // Email is verified, proceed with role-based redirection
+                                                String userId = firebaseUser.getUid();
 
-                                            // Fetch the user's role and other details from Firestore
-                                            db.collection("Users").document(userId)
-                                                    .get()
-                                                    .addOnCompleteListener(userTask -> {
-                                                        if (userTask.isSuccessful()) {
-                                                            DocumentSnapshot userDoc = userTask.getResult();
-                                                            if (userDoc.exists()) {
-                                                                // Retrieve additional data like role
-                                                                String role = userDoc.getString("role");
-                                                                String username = userDoc.getString("username");
+                                                // Fetch the user's role and other details from Firestore
+                                                db.collection("Users").document(userId)
+                                                        .get()
+                                                        .addOnCompleteListener(userTask -> {
+                                                            if (userTask.isSuccessful()) {
+                                                                DocumentSnapshot userDoc = userTask.getResult();
+                                                                if (userDoc.exists()) {
+                                                                    // Retrieve additional data like role
+                                                                    String role = userDoc.getString("role");
+                                                                    String username = userDoc.getString("username");
 
-                                                                // Save the username and role in SharedPreferences
-                                                                SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
-                                                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                                editor.putString("loggedInUserName", username);
-                                                                editor.putString("userRole", role); // Store role for future reference
-                                                                editor.apply();
+                                                                    // Save the username in SharedPreferences
+                                                                    SharedPreferences sharedPreferences = context.getSharedPreferences("UserSession", Context.MODE_PRIVATE);
+                                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                    editor.putString("loggedInUserName", username);
+                                                                    editor.apply();
 
-                                                                // Display login success message
-                                                                Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
+                                                                    // Display login success message
+                                                                    Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                                                                // Redirect based on the user's role
-                                                                switch (role) {
-                                                                    case "user":
-                                                                        mainActivity.switchToUserMode();
-                                                                        ViewUserProfileController profileController = new ViewUserProfileController(mainActivity);
-                                                                        profileController.checkUserProfileCompletion(userId, context, mainActivity);
-                                                                        break;
-                                                                    case "admin":
-                                                                        mainActivity.switchToAdminMode();
-                                                                        break;
-                                                                    case "nutritionist":
-                                                                        mainActivity.switchToNutriMode();
-                                                                        break;
-                                                                    default:
-                                                                        Toast.makeText(context, "Unknown role", Toast.LENGTH_SHORT).show();
+                                                                    // Redirect based on the user's role
+                                                                    switch (role) {
+                                                                        case "user":
+                                                                            mainActivity.switchToUserMode();
+                                                                            ViewUserProfileController profileController = new ViewUserProfileController(mainActivity);
+                                                                            profileController.checkUserProfileCompletion(userId, context, mainActivity);
+                                                                            break;
+                                                                        case "admin":
+                                                                            mainActivity.switchToAdminMode();
+                                                                            break;
+                                                                        case "nutritionist":
+                                                                            mainActivity.switchToNutriMode();
+                                                                            break;
+                                                                        default:
+                                                                            Toast.makeText(context, "Unknown role", Toast.LENGTH_SHORT).show();
+                                                                    }
+                                                                } else {
+                                                                    Toast.makeText(context, "User data not found in Firestore", Toast.LENGTH_SHORT).show();
                                                                 }
                                                             } else {
-                                                                Toast.makeText(context, "User data not found in Firestore", Toast.LENGTH_SHORT).show();
+                                                                Log.e("FirestoreError", "Error getting user data", userTask.getException());
+                                                                Toast.makeText(context, "Error retrieving user data: " + userTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                                             }
-                                                        } else {
-                                                            Log.e("FirestoreError", "Error getting user data", userTask.getException());
-                                                            Toast.makeText(context, "Error retrieving user data: " + userTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
+                                                        });
+                                            } else {
+                                                // Email not verified, prompt the user to verify their email
+                                                Toast.makeText(context, "Email not verified. Please verify your email before logging in.", Toast.LENGTH_SHORT).show();
+                                                firebaseUser.sendEmailVerification()
+                                                        .addOnCompleteListener(verificationTask -> {
+                                                            if (verificationTask.isSuccessful()) {
+                                                                Toast.makeText(context, "Verification email sent. Please check your inbox.", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                Toast.makeText(context, "Failed to send verification email.", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+
+                                                // Sign the user out to prevent them from proceeding
+                                                auth.signOut();
+                                            }
                                         }
                                     } else {
                                         // Authentication failed
