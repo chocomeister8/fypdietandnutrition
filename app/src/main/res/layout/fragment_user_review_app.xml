@@ -28,6 +28,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Submit"
+                    android:backgroundTint="#bcd383"
+                    android:textColor="@color/black"
                     app:layout_constraintEnd_toEndOf="@+id/ratingBar3"
                     app:layout_constraintStart_toStartOf="@+id/ratingBar3"
                     app:layout_constraintTop_toBottomOf="@+id/textInputLayoutTitle" />
@@ -58,6 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Rate Here!"
+                    android:textColor="@color/black"
                     android:textSize="25sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@+id/textView8"
@@ -71,6 +74,7 @@
                     android:layout_marginTop="16dp"
                     android:text="Rate and Review Our App!"
                     android:textSize="25sp"
+                    android:textColor="@color/black"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -91,6 +95,7 @@
                     android:layout_marginStart="208dp"
                     android:layout_marginEnd="210dp"
                     android:text="Diet Diet Must Try"
+                    android:textColor="@color/black"
                     android:textSize="25sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@+id/imageView4"
@@ -119,6 +124,7 @@
                         android:id="@+id/etTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         android:hint="Write Your Title!" />
 
                 </com.google.android.material.textfield.TextInputLayout>
