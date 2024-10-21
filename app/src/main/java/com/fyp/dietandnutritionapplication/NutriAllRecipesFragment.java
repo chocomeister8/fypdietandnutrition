@@ -59,6 +59,7 @@ public class NutriAllRecipesFragment extends Fragment {
         Button button_personalise_recipes = view.findViewById(R.id.button_approved);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_rejected_recipes = view.findViewById(R.id.button_rejected);
+        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
 
         searchEditText = view.findViewById(R.id.search_recipe);
 
@@ -107,6 +108,7 @@ public class NutriAllRecipesFragment extends Fragment {
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NutriApprovedRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NutriPendingRecipesFragment()));
         button_rejected_recipes.setOnClickListener(v -> navigateToFragment(new NutriRejectedRecipesFragment()));
+        button_add_recipe.setOnClickListener(v -> navigateToFragment(new NutriAddRecipeFragment()));
 
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);

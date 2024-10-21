@@ -109,16 +109,6 @@
             android:text="Log In" />
 
         <!-- Not Registered TextView -->
-        <TextView
-            android:id="@+id/noregis"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="Not registered yet?"
-            android:textColor="#913DA6"
-            android:textSize="12sp"
-            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 

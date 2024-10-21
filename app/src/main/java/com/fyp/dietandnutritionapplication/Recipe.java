@@ -21,6 +21,7 @@ public class Recipe implements Parcelable {
     private List<String> healthLabels; // Health labels (e.g., low-fat, high-protein)
     private String url; // Link to the full recipe
     private List<String> ingredientLines; // List of ingredients
+    private List<String> recipeStepsLines;
     private double calories; // Calorie count
     private double totalWeight; // Total weight of the recipe in grams
     private int total_time; // Total cooking time in minutes
@@ -81,6 +82,10 @@ public class Recipe implements Parcelable {
         return ingredientLines;
     }
 
+    public List<String> getRecipeStepsLines() {
+        return recipeStepsLines;
+    }
+
     public double getCalories() {
         return calories;
     }
@@ -107,7 +112,7 @@ public class Recipe implements Parcelable {
 
     // Optionally, add a constructor
     public Recipe(String recipe_id, String userId, String label, String status, String image, List<String> mealType, List<String> cuisineType, List<String> dishType, List<String> dietLabels,
-                  List<String> healthLabels, String url, List<String> ingredientLines, double calories, double totalWeight, int total_Time, String instructions) {
+                  List<String> healthLabels, String url, List<String> ingredientLines, List<String> recipeStepsLines, double calories, double totalWeight, int total_Time, String instructions) {
         this.recipe_id = recipe_id;
         this.userId = userId;
         this.label = label;
@@ -120,6 +125,7 @@ public class Recipe implements Parcelable {
         this.healthLabels = healthLabels;
         this.url = url;
         this.ingredientLines = ingredientLines;
+        this.recipeStepsLines = recipeStepsLines;
         this.calories = calories;
         this.totalWeight = totalWeight;
         this.total_time = total_Time;
@@ -153,6 +159,7 @@ public class Recipe implements Parcelable {
         healthLabels = in.createStringArrayList();
         url = in.readString();
         ingredientLines = in.createStringArrayList();
+        recipeStepsLines = in.createStringArrayList();
         calories = in.readDouble();
         totalWeight = in.readDouble();
         total_time = in.readInt();
@@ -194,6 +201,7 @@ public class Recipe implements Parcelable {
         dest.writeStringList(healthLabels);
         dest.writeString(url);
         dest.writeStringList(ingredientLines);
+        dest.writeStringList(recipeStepsLines);
         dest.writeDouble(calories);
         dest.writeDouble(totalWeight);
         dest.writeInt(total_time);
@@ -241,6 +249,8 @@ public class Recipe implements Parcelable {
     public void setIngredientLines(List<String> ingredients) {
         this.ingredientLines = ingredients;
     }
+
+    public void setRecipeStepsLines(List<String> recipeSteps) {this.recipeStepsLines = recipeSteps;}
 
     public void setInstructions(String instructions) {this.instructions = instructions; }
 }
