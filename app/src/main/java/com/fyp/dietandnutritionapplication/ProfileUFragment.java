@@ -27,6 +27,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import com.google.gson.annotations.SerializedName;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.view.View;
+import android.content.Context;
+
 public class ProfileUFragment extends Fragment {
 
     private ViewUserProfileController viewUserProfileController;
@@ -71,12 +83,16 @@ public class ProfileUFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imageUri;
-    private ImageView profileImageView;
-    private Button uploadImageButton;
+    private ImageView profileImageView, chevronIcon ;
+    private Button uploadImageButton, toggleAllergy;
     private static final int REQUEST_CODE_PERMISSIONS = 1001;
 
     private NotificationUController notificationUController;
     private TextView notificationBadgeTextView;
+
+    private LinearLayout dietaryContainer, allergyContainer, allergySection;
+
+    private boolean isExpanded = false;
 
     @Nullable
     @Override
@@ -97,7 +113,10 @@ public class ProfileUFragment extends Fragment {
             viewUserProfileController = new ViewUserProfileController((MainActivity) requireActivity());
             viewUserProfileController.checkUserProfileCompletion(userId, getContext(), (MainActivity) requireActivity());
             loadUserProfile();
-
+            allergyContainer.setVisibility(View.VISIBLE);
+            chevronIcon.setImageResource(R.drawable.ic_arrow_up);
+            isExpanded = true;
+            allergySection.setOnClickListener(v -> toggleAllergyContainer(v));
             uploadImageButton.setOnClickListener(v -> openFileChooser());
 
             saveButton.setOnClickListener(v -> updateProfile(currentUser.getUid()));
@@ -149,164 +168,10 @@ public class ProfileUFragment extends Fragment {
             }
         });
 
-        dpOthersCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    dpOthersText.setVisibility(View.VISIBLE);
-                } else {
-                    dpOthersText.setVisibility(View.GONE);
-                    dpOthersText.setText("");
-                }
-            }
-        });
-
-        aOthersCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    aOthersText.setVisibility(View.VISIBLE);
-                } else {
-                    aOthersText.setVisibility(View.GONE);
-                    aOthersText.setText("");
-                }
-            }
-        });
-
         dateOfBirthData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDatePickerDialog();
-            }
-        });
-
-        dpNoneCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                glutenFreeCheckBox.setChecked(false);
-                glutenFreeCheckBox.setEnabled(false);
-
-                lactoseIntoleranceCheckBox.setChecked(false);
-                lactoseIntoleranceCheckBox.setEnabled(false);
-
-                vegetarianCheckBox.setChecked(false);
-                vegetarianCheckBox.setEnabled(false);
-
-                dpOthersCheckbox.setChecked(false);
-                dpOthersCheckbox.setEnabled(false);
-                dpOthersText.setEnabled(false);
-            } else {
-                glutenFreeCheckBox.setEnabled(true);
-                lactoseIntoleranceCheckBox.setEnabled(true);
-                vegetarianCheckBox.setEnabled(true);
-                dpOthersCheckbox.setEnabled(true);
-                dpOthersText.setEnabled(true);
-            }
-        });
-
-        glutenFreeCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                dpNoneCheckbox.setChecked(false);
-            }
-        });
-
-        lactoseIntoleranceCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                dpNoneCheckbox.setChecked(false);
-            }
-        });
-
-        vegetarianCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                dpNoneCheckbox.setChecked(false);
-            }
-        });
-
-        dpOthersCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                dpNoneCheckbox.setChecked(false);
-                dpOthersText.setEnabled(true);
-            } else {
-                dpOthersText.setEnabled(false);
-            }
-        });
-
-        aNoneCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                peanutsCheckbox.setChecked(false);
-                peanutsCheckbox.setEnabled(false);
-
-                dairyCheckbox.setChecked(false);
-                dairyCheckbox.setEnabled(false);
-
-                eggsCheckbox.setChecked(false);
-                eggsCheckbox.setEnabled(false);
-
-                soyCheckbox.setChecked(false);
-                soyCheckbox.setEnabled(false);
-
-                seafoodCheckbox.setChecked(false);
-                seafoodCheckbox.setEnabled(false);
-
-                wheatCheckbox.setChecked(false);
-                wheatCheckbox.setEnabled(false);
-
-                aOthersCheckbox.setChecked(false);
-                aOthersCheckbox.setEnabled(false);
-                aOthersText.setEnabled(false);
-            } else {
-                peanutsCheckbox.setEnabled(true);
-                dairyCheckbox.setEnabled(true);
-                eggsCheckbox.setEnabled(true);
-                soyCheckbox.setEnabled(true);
-                seafoodCheckbox.setEnabled(true);
-                wheatCheckbox.setEnabled(true);
-                aOthersCheckbox.setEnabled(true);
-                aOthersText.setEnabled(true);
-            }
-        });
-
-        peanutsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                aNoneCheckbox.setChecked(false);
-            }
-        });
-
-        dairyCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                aNoneCheckbox.setChecked(false);
-            }
-        });
-
-        eggsCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                aNoneCheckbox.setChecked(false);
-            }
-        });
-
-        soyCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                aNoneCheckbox.setChecked(false);
-            }
-        });
-
-        seafoodCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                aNoneCheckbox.setChecked(false);
-            }
-        });
-
-        wheatCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                aNoneCheckbox.setChecked(false);
-            }
-        });
-
-        aOthersCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                aNoneCheckbox.setChecked(false);
-                aOthersText.setEnabled(true);
-            } else {
-                aOthersText.setEnabled(false);
             }
         });
 
@@ -327,24 +192,6 @@ public class ProfileUFragment extends Fragment {
         currentHeightData = view.findViewById(R.id.current_height_data);
         calorieLimitData = view.findViewById(R.id.daily_calorie_limit_data);
 
-        dpNoneCheckbox= view.findViewById(R.id.checkbox_dp_none);
-        glutenFreeCheckBox = view.findViewById(R.id.checkbox_gluten_free);
-        lactoseIntoleranceCheckBox = view.findViewById(R.id.checkbox_lactose_intolerance);
-        vegetarianCheckBox = view.findViewById(R.id.checkbox_vegetarian);
-        dpOthersCheckbox = view.findViewById(R.id.checkbox_dp_other);
-
-        aNoneCheckbox = view.findViewById(R.id.checkbox_a_none);
-        peanutsCheckbox = view.findViewById(R.id.checkbox_peanuts);
-        dairyCheckbox = view.findViewById(R.id.checkbox_dairy);
-        eggsCheckbox = view.findViewById(R.id.checkbox_eggs);
-        soyCheckbox = view.findViewById(R.id.checkbox_soy);
-        seafoodCheckbox = view.findViewById(R.id.checkbox_seafood);
-        wheatCheckbox = view.findViewById(R.id.checkbox_wheat);
-        aOthersCheckbox = view.findViewById(R.id.checkbox_a_other);
-
-        aOthersText = view.findViewById(R.id.other_a_input);
-        dpOthersText = view.findViewById(R.id.other_dp_input);
-
         activityLevelSpinner = view.findViewById(R.id.activity_level_data);
 
         saveButton = view.findViewById(R.id.save_button);
@@ -352,6 +199,11 @@ public class ProfileUFragment extends Fragment {
         profileImageView = view.findViewById(R.id.imageView);
         uploadImageButton = view.findViewById(R.id.upload_picture_button);
 
+        dietaryContainer = view.findViewById(R.id.dietaryContainer);
+        allergyContainer = view.findViewById(R.id.allergyContainer);
+
+        chevronIcon = view.findViewById(R.id.chevronIcon);
+        allergySection = view.findViewById(R.id.allergy_section);
     }
 
     private void openFileChooser() {
@@ -428,38 +280,41 @@ public class ProfileUFragment extends Fragment {
         }
     }
 
+    private void getCheckboxOptions(User user) {
+        viewUserProfileController.getCheckboxOptions(getContext(), dietaryContainer, allergyContainer, user);
+    }
+
     private String getDietaryPreferences() {
         StringBuilder preferences = new StringBuilder();
-        if (dpNoneCheckbox.isChecked()) preferences.append("None, ");
-        if (glutenFreeCheckBox.isChecked()) preferences.append("Gluten Free, ");
-        if (lactoseIntoleranceCheckBox.isChecked()) preferences.append("Lactose Intolerance, ");
-        if (vegetarianCheckBox.isChecked()) preferences.append("Vegetarian, ");
-        if (dpOthersCheckbox.isChecked()) {
-            String othersInput = dpOthersText.getText().toString().trim();
-            if (!othersInput.isEmpty()) {
-                preferences.append(othersInput).append(", ");
+
+        for (int i = 0; i < dietaryContainer.getChildCount(); i++) {
+            View view = dietaryContainer.getChildAt(i);
+            if (view instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) view;
+                if (checkBox.isChecked()) {
+                    preferences.append(checkBox.getText().toString()).append(", ");
+                }
             }
         }
+
         // Remove trailing comma and space if present
         if (preferences.length() > 0) {
             preferences.setLength(preferences.length() - 2); // Remove last comma and space
         }
+
         return preferences.toString();
     }
 
     private String getAllergies() {
         StringBuilder allergies = new StringBuilder();
-        if (aNoneCheckbox.isChecked()) allergies.append("None, ");
-        if (peanutsCheckbox.isChecked()) allergies.append("Peanuts, ");
-        if (dairyCheckbox.isChecked()) allergies.append("Dairy, ");
-        if (eggsCheckbox.isChecked()) allergies.append("Eggs, ");
-        if (soyCheckbox.isChecked()) allergies.append("Soy, ");
-        if (seafoodCheckbox.isChecked()) allergies.append("Seafood, ");
-        if (wheatCheckbox.isChecked()) allergies.append("Wheat, ");
-        if (aOthersCheckbox.isChecked()) {
-            String othersInput = aOthersText.getText().toString().trim();
-            if (!othersInput.isEmpty()) {
-                allergies.append(othersInput).append(", ");
+
+        for (int i = 0; i < allergyContainer.getChildCount(); i++) {
+            View view = allergyContainer.getChildAt(i);
+            if (view instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) view;
+                if (checkBox.isChecked()) {
+                    allergies.append(checkBox.getText().toString()).append(", ");
+                }
             }
         }
 
@@ -467,6 +322,7 @@ public class ProfileUFragment extends Fragment {
         if (allergies.length() > 0) {
             allergies.setLength(allergies.length() - 2); // Remove last comma and space
         }
+
         return allergies.toString();
     }
 
@@ -589,6 +445,7 @@ public class ProfileUFragment extends Fragment {
     }
 
     private void populateProfileFields(User user) {
+
         userNameData.setText(user.getUsername());
         firstNameData.setText(user.getFirstName());
         lastNameData.setText(user.getLastName());
@@ -632,37 +489,44 @@ public class ProfileUFragment extends Fragment {
     }
 
     private void setCheckBoxes(User user) {
+        // Clear existing checkboxes
+        dietaryContainer.removeAllViews();
+        allergyContainer.removeAllViews();
+
+        // Fetch dietary preferences from the user's data
         if (user.getDietaryPreference() != null) {
-            glutenFreeCheckBox.setChecked(user.getDietaryPreference().contains("Gluten Free"));
-            lactoseIntoleranceCheckBox.setChecked(user.getDietaryPreference().contains("Lactose Intolerance"));
-            vegetarianCheckBox.setChecked(user.getDietaryPreference().contains("Vegetarian"));
-            dpOthersCheckbox.setChecked(user.getDietaryPreference().contains("Others"));
-        } else {
-            glutenFreeCheckBox.setChecked(false);
-            lactoseIntoleranceCheckBox.setChecked(false);
-            vegetarianCheckBox.setChecked(false);
-            dpOthersCheckbox.setChecked(false);
+            String[] diets = user.getDietaryPreference().split(", ");
+            for (String diet : diets) {
+                CheckBox dietCheckBox = new CheckBox(getContext());
+                dietCheckBox.setText(diet);
+                dietCheckBox.setChecked(true);  // Mark them as checked
+                dietaryContainer.addView(dietCheckBox);
+            }
         }
 
-        aOthersText.setVisibility(dpOthersCheckbox.isChecked() ? View.VISIBLE : View.GONE);
-
+        // Fetch allergies/health preferences from the user's data
         if (user.getFoodAllergies() != null) {
-            peanutsCheckbox.setChecked(user.getFoodAllergies().contains("Peanuts"));
-            dairyCheckbox.setChecked(user.getFoodAllergies().contains("Dairy"));
-            eggsCheckbox.setChecked(user.getFoodAllergies().contains("Eggs"));
-            soyCheckbox.setChecked(user.getFoodAllergies().contains("Soy"));
-            seafoodCheckbox.setChecked(user.getFoodAllergies().contains("Seafood"));
-            wheatCheckbox.setChecked(user.getFoodAllergies().contains("Wheat"));
-            aOthersCheckbox.setChecked(user.getFoodAllergies().contains("Others"));
-        } else {
-            peanutsCheckbox.setChecked(false);
-            dairyCheckbox.setChecked(false);
-            eggsCheckbox.setChecked(false);
-            soyCheckbox.setChecked(false);
-            seafoodCheckbox.setChecked(false);
-            wheatCheckbox.setChecked(false);
-            aOthersCheckbox.setChecked(false);
+            String[] healthPreferences = user.getFoodAllergies().split(", ");
+            for (String health : healthPreferences) {
+                CheckBox healthCheckBox = new CheckBox(getContext());
+                healthCheckBox.setText(health);
+                healthCheckBox.setChecked(true);  // Mark them as checked
+                allergyContainer.addView(healthCheckBox);
+            }
         }
+    }
+
+    public void toggleAllergyContainer(View view) {
+
+        if (isExpanded) {
+            allergyContainer.setVisibility(View.GONE);
+            chevronIcon.setImageResource(R.drawable.ic_arrow_down);
+        } else {
+            allergyContainer.setVisibility(View.VISIBLE);
+            chevronIcon.setImageResource(R.drawable.ic_arrow_up);
+        }
+
+        isExpanded = !isExpanded;
     }
 
     private void setSpinnerSelection(Spinner spinner, String value) {
@@ -697,6 +561,7 @@ public class ProfileUFragment extends Fragment {
                 @Override
                 public void onUserFetched(User user) {
                     populateProfileFields(user);
+                    getCheckboxOptions(user);
                 }
 
                 @Override
