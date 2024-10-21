@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Main content layout -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F0F9F0">
+
+        <!-- Header layout with logo and text -->
+        <RelativeLayout
+            android:id="@+id/relativeLayout4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/right_icon2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_baseline_menu_24"
+                android:visibility="visible"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="100dp"
+                android:layout_height="70dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/dietdietmusttry_logo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:text="All Recipes"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relativeLayout4"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="center"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:background="@drawable/rounded_item_background"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <!-- Centered Lock Icon -->
+                <ImageView
+                    android:id="@+id/lock_icon_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:src="@drawable/baseline_lock_24" />
+
+                <TextView
+                    android:id="@+id/register_to_access_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:autoLink="none"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Register here to search and filter"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Spinners for Meal Type and Dish Type -->
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relativeLayout6"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="horizontal"/>
+
+        <!-- Column: Content -->
+        <FrameLayout
+            android:id="@+id/navigationBar"
+            android:layout_width="100dp"
+            android:layout_height="650dp"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/rounded_search_bar_background">
+
+            <LinearLayout
+                android:layout_width="99dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/button_all_recipes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="All Recipes"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
+                    android:textSize="11dp" />
+
+                <ImageView
+                    android:id="@+id/lock_icon_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/baseline_lock_24" />
+
+                <ImageView
+                    android:id="@+id/lock_icon_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/baseline_lock_24" />
+
+                <ImageView
+                    android:id="@+id/lock_icon_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/baseline_lock_24" />
+
+                <ImageView
+                    android:id="@+id/lock_icon_5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/baseline_lock_24" />
+
+                <TextView
+                    android:id="@+id/register_to_access_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:autoLink="none"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Register to access more folders"
+                    android:textAlignment="center"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recipe_recycler_view"
+            android:layout_width="300dp"
+            android:layout_height="650dp"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="48dp"
+            android:layout_toEndOf="@+id/navigationBar"
+            android:background="@drawable/recycler_view_bg"
+            android:paddingTop="4dp"
+            android:scrollbars="vertical" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="50dp"
+            android:background="@android:color/darker_gray" />
+
+    </RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

@@ -83,7 +83,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     });
         } else {
             Log.d("RecipeAdapter", "No user_ID for recipe: " + recipe.getLabel());
-            holder.usernameViewText.setText("Recipe by: Online Sources");  // Handle case where user_ID is null or empty
+            holder.usernameViewText.setText("Recipe by: Edamma API");  // Handle case where user_ID is null or empty
         }
 
         // Conditionally show or hide the status

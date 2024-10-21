@@ -44,7 +44,7 @@ public class NavAllRecipesFragment extends Fragment {
     // Define your meal types and dish types
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
-    private List<String> simpleFoodSearches = Arrays.asList("chicken", "beef", "steak", "fish","lamb");
+    private List<String> simpleFoodSearches = Arrays.asList("chicken", "beef", "steak", "fish","lamb chop");
 
     private boolean initialLoadDone = false;
     private boolean isViewInitialized = false; // New flag to check if view is fully initialized
