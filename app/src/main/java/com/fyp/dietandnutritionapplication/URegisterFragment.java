@@ -105,6 +105,19 @@ public class URegisterFragment extends Fragment {
         femaleRadioButton = view.findViewById(R.id.rbFemale);
         registerButton = view.findViewById(R.id.loginbutton);
         radioGroupRole = view.findViewById(R.id.radioGroupRole);
+        RadioButton userRadioButton = view.findViewById(R.id.rbUser);
+        RadioButton nutritionistRadioButton = view.findViewById(R.id.rbnutri);
+
+        if (getArguments() != null) {
+            String role = getArguments().getString("role");
+            if (role != null) {
+                if (role.equals("user")) {
+                    userRadioButton.setChecked(true); // Automatically select "User" role
+                } else if (role.equals("nutritionist")) {
+                    nutritionistRadioButton.setChecked(true); // Automatically select "Nutritionist" role
+                }
+            }
+        }
 
         registerButton.setOnClickListener(new View.OnClickListener() {
 
