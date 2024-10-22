@@ -5,17 +5,19 @@ public class Slot {
     private String date;
     private String time;
     private String nutritionistName;
+    private String clientName;
     private String status;
 
     // Empty constructor required for Firestore
     public Slot() {
     }
 
-    public Slot(String consultationId, String date, String time, String nutritionistName, String status) {
+    public Slot(String consultationId, String date, String time, String nutritionistName, String clientName, String status) {
         this.consultationId = consultationId;
         this.date = date;
         this.time = time;
         this.nutritionistName = nutritionistName;
+        this.clientName = clientName;
         this.status = status;
     }
 
@@ -49,6 +51,13 @@ public class Slot {
 
     public void setNutritionistName(String nutritionistName) {
         this.nutritionistName = nutritionistName;
+    }
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
     public String getStatus() {

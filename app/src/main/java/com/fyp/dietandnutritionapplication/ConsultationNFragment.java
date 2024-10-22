@@ -33,6 +33,7 @@ public class ConsultationNFragment extends Fragment {
     private SlotsAdapter slotsAdapter;
     private String selectedDate = "", selectedTime = "";
     private FirebaseFirestore firestore;
+    private String clientName;
 
     @Nullable
     @Override
@@ -107,10 +108,11 @@ public class ConsultationNFragment extends Fragment {
                                     String consultationId = firestore.collection("Consultation_slots").document().getId(); // Generate unique ID
                                     String date = selectedDate;
                                     String time = selectedTime;
+                                    String clientName = documentSnapshot.getString("clientName");
                                     String nutritionistName = documentSnapshot.getString("username");
                                     String status = documentSnapshot.getString("status"); // Default status
 
-                                    saveSlotToFirestore(consultationId, date, time, nutritionistName, status);
+                                    saveSlotToFirestore(consultationId, date, time, nutritionistName, clientName, status);
                                     Toast.makeText(getContext(), "Slot added: " + date + " " + time, Toast.LENGTH_SHORT).show();
                                     selectedDate = "";
                                     selectedTime = "";
@@ -128,6 +130,7 @@ public class ConsultationNFragment extends Fragment {
                 Toast.makeText(getContext(), "Please select both date and time", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         button_booking_history.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
@@ -172,8 +175,8 @@ public class ConsultationNFragment extends Fragment {
                 });
     }
 
-    private void saveSlotToFirestore(String consultationId, String date, String time, String nutritionistName, String status) {
-        Slot slot = new Slot(consultationId, date, time, nutritionistName, status);
+    private void saveSlotToFirestore(String consultationId, String date, String time, String nutritionistName, String status, String userName) {
+        Slot slot = new Slot(consultationId, date, time, nutritionistName, status, userName);
 
         // Save slot data to Firestore
         firestore.collection("Consultation_slots").add(slot)
