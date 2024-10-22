@@ -41,6 +41,7 @@ public class NutriHomeFragment extends Fragment {
         Button button_recipes = view.findViewById(R.id.button_recipes);
         Button button_consultation = view.findViewById(R.id.consultation);
         Button button_profile = view.findViewById(R.id.profile);
+        Button button_recommendation = view.findViewById(R.id.button_recommendRecipes);
         bookingsRecyclerView = view.findViewById(R.id.bookings_recycler_view);
         addBookingButton = view.findViewById(R.id.add_booking_button);
 
@@ -114,6 +115,15 @@ public class NutriHomeFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+
+        button_recommendation.setOnClickListener(v -> {
+            // Replace current fragment with NavProfileFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ViewAllUserToRecommendFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+
 
         return view;
     }
