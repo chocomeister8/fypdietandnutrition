@@ -23,7 +23,7 @@ public class Profile implements Serializable {
         this.setStatus("active");
     }
 
-    public Profile(String firstName,String lastName,String username,String phoneNumber, String password, String email,String gender, String role, String dateJoined){
+    public Profile(String firstName,String lastName,String username,String phoneNumber, String email,String gender, String role, String dateJoined){
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -33,10 +33,7 @@ public class Profile implements Serializable {
         this.gender = gender;
         this.role = role;
         this.setStatus("active");
-        this.password = password;
-
-
-    }
+         }
 
     public Profile(String firstName,String lastName,String username,String phoneNumber, String email,String gender){
         this.firstName = firstName;
@@ -125,12 +122,5 @@ public class Profile implements Serializable {
         return this.role;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
 }

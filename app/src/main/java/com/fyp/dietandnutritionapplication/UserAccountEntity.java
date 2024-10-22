@@ -209,7 +209,6 @@ public class UserAccountEntity {
         user.setLastName(document.getString("lastName"));
         user.setPhoneNumber(document.getString("phoneNumber"));
         user.setDob(document.getString("dob"));
-        user.setPassword(document.getString("password"));
         user.setEmail(document.getString("email"));
         user.setGender(document.getString("gender"));
         user.setRole(document.getString("role"));
@@ -248,7 +247,6 @@ public class UserAccountEntity {
         user.setLastName(document.getString("lastName"));
         user.setFirstName(document.getString("firstName"));
         user.setPhoneNumber(document.getString("phoneNumber"));
-        user.setPassword(document.getString("password"));
         user.setEmail(document.getString("email"));
         user.setGender(document.getString("gender"));
         user.setRole(document.getString("role"));
@@ -281,7 +279,6 @@ public class UserAccountEntity {
                             userCreate.setLastName(lastName);
                             userCreate.setUsername(userName);
                             userCreate.setDob(dob);
-                            userCreate.setPassword(password);
                             userCreate.setEmail(email);
                             userCreate.setPhoneNumber(phone);
                             userCreate.setGender(gender);
@@ -331,7 +328,6 @@ public class UserAccountEntity {
                             userCreate.setLastName(lastName);
                             userCreate.setUsername(userName);
                             userCreate.setDob(dob);
-                            userCreate.setPassword(password);
                             userCreate.setEmail(email);
                             userCreate.setPhoneNumber(phone);
                             userCreate.setGender(gender);
@@ -374,7 +370,6 @@ public class UserAccountEntity {
                             adminCreate.setLastName(lastName);
                             adminCreate.setUsername(userName);
                             adminCreate.setDob(dob);
-                            adminCreate.setPassword(password);
                             adminCreate.setEmail(email);
                             adminCreate.setPhoneNumber(phone);
                             adminCreate.setGender(gender);

@@ -18,8 +18,8 @@ public class User extends Profile {
         this.setStatus("active");
     }
 
-    public User(String firstName, String lastName, String username, String phoneNumber, String password, String email, String gender, String role, String dateJoined, int calorieLimit, String dob, String dietaryPreference, String foodAllergies, String healthGoal, double currentWeight, double currentHeight, String activityLevel, String profileImageUrl) {
-        super(firstName, lastName, username, phoneNumber, password, email, gender, role, dateJoined);
+    public User(String firstName, String lastName, String username, String phoneNumber, String email, String gender, String role, String dateJoined, int calorieLimit, String dob, String dietaryPreference, String foodAllergies, String healthGoal, double currentWeight, double currentHeight, String activityLevel, String profileImageUrl) {
+        super(firstName, lastName, username, phoneNumber, email, gender, role, dateJoined);
         this.dob = dob;
         this.calorieLimit = calorieLimit;
         this.dietaryPreference = dietaryPreference;

@@ -14,7 +14,7 @@ public class CreateNProfileController {
         String gemail = generateEmailFromName(firstName);
 
         // Create Nutritionist object
-        Nutritionist nutritionist = new Nutritionist(firstName,username,name,phoneNumber,password,email,gender,role,dateJoined,education,contactInfo,expertise,bio,profilePicture);
+        Nutritionist nutritionist = new Nutritionist(firstName,username,name,phoneNumber,email,gender,role,dateJoined,education,contactInfo,expertise,bio,profilePicture);
 
         // Save the nutritionist profile (assuming nutriAccount has a method to save a Nutritionist profile)
         return nutriAccount.saveProfile(nutritionist);

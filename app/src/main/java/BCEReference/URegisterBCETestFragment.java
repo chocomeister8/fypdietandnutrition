@@ -108,7 +108,7 @@ public class URegisterBCETestFragment extends Fragment {
                 } else {
                     gender = "Unspecified"; // Handle case where no gender is selected
                 }
-                ControllerExample.checkAccount(firstName,userName,dob,email,phone,gender,password);
+                ControllerExample.checkAccount(firstName,userName,dob,email,phone,gender);
                 mainActivity.replaceFragment(new LandingFragment());
             }
         });

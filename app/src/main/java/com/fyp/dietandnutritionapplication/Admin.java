@@ -5,11 +5,11 @@ public class Admin extends Profile{
     private String profileImageUrl;
 
     public Admin() {
-        super("", "", "", "", "", "", "","","");
+        super("", "", "", "", "", "", "","");
     }
 
     public Admin(String firstName, String lastName, String username, String phone, String email, String gender, String role , String dateJoined, String profileImageUrl) {
-        super(firstName, lastName, username, phone, gender, email, gender, role, dateJoined);
+        super(firstName, lastName, username, phone, email, gender, role, dateJoined);
         this.profileImageUrl = profileImageUrl;
     }
 

@@ -16,13 +16,12 @@ public class Nutritionist extends Profile {
     }
 
     // Parameterized constructor
-    public Nutritionist(String firstName,String username,String name,String phoneNumber, String password, String email,String gender, String role, String dateJoined,String education, String contactInfo, String expertise, String bio, String profilePicture) {
+    public Nutritionist(String firstName,String username,String name,String phoneNumber, String email,String gender, String role, String dateJoined,String education, String contactInfo, String expertise, String bio, String profilePicture) {
         super();
         this.setFirstName(firstName);
         this.setUsername(username);
         this.setLastName(name);
         this.setPhoneNumber(phoneNumber);
-        this.setPassword(password);
         this.setEmail(email);
         this.education = education;
         this.setGender(gender);

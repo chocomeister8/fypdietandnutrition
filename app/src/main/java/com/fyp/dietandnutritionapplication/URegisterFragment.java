@@ -39,7 +39,7 @@ import java.util.Locale;
  */
 public class URegisterFragment extends Fragment {
 
-    private EditText firstNameEditText, lastNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPasswordEditText;
+    private EditText firstNameEditText, lastNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPW;
     private RadioButton maleRadioButton, femaleRadioButton,selectedRadioButtonRole;
     private RadioGroup radioGroupRole;
     private Button registerButton;
@@ -101,6 +101,7 @@ public class URegisterFragment extends Fragment {
         emailEditText = view.findViewById(R.id.email);
         phoneEditText = view.findViewById(R.id.editTextPhone);
         passwordEditText = view.findViewById(R.id.enterPW);
+        confirmPW = view.findViewById(R.id.confirmPW);
         maleRadioButton = view.findViewById(R.id.rbMale);
         femaleRadioButton = view.findViewById(R.id.rbFemale);
         registerButton = view.findViewById(R.id.loginbutton);
@@ -131,6 +132,7 @@ public class URegisterFragment extends Fragment {
                 String email = emailEditText.getText().toString();
                 String phone = phoneEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
+                String confirmPassword = passwordEditText.getText().toString();
                 int selectedId = radioGroupRole.getCheckedRadioButtonId();
                 if (selectedId == -1) {
                     // No RadioButton selected
@@ -140,13 +142,17 @@ public class URegisterFragment extends Fragment {
 
                 selectedRadioButtonRole = view.findViewById(selectedId);
                 String selectedRole = selectedRadioButtonRole.getText().toString();
-//                String confirmPassword = confirmPasswordEditText.getText().toString();
                 @SuppressLint({"NewApi", "LocalSuppress"}) String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
 
                 if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(dob) ||
-                        TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password)) {
+                        TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
                     Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!password.equals(confirmPassword)) {
+                    Toast.makeText(getActivity(), "Passwords do not match", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -166,6 +172,8 @@ public class URegisterFragment extends Fragment {
                     NRegisterController nRegisterController = new NRegisterController();
                     nRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
                 }
+
+
 
             }
         });
