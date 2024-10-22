@@ -10,7 +10,7 @@ public class EntityExample {
     public EntityExample(){
 
     }
-    public void createUserAccount(String firstname, String username, String dob, String email, String phNum, String gender, String password) {
+    public void createUserAccount(String firstname, String username, String dob, String email, String phNum, String gender) {
         User userCreate = new User();
         userCreate.setFirstName(firstname);
         userCreate.setUsername(username);
@@ -18,7 +18,6 @@ public class EntityExample {
         userCreate.setEmail(email);
         userCreate.setPhoneNumber(phNum);
         userCreate.setGender(gender);
-        userCreate.setPassword(password);
         this.accountArray.add(userCreate);
     }
 }
