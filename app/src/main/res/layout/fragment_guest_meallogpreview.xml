@@ -35,6 +35,24 @@
         app:layout_constraintStart_toEndOf="@id/logo"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="© Recipe API resource from Edamam"
+            android:textColor="#555555"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+
     <ImageView
         android:id="@+id/menu_icon"
         android:layout_width="wrap_content"
