@@ -36,7 +36,7 @@ public class NavVegetarianRecipesFragment extends Fragment {
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
 
-    private final String[] recipeQueries = {"American", "Asian", "British", "Caribbean", "Central Europe", "Chinese", "Eastern Europe", "French", "Indian", "Italian", "Japanese", "Kosher", "Mediterranean", "Mexican", "Middle Eastern", "Nordic", "South American", "South East Asian"};
+    private final String[] recipeQueries = {"Vegetable Stir-Fry", "Vegetable Curry", "Lentil Soup", "Vegetarian Pizza", "Vegetable Fried Rice", "Veggie Lasagna"};
     private final Random random = new Random();
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};

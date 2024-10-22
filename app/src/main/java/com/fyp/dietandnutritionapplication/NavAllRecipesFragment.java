@@ -49,6 +49,29 @@ public class NavAllRecipesFragment extends Fragment {
     private boolean initialLoadDone = false;
     private boolean isViewInitialized = false; // New flag to check if view is fully initialized
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Check if the view is fully initialized before proceeding
+        if (!isViewInitialized) {
+            return;
+        }
+
+        // Get the current search query and spinner selections
+        String searchQuery = searchEditText.getText().toString().trim();
+        boolean isSearchEmpty = searchQuery.isEmpty();
+        boolean isMealTypeDefault = mealTypeSpinner.getSelectedItemPosition() == 0; // Check if MealType is default
+        boolean isDishTypeDefault = dishTypeSpinner.getSelectedItemPosition() == 0; // Check if DishType is default
+
+        // Fetch random recipes if no search query or spinners are selected
+        if (isSearchEmpty && isMealTypeDefault && isDishTypeDefault) {
+            fetchRecipes(getRandomSimpleFoodSearch(), null, null); // Fetch random recipes if no filters are applied
+        } else {
+            // If filters are applied, load recipes based on the current filters
+            filterRecipes();
+        }
+    }
 
     @Nullable
     @Override
@@ -90,8 +113,9 @@ public class NavAllRecipesFragment extends Fragment {
             dishTypeSpinner.setSelection(savedDishTypePos);
 
         } else if (!initialLoadDone) {
-            // Fetch recipes with a default random query only if initial load is not done
+            // Fetch default random recipes if no state is restored
             fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+            initialLoadDone = true;
         }
 
         // Clear filters button logic
