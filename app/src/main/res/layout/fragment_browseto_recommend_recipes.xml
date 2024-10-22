@@ -66,7 +66,7 @@
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@+id/add_recipe_button"
+                android:layout_toStartOf="@+id/clear_filters_button"
                 android:background="@drawable/rounded_search_bar_background"
                 android:drawableStart="@drawable/ic_search"
                 android:drawablePadding="10dp"
@@ -76,18 +76,6 @@
                 android:textColor="#000000" />
 
             <!-- Clear Filters Button -->
-
-            <Button
-                android:id="@+id/add_recipe_button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:layout_toStartOf="@+id/clear_filters_button"
-                android:padding="5dp"
-                android:text="Add"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/clear_filters_button"
@@ -170,57 +158,6 @@
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="11dp" />
-
-                <Button
-                    android:id="@+id/button_recipes_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Pending Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="11dp" />
-
-                <Button
-                    android:id="@+id/button_approved"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Approved Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="10dp" />
-
-                <Button
-                    android:id="@+id/button_rejected"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Rejected Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="10dp" />
-                <Button
-                    android:id="@+id/recommendRecipes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Recommend Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="10dp" />
 
 
             </LinearLayout>

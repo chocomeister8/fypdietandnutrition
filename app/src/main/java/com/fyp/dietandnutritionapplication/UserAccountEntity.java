@@ -18,6 +18,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -39,6 +43,8 @@ public class UserAccountEntity {
     private ArrayList<Profile> accounts = new ArrayList<>();
     FirebaseAuth mAuth;
     private ArrayList<Profile> nutriProfiles = new ArrayList<>();
+    private ArrayList<Profile> userProfiles = new ArrayList<>();
+
 
 
     public UserAccountEntity() {
@@ -49,6 +55,11 @@ public class UserAccountEntity {
 
     public interface DataCallback {
         void onSuccess(ArrayList<Profile> accounts);
+        void onFailure(Exception e);
+    }
+
+    public interface DataUserCallback {
+        void onSuccess(ArrayList<User> users);
         void onFailure(Exception e);
     }
 
@@ -138,6 +149,49 @@ public class UserAccountEntity {
                             }
                             nutriProfiles.addAll(nutritionists);
                             callback.onSuccess(nutriProfiles);
+                        } else {
+                            callback.onFailure(new Exception("QuerySnapshot is null"));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    public void retrieveAllUsers(final DataCallback callback) {
+        db.collection("Users").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null) {
+                            admins.clear();
+                            users.clear();
+                            nutritionists.clear();
+                            accounts.clear();
+
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                String role = document.getString("role");
+
+                                switch (role) {
+                                    case "user":
+                                        User user = createUserFromDocument(document);
+                                        users.add(user);
+                                        accounts.add(user);
+                                        break;
+                                    case "admin":
+                                        Admin admin = createAdminFromDocument(document);
+                                        admins.add(admin);
+                                        accounts.add(admin);
+                                        break;
+                                    case "nutritionist":
+                                        Nutritionist nutritionist = createNutritionistFromDocument(document);
+                                        nutritionists.add(nutritionist);
+                                        accounts.add(nutritionist);
+                                        break;
+                                }
+                            }
+                            userProfiles.addAll(users);
+                            callback.onSuccess(userProfiles);
                         } else {
                             callback.onFailure(new Exception("QuerySnapshot is null"));
                         }
@@ -690,6 +744,58 @@ public class UserAccountEntity {
     public interface UpdateCallback {
         void onSuccess();
         void onFailure(String errorMessage);
+    }
+
+    public void getCheckboxOptions(Context context, LinearLayout dietaryContainer, LinearLayout allergyContainer, User user) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Fetch Dietary Options
+        db.collection("DietOptions").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Clear existing checkboxes before populating
+                dietaryContainer.removeAllViews();
+
+                // Add dietary options as checkboxes
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String option = document.getString("diet");
+                    CheckBox dietCheckBox = new CheckBox(context);
+                    dietCheckBox.setText(option);
+
+                    // Check the checkbox if it matches user's dietary preferences
+                    if (user.getDietaryPreference() != null && user.getDietaryPreference().contains(option)) {
+                        dietCheckBox.setChecked(true);
+                    }
+
+                    dietaryContainer.addView(dietCheckBox);
+                }
+            } else {
+                Log.w("Firestore", "Error getting dietary options.", task.getException());
+            }
+        });
+
+        // Fetch Allergy/Health Options
+        db.collection("AllergyOptions").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Clear existing checkboxes before populating
+                allergyContainer.removeAllViews();
+
+                // Add allergy/health options as checkboxes
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String option = document.getString("healthPreference");
+                    CheckBox allergyCheckBox = new CheckBox(context);
+                    allergyCheckBox.setText(option);
+
+                    // Check the checkbox if it matches user's health/allergy preferences
+                    if (user.getFoodAllergies() != null && user.getFoodAllergies().contains(option)) {
+                        allergyCheckBox.setChecked(true);
+                    }
+
+                    allergyContainer.addView(allergyCheckBox);
+                }
+            } else {
+                Log.w("Firestore", "Error getting allergy options.", task.getException());
+            }
+        });
     }
 
 

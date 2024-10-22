@@ -121,6 +121,7 @@ public class RecipesEntity {
         recipeData.put("cuisineType", recipe.getCuisineType());
         recipeData.put("dishType", recipe.getDishType());
         recipeData.put("ingredientsList", recipe.getIngredientLines());
+        recipeData.put("recipeStepsList", recipe.getRecipeStepsLines());
         recipeData.put("userId", recipe.getuserId());
         recipeData.put("status", recipe.getStatus());
 

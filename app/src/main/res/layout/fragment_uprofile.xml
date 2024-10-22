@@ -208,121 +208,46 @@
                 android:textStyle="bold" />
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <!-- Checkboxes for Dietary Preferences -->
-                <CheckBox
-                    android:id="@+id/checkbox_dp_none"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="None" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_gluten_free"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Gluten-Free" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_lactose_intolerance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Lactose Intolerance" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_vegetarian"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Vegetarian" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_dp_other"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Others" />
-
-                <!-- EditText for Custom Input when 'Other' is selected -->
-                <EditText
-                    android:id="@+id/other_dp_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Specify Other"
-                    android:visibility="gone" /> <!-- Initially hidden -->
-
-            </LinearLayout>
-
-            <!-- Allergies Dropdown -->
-            <TextView
+                android:id="@+id/dietaryContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Allergies"
-                android:textStyle="bold" />
+                android:orientation="vertical">
+            </LinearLayout>
+
+
+            <!-- Allergies Dropdown -->
+            <LinearLayout
+                android:id="@+id/allergy_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:onClick="toggleAllergyContainer">
+
+                <!-- Title for Section -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Health Preferences"
+                    android:textStyle="bold" />
+
+                <!-- Expand/Collapse Arrow -->
+                <ImageView
+                    android:id="@+id/chevronIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_up" />
+            </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
+                android:id="@+id/allergyContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-
-                <CheckBox
-                    android:id="@+id/checkbox_a_none"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="None" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_peanuts"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Peanuts" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_dairy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Dairy" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_eggs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Eggs" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_soy"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Soy" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_seafood"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Seafood" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_wheat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Wheat" />
-
-                <CheckBox
-                    android:id="@+id/checkbox_a_other"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Others" />
-
-                <!-- EditText for Custom Input when 'Other' is selected -->
-                <EditText
-                    android:id="@+id/other_a_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Specify Other"
-                    android:visibility="gone" /> <!-- Initially hidden -->
-
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
             </LinearLayout>
+
 
             <!-- Health Goals -->
             <TextView

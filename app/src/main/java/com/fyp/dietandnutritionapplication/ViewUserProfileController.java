@@ -4,6 +4,8 @@ import static android.app.PendingIntent.getActivity;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -154,6 +156,11 @@ public class ViewUserProfileController {
         Fragment currentFragment = mainActivity.getSupportFragmentManager().findFragmentById(R.id.frame_layout);
         return !(currentFragment instanceof ProfileUFragment);
     }
+
+    public void getCheckboxOptions(Context context, LinearLayout dietaryContainer, LinearLayout allergyContainer, User user) {
+        userAccountEntity.getCheckboxOptions(context, dietaryContainer, allergyContainer, user);
+    }
+
 
 }
 

@@ -28,8 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
-public class AddRecipeFragment extends Fragment {
-    private int recipeStepCounter = 1;
+public class NutriAddRecipeFragment extends Fragment {
 
     private LinearLayout ingredientsSection, recipeStepsSection;
     private Button addIngredientButton, addRecipeStepsButton, saveRecipeButton;
@@ -45,7 +44,7 @@ public class AddRecipeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_recipe, container, false);
+        View view = inflater.inflate(R.layout.nutri_add_recipe, container, false);
 
         addRecipeController = new AddRecipeController();
 
@@ -56,8 +55,10 @@ public class AddRecipeFragment extends Fragment {
 
         ingredientsSection = view.findViewById(R.id.ingredients_section);
         addIngredientButton = view.findViewById(R.id.add_ingredient_button);
+
         recipeStepsSection = view.findViewById(R.id.recipe_steps_section);
         addRecipeStepsButton = view.findViewById(R.id.add_recipe_step);
+
         saveRecipeButton = view.findViewById(R.id.save_recipe_button);
 
         // CheckBox Layouts
@@ -139,6 +140,7 @@ public class AddRecipeFragment extends Fragment {
 
         ingredientsSection.addView(ingredientRow);
     }
+
     private void addRecipeStep() {
         LinearLayout recipeSteps = new LinearLayout(getContext());
         recipeSteps.setOrientation(LinearLayout.HORIZONTAL);
@@ -146,51 +148,21 @@ public class AddRecipeFragment extends Fragment {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        // Step description (EditText)
+        // Ingredient Name
         EditText recipeStepsInput = new EditText(getContext());
         recipeStepsInput.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-
-        // Set the hint to show the current step number (e.g., "Step 1")
-        recipeStepsInput.setHint("Step " + recipeStepCounter);
+        recipeStepsInput.setHint("Recipe Step");
 
         // Remove Button
         Button removeButton = new Button(getContext());
         removeButton.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         removeButton.setText("Remove");
+        removeButton.setOnClickListener(v -> ingredientsSection.removeView(recipeSteps));
 
-        // Add click listener to remove the step when clicked
-        removeButton.setOnClickListener(v -> {
-            recipeStepsSection.removeView(recipeSteps);
-            // Decrement the counter and update step numbers
-            recipeStepCounter--;
-            updateStepHints();
-        });
-
-        // Add the input field and remove button to the layout
         recipeSteps.addView(recipeStepsInput);
         recipeSteps.addView(removeButton);
 
-        // Add the row to the section for recipe steps
         recipeStepsSection.addView(recipeSteps);
-
-        // Increment the counter for the next step
-        recipeStepCounter++;
-    }
-
-    // Update hints of all steps to reflect correct step numbers after a step is removed
-    private void updateStepHints() {
-        int count = recipeStepsSection.getChildCount();
-        for (int i = 0; i < count; i++) {
-            View view = recipeStepsSection.getChildAt(i);
-            if (view instanceof LinearLayout) {
-                LinearLayout rowLayout = (LinearLayout) view;
-                EditText stepInput = (EditText) rowLayout.getChildAt(0); // The input field
-                if (stepInput != null) {
-                    // Update the hint to reflect the correct step number
-                    stepInput.setHint("Step " + (i + 1));
-                }
-            }
-        }
     }
 
     // Save Recipe Data to Firestore
@@ -200,7 +172,7 @@ public class AddRecipeFragment extends Fragment {
         double calories = 0;
         double weight = 0;
         double totalTime = 0;
-        String status = "Pending";
+        String status = "Approved";
 
         // Fetch current user ID from Firebase Authentication
         String userId = getCurrentUserId();
@@ -294,13 +266,13 @@ public class AddRecipeFragment extends Fragment {
         AddRecipeController addRecipeController = new AddRecipeController();
         addRecipeController.addRecipe(recipeTitle, calories, weight, totalTime, mealTypes, cuisineTypes, dishTypes, ingredientsList, recipeStepsList, userId, status);
 
-        redirectToViewPendingRecipes();
+        redirectToViewCommunityRecipes();
     }
 
-    private void redirectToViewPendingRecipes(){
+    private void redirectToViewCommunityRecipes(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_layout, new NavPendingRecipesFragment()); // Use your container ID
+        fragmentTransaction.replace(R.id.frame_layout, new NavCommunityRecipesFragment()); // Use your container ID
         fragmentTransaction.addToBackStack(null); // Optional: Add to back stack
         fragmentTransaction.commit();
     }
@@ -316,13 +288,13 @@ public class AddRecipeFragment extends Fragment {
 
     private void sendNotification(String userId, String recipeId) {
 
-    Map<String, Object> notificationData = new HashMap<>();
-    notificationData.put("userId", userId);
-    notificationData.put("message", "Your recipe (ID: " + recipeId + ") has been submitted and is waiting for approval.");
-    notificationData.put("type", "Recipe Submission");
-    notificationData.put("isRead", false);
-    Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
-    notificationData.put("timestamp", entryDateTime);
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("userId", userId);
+        notificationData.put("message", "Your recipe (ID: " + recipeId + ") has been submitted and is waiting for approval.");
+        notificationData.put("type", "Recipe Submission");
+        notificationData.put("isRead", false);
+        Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
+        notificationData.put("timestamp", entryDateTime);
 
         db.collection("Notifications")
                 .add(notificationData) // Use add() to create a new document

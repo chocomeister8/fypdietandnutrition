@@ -59,49 +59,41 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="8dp">
 
-            <!-- Search Bar -->
-            <EditText
-                android:id="@+id/search_recipe"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="88dp"
                 android:layout_alignParentStart="true"
-                android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@+id/add_recipe_button"
-                android:background="@drawable/rounded_search_bar_background"
-                android:drawableStart="@drawable/ic_search"
-                android:drawablePadding="10dp"
-                android:hint="Enter Recipe Name:"
-                android:inputType="text"
-                android:padding="10dp"
-                android:textColor="#000000" />
-
-            <!-- Clear Filters Button -->
-
-            <Button
-                android:id="@+id/add_recipe_button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:layout_toStartOf="@+id/clear_filters_button"
-                android:padding="5dp"
-                android:text="Add"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
-
-            <Button
-                android:id="@+id/clear_filters_button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/decline_background"
-                android:padding="4dp"
-                android:text="Clear Filters"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:layout_gravity="center"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:background="@drawable/rounded_item_background"
+                android:gravity="center"
+                android:orientation="vertical">
 
+                <!-- Centered Lock Icon -->
+                <ImageView
+                    android:id="@+id/lock_icon_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:src="@drawable/baseline_lock_24" />
+
+                <TextView
+                    android:id="@+id/register_to_access_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:autoLink="none"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Register here to search and filter"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
         </RelativeLayout>
 
         <!-- Spinners for Meal Type and Dish Type -->
@@ -115,28 +107,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:orientation="horizontal">
-
-            <!-- Meal Type Spinner -->
-            <Spinner
-                android:id="@+id/spinner_meal_type"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_search_bar_background"
-                android:hint="Select Meal Type" />
-
-            <!-- Dish Type Spinner -->
-            <Spinner
-                android:id="@+id/spinner_dish_type"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_search_bar_background"
-                android:hint="Select Dish Type" />
-
-        </LinearLayout>
+            android:orientation="horizontal"/>
 
         <!-- Column: Content -->
         <FrameLayout
@@ -171,57 +142,55 @@
                     android:textColor="#333333"
                     android:textSize="11dp" />
 
-                <Button
-                    android:id="@+id/button_recipes_status"
+                <ImageView
+                    android:id="@+id/lock_icon_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Pending Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="11dp" />
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/baseline_lock_24" />
 
-                <Button
-                    android:id="@+id/button_approved"
+                <ImageView
+                    android:id="@+id/lock_icon_3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Approved Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="10dp" />
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/baseline_lock_24" />
 
-                <Button
-                    android:id="@+id/button_rejected"
+                <ImageView
+                    android:id="@+id/lock_icon_4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Rejected Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="10dp" />
-                <Button
-                    android:id="@+id/recommendRecipes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="Recommend Recipes"
-                    android:textAlignment="viewStart"
-                    android:textColor="#333333"
-                    android:textSize="10dp" />
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/baseline_lock_24" />
 
+                <ImageView
+                    android:id="@+id/lock_icon_5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="Lock Icon"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/baseline_lock_24" />
+
+                <TextView
+                    android:id="@+id/register_to_access_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:autoLink="none"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Register to access more folders"
+                    android:textAlignment="center"
+                    android:layout_marginTop="20dp"
+                    android:textColor="@android:color/holo_blue_dark"
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </FrameLayout>
@@ -233,10 +202,10 @@
             android:layout_below="@+id/linearLayout2"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="-10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="48dp"
             android:layout_toEndOf="@+id/navigationBar"
             android:background="@drawable/recycler_view_bg"
             android:paddingTop="4dp"

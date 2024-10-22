@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-
 public class LandingFragment extends Fragment {
 
     @Override
@@ -23,26 +22,27 @@ public class LandingFragment extends Fragment {
         ImageView nutriImageView = view.findViewById(R.id.nutriimg);
 
         userImageView.setOnClickListener(v -> {
-            // Switch to guest mode
+            // Switch to user mode and set role as "user"
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToGuestMode();
+                URegisterFragment uRegisterFragment = new URegisterFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("role", "user"); // Set the role to "user"
+                uRegisterFragment.setArguments(bundle);
+                ((MainActivity) getActivity()).replaceFragment(uRegisterFragment);
             }
         });
 
         nutriImageView.setOnClickListener(v -> {
-            // Switch to nutri mode (for nutritionists as guests)
+            // Switch to nutritionist mode and set role as "nutritionist"
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
-            }
-        });
-
-        userImageView.setOnClickListener(v -> {
-            // Switch to admin mode
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
+                URegisterFragment uRegisterFragment = new URegisterFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("role", "nutritionist"); // Set the role to "nutritionist"
+                uRegisterFragment.setArguments(bundle);
+                ((MainActivity) getActivity()).replaceFragment(uRegisterFragment);
             }
         });
 
         return view;
     }
-}//
+}

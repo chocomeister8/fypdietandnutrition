@@ -1,7 +1,5 @@
 package com.fyp.dietandnutritionapplication;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,20 +19,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class NavAllRecipesFragment extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+public class BrowsetoRecommendRecipesFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-    private List<Recipe> recipeList = new ArrayList<>();
+    private List<Recipe> recipeList = new ArrayList<>();;
     private EditText searchEditText;
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
@@ -44,23 +41,31 @@ public class NavAllRecipesFragment extends Fragment {
     // Define your meal types and dish types
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
-    private List<String> simpleFoodSearches = Arrays.asList("chicken", "beef", "steak", "fish","lamb chop");
+
+    private List<String> simpleFoodSearches = Arrays.asList(
+            "chicken", "beef", "steak", "fish", "soup", "lamb"
+    );
 
     private boolean initialLoadDone = false;
     private boolean isViewInitialized = false; // New flag to check if view is fully initialized
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nav_all_recipes, container, false);
+        View view = inflater.inflate(R.layout.fragment_browseto_recommend_recipes, container, false);
+
+        // Initialize views
+        Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
+
+        searchEditText = view.findViewById(R.id.search_recipe);
 
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.recipe_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Initialize the recipe list and adapter
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
-        searchEditText = view.findViewById(R.id.search_recipe);
 
         // Setup spinners
         mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
@@ -94,27 +99,12 @@ public class NavAllRecipesFragment extends Fragment {
             fetchRecipes(getRandomSimpleFoodSearch(), null, null);
         }
 
+        // Set up button click listeners
+        button_all_recipes.setOnClickListener(v -> navigateToFragment(new NutriAllRecipesFragment()));
+
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
         clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
-
-        // Initialize views
-        Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
-        Button button_vegetarian = view.findViewById(R.id.button_vegetarian);
-        Button button_favourite = view.findViewById(R.id.button_favourite);
-        Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
-        Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
-        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
-
-        // Set up button click listeners
-        button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
-        button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
-        button_favourite.setOnClickListener(v -> navigateToFragment(new ViewFavouriteRecipesFragment()));
-        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
-        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
-        button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
-        button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 
         setupSpinnerListeners();
         setupSearchBar();
@@ -123,6 +113,7 @@ public class NavAllRecipesFragment extends Fragment {
 
         return view;
     }
+
 
     private void setupSpinners() {
         // Set up meal type spinner
@@ -223,20 +214,21 @@ public class NavAllRecipesFragment extends Fragment {
     }
 
     private void openRecipeDetailFragment(Recipe recipe) {
-
+        // From NavAllRecipesFragment
         Bundle bundle = new Bundle();
-        bundle.putParcelable("selected_recipe", recipe);
-        bundle.putString("source", "all");
-        bundle.putString("search_query", searchEditText.getText().toString());
-        bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());
-        bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());
+        bundle.putParcelable("selected_recipe", recipe);  // Assuming selectedRecipe is the clicked recipe object
+        bundle.putString("source", "all");  // Pass "all" as the source
+        bundle.putString("search_query", searchEditText.getText().toString());  // Pass the search query
+        bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner1
+        bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner2
 
-        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        NutriRDetailsFragment recipeDetailFragment = new NutriRDetailsFragment();
         recipeDetailFragment.setArguments(bundle);
         requireActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, recipeDetailFragment)
                 .addToBackStack(null)
                 .commit();
+
     }
 
     private void fetchRecipes(String query, String mealType, String dishType) {
@@ -272,6 +264,7 @@ public class NavAllRecipesFragment extends Fragment {
 
                         recipeList.add(recipe);
                     }
+
                     recipeAdapter.notifyDataSetChanged();
 
                     if (!initialLoadDone) {
