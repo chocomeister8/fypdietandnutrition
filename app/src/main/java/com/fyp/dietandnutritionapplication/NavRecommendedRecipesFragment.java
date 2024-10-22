@@ -24,17 +24,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.HttpException;
 import retrofit2.Response;
 
 public class NavRecommendedRecipesFragment extends Fragment {
 
     private FirebaseFirestore firestore;
     private double userCalorieGoal;
+    private String userDietaryPreference;
+    private String userAllergies;
+    private String calorieGoalString;
 
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
@@ -138,6 +144,7 @@ public class NavRecommendedRecipesFragment extends Fragment {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         userCalorieGoal = documentSnapshot.getDouble("calorieLimit");
+                        String calorieGoalString = String.valueOf(userCalorieGoal);
                         Log.d("Calorie Goal", "User's calorie goal: " + userCalorieGoal);
                     } else {
                         Log.w("Calorie Goal", "User document not found");

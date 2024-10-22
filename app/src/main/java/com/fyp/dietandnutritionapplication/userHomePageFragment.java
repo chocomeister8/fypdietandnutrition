@@ -304,7 +304,7 @@ public class userHomePageFragment extends Fragment {
                     int count = 0;
 
                     for (RecipeResponse.Hit hit : hits) {
-                        if (count >= 3) {
+                        if (count >= 5) {
                             break; // Exit the loop after fetching 3 recipes
                         }
 
