@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -64,17 +66,23 @@ public class ConsultationsFragment extends Fragment {
         // Set up the ConsultationAdapter to bind data to the ListView
         consultationAdapter = new ConsultationAdapter(requireContext(), consultationList2);
         consultationListView.setAdapter(consultationAdapter);
+
+        String currentUserId = getCurrentUserId();
+
         ConsultationEntity consultationEntity = new ConsultationEntity();
-        consultationEntity.retrieveCons(new ConsultationEntity.DataCallback() {
+        consultationEntity.retrieveConsultationSlots(new ConsultationEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Consultation> consultationList) {
-
-                Toast.makeText(getContext(), "Success to load accounts.", Toast.LENGTH_SHORT).show();
-
-                consultationList2.clear(); // Clear the current list
-                consultationList2.addAll(consultationList);
-//                consultationAdapter.setConsultationList(consultationList);// Add the fetched consultations
-                consultationAdapter.notifyDataSetChanged();
+                if (consultationList.isEmpty()) {
+                    // No consultations found for the user, show a toast message
+                    Toast.makeText(getContext(), "You haven't booked any consultation yet, our nutritionist is always there for you.", Toast.LENGTH_LONG).show();
+                } else {
+                    // Success, consultations found, update the list
+                    Toast.makeText(getContext(), "Success to load your consultations.", Toast.LENGTH_SHORT).show();
+                    consultationList2.clear();
+                    consultationList2.addAll(consultationList);
+                    consultationAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -109,7 +117,7 @@ public class ConsultationsFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 searchText = s.toString();
-//                filterConsultations(); // Filter consultations based on the search text
+                filterConsultations(); // Filter consultations based on the search text
             }
 
             @Override
@@ -149,6 +157,14 @@ public class ConsultationsFragment extends Fragment {
 
 
         return view;
+    }
+
+    private String getCurrentUserId() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return user.getUid();  // Get the logged-in user's unique ID
+        }
+        return null;  // If no user is logged in
     }
 
     private void filterConsultations() {

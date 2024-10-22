@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -43,6 +45,8 @@ public class ConsultationNFragment extends Fragment {
         Button button_pendingConsultation = view.findViewById(R.id.pending_consultation);
 
         firestore = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
 
         // Initialize views
         datePickerButton = view.findViewById(R.id.date_picker_button);
@@ -92,20 +96,34 @@ public class ConsultationNFragment extends Fragment {
         // Save Button Click
         saveButton.setOnClickListener(v -> {
             if (!selectedDate.isEmpty() && !selectedTime.isEmpty()) {
-                String consultationId = firestore.collection("Consultation_slots").document().getId(); // Generate unique ID
-                String date = selectedDate;
-                String time = selectedTime;
-                String nutritionistName = "Dr. Jane Doe"; // Replace with dynamic value based on logged-in user
-                String status = "Pending"; // Default status
+                if (currentUser != null) {
+                    String userId = currentUser.getUid();
 
-                saveSlotToFirestore(consultationId, date, time, nutritionistName, status);
-//                availableSlotsList.add(slot);
-//                slotsAdapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Slot added: " + date + time, Toast.LENGTH_SHORT).show();
-                selectedDate = "";
-                selectedTime = "";
-                datePickerButton.setText("Select Date");
-                timePickerButton.setText("Select Time");
+                    // Fetch nutritionist details from Firestore using user ID
+                    firestore.collection("Users").document(userId)
+                            .get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    String consultationId = firestore.collection("Consultation_slots").document().getId(); // Generate unique ID
+                                    String date = selectedDate;
+                                    String time = selectedTime;
+                                    String nutritionistName = documentSnapshot.getString("username");
+                                    String status = documentSnapshot.getString("status"); // Default status
+
+                                    saveSlotToFirestore(consultationId, date, time, nutritionistName, status);
+                                    Toast.makeText(getContext(), "Slot added: " + date + " " + time, Toast.LENGTH_SHORT).show();
+                                    selectedDate = "";
+                                    selectedTime = "";
+                                    datePickerButton.setText("Select Date");
+                                    timePickerButton.setText("Select Time");
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "Failed to fetch nutritionist details", Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(getContext(), "Please select both date and time", Toast.LENGTH_SHORT).show();
             }

@@ -28,7 +28,10 @@ public class ConsultationEntity {
 
     // Retrieve all consultations
     public void retrieveConsultationSlots(final DataCallback callback) {
-        db.collection("Consultation_slots").get()
+        String username = "null";
+        db.collection("Consultation_slots")
+                .whereEqualTo("username", username)  // Assumes there is a userId field in the consultation documents
+                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
@@ -84,9 +87,9 @@ public class ConsultationEntity {
         return slot;
     }
 
-    public void fetchAccounts(ConsultationEntity.DataCallback callback) {
-        retrieveConsultationSlots(callback);
-    }
+//    public void fetchAccounts(ConsultationEntity.DataCallback callback) {
+//        retrieveConsultationSlots(callback);
+//    }
 
     public void addConsultation(String nutritionistName, String date, String time, String status, String userId, DataCallback callback) {
         // Create a new consultation object
