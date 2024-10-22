@@ -28,7 +28,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class NutriAllRecipesFragment extends Fragment {
+public class BrowsetoRecommendRecipesFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList = new ArrayList<>();;
@@ -52,15 +52,10 @@ public class NutriAllRecipesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nutri_all_recipes, container, false);
+        View view = inflater.inflate(R.layout.fragment_browseto_recommend_recipes, container, false);
 
         // Initialize views
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
-        Button button_personalise_recipes = view.findViewById(R.id.button_approved);
-        Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
-        Button button_rejected_recipes = view.findViewById(R.id.button_rejected);
-        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
-        Button button_recommend_recipes = view.findViewById(R.id.recommendRecipes);
 
         searchEditText = view.findViewById(R.id.search_recipe);
 
@@ -106,11 +101,6 @@ public class NutriAllRecipesFragment extends Fragment {
 
         // Set up button click listeners
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NutriAllRecipesFragment()));
-        button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NutriApprovedRecipesFragment()));
-        button_recipes_status.setOnClickListener(v -> navigateToFragment(new NutriPendingRecipesFragment()));
-        button_rejected_recipes.setOnClickListener(v -> navigateToFragment(new NutriRejectedRecipesFragment()));
-        button_add_recipe.setOnClickListener(v -> navigateToFragment(new NutriAddRecipeFragment()));
-        button_recommend_recipes.setOnClickListener(v -> navigateToFragment(new ViewAllUserToRecommendFragment()));
 
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
@@ -232,7 +222,7 @@ public class NutriAllRecipesFragment extends Fragment {
         bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner1
         bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner2
 
-        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        NutriRDetailsFragment recipeDetailFragment = new NutriRDetailsFragment();
         recipeDetailFragment.setArguments(bundle);
         requireActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, recipeDetailFragment)
