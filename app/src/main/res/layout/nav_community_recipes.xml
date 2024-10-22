@@ -167,22 +167,21 @@
             </LinearLayout>
         </FrameLayout>
 
-
-        <!-- Column: Content -->
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recipe_status_recycle_view"
             android:layout_width="300dp"
             android:layout_height="650dp"
             android:layout_below="@+id/search_bar"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="5dp"
+            android:layout_marginStart="-10dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="50dp"
-            android:background="@drawable/rounded_item_background"
-            android:orientation="vertical"
-            android:padding="5dp"><!-- Optional: Add background color for visibility -->
-
-        </LinearLayout>
+            android:layout_toEndOf="@+id/navigationBar"
+            android:background="@drawable/recycler_view_bg"
+            android:paddingTop="4dp"
+            android:scrollbars="vertical" />
 
     </RelativeLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

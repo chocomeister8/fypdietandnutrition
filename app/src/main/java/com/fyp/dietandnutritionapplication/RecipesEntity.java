@@ -169,7 +169,7 @@ public class RecipesEntity {
                 });
     }
 
-    public void fetchAllApprovedRecipes(OnRecipesFetchedListener listener) {
+    public void fetchAllApprovedRecipes(String searchQuery, OnRecipesFetchedListener listener) {
         db.collection("Recipes")
                 .whereEqualTo("status", "Approved") // Filter to get only recipes with status "Approved"
                 .get()
@@ -183,14 +183,25 @@ public class RecipesEntity {
                                 Recipe recipe = document.toObject(Recipe.class);
                                 recipe.setRecipe_id(document.getId());
 
+                                // Check if the recipe name is not null
+                                String recipeName = recipe.getLabel(); // Assuming getName() returns a String
+                                boolean nameMatches = false;
+
+                                // Check if the search query is empty or if the recipe name contains the search query
+                                if (searchQuery.isEmpty() || (recipeName != null && recipeName.toLowerCase().contains(searchQuery.toLowerCase()))) {
+                                    nameMatches = true;
+                                }
+
+                                if (nameMatches) {
+                                    recipeList.add(recipe);
+                                }
+
                                 // Calculate calories per 100g if total weight is available
                                 double caloriesPer100g = recipe.getCaloriesPer100g();
                                 if (recipe.getTotalWeight() > 0) {
                                     caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
                                 }
                                 recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-
-                                recipeList.add(recipe); // Add the recipe to the temporary list
                             }
 
                             // Pass the fetched recipes to the listener

@@ -1,10 +1,14 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,11 +29,12 @@ public class NavCommunityRecipesFragment extends Fragment implements RecipeAdapt
     private RecipeAdapter recipesAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
     private ViewRecipesController viewRecipesController;
+    private EditText searchEditText;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nav_pending_recipes, container, false);
+        View view = inflater.inflate(R.layout.nav_community_recipes, container, false);
 
         // Initialize Firestore and RecyclerView
         db = FirebaseFirestore.getInstance();
@@ -40,19 +45,15 @@ public class NavCommunityRecipesFragment extends Fragment implements RecipeAdapt
         recipesAdapter = new RecipeAdapter(recipeList, this, false);
         recipesRecyclerView.setAdapter(recipesAdapter);
 
-        ViewRecipesController viewRecipesController = new ViewRecipesController();
+        viewRecipesController = new ViewRecipesController();
+
+        searchEditText = view.findViewById(R.id.search_bar); // Make sure this ID matches your XML layout
+        setupSearchBar(); // Set up the search functionality
+
+        // Fetch all approved recipes initially
+        fetchRecipes("");
 
         setupNavigationButtons(view);
-
-        // Fetch pending recipes for the current user and update the UI accordingly
-        viewRecipesController.fetchAllApprovedRecipes(new ViewRecipesController.OnRecipesFetchedListener() {
-            @Override
-            public void onRecipesFetched(List<Recipe> fetchedRecipes) {
-                recipeList.clear();
-                recipeList.addAll(fetchedRecipes);
-                recipesAdapter.notifyDataSetChanged(); // Notify adapter of data change
-            }
-        });
 
         return view;
     }
@@ -72,6 +73,39 @@ public class NavCommunityRecipesFragment extends Fragment implements RecipeAdapt
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
+    }
+
+    private void fetchRecipes(String searchQuery) {
+        viewRecipesController.fetchAllApprovedRecipes(searchQuery, new ViewRecipesController.OnRecipesFetchedListener() {
+            @Override
+            public void onRecipesFetched(List<Recipe> fetchedRecipes) {
+                recipeList.clear();
+                recipeList.addAll(fetchedRecipes);
+                recipesAdapter.notifyDataSetChanged(); // Notify adapter of data change
+            }
+        });
+    }
+
+    private void setupSearchBar() {
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Filter recipes based on the search query
+                String searchQuery = charSequence.toString().trim();
+                Log.d("SearchQuery", "Searching for: " + searchQuery); // Debug log
+                fetchRecipes(searchQuery);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Do nothing
+            }
+        });
     }
 
     private void navigateToFragment(Fragment fragment) {

@@ -37,8 +37,8 @@ public class ViewRecipesController {
         });
     }
 
-    public void fetchAllApprovedRecipes(OnRecipesFetchedListener listener) {
-        recipesEntity.fetchAllApprovedRecipes(new RecipesEntity.OnRecipesFetchedListener() {
+    public void fetchAllApprovedRecipes(String searchQuery, OnRecipesFetchedListener listener) {
+        recipesEntity.fetchAllApprovedRecipes(searchQuery, new RecipesEntity.OnRecipesFetchedListener() {
             @Override
             public void onRecipesFetched(ArrayList<Recipe> recipeList) {
                 Log.d(TAG, "Fetched " + recipeList.size() + " approved recipes.");
