@@ -180,6 +180,18 @@
                     android:textColor="#333333"
                     android:textSize="10dp" />
 
+                <Button
+                    android:id="@+id/recommendRecipes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Recommend Recipes"
+                    android:textAlignment="viewStart"
+                    android:textColor="#333333"
+                    android:textSize="10dp" />
 
             </LinearLayout>
         </FrameLayout>

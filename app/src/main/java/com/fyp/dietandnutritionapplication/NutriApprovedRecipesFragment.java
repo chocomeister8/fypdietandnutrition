@@ -58,6 +58,7 @@ public class NutriApprovedRecipesFragment extends Fragment {
         Button button_pending_recipes = view.findViewById(R.id.button_recipes_status);
         Button button_approved_recipes = view.findViewById(R.id.button_approved);
         Button button_rejected_recipes = view.findViewById(R.id.button_rejected);
+        Button button_recommend_recipes = view.findViewById(R.id.recommendRecipes);
 
         searchEditText = view.findViewById(R.id.search_recipe);
 
@@ -107,6 +108,14 @@ public class NutriApprovedRecipesFragment extends Fragment {
             // Replace current fragment with NutriPendingRecipesFragment
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.frame_layout, new NutriRejectedRecipesFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        button_recommend_recipes.setOnClickListener(v -> {
+            // Replace current fragment with ViewAllUserToRecommendFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ViewAllUserToRecommendFragment())
                     .addToBackStack(null)
                     .commit();
         });

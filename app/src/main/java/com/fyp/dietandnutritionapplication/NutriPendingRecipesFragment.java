@@ -62,12 +62,14 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
         Button button_approved_recipes = view.findViewById(R.id.button_approved);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_rejected_recipes = view.findViewById(R.id.button_rejected);
+        Button button_recommend_recipes = view.findViewById(R.id.recommendRecipes);
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NutriAllRecipesFragment()));
         button_approved_recipes.setOnClickListener(v -> navigateToFragment(new NutriApprovedRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NutriPendingRecipesFragment()));
         button_rejected_recipes.setOnClickListener(v -> navigateToFragment(new NutriRejectedRecipesFragment()));
+        button_recommend_recipes.setOnClickListener(v -> navigateToFragment(new ViewAllUserToRecommendFragment()));
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -87,39 +89,6 @@ public class NutriPendingRecipesFragment extends Fragment implements RecipeAdapt
             }
         });
     }
-
-//    private void fetchUserRecipes() {
-//
-//        db.collection("Recipes")
-//                .whereEqualTo("status", "Pending") // Filter to get only recipes with status "Pending"
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            recipeList.clear(); // Clear the list before adding new data
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                Recipe recipe = document.toObject(Recipe.class);
-//                                User user = document.toObject(User.class);
-//                                recipe.setRecipe_id(document.getId());
-//
-//                                // Calculate calories per 100g if total weight is available
-//                                double caloriesPer100g = recipe.getCaloriesPer100g();
-//                                if (recipe.getTotalWeight() > 0) {
-//                                    caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-//                                }
-//                                recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-//
-//                                recipeList.add(recipe); // Add the recipe to the list
-//                            }
-//                            // Notify the adapter of data changes
-//                            recipesAdapter.notifyDataSetChanged();
-//                        } else {
-//                            Log.w(TAG, "Error getting documents.", task.getException());
-//                        }
-//                    }
-//                });
-//    }
 
     @Override
     public void onRecipeClick(Recipe recipe) {

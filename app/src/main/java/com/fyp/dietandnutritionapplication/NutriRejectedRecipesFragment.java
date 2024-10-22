@@ -61,11 +61,13 @@ public class NutriRejectedRecipesFragment extends Fragment implements RecipeAdap
         Button button_approved_recipes = view.findViewById(R.id.button_approved);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_rejected_recipes = view.findViewById(R.id.button_rejected);
+        Button button_recommend_recipes = view.findViewById(R.id.recommendRecipes);
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NutriAllRecipesFragment()));
         button_approved_recipes.setOnClickListener(v -> navigateToFragment(new NutriApprovedRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NutriPendingRecipesFragment()));
+        button_recommend_recipes.setOnClickListener(v -> navigateToFragment(new ViewAllUserToRecommendFragment()));
     }
 
     private void navigateToFragment(Fragment fragment) {

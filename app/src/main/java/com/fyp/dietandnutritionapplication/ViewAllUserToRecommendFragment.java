@@ -63,14 +63,6 @@ public class ViewAllUserToRecommendFragment extends Fragment {
             Log.d("ViewAllUserToRecommendFragment", "Arguments are null");
         }
 
-//        TextView test = view.findViewById(R.id.test);
-//
-        if (recipe != null && recipe.getName() != null) {
-            Toast.makeText(getContext(), recipe.getLabel(), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getContext(), "Recipe not found", Toast.LENGTH_SHORT).show();
-        }
-
         listView = view.findViewById(R.id.listView);
         roleSpinner = view.findViewById(R.id.filterRoleSpinner);
         searchAdminEditText = view.findViewById(R.id.searchAdminEditText);
@@ -93,49 +85,6 @@ public class ViewAllUserToRecommendFragment extends Fragment {
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-//        ViewAccountsController viewAccountsController = new ViewAccountsController();
-//        viewAccountsController.retrieveAccounts(new UserAccountEntity.DataCallback() {
-//            @Override
-//            public void onSuccess(ArrayList<Profile> accounts) {
-//                profiles.clear();
-//                profiles.addAll(accounts);
-//                originalProfiles.clear();
-//                originalProfiles.addAll(accounts);
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onFailure(Exception e) {
-//                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
-
-        // Set up Spinner for role filtering
-        List<String> sortRole = new ArrayList<>();
-        sortRole.add("All Users");
-        sortRole.add("Admin");
-        sortRole.add("Nutritionist");
-        sortRole.add("User");
-
-        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, sortRole);
-        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        roleSpinner.setAdapter(sortAdapter);
-
-        // Update role filter when spinner selection changes
-        roleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedRole = sortRole.get(position); // Update the selected role
-                filterProfiles(); // Apply combined filter
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Handle no selection
             }
         });
 
