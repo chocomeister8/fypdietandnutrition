@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                     replaceFragment(new NutriHomeFragment());
                     break;
                 case R.id.recipe:
-                    replaceFragment(new NutriRecipesFolderFragment());
+                    replaceFragment(new NutriAllRecipesFragment());
                     break;
 //                case R.id.addRecipe: // Link API
 //                    replaceFragment(new AddRecipeFragment());

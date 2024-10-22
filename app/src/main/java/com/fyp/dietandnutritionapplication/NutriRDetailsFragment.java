@@ -189,18 +189,6 @@ public class NutriRDetailsFragment extends Fragment {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
-//        AddFavouriteRecipeController addFavouriteRecipeController = new AddFavouriteRecipeController();
-//        saveButton.setOnClickListener(v -> addFavouriteRecipeController.checkAddFavouriteRecipe(recipe, getContext()));
-//
-//        // Add to folder functionality
-//        addToFolderButton.setOnClickListener(v -> {
-//            // Create an instance of AddToFolderFragment
-//            AddToFolderFragment addToFolderFragment = new AddToFolderFragment(recipe);
-//
-//            // Call the method to show the dialog
-//            addToFolderFragment.showAddToFolderDialog(getActivity());
-//        });
-
         recommendButton.setOnClickListener(v -> {
             RecommendRecipesController recommendRecipesController = new RecommendRecipesController();
             recommendRecipesController.recommendRecipesToUser(recipe,UsernamePass.userName,getContext());
