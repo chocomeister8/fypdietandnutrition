@@ -49,6 +49,16 @@ public class LoginFragment extends Fragment {
         TextView forgetPW = view.findViewById(R.id.forgotPW);
         loginButton = view.findViewById(R.id.loginbutton);
 
+        TextView myTextView = view.findViewById(R.id.noregis);
+        myTextView.setClickable(true);
+
+        myTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+            }
+        });
+
         forgetPW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

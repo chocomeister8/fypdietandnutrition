@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
             default: // guest or undefined role
                 setupGuestNavigation();
-                replaceFragment(new LandingFragment());
+                replaceFragment(new LoginFragment());
                 break;
         }
     }
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.landing:
-                    replaceFragment(new LandingFragment());
+                    replaceFragment(new LoginFragment());
                     break;
                 case R.id.recipe:
                     replaceFragment(new navGuestRecipesFolderFragment());
