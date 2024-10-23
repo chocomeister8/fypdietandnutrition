@@ -42,23 +42,25 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:src="@drawable/baseline_menu_24" />
-
     </RelativeLayout>
 
-    <!-- Container for FrameLayout and LinearLayout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:text="Nutritionists will receive 80% profit per consultation"
+        android:gravity="center"
+        android:textColor="#555555"
+        android:textSize="12sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="586dp"
         android:orientation="horizontal">
 
-        <!-- Sidebar Layout -->
-
-        <!-- Main Content Layout -->
         <FrameLayout
             android:id="@+id/navigationBar"
             android:layout_width="125dp"
-            android:layout_height="279dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/rounded_search_bar_background">
@@ -113,13 +115,12 @@
         <LinearLayout
             android:id="@+id/mainContent"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="562dp"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginStart="8dp">
+            android:padding="16dp">
 
-            <!-- Date Picker -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -139,10 +140,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Select Date"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/black" />
             </LinearLayout>
 
-            <!-- Time Picker -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -161,11 +161,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Select Time"
-                    android:textColor="@color/black"/>
-
+                    android:textColor="@color/black" />
             </LinearLayout>
 
-            <!-- Save Button -->
             <Button
                 android:id="@+id/save_button"
                 android:layout_width="wrap_content"
@@ -176,7 +174,6 @@
                 android:text="Save"
                 android:textColor="#FFF" />
 
-            <!-- Available Slots Label -->
             <TextView
                 android:id="@+id/available_slots_label"
                 android:layout_width="wrap_content"
@@ -186,15 +183,11 @@
                 android:textColor="#000"
                 android:textSize="18sp" />
 
-            <!-- List of Available Slots -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view_slots"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="240dp"
                 android:layout_marginTop="12dp" />
-
         </LinearLayout>
-
     </LinearLayout>
-
 </LinearLayout>

@@ -64,6 +64,7 @@ public class ConsultationAdapter extends BaseAdapter {
             viewHolder.clientNameTextView = convertView.findViewById(R.id.client_name);
             viewHolder.dateTextView = convertView.findViewById(R.id.date);
             viewHolder.timeTextView = convertView.findViewById(R.id.time);
+            viewHolder.priceTextView = convertView.findViewById(R.id.price);
             viewHolder.statusTextView = convertView.findViewById(R.id.status);
             viewHolder.bookButton = convertView.findViewById(R.id.book_button); // Add the button
 
@@ -81,6 +82,7 @@ public class ConsultationAdapter extends BaseAdapter {
         viewHolder.clientNameTextView.setText(currentConsultation.getClientName());
         viewHolder.dateTextView.setText(currentConsultation.getDate());
         viewHolder.timeTextView.setText(currentConsultation.getTime());
+        viewHolder.priceTextView.setText("$150");
         viewHolder.statusTextView.setText(currentConsultation.getStatus());
 
         viewHolder.bookButton.setOnClickListener(v -> {
@@ -156,6 +158,7 @@ public class ConsultationAdapter extends BaseAdapter {
         TextView dateTextView;
         TextView timeTextView;
         TextView statusTextView;
+        TextView priceTextView;
         Button bookButton;
     }
 }
