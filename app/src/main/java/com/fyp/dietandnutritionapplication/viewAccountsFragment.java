@@ -118,12 +118,13 @@ public class viewAccountsFragment extends Fragment {
 
         listView.setOnItemClickListener((parent, view1, position, id) -> {
             Profile selectedProfile = profiles.get(position); // Get the selected profile
-
+            int scrollPosition = listView.getFirstVisiblePosition();
             // Create a new instance of AccountFragment and pass the selected profile
             AccountDetailsFragment accountFragment = new AccountDetailsFragment();
 
             // Create a bundle to pass data
             Bundle bundle = new Bundle();
+            bundle.putInt("scrollPosition", scrollPosition);
             bundle.putSerializable("selectedProfile", selectedProfile); // Pass the profile object (make sure Profile implements Serializable)
             accountFragment.setArguments(bundle);
 
@@ -135,6 +136,17 @@ public class viewAccountsFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Restore scroll position if available
+        if (getArguments() != null) {
+            int scrollPosition = getArguments().getInt("scrollPosition", 0); // Default to 0 if not found
+            listView.setSelection(scrollPosition); // Restore the scroll position
+        }
     }
 
     // Combined method to filter by both role and name

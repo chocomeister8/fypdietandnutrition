@@ -21,6 +21,7 @@ gridlayout = "1.0.0"
 
 [libraries]
 firebase-database = { module = "com.google.firebase:firebase-database", version.ref = "firebaseDatabase" }
+firebase-functions = { module = "com.google.firebase:firebase-functions", version.ref = "firebaseStorage" }
 firebase-storage = { module = "com.google.firebase:firebase-storage", version.ref = "firebaseStorage" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

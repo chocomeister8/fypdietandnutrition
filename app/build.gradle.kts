@@ -58,8 +58,6 @@ dependencies {
     implementation ("com.google.firebase:firebase-database:21.0.0")
     implementation("com.google.firebase:firebase-storage:16.0.1")
 
-
-
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.picasso:picasso:2.71828")

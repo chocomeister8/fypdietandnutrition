@@ -56,6 +56,7 @@ public class AccountDetailsFragment extends Fragment {
         TextView experienceTextView = view.findViewById(R.id.experience);
         Button approveNutritionistButton = view.findViewById(R.id.approveNutritionists);
         Button rejectNutritionistButton = view.findViewById(R.id.rejectNutritionists);
+        Button backButton = view.findViewById(R.id.backButton);
 
         CardView nutritionistDetails = view.findViewById(R.id.nutriprofileCard);
 
@@ -156,16 +157,34 @@ public class AccountDetailsFragment extends Fragment {
 
         approveNutritionistButton.setOnClickListener(v -> {
             if (selectedProfile != null) {
-                String usernameToReactivate = selectedProfile.getUsername();
-                approveNutritionist.approveNutritionist(usernameToReactivate);
+                String nutritionistToApprove  = selectedProfile.getUsername();
+                approveNutritionist.approveNutritionist(nutritionistToApprove);
                 selectedProfile.setStatus("active"); // Update the profile status
-                Toast.makeText(getActivity(), "Nutritionist Approved: " + usernameToReactivate, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Nutritionist Approved: " + nutritionistToApprove, Toast.LENGTH_SHORT).show();
 
                 // Redirect to ViewAccountsFragment after reactivation
                 redirectToViewAccountsFragment();
             } else {
                 Toast.makeText(getActivity(), "No Nutritionist to approve.", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        rejectNutritionistButton.setOnClickListener(v -> {
+            if (selectedProfile != null) {
+                String nutritionistToReject = selectedProfile.getUsername();
+                rejectNutritionist.rejectNutritionist(nutritionistToReject );
+                selectedProfile.setStatus("rejected"); // Update the profile status
+                Toast.makeText(getActivity(), "Nutritionist Rejected: " + nutritionistToReject , Toast.LENGTH_SHORT).show();
+
+                // Redirect to ViewAccountsFragment after reactivation
+                redirectToAdminHomeFragment();
+            } else {
+                Toast.makeText(getActivity(), "No Nutritionist to approve.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        backButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         return view;
@@ -175,6 +194,14 @@ public class AccountDetailsFragment extends Fragment {
         viewAccountsFragment viewAccountsFragment = new viewAccountsFragment();
         requireActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, viewAccountsFragment)  // Replace with your fragment container ID
+                .addToBackStack(null)  // Optionally add to backstack
+                .commit();
+    }
+
+    private void redirectToAdminHomeFragment() {
+        AdminHomeFragment adminHomeFragment = new AdminHomeFragment();
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, adminHomeFragment)  // Replace with your fragment container ID
                 .addToBackStack(null)  // Optionally add to backstack
                 .commit();
     }

@@ -32,9 +32,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class UserAccountEntity {
     private FirebaseFirestore db;
@@ -484,8 +484,11 @@ public class UserAccountEntity {
                         String status = document.getString("status"); // Retrieve the status field
 
                         // If the status is not "active", show an error message and return early
-                        if (!"active".equalsIgnoreCase(status)) {
+                        if ("deactivated".equalsIgnoreCase(status)) {
                             Toast.makeText(context, "Account deactivated. Please contact the admin.", Toast.LENGTH_LONG).show();
+                            return;
+                        } else if ("pending".equalsIgnoreCase(status)) {
+                            Toast.makeText(context, "Admin has not reviewed your account yet! Please check your email.", Toast.LENGTH_LONG).show();
                             return;
                         }
 
@@ -793,6 +796,59 @@ public class UserAccountEntity {
                                             Log.d("UserAccountEntity", "User profile updated successfully.");
                                             sendApprovalEmail(email, callback);
                                             callback.onSuccess("Approval successful! A verification email has been sent to the nutritionist.");
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("UserAccountEntity", "Error updating user profile", e);
+                                            callback.onFailure(e.getMessage());
+                                        });
+                                break; // Exit the loop after updating the first match
+                            }
+                        } else {
+                            Log.e("UserAccountEntity", "User not found for username: " + username);
+                            callback.onFailure("User not found");
+                        }
+                    } else {
+                        Log.e("UserAccountEntity", "Query failed: " + task.getException());
+                        callback.onFailure("Query failed: " + task.getException().getMessage());
+                    }
+                });
+    }
+
+    public void rejectNutritionist(String username, RegisterCallback callback) {
+        if (username == null) {
+            Log.e("UserAccountEntity", "Username cannot be null");
+            callback.onFailure("Invalid input: Username cannot be null");
+            return;
+        }
+
+        // Define the hard-coded updates for status
+        final Map<String, Object> updatedFields = new HashMap<>();
+        updatedFields.put("status", "rejected"); // Change status to inactive
+
+        Log.d("UserAccountEntity", "Attempting to approve Nutritionist: " + username);
+
+        db.collection("Users") // Replace with your Firestore collection name
+                .whereEqualTo("username", username) // Query to find the user by username
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (task.getResult() != null && !task.getResult().isEmpty()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("UserAccountEntity", "User found: " + document.getId());
+
+                                String email = document.getString("email");
+                                if (email == null) {
+                                    Log.e("UserAccountEntity", "Email not found for user: " + username);
+                                    callback.onFailure("Email not found for user");
+                                    return;
+                                }
+
+                                db.collection("Users").document(document.getId())
+                                        .update(updatedFields)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d("UserAccountEntity", "User profile updated successfully.");
+                                            callback.onSuccess("Rejected Nutritionist.");
                                         })
                                         .addOnFailureListener(e -> {
                                             Log.e("UserAccountEntity", "Error updating user profile", e);

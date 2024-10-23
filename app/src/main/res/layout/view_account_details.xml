@@ -52,7 +52,7 @@
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="410dp"
-        android:layout_height="650dp"
+        android:layout_height="750dp"
         android:background="#C2F4C3"
         android:orientation="vertical"
         android:padding="16dp"
@@ -385,6 +385,17 @@
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
             android:text="Reject Nutritionist"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/container"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:text="Back"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/container"
