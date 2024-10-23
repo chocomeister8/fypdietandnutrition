@@ -10,10 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -22,17 +20,14 @@ public class ConsultationAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<Consultation> consultationList;
     private LayoutInflater inflater;
-    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-    FirebaseAuth auth = FirebaseAuth.getInstance();
-
-    // Ensure currentUser is checked inside onClick method instead of being cached here
-    // FirebaseUser currentUser = auth.getCurrentUser();
+    private FirebaseAuth auth;
 
     public ConsultationAdapter(Context context, ArrayList<Consultation> consultationList) {
         super();
         this.context = context;
-        this.consultationList = consultationList; // Initialize with the provided list
-        this.inflater = LayoutInflater.from(context); // Initialize inflater here
+        this.consultationList = consultationList;
+        this.inflater = LayoutInflater.from(context);
+        this.auth = FirebaseAuth.getInstance();
     }
 
     @Override
@@ -54,7 +49,7 @@ public class ConsultationAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
 
-        // Reuse the convertView if possible, to save memory
+        // Reuse the convertView if possible
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.consultation_view_item, parent, false);
             viewHolder = new ViewHolder();
@@ -64,9 +59,8 @@ public class ConsultationAdapter extends BaseAdapter {
             viewHolder.clientNameTextView = convertView.findViewById(R.id.client_name);
             viewHolder.dateTextView = convertView.findViewById(R.id.date);
             viewHolder.timeTextView = convertView.findViewById(R.id.time);
-            viewHolder.priceTextView = convertView.findViewById(R.id.price);
             viewHolder.statusTextView = convertView.findViewById(R.id.status);
-            viewHolder.bookButton = convertView.findViewById(R.id.book_button); // Add the button
+            viewHolder.bookButton = convertView.findViewById(R.id.book_button);
 
             convertView.setTag(viewHolder);
         } else {
@@ -76,14 +70,17 @@ public class ConsultationAdapter extends BaseAdapter {
         // Get the Consultation object for the current position
         Consultation currentConsultation = (Consultation) getItem(position);
 
-        // Set data to the views
-        viewHolder.consultationIdTextView.setText(currentConsultation.getConsultationId());
-        viewHolder.nutritionistNameTextView.setText(currentConsultation.getNutritionistName());
-        viewHolder.clientNameTextView.setText(currentConsultation.getClientName());
-        viewHolder.dateTextView.setText(currentConsultation.getDate());
-        viewHolder.timeTextView.setText(currentConsultation.getTime());
-        viewHolder.priceTextView.setText("$150");
-        viewHolder.statusTextView.setText(currentConsultation.getStatus());
+        // Check for null values and set data to the views
+        if (currentConsultation != null) {
+            viewHolder.consultationIdTextView.setText(currentConsultation.getConsultationId());
+            viewHolder.nutritionistNameTextView.setText(currentConsultation.getNutritionistName());
+            viewHolder.clientNameTextView.setText(currentConsultation.getClientName());
+            viewHolder.dateTextView.setText(currentConsultation.getDate());
+            viewHolder.timeTextView.setText(currentConsultation.getTime());
+            viewHolder.statusTextView.setText(currentConsultation.getStatus());
+        } else {
+            Toast.makeText(context, "Consultation data is not available.", Toast.LENGTH_SHORT).show();
+        }
 
         viewHolder.bookButton.setOnClickListener(v -> {
             // Fetch current user inside the onClick method
@@ -98,34 +95,7 @@ public class ConsultationAdapter extends BaseAdapter {
                 String consultationId = currentConsultation.getConsultationId();
 
                 // Create a dialog to show confirmation
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Confirm Booking");
-
-                // Add consultation cost and duration information to the message
-                builder.setMessage("This consultation costs $150 for 50 minutes.\n\nProceed to payment ?");
-
-                // Set up the Confirm button
-                builder.setPositiveButton("Confirm Booking", (dialog, which) -> {
-                    // Perform the booking action here
-                    // Ensure the bookConsultation method is implemented
-                    bookConsultation(userId, consultationId, clientName)
-                            .addOnSuccessListener(aVoid -> {
-                                // Handle successful booking
-                                Toast.makeText(context, "Consultation booked successfully!", Toast.LENGTH_LONG).show();
-                            })
-                            .addOnFailureListener(e -> {
-                                // Handle error in booking
-                                Toast.makeText(context, "Error booking consultation: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            });
-                });
-
-                // Set up the Cancel button
-                builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-
-                // Show the dialog
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
+                showConfirmationDialog(userId, consultationId, clientName);
             } else {
                 // User is not logged in
                 Toast.makeText(context, "You need to log in to book a consultation.", Toast.LENGTH_SHORT).show();
@@ -135,20 +105,33 @@ public class ConsultationAdapter extends BaseAdapter {
         return convertView;
     }
 
+    // Method to show confirmation dialog
+    private void showConfirmationDialog(String userId, String consultationId, String clientName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Confirm Booking");
+        builder.setMessage("This consultation costs $150 for 50 minutes.\n\nProceed to payment?");
+
+        builder.setPositiveButton("Confirm Booking", (dialog, which) -> {
+            // Redirect to the PaymentConsultationFragment without storing in Firestore
+            if (context instanceof MainActivity) {
+                MainActivity mainActivity = (MainActivity) context;
+                PaymentConsultationFragment paymentFragment = PaymentConsultationFragment.newInstance(consultationId);
+                mainActivity.replaceFragment(paymentFragment);
+                Toast.makeText(context, "Redirecting to payment...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        // Show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     // Method to update the consultation list and notify the adapter
     public void setConsultationList(ArrayList<Consultation> consultations) {
         this.consultationList.clear(); // Clear the old data
         this.consultationList.addAll(consultations); // Add the new data
         notifyDataSetChanged(); // Notify that the data has changed
-    }
-
-    // This is a placeholder for the actual booking method
-    private Task<Void> bookConsultation(String userId, String consultationId, String clientName) {
-        // Implement Firebase Firestore or booking logic here
-        // Return Task<Void> or similar from Firebase or any other service
-        return firestore.collection("consultations")
-                .document(consultationId)
-                .update("status", "booked", "clientName", clientName, "userId", userId);
     }
 
     static class ViewHolder {
@@ -158,7 +141,6 @@ public class ConsultationAdapter extends BaseAdapter {
         TextView dateTextView;
         TextView timeTextView;
         TextView statusTextView;
-        TextView priceTextView;
         Button bookButton;
     }
 }
