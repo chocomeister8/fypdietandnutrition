@@ -1,6 +1,7 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -147,6 +148,8 @@ public class UserMealRecordFragment extends Fragment {
 
     private static final int MAX_MEAL_RECORDS = 3;
     private int mealCount = 0;
+    private static final int REQUEST_CODE_PERMISSIONS = 1001;
+    private static final int REQUEST_IMAGE_PICK = 103;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -259,27 +262,63 @@ public class UserMealRecordFragment extends Fragment {
         }
     }
 
+    private void openGalleryForImage(String mealType) {
+        selectedMealType = mealType;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
-            if (data != null) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                if (imageBitmap != null) {
-                    uploadImageToFirebaseStorage(imageBitmap, imageUrl -> {
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+
+                // First, handle camera data if present
+                if (data != null && data.getExtras() != null) {
+                    Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+
+                    if (imageBitmap != null) {
                         String userId = getCurrentUserId();
                         String selectedMealType = this.selectedMealType;
-                        downloadImageFromFirebase(imageUrl, downloadedBitmap -> {
-                            sendImageToFoodvisor(imageUrl, downloadedBitmap, userId, selectedMealType);
+
+                        uploadImageToFirebaseStorage(imageBitmap, imageUrl -> {
+                            downloadImageFromFirebase(imageUrl, downloadedBitmap -> {
+                                sendImageToFoodvisor(imageUrl, downloadedBitmap, userId, selectedMealType);
+                            });
                         });
-                    });
+                    }
+                }
+
+                // If no camera data, check if the result is from gallery selection (URI)
+                Uri selectedImageUri = data.getData();
+                if (selectedImageUri != null) {
+                    try {
+                        // Convert the selected image URI to a bitmap
+                        Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), selectedImageUri);
+
+                        if (imageBitmap != null) {
+                            String userId = getCurrentUserId();
+                            String selectedMealType = this.selectedMealType;
+
+                            sendImageToFoodvisor(selectedImageUri.toString(), imageBitmap, userId, selectedMealType);
+                        }
+                    } catch (IOException e) {
+                        Log.e("DEBUG", "Error getting bitmap from URI", e);
+                    }
                 } else {
-                    Toast.makeText(getActivity(), "Failed to capture image.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Failed to capture or select image.", Toast.LENGTH_SHORT).show();
                 }
             }
+        } else {
+            Toast.makeText(getActivity(), "Operation canceled.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void uploadImageToFirebaseStorage(Bitmap imageBitmap, OnImageUploadListener listener) {
         // Create a file to save the bitmap
@@ -1374,7 +1413,7 @@ public class UserMealRecordFragment extends Fragment {
                 // Show the options dialog (Snap a Photo or Enter Manually)
                 AlertDialog.Builder optionBuilder = new AlertDialog.Builder(requireContext());
                 optionBuilder.setTitle("Choose an Option")
-                        .setItems(new CharSequence[]{"Snap a Photo", "Enter Manually"}, new DialogInterface.OnClickListener() {
+                        .setItems(new CharSequence[]{"Snap a Photo", "Upload from Gallery", "Enter Manually"}, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
@@ -1383,10 +1422,13 @@ public class UserMealRecordFragment extends Fragment {
                                         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                                             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                                         } else {
-                                            openCameraWithMealType(selectedMealType); // Pass the selected meal type
+                                            openCameraWithMealType(selectedMealType);
                                         }
                                         break;
                                     case 1:
+                                        openGalleryForImage(selectedMealType);
+                                        break;
+                                    case 2:
                                         // Handle entering manually
                                         handleFoodNameInput(userId, selectedMealType);
                                         break;
