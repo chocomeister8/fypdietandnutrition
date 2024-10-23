@@ -1,5 +1,6 @@
 package com.fyp.dietandnutritionapplication;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,7 +24,9 @@ public class ConsultationAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseUser currentUser = auth.getCurrentUser();
+
+    // Ensure currentUser is checked inside onClick method instead of being cached here
+    // FirebaseUser currentUser = auth.getCurrentUser();
 
     public ConsultationAdapter(Context context, ArrayList<Consultation> consultationList) {
         super();
@@ -69,7 +73,7 @@ public class ConsultationAdapter extends BaseAdapter {
         }
 
         // Get the Consultation object for the current position
-        Consultation currentConsultation = consultationList.get(position);
+        Consultation currentConsultation = (Consultation) getItem(position);
 
         // Set data to the views
         viewHolder.consultationIdTextView.setText(currentConsultation.getConsultationId());
@@ -80,55 +84,51 @@ public class ConsultationAdapter extends BaseAdapter {
         viewHolder.statusTextView.setText(currentConsultation.getStatus());
 
         viewHolder.bookButton.setOnClickListener(v -> {
+            // Fetch current user inside the onClick method
+            FirebaseUser currentUser = auth.getCurrentUser();
+
             // Ensure user is logged in
             if (currentUser != null) {
                 String userId = currentUser.getUid();
                 String clientName = currentUser.getDisplayName(); // Get logged-in user's name
 
-                // Get consultation ID from current consultation object
+                // Get consultation ID from the current consultation object
                 String consultationId = currentConsultation.getConsultationId();
 
-                // Fetch the consultation slot details from Firestore based on the consultationId
-                firestore.collection("Consultation_slots").document(consultationId)
-                        .get()
-                        .addOnSuccessListener(documentSnapshot -> {
-                            if (documentSnapshot.exists()) {
-                                // Fetch necessary details from the consultation slot
-                                String nutritionistName = documentSnapshot.getString("nutritionistName");
-                                String date = documentSnapshot.getString("date");
-                                String time = documentSnapshot.getString("time");
-                                String status = "pending"; // You can set the default status to "pending"
+                // Create a dialog to show confirmation
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Confirm Booking");
 
-                                // Create a new Consultation object for booking
-                                Consultation booking = new Consultation(consultationId, nutritionistName, clientName, date, time, status);
+                // Add consultation cost and duration information to the message
+                builder.setMessage("This consultation costs $150 for 50 minutes.\n\nAre you sure you want to book this consultation?");
 
-                                // Save the booking to the "Bookings" collection in Firestore
-                                firestore.collection("Bookings")
-                                        .document(consultationId) // Using consultationId as the document ID
-                                        .set(booking) // Saving the Booking object
-                                        .addOnSuccessListener(aVoid -> {
-                                            // Show success message
-                                            Toast.makeText(context, "Consultation booked with " + nutritionistName, Toast.LENGTH_SHORT).show();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            // Show error message
-                                            Toast.makeText(context, "Failed to book consultation: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                        });
-                            } else {
-                                // Consultation slot does not exist
-                                Toast.makeText(context, "Consultation slot not found", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnFailureListener(e -> {
-                            // Handle error in fetching consultation slot
-                            Toast.makeText(context, "Error fetching consultation slot: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        });
+                // Set up the Confirm button
+                builder.setPositiveButton("Confirm Booking", (dialog, which) -> {
+                    // Perform the booking action here
+                    // Ensure the bookConsultation method is implemented
+                    bookConsultation(userId, consultationId, clientName)
+                            .addOnSuccessListener(aVoid -> {
+                                // Handle successful booking
+                                Toast.makeText(context, "Consultation booked successfully!", Toast.LENGTH_LONG).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                // Handle error in booking
+                                Toast.makeText(context, "Error booking consultation: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            });
+                });
+
+                // Set up the Cancel button
+                builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+                // Show the dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
             } else {
                 // User is not logged in
                 Toast.makeText(context, "You need to log in to book a consultation.", Toast.LENGTH_SHORT).show();
             }
         });
-
 
         return convertView;
     }
@@ -138,6 +138,15 @@ public class ConsultationAdapter extends BaseAdapter {
         this.consultationList.clear(); // Clear the old data
         this.consultationList.addAll(consultations); // Add the new data
         notifyDataSetChanged(); // Notify that the data has changed
+    }
+
+    // This is a placeholder for the actual booking method
+    private Task<Void> bookConsultation(String userId, String consultationId, String clientName) {
+        // Implement Firebase Firestore or booking logic here
+        // Return Task<Void> or similar from Firebase or any other service
+        return firestore.collection("consultations")
+                .document(consultationId)
+                .update("status", "booked", "clientName", clientName, "userId", userId);
     }
 
     static class ViewHolder {

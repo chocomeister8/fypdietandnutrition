@@ -119,8 +119,30 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/time_label"
+            app:layout_constraintStart_toEndOf="@+id/date_label"
             app:layout_constraintTop_toTopOf="@+id/time_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Time Label -->
+        <TextView
+            android:id="@+id/price_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Price:"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/time_label"
+            android:layout_marginTop="8dp" />
+
+        <!-- Dynamic Time Value -->
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/price_label"
+            app:layout_constraintTop_toTopOf="@+id/price_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Status Label -->
@@ -132,7 +154,7 @@
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_label"
+            app:layout_constraintTop_toBottomOf="@+id/price_label"
             android:layout_marginTop="8dp" />
 
         <!-- Dynamic Status Value -->
