@@ -3,10 +3,14 @@ package com.fyp.dietandnutritionapplication;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -18,8 +22,10 @@ import android.view.ViewGroup;
 
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -36,6 +42,8 @@ import android.widget.ImageView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,12 +52,16 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicReference;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
@@ -62,8 +74,23 @@ import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 import android.Manifest;
 import androidx.activity.result.ActivityResultLauncher;
 
+import com.fyp.dietandnutritionapplication.RecognizedIngredient;
 
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class UserMealRecordFragment extends Fragment {
@@ -117,6 +144,14 @@ public class UserMealRecordFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
+
+    private static final int MAX_MEAL_RECORDS = 3;
+    private int mealCount = 0;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
+
     @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
@@ -126,33 +161,14 @@ public class UserMealRecordFragment extends Fragment {
         userMealRecordController = new UserMealRecordController();
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
-        String userId = currentUser.getUid();
+
+        sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         dateTextView = view.findViewById(R.id.dateTextView);
         calorieLimitTextView = view.findViewById(R.id.progress_calorielimit);
 
         notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
-
-        notificationUController = new NotificationUController();
-        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
-            @Override
-            public void onNotificationsFetched(List<Notification> notifications) {
-                // Notifications can be processed if needed
-
-                // After fetching notifications, count them
-                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
-                    @Override
-                    public void onCountFetched(int count) {
-                        if (count > 0) {
-                            notificationBadgeTextView.setText(String.valueOf(count));
-                            notificationBadgeTextView.setVisibility(View.VISIBLE);
-                        } else {
-                            notificationBadgeTextView.setVisibility(View.GONE);
-                        }
-                    }
-                });
-            }
-        });
 
         cardViewBreakfast = view.findViewById(R.id.breakfastCard);
         cardViewLunch = view.findViewById(R.id.lunchCard);
@@ -178,42 +194,59 @@ public class UserMealRecordFragment extends Fragment {
 
         calendar = Calendar.getInstance();
 
-        ImageView notiImage = view.findViewById(R.id.noti_icon);
-        notiImage.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NotificationUFragment())
-                    .addToBackStack(null)
-                    .commit();
-
-        });
-
         if (currentUser != null) {
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-            String selectedDateString = sdf.format(calendar.getTime());
-            dateTextView.setText(selectedDateString);
-
-            userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
-                @Override
-                public void onDataFetched(String username, double calorieLimit) {
-                    updateDateTextView(calendar, username, userId);
-                    dateTextView.setOnClickListener(v -> showDatePickerDialog(username, userId));
-                }
-            });
-
-            mealOptionButton1 = view.findViewById(R.id.camera_icon);
-            mealOptionButton2 = view.findViewById(R.id.snap_photo_text);
-            mealOptionButton1.setOnClickListener(v -> showMealOptionDialog(userId));
-            mealOptionButton2.setOnClickListener(v -> showMealOptionDialog(userId));
-
-        }
-        else {
-            Toast.makeText(getActivity(), "User not logged in", Toast.LENGTH_SHORT).show();
+            String userId = currentUser.getUid();
+            Log.d("MealLogFragment", "User is logged in with ID: " + userId);
+            initializeLoggedInUser(view, userId);
+        } else {
+            Log.d("MealLogFragment", "No user is logged in. Initializing guest mode.");
+            clearMealLogUI();
+            resetMealInsertionCount();
+            initializeGuestUser(view);
         }
 
         return view;
 
+    }
+
+    private void initializeLoggedInUser(View view, String userId) {
+        // Setup for logged-in users
+        notificationUController = new NotificationUController();
+        notificationUController.fetchNotifications(userId, notifications -> {
+            // Handle notifications
+            notificationUController.countNotifications(userId, count -> {
+                if (count > 0) {
+                    notificationBadgeTextView.setText(String.valueOf(count));
+                    notificationBadgeTextView.setVisibility(View.VISIBLE);
+                } else {
+                    notificationBadgeTextView.setVisibility(View.GONE);
+                }
+            });
+        });
+
+        mealOptionButton1 = view.findViewById(R.id.camera_icon);
+        mealOptionButton2 = view.findViewById(R.id.snap_photo_text);
+        mealOptionButton1.setOnClickListener(v -> showMealOptionDialog(userId));
+        mealOptionButton2.setOnClickListener(v -> showMealOptionDialog(userId));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        String selectedDateString = sdf.format(calendar.getTime());
+        dateTextView.setText(selectedDateString);
+
+        userMealRecordController.fetchUsernameAndCalorieLimit(userId, (username, calorieLimit) -> {
+            updateDateTextView(calendar, username, userId);
+            dateTextView.setOnClickListener(v -> showDatePickerDialog(username, userId));
+        });
+    }
+
+    private void initializeGuestUser(View view) {
+        clearMealLogUI();
+        hideNotificationBadge();
+        mealOptionButton1 = view.findViewById(R.id.camera_icon);
+        mealOptionButton2 = view.findViewById(R.id.snap_photo_text);
+        mealOptionButton1.setOnClickListener(v -> checkMealInsertLimit(null));
+        mealOptionButton2.setOnClickListener(v -> checkMealInsertLimit(null));
     }
 
     private void openCameraWithMealType(String mealType) {
@@ -226,41 +259,23 @@ public class UserMealRecordFragment extends Fragment {
         }
     }
 
-    private Bitmap downscaleBitmap(Bitmap bitmap, int maxSize) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        float aspectRatio = (float) width / height;
-
-        if (width > height) {
-            width = maxSize;
-            height = Math.round(maxSize / aspectRatio);
-        } else {
-            height = maxSize;
-            width = Math.round(maxSize * aspectRatio);
-        }
-
-        return Bitmap.createScaledBitmap(bitmap, width, height, true);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
-                if (extras != null) {
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    if (imageBitmap != null) {
-                        Log.d("Debug", "Image captured successfully.");
-                        uploadImageToFirebaseStorage(imageBitmap, imageUrl -> {
-
-                            performImageRecognition(getCurrentUserId(), selectedMealType, imageBitmap, imageUrl);
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                if (imageBitmap != null) {
+                    uploadImageToFirebaseStorage(imageBitmap, imageUrl -> {
+                        String userId = getCurrentUserId();
+                        String selectedMealType = this.selectedMealType;
+                        downloadImageFromFirebase(imageUrl, downloadedBitmap -> {
+                            sendImageToFoodvisor(imageUrl, downloadedBitmap, userId, selectedMealType);
                         });
-
-                    } else {
-                        Log.e("Error", "Captured image bitmap is null.");
-                        Toast.makeText(getActivity(), "Failed to capture image.", Toast.LENGTH_SHORT).show();
-                    }
+                    });
+                } else {
+                    Toast.makeText(getActivity(), "Failed to capture image.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -306,45 +321,308 @@ public class UserMealRecordFragment extends Fragment {
         void onImageUploaded(String imageUrl);
     }
 
-    private void performImageRecognition(String userId, String selectedMealType, Bitmap bitmap, String imageUrl) {
-        InputImage image = InputImage.fromBitmap(bitmap, 0);
-
-        ImageLabelerOptions options =
-                new ImageLabelerOptions.Builder()
-                        .setConfidenceThreshold(0.8f)  // Set confidence threshold
-                        .build();
-
-        ImageLabeler labeler = ImageLabeling.getClient(options);
-
-        labeler.process(image)
-                .addOnSuccessListener(labels -> {
-                    Log.d("ImageRecognition", "Number of labels recognized: " + labels.size());
-                    if (labels.isEmpty()) {
-                        Log.w("ImageRecognition", "No labels detected.");
-                        return;
+    private void downloadImageFromFirebase(String imageUrl, OnImageDownloadListener listener) {
+        Glide.with(getContext())
+                .asBitmap()
+                .load(imageUrl)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        // Pass the downloaded image to the listener
+                        listener.onImageDownloaded(resource);
                     }
 
-                    for (ImageLabel label : labels) {
-                        Log.d("ImageRecognition", label.getText() + " - Confidence: " + label.getConfidence());
-                        String labelText = label.getText();
-
-                        String selectedDate = dateTextView.getText().toString();
-                        if (isFoodLabel(labelText)) {
-                            searchFoodInEdamam(userId, labelText, 100.00, "grams", selectedMealType, selectedDate, false, "", imageUrl);
-                        }
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        // Handle cleanup, if needed
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("ImageRecognition", "Error processing image", e);
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        Log.e("Firebase Image", "Failed to download image");
+                    }
                 });
     }
 
-    private boolean isFoodLabel(String label) {
-        Log.d("FoodAPI", "Received label for checking: " + label);
-        List<String> foodKeywords = Arrays.asList("apple", "banana", "pizza", "sushi", "noodle", "fruit", "vegetable", "dish");
-        boolean isFood = foodKeywords.stream().anyMatch(keyword -> label.toLowerCase().contains(keyword));
-        Log.d("FoodAPI", "Is food label? " + isFood + " for label: " + label);
-        return isFood;
+    public interface OnImageDownloadListener {
+        void onImageDownloaded(Bitmap bitmap);
+    }
+
+    private void sendImageToFoodvisor(String imageURL, Bitmap imageBitmap, String userId, String selectedMealType) {
+        userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
+            @Override
+            public void onDataFetched(String username, double calorielimit) {
+                if (username != null) {
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("https://vision.foodvisor.io/api/1.0/en/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+
+                    FoodvisorApi api = retrofit.create(FoodvisorApi.class);
+                    Log.d("Foodvisor", "Sending image URL to Foodvisor API");
+
+                    File file = new File(getContext().getCacheDir(), "meal_image.jpg");
+                    try (FileOutputStream out = new FileOutputStream(file)) {
+                        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    } catch (IOException e) {
+                        Log.e("Foodvisor", "Failed to save bitmap to file: " + e.getMessage());
+                        return;
+                    }
+
+                    // Convert the image file to RequestBody
+                    RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
+                    MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+
+                    // Correct way to pass scopes as a single string
+                    MultipartBody.Part scopesPart = MultipartBody.Part.createFormData("scopes", "nutrition:macro,nutrition:micro");
+
+                    Call<ResponseBody> call = api.recognizeFood("Api-Key RXpIy6iK.phqqXRhf9UwSh0EjBr4Rui8VticNXlB4", imagePart);
+
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Log.d("Foodvisor", "API response code: " + response.code());
+
+                            if (response.isSuccessful()) {
+                                Log.d("Foodvisor", "API call successful");
+                                try {
+                                    String result = response.body().string();
+                                    Log.d("Foodvisor", "API Response: " + result);
+
+                                    // Start parsing the JSON response
+                                    JSONObject jsonObject = new JSONObject(result);
+                                    JSONArray items = jsonObject.getJSONArray("items");
+
+                                    List<RecognizedIngredient> ingredients = new ArrayList<>();
+
+                                    for (int i = 0; i < items.length(); i++) {
+                                        JSONObject item = items.getJSONObject(i);
+                                        JSONArray foodArray = item.getJSONArray("food");
+
+                                        for (int j = 0; j < foodArray.length(); j++) {
+                                            JSONObject food = foodArray.getJSONObject(j);
+                                            JSONObject foodInfo = food.getJSONObject("food_info");
+                                            JSONObject nutrition = foodInfo.getJSONObject("nutrition");
+
+                                            String foodName = foodInfo.optString("display_name", "Unknown");
+                                            double calories = nutrition.optDouble("calories_100g", 0);
+                                            double carbs = nutrition.optDouble("carbs_100g", 0);
+                                            double fats = nutrition.optDouble("fat_100g", 0);
+                                            double proteins = nutrition.optDouble("proteins_100g", 0);
+                                            double fibers = nutrition.optDouble("fibers_100g", 0);
+
+                                            RecognizedIngredient ingredient = new RecognizedIngredient();
+                                            ingredient.setDisplayName(foodName);
+                                            ingredient.setCalories((float) calories);
+                                            ingredient.setCarbs((float) carbs);
+                                            ingredient.setFats((float) fats);
+                                            ingredient.setProteins((float) proteins);
+                                            ingredient.setFibers((float) fibers);
+
+                                            ingredients.add(ingredient);
+                                        }
+                                    }
+
+                                    // Show the ingredients in a confirmation dialog for the user to review
+                                    showConfirmationDialog(ingredients, selectedMealType, userId, username, imageURL);
+
+                                } catch (IOException | JSONException e) {
+                                    Log.e("Foodvisor", "Error parsing response: " + e.getMessage());
+                                    showFallbackOptions(userId, selectedMealType);  // If an error occurs, show fallback options
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Log.e("Foodvisor", "API call failed: " + t.getMessage());
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void showConfirmationDialog(List<RecognizedIngredient> ingredients, String selectedMealType, String userId, String username, String imageURL) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Review Ingredients");
+
+        // Create a LinearLayout to hold the checkboxes
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        // Create an array to store the user's selections
+        final boolean[] checkedItems = new boolean[ingredients.size()];
+
+        // Create checkboxes for each ingredient
+        for (int i = 0; i < ingredients.size(); i++) {
+            RecognizedIngredient ingredient = ingredients.get(i);
+            CheckBox checkBox = new CheckBox(requireContext());
+            checkBox.setText(ingredient.getDisplayName() + " - Calories: " + ingredient.calories + " kcal");
+            layout.addView(checkBox);
+
+            // Set the checkbox listener to track selections
+            final int index = i;
+            checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
+            {
+                Log.d("DEBUG", "Checkbox for ingredient: " + ingredient.getDisplayName() + " checked: " + isChecked);
+                checkedItems[index] = isChecked;
+            });
+        }
+
+        TextView manualEntryLabel = new TextView(requireContext());
+        manualEntryLabel.setText("Or Add a New Ingredient:");
+        layout.addView(manualEntryLabel);
+
+        EditText manualIngredientName = new EditText(requireContext());
+        manualIngredientName.setHint("Ingredient Name");
+        layout.addView(manualIngredientName);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Confirm", (dialog, which) -> {
+            for (int i = 0; i < ingredients.size(); i++) {
+                if (checkedItems[i]) {
+                    RecognizedIngredient ingredient = ingredients.get(i);
+                    userMealRecordController.storeMealData(
+                            userId,
+                            username,
+                            ingredient.getDisplayName(),
+                            selectedMealType,
+                            "1 Serving",
+                            ingredient.calories,
+                            ingredient.carbs,
+                            ingredient.proteins,
+                            ingredient.fats,
+                            ingredient.fibers,
+                            dateTextView.getText().toString(),
+                            imageURL
+                    );
+                    refreshMealData();
+                }
+            }
+
+
+            //Toast.makeText(requireContext(), "Selected meals saved successfully", Toast.LENGTH_SHORT).show();
+            String newIngredientName = manualIngredientName.getText().toString().trim();
+            if (!newIngredientName.isEmpty()) {
+                Log.d("DEBUG", "Fetching nutrition info for manually entered ingredient: " + newIngredientName);
+                // Fetch nutrition info from Foodvisor
+                fetchNutritionalInfoFromFoodvisor(newIngredientName, (fetchedIngredient) -> {
+                    if (fetchedIngredient != null) {
+                        Log.d("DEBUG", "Fetched ingredient: " + fetchedIngredient.getDisplayName());
+                        userMealRecordController.storeMealData(
+                                userId,
+                                username,
+                                fetchedIngredient.getDisplayName(),
+                                selectedMealType,
+                                "1 Serving",
+                                fetchedIngredient.calories,
+                                fetchedIngredient.carbs,
+                                fetchedIngredient.proteins,
+                                fetchedIngredient.fats,
+                                fetchedIngredient.fibers,
+                                dateTextView.getText().toString(),
+                                imageURL
+                        );
+                        Toast.makeText(requireContext(), "Ingredient saved successfully", Toast.LENGTH_SHORT).show();
+                        refreshMealData();
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to fetch nutrition info", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+
+        });
+
+        // Retry button
+        builder.setNeutralButton("Retry", (dialog, which) -> {
+            // Retry taking a picture
+            openCameraWithMealType(selectedMealType);
+        });
+
+        // Manual input button
+        builder.setNegativeButton("Enter Manually", (dialog, which) -> {
+            // Show the manual input dialog
+            handleFoodNameInput(userId, selectedMealType);
+        });
+
+        builder.show();
+    }
+
+    private void fetchNutritionalInfoFromFoodvisor(String ingredientName, OnIngredientFetchedListener listener) {
+        Log.d("DEBUG", "Fetching nutritional info for ingredient: " + ingredientName);
+        String apiKey = "Api-Key RXpIy6iK.phqqXRhf9UwSh0EjBr4Rui8VticNXlB4";
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://vision.foodvisor.io/api/1.0/en/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        FoodvisorApi apiService = retrofit.create(FoodvisorApi.class);
+
+        Call<List<RecognizedIngredient>> call = apiService.getIngredientInfo(ingredientName, apiKey);
+
+        call.enqueue(new Callback<List<RecognizedIngredient>>() {
+            @Override
+            public void onResponse(Call<List<RecognizedIngredient>> call, Response<List<RecognizedIngredient>> response) {
+
+                if (response.isSuccessful() && response.body() != null) {
+
+                    List<RecognizedIngredient> fetchedIngredients = response.body();
+                    if (!fetchedIngredients.isEmpty()) {
+                        Log.d("DEBUG", "!fetchedIngredients.isEmpty()");
+                        RecognizedIngredient firstIngredient = fetchedIngredients.get(0);
+
+                        Log.d("DEBUG", "Fetched ingredient: " + firstIngredient.getDisplayName());
+                        Log.d("DEBUG", "Calories: " + firstIngredient.getCalories());
+                        Log.d("DEBUG", "Proteins: " + firstIngredient.getProteins());
+                        Log.d("DEBUG", "Carbs: " + firstIngredient.getCarbs());
+                        Log.d("DEBUG", "Fats: " + firstIngredient.getFats());
+                        Log.d("DEBUG", "Fibers: " + firstIngredient.getFibers());
+
+
+                        listener.onIngredientFetched(firstIngredient);
+                    } else {
+                        Log.e("DEBUG", "No ingredients found for: " + ingredientName);
+                        listener.onIngredientFetched(null);
+                    }
+                } else {
+                    try {
+                        Log.e("DEBUG", "Error body: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        Log.e("DEBUG", "Failed to log error body");
+                    }
+                    listener.onIngredientFetched(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<RecognizedIngredient>> call, Throwable t) {
+                Log.e("DEBUG", "API call failed: " + t.getMessage(), t);
+                listener.onIngredientFetched(null);
+            }
+        });
+    }
+
+    interface OnIngredientFetchedListener {
+        void onIngredientFetched(RecognizedIngredient ingredient);
+    }
+
+
+    private void showFallbackOptions(String userId, String selectedMealType) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Recognition Failed")
+                .setMessage("We couldn't recognize the food item. What would you like to do?")
+                .setPositiveButton("Enter Manually", (dialog, which) -> {
+                    handleFoodNameInput(userId, selectedMealType);
+                })
+                .setNegativeButton("Retry", (dialog, which) -> {
+                    openCameraWithMealType(selectedMealType);
+                })
+                .setCancelable(false)
+                .show();
     }
 
     private void updateCalorieDisplay(double calorieLimit, double remainingCalories) {
@@ -385,7 +663,6 @@ public class UserMealRecordFragment extends Fragment {
     }
 
     private void fetchFoodServingUnits(String userId, String selectedMealType, String foodName) {
-
         EdamamApiService apiService = ApiClient.getRetrofitInstance().create(EdamamApiService.class);
         String appId = "997e8d42";
         String appKey = "4483ab153d93c4a64d6f156fcffa78ff";
@@ -483,6 +760,27 @@ public class UserMealRecordFragment extends Fragment {
     }
 
     public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
+        if (userId == null) {
+            // For guests, proceed without fetching user-specific data
+            Log.d("MealLogFragment", "Guest is logging a meal. Proceeding without user-specific data.");
+
+            String username = "Guest";
+            double calorieLimit = 2000;
+
+            performMealLogOperations(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, isUpdate, mealRecordID, imageURL);
+
+        } else {
+            if (userId != null) {
+                Log.d("Test3 10/24/2024", userId);
+                // Proceed with the flow for logged-in users
+                performMealLogOperations(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, isUpdate, mealRecordID, imageURL);
+            } else {
+                Log.e("MealLogFragment", "Failed to fetch user data.");
+            }
+        }
+    }
+
+    private void performMealLogOperations(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
         userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
             @Override
             public void onDataFetched(String username, double calorielimit) {
@@ -505,7 +803,7 @@ public class UserMealRecordFragment extends Fragment {
                                     FoodResponse.Hint hint = hints.get(0);
                                     FoodResponse.Food food = hint.getFood();
                                     if (food != null) {
-                                        // Correctly access the measures list from Hint, not Food
+
                                         List<FoodResponse.Measure> measures = hints.get(0).getMeasures();
                                         if (measures != null && !measures.isEmpty()) {
                                             for (FoodResponse.Measure measure : measures) {
@@ -558,26 +856,26 @@ public class UserMealRecordFragment extends Fragment {
 
 
                                                     if (apiCallSuccessful) {
-                                                    if (isUpdate) {
-                                                        MealRecord mealRecord = new MealRecord();
-                                                        mealRecord.setMealType(selectedMealType);
-                                                        mealRecord.setServingSize(servingSize + " " + servingUnit);
-                                                        mealRecord.setCalories(adjustedCalories);
-                                                        mealRecord.setProteins(adjustedProtein);
-                                                        mealRecord.setFats(adjustedFat);
-                                                        mealRecord.setCarbs(adjustedCarbohydrates);
-                                                        mealRecord.setFiber(adjustedFiber);
-                                                        mealRecord.setImageUrl(imageURL);
+                                                        if (isUpdate) {
+                                                            MealRecord mealRecord = new MealRecord();
+                                                            mealRecord.setMealType(selectedMealType);
+                                                            mealRecord.setServingSize(servingSize + " " + servingUnit);
+                                                            mealRecord.setCalories(adjustedCalories);
+                                                            mealRecord.setProteins(adjustedProtein);
+                                                            mealRecord.setFats(adjustedFat);
+                                                            mealRecord.setCarbs(adjustedCarbohydrates);
+                                                            mealRecord.setFiber(adjustedFiber);
+                                                            mealRecord.setImageUrl(imageURL);
 
-                                                        userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
-                                                        Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
-                                                    } else {
-                                                        userMealRecordController.storeMealData(userId, username, foodName, selectedMealType,
-                                                                servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein,
-                                                                adjustedFat, adjustedFiber, selectedDate, imageURL);
+                                                            userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
+                                                            Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            userMealRecordController.storeMealData(userId, username, foodName, selectedMealType,
+                                                                    servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein,
+                                                                    adjustedFat, adjustedFiber, selectedDate, imageURL);
+                                                        }
+                                                        refreshMealData();
                                                     }
-                                                    refreshMealData();
-                                                  }
                                                 }
                                             }
                                         } else {
@@ -604,6 +902,7 @@ public class UserMealRecordFragment extends Fragment {
                 }
             }
         });
+
     }
 
     private void updateMealLogUI(List<MealRecord> mealRecords, String selectedDateString, String userId) {
@@ -973,28 +1272,66 @@ public class UserMealRecordFragment extends Fragment {
         });
     }
 
-    private void clearMealLogUI() {
+    public void clearMealLogUI() {
         // Reset the totals
         totalCarbs = 0;
         totalProteins = 0;
         totalFats = 0;
 
-        // Clear text fields and hide card views
         breakfastTextView.setText("");
         lunchTextView.setText("");
         dinnerTextView.setText("");
         snackTextView.setText("");
 
-        // Hide the card views since no meals exist for this date
         cardViewBreakfast.setVisibility(View.GONE);
         cardViewLunch.setVisibility(View.GONE);
         cardViewDinner.setVisibility(View.GONE);
         cardViewSnack.setVisibility(View.GONE);
 
-        // Optionally update the totals view to show zeros or an empty state
         carbsTextView.setText("0g");
         proteinsTextView.setText("0g");
         fatsTextView.setText("0g");
+    }
+
+    private void hideNotificationBadge() {
+        notificationBadgeTextView.setVisibility(View.GONE);
+    }
+
+    private void checkMealInsertLimit(String userId) {
+        int mealCount = getMealInsertionCount();
+        if (mealCount >= MAX_MEAL_RECORDS) {
+            showRegisterPrompt();
+        } else {
+            incrementMealInsertionCount();
+            showMealOptionDialog(userId);
+        }
+    }
+
+    private int getMealInsertionCount() {
+        return sharedPreferences.getInt("mealCount", 0); // Default is 0
+    }
+
+    private void incrementMealInsertionCount() {
+        int currentCount = getMealInsertionCount();
+        editor.putInt("mealCount", currentCount + 1);
+        editor.apply();
+    }
+
+    private void showRegisterPrompt() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Limit Reached")
+                .setMessage("You have reached the limit of 5 meal entries. Please register to add more.")
+                .setPositiveButton("Register", (dialog, which) -> {
+                    // Redirect to registration page
+                    ((MainActivity) getActivity()).replaceFragment(new URegisterFragment());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void resetMealInsertionCount() {
+        editor.putInt("mealCount", 0);
+        editor.apply();
     }
 
     private void showMealOptionDialog(String userId) {
@@ -1002,6 +1339,10 @@ public class UserMealRecordFragment extends Fragment {
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.meal_log_dialog_meal_type_selection, null);
+
+        if (userId == null) {
+            checkMealInsertLimit(null);
+        }
 
         Spinner mealTypeSpinner = dialogView.findViewById(R.id.mealTypeSpinner);
 
@@ -1070,6 +1411,12 @@ public class UserMealRecordFragment extends Fragment {
 
         clearMealLogUI();
 
+        if (userId == null || username == null) {
+            // If no user is logged in, stop here
+            Log.d("MealLogFragment", "No user logged in. Skipping meal data fetch.");
+            return;
+        }
+
         Log.d("MealLogFragment", "updateDateTextView Selected Date: " + formattedDate);
         userMealRecordController.fetchMealsLogged(username, formattedDate, new MealRecord.OnMealsFetchedListener() {
             @Override
@@ -1098,9 +1445,8 @@ public class UserMealRecordFragment extends Fragment {
     private String getCurrentUserId() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            return user.getUid();  // Returns the current user's unique ID
+            return user.getUid();
         } else {
-            // Handle the case where the user is not signed in
             Log.d("Auth", "No user is currently signed in.");
             return null; // Or handle appropriately (e.g., show an error message)
         }

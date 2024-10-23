@@ -158,13 +158,25 @@ public class ProfileUFragment extends Fragment {
 
         });
 
+
+
         ImageView logoutImage = view.findViewById(R.id.logout_icon);
         logoutImage.setOnClickListener(v -> {
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            FirebaseAuth.getInstance().signOut();
 
             if (getActivity() instanceof MainActivity) {
+                UserMealRecordFragment userMealRecordFragment = (UserMealRecordFragment) getFragmentManager().findFragmentByTag("UserMealRecordFragment");
+                if (userMealRecordFragment != null) {
+                    userMealRecordFragment.clearMealLogUI();
+                }
                 Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                 ((MainActivity) getActivity()).switchToGuestMode();
-                ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
             }
         });
 

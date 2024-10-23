@@ -1,6 +1,8 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -112,6 +114,12 @@ public class userHomePageFragment extends Fragment {
             }
         });
         logoutIcon.setOnClickListener(v -> {
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+
+            FirebaseAuth.getInstance().signOut();
             // Create an AlertDialog to confirm logout
             new AlertDialog.Builder(getContext())
                     .setTitle("Confirm Logout")
@@ -120,8 +128,12 @@ public class userHomePageFragment extends Fragment {
                         // User confirmed to log out
                         Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                         if (getActivity() instanceof MainActivity) {
+                            UserMealRecordFragment userMealRecordFragment = (UserMealRecordFragment) getFragmentManager().findFragmentByTag("UserMealRecordFragment");
+                            if (userMealRecordFragment != null) {
+                                userMealRecordFragment.clearMealLogUI();
+                            }
                             ((MainActivity) getActivity()).switchToGuestMode();
-                            ((MainActivity) getActivity()).replaceFragment(new LandingFragment());
+                            ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
                         }
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> {
