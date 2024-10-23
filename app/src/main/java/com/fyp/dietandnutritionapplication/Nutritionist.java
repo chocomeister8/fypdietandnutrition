@@ -7,6 +7,8 @@ public class Nutritionist extends Profile {
     private String expertise;
     private String bio;
     private String profilePicture;
+    private String specialization;
+    private String experience;
 
     // Default constructor
     public Nutritionist() {
@@ -16,7 +18,7 @@ public class Nutritionist extends Profile {
     }
 
     // Parameterized constructor
-    public Nutritionist(String firstName,String username,String name,String phoneNumber, String email,String gender, String role, String dateJoined,String education, String contactInfo, String expertise, String bio, String profilePicture) {
+    public Nutritionist(String firstName,String username,String name,String phoneNumber, String email,String gender, String role, String specialization, String experience, String dateJoined,String education, String contactInfo, String expertise, String bio, String profilePicture) {
         super();
         this.setFirstName(firstName);
         this.setUsername(username);
@@ -29,6 +31,8 @@ public class Nutritionist extends Profile {
         this.expertise = expertise;
         this.bio = bio;
         this.profilePicture = profilePicture;
+        this.setSpecialization(specialization);
+        this.setExperience(experience);
         this.setRole("nutritionist");
         this.setStatus("active");
     }
@@ -38,6 +42,22 @@ public class Nutritionist extends Profile {
         this.firstName = firstName;
         this.setEmail(email);
         this.profilePicture = profilePicture;
+    }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
     }
 
     // Getter and Setter methods

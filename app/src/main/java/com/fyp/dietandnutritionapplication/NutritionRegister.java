@@ -6,6 +6,6 @@ public class NutritionRegister extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nutritionistregister);
+        setContentView(R.layout.fragment_n_register);
     }
 }

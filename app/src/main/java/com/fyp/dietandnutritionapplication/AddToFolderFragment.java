@@ -123,7 +123,17 @@ public class AddToFolderFragment extends Fragment {
                     // Folder exists, retrieve it
                     folder = document.toObject(RecipeFolder.class);
                     if (folder != null) {
-                        folder.addRecipe(recipe); // Add the new recipe
+
+                        boolean isDuplicate = folder.getRecipes().stream()
+                                .anyMatch(existingRecipe -> existingRecipe.getLabel().equalsIgnoreCase(recipe.getLabel()));
+
+                        if (isDuplicate) {
+                            Toast.makeText(context, "Error: Recipe with the same label already exists in the folder.", Toast.LENGTH_SHORT).show();
+                            return;
+                        } else {
+                            // Add the new recipe if it's not a duplicate
+                            folder.addRecipe(recipe);
+                        }
                     }
                 } else {
                     // Folder does not exist, create a new one

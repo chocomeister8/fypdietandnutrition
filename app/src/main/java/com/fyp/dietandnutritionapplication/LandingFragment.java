@@ -35,11 +35,11 @@ public class LandingFragment extends Fragment {
         nutriImageView.setOnClickListener(v -> {
             // Switch to nutritionist mode and set role as "nutritionist"
             if (getActivity() instanceof MainActivity) {
-                URegisterFragment uRegisterFragment = new URegisterFragment();
+                NRegisterFragment nRegisterFragment = new NRegisterFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("role", "nutritionist"); // Set the role to "nutritionist"
-                uRegisterFragment.setArguments(bundle);
-                ((MainActivity) getActivity()).replaceFragment(uRegisterFragment);
+                nRegisterFragment.setArguments(bundle);
+                ((MainActivity) getActivity()).replaceFragment(nRegisterFragment);
             }
         });
 

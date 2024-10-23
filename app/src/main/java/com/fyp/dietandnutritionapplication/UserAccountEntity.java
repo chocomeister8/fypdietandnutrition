@@ -250,6 +250,8 @@ public class UserAccountEntity {
         user.setEmail(document.getString("email"));
         user.setGender(document.getString("gender"));
         user.setRole(document.getString("role"));
+        user.setSpecialization(document.getString("specialization"));
+        user.setExperience(document.getString("experience"));
         user.setDateJoined(document.getString("dateJoined"));
         user.setEducation(document.getString("education"));
         user.setContactInfo(document.getString("contactInfo"));
@@ -314,7 +316,7 @@ public class UserAccountEntity {
     }
 
 
-    public void registerNutri(String firstName, String lastName, String userName, String dob, String email, String phone, String gender, String password, String datejoined, Context context, RegisterCallback callback) {
+    public void registerNutri(String firstName, String lastName, String userName, String email, String phone, String gender, String password, String specialization, String experience, String datejoined, Context context, RegisterCallback callback) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -327,10 +329,11 @@ public class UserAccountEntity {
                             userCreate.setFirstName(firstName);
                             userCreate.setLastName(lastName);
                             userCreate.setUsername(userName);
-                            userCreate.setDob(dob);
                             userCreate.setEmail(email);
                             userCreate.setPhoneNumber(phone);
                             userCreate.setGender(gender);
+                            userCreate.setSpecialization(specialization);
+                            userCreate.setExperience(experience);
                             userCreate.setDateJoined(datejoined);
                             userCreate.setRole("nutritionist");
                             userCreate.setBio(" ");
@@ -340,7 +343,9 @@ public class UserAccountEntity {
                             db.collection("Users").document(userId).set(userCreate)
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
-                                            sendVerificationEmail(firebaseUser, callback);
+                                            // Send verification email
+                                            Toast.makeText(context, "Registration successful, please do email verification after Admin approval!", Toast.LENGTH_LONG).show();
+                                            callback.onSuccess("Succesfully registered!");
                                         } else {
                                             callback.onFailure("Failed to save user data");
                                         }

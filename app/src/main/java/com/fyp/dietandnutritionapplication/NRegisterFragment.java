@@ -37,9 +37,9 @@ import java.util.Locale;
  * Use the {@link URegisterFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class URegisterFragment extends Fragment {
+public class NRegisterFragment extends Fragment {
 
-    private EditText firstNameEditText, lastNameEditText, userNameEditText, dobEditText, emailEditText, phoneEditText, passwordEditText, confirmPW;
+    private EditText firstNameEditText, lastNameEditText, userNameEditText, emailEditText, phoneEditText, passwordEditText, confirmPW, specializationEditText, experienceEditText;
     private RadioButton maleRadioButton, femaleRadioButton,selectedRadioButtonRole;
     private RadioGroup radioGroupRole;
     private Button registerButton;
@@ -56,7 +56,7 @@ public class URegisterFragment extends Fragment {
     private String mParam2;
 
 
-    public URegisterFragment() {
+    public NRegisterFragment() {
         // Required empty public constructor
     }
 
@@ -69,8 +69,8 @@ public class URegisterFragment extends Fragment {
      * @return A new instance of fragment userRegisterFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static URegisterFragment newInstance(String param1, String param2) {
-        URegisterFragment fragment = new URegisterFragment();
+    public static NRegisterFragment newInstance(String param1, String param2) {
+        NRegisterFragment fragment = new NRegisterFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -91,13 +91,12 @@ public class URegisterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_u_register, container, false);
+        View view = inflater.inflate(R.layout.fragment_n_register, container, false);
         mAuth = FirebaseAuth.getInstance();
         MainActivity mainActivity = (MainActivity) getActivity();
         firstNameEditText = view.findViewById(R.id.firstName);
         lastNameEditText = view.findViewById(R.id.lastName);
         userNameEditText = view.findViewById(R.id.userNameCreate);
-        dobEditText = view.findViewById(R.id.dobtext);
         emailEditText = view.findViewById(R.id.email);
         phoneEditText = view.findViewById(R.id.editTextPhone);
         passwordEditText = view.findViewById(R.id.enterPW);
@@ -108,6 +107,8 @@ public class URegisterFragment extends Fragment {
         radioGroupRole = view.findViewById(R.id.radioGroupRole);
         RadioButton userRadioButton = view.findViewById(R.id.rbUser);
         RadioButton nutritionistRadioButton = view.findViewById(R.id.rbnutri);
+        specializationEditText = view.findViewById(R.id.specialization);
+        experienceEditText = view.findViewById(R.id.experience);
 
         if (getArguments() != null) {
             String role = getArguments().getString("role");
@@ -128,25 +129,19 @@ public class URegisterFragment extends Fragment {
                 String firstName = firstNameEditText.getText().toString();
                 String lastName = lastNameEditText.getText().toString();
                 String userName = userNameEditText.getText().toString();
-                String dob = dobEditText.getText().toString();
                 String email = emailEditText.getText().toString();
                 String phone = phoneEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 String confirmPassword = passwordEditText.getText().toString();
-                int selectedId = radioGroupRole.getCheckedRadioButtonId();
-                if (selectedId == -1) {
-                    // No RadioButton selected
-                    Toast.makeText(getActivity(), "Please select a role.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                String specialization = specializationEditText.getText().toString();
+                String experience = experienceEditText.getText().toString();
+                String role = "nutritionist";
 
-                selectedRadioButtonRole = view.findViewById(selectedId);
-                String selectedRole = selectedRadioButtonRole.getText().toString();
                 @SuppressLint({"NewApi", "LocalSuppress"}) String date = LocalDateTime.now(ZoneId.of("Asia/Singapore")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
 
-                if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) || TextUtils.isEmpty(dob) ||
-                        TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
+                if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(userName) ||
+                        TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword) || TextUtils.isEmpty(specialization) || TextUtils.isEmpty(experience) ) {
                     Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -165,14 +160,11 @@ public class URegisterFragment extends Fragment {
                     gender = "Unspecified";
                 }
 
-                URegisterController uRegisterController = new URegisterController();
-                uRegisterController.checkRegister(firstName, lastName,  userName, dob, email, phone, gender, password, date, getActivity());
+                NRegisterController nRegisterController = new NRegisterController();
+                nRegisterController.checkRegister(firstName, lastName,  userName, email, phone, gender, password, specialization, experience, date, getActivity());
 
-                }
-
+            }
         });
-
-        dobEditText.setOnClickListener(v -> showDatePickerDialog(dobEditText));
 
         TextView myTextView = view.findViewById(R.id.haveacct);
         myTextView.setClickable(true);
@@ -186,35 +178,6 @@ public class URegisterFragment extends Fragment {
         return view;
     }
 
-    private void showDatePickerDialog(EditText dobEditText) {
-        final Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), (view, selectedYear, selectedMonth, selectedDay) -> {
-            calendar.set(Calendar.YEAR, selectedYear);
-            calendar.set(Calendar.MONTH, selectedMonth);
-            calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String formattedDate = dateFormat.format(calendar.getTime());
-
-            dobEditText.setText(formattedDate);
-        }, year, month, day);
-
-        // Set the date range for the DatePickerDialog
-        Calendar minDate = Calendar.getInstance();
-        minDate.set(Calendar.YEAR, 1900); // Set the minimum year (e.g., 1900)
-
-        Calendar maxDate = Calendar.getInstance();
-        maxDate.set(Calendar.YEAR, 2024); // Set the maximum year to 2024
-
-        datePickerDialog.getDatePicker().setMinDate(minDate.getTimeInMillis());
-        datePickerDialog.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
-
-        // Show the dialog
-        datePickerDialog.show();
-    }
 
 
 }
