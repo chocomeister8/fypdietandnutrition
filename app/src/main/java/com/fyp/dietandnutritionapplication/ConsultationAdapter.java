@@ -100,7 +100,7 @@ public class ConsultationAdapter extends BaseAdapter {
                 builder.setTitle("Confirm Booking");
 
                 // Add consultation cost and duration information to the message
-                builder.setMessage("This consultation costs $150 for 50 minutes.\n\nAre you sure you want to book this consultation?");
+                builder.setMessage("This consultation costs $150 for 50 minutes.\n\nProceed to payment ?");
 
                 // Set up the Confirm button
                 builder.setPositiveButton("Confirm Booking", (dialog, which) -> {
