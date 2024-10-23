@@ -81,12 +81,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="400dp" />
 
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#E0E0E0" />
-
             <Button
                 android:id="@+id/viewAccountsButton"
                 android:layout_width="match_parent"
@@ -97,7 +91,7 @@
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+                app:layout_constraintTop_toBottomOf="@+id/accountBarchart"
                 tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
 
             <Button
@@ -112,12 +106,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/viewAccountsButton"
                 tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#E0E0E0" />
 
         </TableLayout>
 
@@ -135,12 +123,6 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tableLayout">
 
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#E0E0E0" />
-
             <!-- Row for FAQs -->
             <TableRow
                 android:layout_width="wrap_content"
@@ -154,12 +136,6 @@
                     android:textColor="#009688"
                     android:textSize="16sp" />
             </TableRow>
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#E0E0E0" />
 
             <Button
                 android:id="@+id/viewFAQbutton"
@@ -185,6 +161,86 @@
                 tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
 
         </TableLayout>
+
+        <!-- For add in promo code -->
+        <TableLayout
+            android:id="@+id/promoCodeTable"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="#FFFFFF"
+            android:elevation="4dp"
+            android:stretchColumns="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/faqTable">
+
+            <!-- Row for Promo Code -->
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#F5F5F5">
+
+                <TextView
+                    android:id="@+id/addPromoCode"
+                    android:layout_width="wrap_content"
+                    android:padding="12dp"
+                    android:textColor="#009688"
+                    android:textSize="16sp"
+                    android:text="Create Promo Code:" />
+
+                <EditText
+                    android:id="@+id/promoCodeInput"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Promo code"
+                    android:padding="8dp" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#F5F5F5">
+
+                <TextView
+                    android:id="@+id/discountValue"
+                    android:layout_width="wrap_content"
+                    android:padding="12dp"
+                    android:textColor="#009688"
+                    android:textSize="16sp"
+                    android:text="Discount Value:" />
+
+                <EditText
+                    android:id="@+id/discountvalues"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Discount value"
+                    android:padding="8dp" />
+
+            </TableRow>
+
+            <Button
+                android:id="@+id/addPromoCodeButton"
+                android:layout_width="180dp"
+                android:layout_height="50dp"
+                android:backgroundTint="#009688"
+                android:radius="15dp"
+                android:text="Add Promo Code"
+                android:textSize="10sp"
+                tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
+        </TableLayout>
+
+        <!-- Spacer for spacing below the promo code table -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintTop_toBottomOf="@+id/promoCodeTable"
+            app:layout_constraintBottom_toBottomOf="parent"/> <!-- Adjust height as needed -->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

@@ -93,7 +93,7 @@
                 android:id="@+id/tvSubtotalValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$150.00"
+                android:text="Loading..."
                 android:textStyle="bold"
                 android:textSize="23sp"
                 android:layout_marginEnd="5dp"
@@ -108,7 +108,7 @@
             android:layout_marginTop="16dp">
 
             <EditText
-                android:id="@+id/etZipCode"
+                android:id="@+id/promoCode"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -118,7 +118,7 @@
                 android:inputType="textPostalAddress" />
 
             <Button
-                android:id="@+id/btnGo"
+                android:id="@+id/applyPromoButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Apply"
@@ -136,10 +136,10 @@
             android:textColor="#000000" />
 
         <TextView
-            android:id="@+id/tvShippingValue"
+            android:id="@+id/discountValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$10.00"
+            android:text=" "
             android:textSize="18sp"
             android:layout_gravity="end"
             android:textColor="#000000" />
@@ -159,7 +159,7 @@
             android:id="@+id/tvEstimatedTotalValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$140.00"
+            android:text="Loading..."
             android:textSize="25sp"
             android:textStyle="bold"
             android:textColor="#000000"

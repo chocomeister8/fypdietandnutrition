@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -31,6 +32,10 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 
 public class AdminHomeFragment extends Fragment {
@@ -41,6 +46,8 @@ public class AdminHomeFragment extends Fragment {
     private int numberOfNutritionists = 0;
     private int numberOfAdmins = 0;
     private TextView faqCountTextView;
+    private EditText promoCodeInput, discountValuesInput; // Add references for promo code and discount
+    private Button addPromoCodeButton;
 
     @Nullable
     @Override
@@ -56,6 +63,14 @@ public class AdminHomeFragment extends Fragment {
         Button addAdminButton = view.findViewById(R.id.addAdminButton);
         Button viewFAQsButton = view.findViewById(R.id.viewFAQbutton);
         Button addFAQButton = view.findViewById(R.id.addFAQbutton);
+
+        // Initialize promo code input and button
+        promoCodeInput = view.findViewById(R.id.promoCodeInput);
+        discountValuesInput = view.findViewById(R.id.discountvalues);
+        addPromoCodeButton = view.findViewById(R.id.addPromoCodeButton);
+
+        // Set OnClickListener for the add promo code button
+        addPromoCodeButton.setOnClickListener(v -> addPromoCode());
 
         // Set an OnClickListener on the viewAccountsButton
         viewAccountsButton.setOnClickListener(v -> {
@@ -299,4 +314,63 @@ public class AdminHomeFragment extends Fragment {
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
+
+    // Method to check if a string is numeric
+    private boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true; // It's numeric
+        } catch (NumberFormatException e) {
+            return false; // It's not numeric
+        }
+    }
+
+    // Your existing addPromoCode method
+    private void addPromoCode() {
+        String promoCode = promoCodeInput.getText().toString().trim();
+        String discountValueStr = discountValuesInput.getText().toString().trim();
+
+        // Check if promo code is empty
+        if (promoCode.isEmpty()) {
+            Toast.makeText(getContext(), "Please enter a promo code.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if discount value is a number
+        if (discountValueStr.isEmpty() || !isNumeric(discountValueStr)) {
+            Toast.makeText(getContext(), "Please enter a valid discount value (number).", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Parse discount value as a number
+        double discountValue = Double.parseDouble(discountValueStr);
+
+        // Log the values being saved
+        Log.d("AdminHomeFragment", "Adding Promo Code: " + promoCode + " with discount: " + discountValue);
+
+        // Save promo code and discount value to database
+        savePromoCodeToDatabase(promoCode, discountValue);
+    }
+
+    // Save the promo code to Firestore
+    private void savePromoCodeToDatabase(String promoCode, double discountValue) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        PromoCode promo = new PromoCode(promoCode, discountValue);
+
+        Log.d("AdminHomeFragment", "Saving promo code: " + promoCode + ", Discount: " + discountValue);
+
+        db.collection("promoCode")
+                .add(promo)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("AdminHomeFragment", "Promo code added with ID: " + documentReference.getId());
+                    Toast.makeText(getContext(), "Promo code added successfully.", Toast.LENGTH_SHORT).show();
+                    promoCodeInput.setText("");
+                    discountValuesInput.setText("");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("AdminHomeFragment", "Error adding promo code: " + e);
+                    Toast.makeText(getContext(), "Failed to add promo code: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
 }
