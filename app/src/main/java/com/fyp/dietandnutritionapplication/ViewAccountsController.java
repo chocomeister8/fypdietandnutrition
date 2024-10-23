@@ -24,4 +24,22 @@ public class ViewAccountsController {
             }
         });
     }
+
+    public void retrievePendingNutritionist(final UserAccountEntity.DataCallback callback) {
+        UserAccountEntity userAccountEntity = new UserAccountEntity();
+        userAccountEntity.retrievePendingNutritionists(new UserAccountEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Profile> accounts) {
+                profiles.clear();
+                profiles.addAll(accounts);
+                callback.onSuccess(profiles);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                callback.onFailure(e);
+            }
+        });
+    }
 }

@@ -11,14 +11,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 public class AccountDetailsFragment extends Fragment {
 
     private Profile selectedProfile; // Declare selectedProfile at class level
+    private Nutritionist nutritionist;
     private SuspendUserController suspendUserController;
     private ReactivateUserController reactivateUserController; // Declare an instance for ReactivateUserController
-
+    private approveNutritionistController approveNutritionist;
+    private rejectNutritionistController rejectNutritionist;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -27,11 +30,14 @@ public class AccountDetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.view_account_details, container, false);
         suspendUserController = new SuspendUserController();
         reactivateUserController = new ReactivateUserController(); // Initialize the controller
+        approveNutritionist = new approveNutritionistController();
+        rejectNutritionist = new rejectNutritionistController();
 
 
         // Retrieve the profile from the arguments
         if (getArguments() != null) {
             selectedProfile = (Profile) getArguments().getSerializable("selectedProfile");
+            nutritionist = (Nutritionist) getArguments().getSerializable("nutritionist");
         }
 
         // Find your TextView or other UI elements to display profile details
@@ -46,6 +52,17 @@ public class AccountDetailsFragment extends Fragment {
         Button suspendUserButton = view.findViewById(R.id.suspendUserButton);
         Button reactivateUserButton = view.findViewById(R.id.ReactivateUserButton);
 
+        TextView specializationTextView = view.findViewById(R.id.specialization);
+        TextView experienceTextView = view.findViewById(R.id.experience);
+        Button approveNutritionistButton = view.findViewById(R.id.approveNutritionists);
+        Button rejectNutritionistButton = view.findViewById(R.id.rejectNutritionists);
+
+        CardView nutritionistDetails = view.findViewById(R.id.nutriprofileCard);
+
+        String userRole = selectedProfile.getRole();
+        String userStatus = selectedProfile.getStatus();
+        Log.d("AccountDetailsFragment", "User role: " + userRole + ", status: " + userStatus);
+
         // Set the details in the UI
         if (selectedProfile != null) {
             firstnameTextView.setText(selectedProfile.getFirstName());
@@ -57,25 +74,56 @@ public class AccountDetailsFragment extends Fragment {
             roleTextView.setText(selectedProfile.getRole());
             datejoinedTextView.setText(selectedProfile.getDateJoined());
 
-            String userStatus = selectedProfile.getStatus();
-            Log.d("AccountDetailsFragment", "User status: " + userStatus); // Debug log
-
-            Log.d("FirestoreData", "Fetched status: " + selectedProfile.getStatus());
-
-
-            // Determine user status and set button visibility
+            // Check the user's status
             if ("active".equalsIgnoreCase(userStatus)) {
                 suspendUserButton.setVisibility(View.VISIBLE);  // Show suspend button for active users
-                reactivateUserButton.setVisibility(View.GONE);  // Hide reactivate button
-            } else if ("deactivated".equalsIgnoreCase(userStatus)) {
-                suspendUserButton.setVisibility(View.GONE);  // Hide suspend button for deactivated users
+                reactivateUserButton.setVisibility(View.GONE);   // Hide reactivate button
+                approveNutritionistButton.setVisibility(View.GONE);   // Hide approve button
+                rejectNutritionistButton.setVisibility(View.GONE);    // Hide reject button
+            } else if ("suspended".equalsIgnoreCase(userStatus)) {
+                suspendUserButton.setVisibility(View.GONE);   // Hide suspend button
                 reactivateUserButton.setVisibility(View.VISIBLE);  // Show reactivate button
+                approveNutritionistButton.setVisibility(View.GONE);   // Hide approve button
+                rejectNutritionistButton.setVisibility(View.GONE);    // Hide reject button
+            } else if ("pending".equalsIgnoreCase(userStatus) && "nutritionist".equalsIgnoreCase(userRole)) {
+                suspendUserButton.setVisibility(View.GONE);  // Hide suspend button
+                reactivateUserButton.setVisibility(View.GONE);  // Hide reactivate button
+                approveNutritionistButton.setVisibility(View.VISIBLE);   // Show approve button for pending nutritionists
+                rejectNutritionistButton.setVisibility(View.VISIBLE);    // Show reject button for pending nutritionists
             } else {
-                // Handle unexpected status
-                Log.d("AccountDetailsFragment", "Unexpected status: " + userStatus);
-                suspendUserButton.setVisibility(View.GONE);  // Hide both buttons if status is unexpected
+                // Handle unexpected status or roles
+                Log.d("AccountDetailsFragment", "Unexpected status or role: " + userRole + ", " + userStatus);
+                suspendUserButton.setVisibility(View.GONE);  // Hide all action buttons if status/role is unexpected
                 reactivateUserButton.setVisibility(View.GONE);
+                approveNutritionistButton.setVisibility(View.GONE);
+                rejectNutritionistButton.setVisibility(View.GONE);
             }
+
+            // Additional handling for Nutritionist-specific fields
+            if (selectedProfile instanceof Nutritionist) {
+                Nutritionist nutritionistProfile = (Nutritionist) selectedProfile;
+                specializationTextView.setText(nutritionistProfile.getSpecialization());
+                experienceTextView.setText(nutritionistProfile.getExperience());
+
+                // Show nutritionist-specific fields
+                specializationTextView.setVisibility(View.VISIBLE);
+                experienceTextView.setVisibility(View.VISIBLE);
+            } else {
+                // Hide nutritionist-specific fields if not a Nutritionist
+                specializationTextView.setVisibility(View.GONE);
+                experienceTextView.setVisibility(View.GONE);
+            }
+
+            // Additional check for role
+            if ("admin".equalsIgnoreCase(userRole) || "user".equalsIgnoreCase(userRole)) {
+                // Hide specialization and experience for admin or user roles
+                nutritionistDetails.setVisibility(View.GONE);
+                specializationTextView.setVisibility(View.GONE);
+                experienceTextView.setVisibility(View.GONE);
+            }
+        } else {
+            // Handle the case when selectedProfile is null
+            Toast.makeText(getActivity(), "No profile selected.", Toast.LENGTH_SHORT).show();
         }
 
         suspendUserButton.setOnClickListener(v -> {
@@ -103,6 +151,20 @@ public class AccountDetailsFragment extends Fragment {
                 redirectToViewAccountsFragment();
             } else {
                 Toast.makeText(getActivity(), "No user selected to reactivate.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        approveNutritionistButton.setOnClickListener(v -> {
+            if (selectedProfile != null) {
+                String usernameToReactivate = selectedProfile.getUsername();
+                approveNutritionist.approveNutritionist(usernameToReactivate);
+                selectedProfile.setStatus("active"); // Update the profile status
+                Toast.makeText(getActivity(), "Nutritionist Approved: " + usernameToReactivate, Toast.LENGTH_SHORT).show();
+
+                // Redirect to ViewAccountsFragment after reactivation
+                redirectToViewAccountsFragment();
+            } else {
+                Toast.makeText(getActivity(), "No Nutritionist to approve.", Toast.LENGTH_SHORT).show();
             }
         });
 

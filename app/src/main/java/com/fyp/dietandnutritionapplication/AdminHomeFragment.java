@@ -63,6 +63,7 @@ public class AdminHomeFragment extends Fragment {
         Button addAdminButton = view.findViewById(R.id.addAdminButton);
         Button viewFAQsButton = view.findViewById(R.id.viewFAQbutton);
         Button addFAQButton = view.findViewById(R.id.addFAQbutton);
+        Button viewPendingNutri = view.findViewById(R.id.viewPendingNutri);
 
         // Initialize promo code input and button
         promoCodeInput = view.findViewById(R.id.promoCodeInput);
@@ -87,6 +88,15 @@ public class AdminHomeFragment extends Fragment {
             FragmentManager fragmentManager = getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.frame_layout, new AddAdminFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        viewPendingNutri.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new viewPendingNutritionistFragment()); // Ensure R.id.frame_layout is the container in your activity
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });

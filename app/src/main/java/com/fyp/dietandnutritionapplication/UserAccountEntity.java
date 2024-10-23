@@ -2,6 +2,7 @@ package com.fyp.dietandnutritionapplication;
 
 import static java.security.AccessController.getContext;
 
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -81,25 +82,31 @@ public class UserAccountEntity {
 
                             for (QueryDocumentSnapshot document : querySnapshot) {
                                 String role = document.getString("role");
+                                String status = document.getString("status");
 
                                 switch (role) {
                                     case "user":
                                         User user = createUserFromDocument(document);
+                                        user.setStatus(status);
                                         users.add(user);
-                                        user.setStatus(document.getString("status"));
                                         accounts.add(user);
                                         break;
+
                                     case "admin":
                                         Admin admin = createAdminFromDocument(document);
+                                        admin.setStatus(status);
                                         admins.add(admin);
-                                        admin.setStatus(document.getString("status"));
                                         accounts.add(admin);
-
                                         break;
+
                                     case "nutritionist":
-                                        Nutritionist nutritionist = createNutritionistFromDocument(document);
-                                        nutritionists.add(nutritionist);
-                                        accounts.add(nutritionist);
+                                        // Only add if the nutritionist has an "active" status
+                                        if ("active".equalsIgnoreCase(status)) {
+                                            Nutritionist nutritionist = createNutritionistFromDocument(document);
+                                            nutritionist.setStatus(status);
+                                            nutritionists.add(nutritionist);
+                                            accounts.add(nutritionist);
+                                        }
                                         break;
                                 }
                             }
@@ -117,6 +124,51 @@ public class UserAccountEntity {
 
     public void retrieveNutritionists(final DataCallback callback) {
         db.collection("Users").get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null) {
+                            admins.clear();
+                            users.clear();
+                            nutritionists.clear();
+                            accounts.clear();
+
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                String role = document.getString("role");
+
+                                switch (role) {
+                                    case "user":
+                                        User user = createUserFromDocument(document);
+                                        users.add(user);
+                                        accounts.add(user);
+                                        break;
+                                    case "admin":
+                                        Admin admin = createAdminFromDocument(document);
+                                        admins.add(admin);
+                                        accounts.add(admin);
+                                        break;
+                                    case "nutritionist":
+                                        Nutritionist nutritionist = createNutritionistFromDocument(document);
+                                        nutritionists.add(nutritionist);
+                                        accounts.add(nutritionist);
+                                        break;
+                                }
+                            }
+                            nutriProfiles.addAll(nutritionists);
+                            callback.onSuccess(nutriProfiles);
+                        } else {
+                            callback.onFailure(new Exception("QuerySnapshot is null"));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
+
+    public void retrievePendingNutritionists(final DataCallback callback) {
+        db.collection("Users")
+                .whereEqualTo("role", "nutritionist")
+                .whereEqualTo("status", "pending").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
@@ -203,6 +255,8 @@ public class UserAccountEntity {
 
     private User createUserFromDocument(QueryDocumentSnapshot document) {
         User user = new User();
+
+        // Set basic fields
         user.setUsername(document.getString("username"));
         user.setRole(document.getString("role"));
         user.setFirstName(document.getString("firstName"));
@@ -213,14 +267,30 @@ public class UserAccountEntity {
         user.setGender(document.getString("gender"));
         user.setRole(document.getString("role"));
         user.setDateJoined(document.getString("dateJoined"));
-        user.setCalorieLimit(document.getLong("calorieLimit").intValue());
+
+        // Handle calorieLimit safely with a null check
+        Long calorieLimit = document.getLong("calorieLimit");
+        if (calorieLimit != null) {
+            user.setCalorieLimit(calorieLimit.intValue());
+        } else {
+            user.setCalorieLimit(0); // Set a default value if null
+        }
+
+        // Set other fields
         user.setDietaryPreference(document.getString("dietPreference"));
-        user.setFoodAllergies(document.getString("healthGoal"));
-        user.setHealthGoal(document.getString("foodAllergies"));
-        user.setCurrentWeight(document.getDouble("currentWeight"));
-        user.setCurrentHeight(document.getDouble("currentHeight"));
+        user.setFoodAllergies(document.getString("foodAllergies"));
+        user.setHealthGoal(document.getString("healthGoal"));
+
+        // Check null for weight and height
+        Double currentWeight = document.getDouble("currentWeight");
+        user.setCurrentWeight(currentWeight != null ? currentWeight : 0.0);
+
+        Double currentHeight = document.getDouble("currentHeight");
+        user.setCurrentHeight(currentHeight != null ? currentHeight : 0.0);
+
         user.setActivityLevel(document.getString("activityLevel"));
         user.setStatus(document.getString("status"));
+
         return user;
     }
 
@@ -314,7 +384,6 @@ public class UserAccountEntity {
                     }
                 });
     }
-
 
     public void registerNutri(String firstName, String lastName, String userName, String email, String phone, String gender, String password, String specialization, String experience, String datejoined, Context context, RegisterCallback callback) {
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -686,6 +755,84 @@ public class UserAccountEntity {
                         callback.onFailure("Query failed: " + task.getException().getMessage());
                     }
                 });
+    }
+
+    public void approveNutritionist(String username, RegisterCallback callback) {
+        if (username == null) {
+            Log.e("UserAccountEntity", "Username cannot be null");
+            callback.onFailure("Invalid input: Username cannot be null");
+            return;
+        }
+
+        // Define the hard-coded updates for status
+        final Map<String, Object> updatedFields = new HashMap<>();
+        updatedFields.put("status", "active"); // Change status to inactive
+
+        Log.d("UserAccountEntity", "Attempting to approve Nutritionist: " + username);
+
+        db.collection("Users") // Replace with your Firestore collection name
+                .whereEqualTo("username", username) // Query to find the user by username
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (task.getResult() != null && !task.getResult().isEmpty()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d("UserAccountEntity", "User found: " + document.getId());
+
+                                String email = document.getString("email");
+                                if (email == null) {
+                                    Log.e("UserAccountEntity", "Email not found for user: " + username);
+                                    callback.onFailure("Email not found for user");
+                                    return;
+                                }
+
+                                db.collection("Users").document(document.getId())
+                                        .update(updatedFields)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d("UserAccountEntity", "User profile updated successfully.");
+                                            sendApprovalEmail(email, callback);
+                                            callback.onSuccess("Approval successful! A verification email has been sent to the nutritionist.");
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("UserAccountEntity", "Error updating user profile", e);
+                                            callback.onFailure(e.getMessage());
+                                        });
+                                break; // Exit the loop after updating the first match
+                            }
+                        } else {
+                            Log.e("UserAccountEntity", "User not found for username: " + username);
+                            callback.onFailure("User not found");
+                        }
+                    } else {
+                        Log.e("UserAccountEntity", "Query failed: " + task.getException());
+                        callback.onFailure("Query failed: " + task.getException().getMessage());
+                    }
+                });
+    }
+
+    private void sendApprovalEmail(String email, RegisterCallback callback) {
+        if (email == null || email.isEmpty()) {
+            callback.onFailure("Invalid email address.");
+            return;
+        }
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.sendSignInLinkToEmail(email, getEmailActionSettings())
+                .addOnCompleteListener(emailTask -> {
+                    if (emailTask.isSuccessful()) {
+                        callback.onSuccess("Approval successful! A verification email has been sent to the nutritionist."); // Notify success after sending email
+                    } else {
+                        callback.onFailure("Failed to send approval email: " + emailTask.getException().getMessage());
+                    }
+                });
+    }
+
+    private ActionCodeSettings getEmailActionSettings() {
+        return ActionCodeSettings.newBuilder()
+                .setUrl("https://your-app-link.com/verify") // Your app's verification link
+                .setHandleCodeInApp(true)
+                .setAndroidPackageName("com.fyp.dietandnutritionapplication", true, null)
+                .build();
     }
 
     private void retrieveUsername(String userId,Context context) {

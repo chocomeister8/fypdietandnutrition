@@ -14,7 +14,7 @@ public class Nutritionist extends Profile {
     public Nutritionist() {
         super();
         this.setRole("nutritionist");
-        this.setStatus("active");
+        this.setStatus("pending");
     }
 
     // Parameterized constructor
@@ -34,7 +34,7 @@ public class Nutritionist extends Profile {
         this.setSpecialization(specialization);
         this.setExperience(experience);
         this.setRole("nutritionist");
-        this.setStatus("active");
+        this.setStatus("pending");
     }
 
     //for consulationUFragement class
