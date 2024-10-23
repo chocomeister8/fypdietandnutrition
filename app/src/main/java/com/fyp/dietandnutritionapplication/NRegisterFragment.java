@@ -107,8 +107,8 @@ public class NRegisterFragment extends Fragment {
         radioGroupRole = view.findViewById(R.id.radioGroupRole);
         RadioButton userRadioButton = view.findViewById(R.id.rbUser);
         RadioButton nutritionistRadioButton = view.findViewById(R.id.rbnutri);
-        specializationEditText = view.findViewById(R.id.specialization);
-        experienceEditText = view.findViewById(R.id.experience);
+        specializationEditText = view.findViewById(R.id.specializationEditText);
+        experienceEditText = view.findViewById(R.id.experienceEditText);
 
         if (getArguments() != null) {
             String role = getArguments().getString("role");

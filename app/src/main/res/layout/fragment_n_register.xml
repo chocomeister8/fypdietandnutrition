@@ -203,7 +203,7 @@
         </LinearLayout>
 
         <EditText
-            android:id="@+id/specialization"
+            android:id="@+id/specializationEditText"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginStart="20dp"
@@ -216,7 +216,7 @@
             app:layout_constraintTop_toBottomOf="@id/pwLayout" />
 
         <EditText
-            android:id="@+id/experience"
+            android:id="@+id/experienceEditText"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginStart="20dp"
@@ -230,7 +230,7 @@
             android:maxLines="6"
             android:scrollbars="vertical"
             android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/specialization" />
+            app:layout_constraintTop_toBottomOf="@id/specializationEditText" />
 
         <!-- Register Button -->
         <LinearLayout
@@ -240,7 +240,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="20dp"
-            app:layout_constraintTop_toBottomOf="@id/experience">
+            app:layout_constraintTop_toBottomOf="@id/experienceEditText">
 
             <RadioGroup
                 android:id="@+id/radioGroupRole"
