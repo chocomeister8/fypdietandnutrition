@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-public class NavRecommendedRecipesFragment extends Fragment {
+public class NavRecommendedRecipesFragment extends Fragment implements NavRecommendedRecipesController.OnRecommendedRecipesRetrievedListener {
 
     private FirebaseFirestore firestore;
     private double userCalorieGoal;
@@ -74,6 +76,8 @@ public class NavRecommendedRecipesFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
+//        String userID = getUserId();
+//        retrieveRecommendedRecipes(userID);
         searchEditText = view.findViewById(R.id.search_recipe);
 
         // Setup spinners
@@ -153,10 +157,6 @@ public class NavRecommendedRecipesFragment extends Fragment {
                 .addOnFailureListener(e -> Log.e("Calorie Goal", "Failed to retrieve calorie goal", e));
     }
 
-    private String getUserId() {
-        // Return the current user's ID, possibly from FirebaseAuth or another source
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
-    }
 
     private void filterRecipes() {
         String searchQuery = searchEditText.getText().toString().trim();
@@ -273,58 +273,86 @@ public class NavRecommendedRecipesFragment extends Fragment {
 
     }
 
+//    private void fetchRecipes(String query, String mealType, String dishType) {
+//        String app_id = "2c7710ea"; // Your Edamam API app ID
+//        String app_key = "97f5e9187c865600f74e2baa358a9efb";
+//        String type = "public";
+//
+//        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
+//
+//        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type, null, mealType, dishType, null);
+//
+//        call.enqueue(new Callback<RecipeResponse>() {
+//            @Override
+//            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    List<RecipeResponse.Hit> hits = response.body().getHits();
+//
+//                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
+//
+//                    // Clear previous recipes
+//                    recipeList.clear();
+//
+//                    for (RecipeResponse.Hit hit : hits) {
+//                        Recipe recipe = hit.getRecipe();
+//                        double caloriesPer100g = recipe.getCaloriesPer100g();
+//
+//                        if (recipe.getTotalWeight() > 0) {
+//                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+//                        }
+//
+//                        recipe.setCaloriesPer100g(caloriesPer100g);
+//
+//                        // Filter recipes based on user's calorie goal
+//                        if (recipe.getCalories() <= userCalorieGoal) {
+//                            recipeList.add(recipe); // Add only recipes that meet the calorie goal
+//                        }
+//                    }
+//                    recipeAdapter.notifyDataSetChanged();
+//
+//                    if (!initialLoadDone) {
+//                        setupSpinnerListeners();
+//                        setupSearchBar();
+//                        initialLoadDone = true; // Set flag to true after first fetch
+//                    }
+//                } else {
+//                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<RecipeResponse> call, Throwable t) {
+//                Log.e("Fetch Recipes", "Error: " + t.getMessage());
+//            }
+//        });
+//    }
+
+
     private void fetchRecipes(String query, String mealType, String dishType) {
-        String app_id = "2c7710ea"; // Your Edamam API app ID
-        String app_key = "97f5e9187c865600f74e2baa358a9efb";
-        String type = "public";
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            NavRecommendedRecipesController navRecommendedRecipesController = new NavRecommendedRecipesController();
 
-        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type, null, mealType, dishType, null);
-
-        call.enqueue(new Callback<RecipeResponse>() {
-            @Override
-            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<RecipeResponse.Hit> hits = response.body().getHits();
-
-                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
-
-                    // Clear previous recipes
+            // Call retrieveRecommendedRecipes with userId and an implementation of the listener
+            navRecommendedRecipesController.retrieveRecommendedRecipes(userId, getContext(), new NavRecommendedRecipesController.OnRecommendedRecipesRetrievedListener() {
+                @Override
+                public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
+                    // Handle the retrieved recipes
                     recipeList.clear();
-
-                    for (RecipeResponse.Hit hit : hits) {
-                        Recipe recipe = hit.getRecipe();
-                        double caloriesPer100g = recipe.getCaloriesPer100g();
-
-                        if (recipe.getTotalWeight() > 0) {
-                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                        }
-
-                        recipe.setCaloriesPer100g(caloriesPer100g);
-
-                        // Filter recipes based on user's calorie goal
-                        if (recipe.getCalories() <= userCalorieGoal) {
-                            recipeList.add(recipe); // Add only recipes that meet the calorie goal
-                        }
-                    }
+                    recipeList.addAll(recipes);
                     recipeAdapter.notifyDataSetChanged();
-
-                    if (!initialLoadDone) {
-                        setupSpinnerListeners();
-                        setupSearchBar();
-                        initialLoadDone = true; // Set flag to true after first fetch
-                    }
-                } else {
-                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
                 }
-            }
 
-            @Override
-            public void onFailure(Call<RecipeResponse> call, Throwable t) {
-                Log.e("Fetch Recipes", "Error: " + t.getMessage());
-            }
-        });
+                @Override
+                public void onError(Exception e) {
+                    // Handle errors
+                    Toast.makeText(getContext(), "Error retrieving recommended recipes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private String getRandomSimpleFoodSearch() {
@@ -334,5 +362,40 @@ public class NavRecommendedRecipesFragment extends Fragment {
             Log.w("Random Search", "Simple food searches list is empty!");
             return ""; // Return an empty string or handle it appropriately
         }
+    }
+
+    private String getUserId() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        return (auth.getCurrentUser() != null) ? auth.getCurrentUser().getUid() : null;
+    }
+
+    private void retrieveRecommendedRecipes(String userId) {
+        NavRecommendedRecipesController recommendRecipesController = new NavRecommendedRecipesController();
+        recommendRecipesController.retrieveRecommendedRecipes(getUserId(), getContext(), new NavRecommendedRecipesController.OnRecommendedRecipesRetrievedListener() {
+            @Override
+            public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
+                recipeList.clear();
+                recipeList.addAll(recipes);
+                recipeAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("NavRecommendedRecipes", "Error retrieving recommended recipes: " + e.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
+        // Update the UI with the retrieved recommended recipes
+        recipeList.clear();
+        recipeList.addAll(recipes);
+        recipeAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onError(Exception e) {
+
     }
 }
