@@ -145,14 +145,8 @@ public class UserMealRecordFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
-
-    private static final int MAX_MEAL_RECORDS = 3;
-    private int mealCount = 0;
     private static final int REQUEST_CODE_PERMISSIONS = 1001;
     private static final int REQUEST_IMAGE_PICK = 103;
-
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
 
 
     @SuppressLint("MissingInflatedId")
@@ -164,9 +158,6 @@ public class UserMealRecordFragment extends Fragment {
         userMealRecordController = new UserMealRecordController();
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
-
-        sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
 
         dateTextView = view.findViewById(R.id.dateTextView);
         calorieLimitTextView = view.findViewById(R.id.progress_calorielimit);
@@ -201,11 +192,6 @@ public class UserMealRecordFragment extends Fragment {
             String userId = currentUser.getUid();
             Log.d("MealLogFragment", "User is logged in with ID: " + userId);
             initializeLoggedInUser(view, userId);
-        } else {
-            Log.d("MealLogFragment", "No user is logged in. Initializing guest mode.");
-            clearMealLogUI();
-            resetMealInsertionCount();
-            initializeGuestUser(view);
         }
 
         return view;
@@ -243,14 +229,7 @@ public class UserMealRecordFragment extends Fragment {
         });
     }
 
-    private void initializeGuestUser(View view) {
-        clearMealLogUI();
-        hideNotificationBadge();
-        mealOptionButton1 = view.findViewById(R.id.camera_icon);
-        mealOptionButton2 = view.findViewById(R.id.snap_photo_text);
-        mealOptionButton1.setOnClickListener(v -> checkMealInsertLimit(null));
-        mealOptionButton2.setOnClickListener(v -> checkMealInsertLimit(null));
-    }
+
 
     private void openCameraWithMealType(String mealType) {
         selectedMealType = mealType;
@@ -318,7 +297,6 @@ public class UserMealRecordFragment extends Fragment {
             Toast.makeText(getActivity(), "Operation canceled.", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     private void uploadImageToFirebaseStorage(Bitmap imageBitmap, OnImageUploadListener listener) {
         // Create a file to save the bitmap
@@ -649,7 +627,6 @@ public class UserMealRecordFragment extends Fragment {
         void onIngredientFetched(RecognizedIngredient ingredient);
     }
 
-
     private void showFallbackOptions(String userId, String selectedMealType) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Recognition Failed")
@@ -799,27 +776,6 @@ public class UserMealRecordFragment extends Fragment {
     }
 
     public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
-        if (userId == null) {
-            // For guests, proceed without fetching user-specific data
-            Log.d("MealLogFragment", "Guest is logging a meal. Proceeding without user-specific data.");
-
-            String username = "Guest";
-            double calorieLimit = 2000;
-
-            performMealLogOperations(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, isUpdate, mealRecordID, imageURL);
-
-        } else {
-            if (userId != null) {
-                Log.d("Test3 10/24/2024", userId);
-                // Proceed with the flow for logged-in users
-                performMealLogOperations(userId, foodName, servingSize, servingUnit, selectedMealType, selectedDate, isUpdate, mealRecordID, imageURL);
-            } else {
-                Log.e("MealLogFragment", "Failed to fetch user data.");
-            }
-        }
-    }
-
-    private void performMealLogOperations(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
         userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
             @Override
             public void onDataFetched(String username, double calorielimit) {
@@ -1332,56 +1288,11 @@ public class UserMealRecordFragment extends Fragment {
         fatsTextView.setText("0g");
     }
 
-    private void hideNotificationBadge() {
-        notificationBadgeTextView.setVisibility(View.GONE);
-    }
-
-    private void checkMealInsertLimit(String userId) {
-        int mealCount = getMealInsertionCount();
-        if (mealCount >= MAX_MEAL_RECORDS) {
-            showRegisterPrompt();
-        } else {
-            incrementMealInsertionCount();
-            showMealOptionDialog(userId);
-        }
-    }
-
-    private int getMealInsertionCount() {
-        return sharedPreferences.getInt("mealCount", 0); // Default is 0
-    }
-
-    private void incrementMealInsertionCount() {
-        int currentCount = getMealInsertionCount();
-        editor.putInt("mealCount", currentCount + 1);
-        editor.apply();
-    }
-
-    private void showRegisterPrompt() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Limit Reached")
-                .setMessage("You have reached the limit of 5 meal entries. Please register to add more.")
-                .setPositiveButton("Register", (dialog, which) -> {
-                    // Redirect to registration page
-                    ((MainActivity) getActivity()).replaceFragment(new URegisterFragment());
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    private void resetMealInsertionCount() {
-        editor.putInt("mealCount", 0);
-        editor.apply();
-    }
-
     private void showMealOptionDialog(String userId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.meal_log_dialog_meal_type_selection, null);
-
-        if (userId == null) {
-            checkMealInsertLimit(null);
-        }
 
         Spinner mealTypeSpinner = dialogView.findViewById(R.id.mealTypeSpinner);
 
