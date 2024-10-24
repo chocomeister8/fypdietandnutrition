@@ -116,8 +116,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     // Method to update the recipe list and notify the adapter
     public void updateRecipeList(List<Recipe> newRecipeList) {
-        this.recipeList = new ArrayList<>(newRecipeList); // Create a new list to avoid modifying the original list
-        notifyDataSetChanged(); // Notify the adapter to refresh the views
+        this.recipeList.clear();  // Clear the current list
+        this.recipeList.addAll(newRecipeList);  // Add new data
+        notifyDataSetChanged();  // Notify the adapter to refresh
     }
 
 

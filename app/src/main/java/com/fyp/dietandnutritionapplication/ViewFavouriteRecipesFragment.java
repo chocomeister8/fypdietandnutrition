@@ -22,6 +22,10 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +34,10 @@ import java.util.Random;
 public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouriteRecipesController.OnFavoriteRecipesRetrievedListener {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
+    private RecipeAdapter recipeNewAdapter;
     private List<Recipe> recipeList;
+    private List<Recipe> recipeNewList;
+    private List<Recipe> APIRecipeList;
     private EditText searchEditText;
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
@@ -73,12 +80,15 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
+        APIRecipeList = new ArrayList<>();
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
 //        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
         fetchFavoriteRecipes();
+        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        displayFavouriteRecipes();
 
         // Setup spinners
         mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
@@ -261,52 +271,76 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 
 
 
-//    private void fetchRecipes(String query, String mealType, String dishType) {
-//        String app_id = "2c7710ea"; // Your Edamam API app ID
-//        String app_key = "97f5e9187c865600f74e2baa358a9efb";
-//        String type = "public";
-//
-//        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-//
-//        // Assuming the API requires meal type and dish type as separate parameters
-//        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType, null);
-//
-//        call.enqueue(new Callback<RecipeResponse>() {
-//            @Override
-//            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-//                if (response.isSuccessful() && response.body() != null) {
-//                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
-//
-//                    // Debugging: Log the number of recipes fetched
-//                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
-//
-//                    // Clear previous recipes
-//                    recipeList.clear();
-//
-//                    for (RecipeResponse.Hit hit : hits) {
-//                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
-//
-//                        double caloriesPer100g = recipe.getCaloriesPer100g();
-//                        if (recipe.getTotalWeight() > 0) {
-//                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-//                        }
-//                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-//
-//                        recipeList.add(recipe);
-//                    }
-//
-//                    recipeAdapter.notifyDataSetChanged();
-//                } else {
-//                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<RecipeResponse> call, Throwable t) {
-//                Log.e("Fetch Recipes", "Error: " + t.getMessage());
-//            }
-//        });
-//    }
+    private void fetchRecipes(String query, String mealType, String dishType) {
+        String app_id = "2c7710ea"; // Your Edamam API app ID
+        String app_key = "97f5e9187c865600f74e2baa358a9efb";
+        String type = "public";
+
+        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
+
+        // Assuming the API requires meal type and dish type as separate parameters
+        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType, null);
+
+        call.enqueue(new Callback<RecipeResponse>() {
+            @Override
+            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+
+                    // Debugging: Log the number of recipes fetched
+                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
+
+                    // Clear previous recipes
+                    APIRecipeList.clear();
+
+                    for (RecipeResponse.Hit hit : hits) {
+                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
+
+                        double caloriesPer100g = recipe.getCaloriesPer100g();
+                        if (recipe.getTotalWeight() > 0) {
+                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                        }
+                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                        APIRecipeList.add(recipe);
+                    }
+
+                } else {
+                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RecipeResponse> call, Throwable t) {
+                Log.e("Fetch Recipes", "Error: " + t.getMessage());
+            }
+        });
+    }
+
+    public void displayFavouriteRecipes() {
+        // Ensure recipeNewList is initialized
+        if (recipeNewList == null) {
+            recipeNewList = new ArrayList<>(); // Initialize if null
+        } else {
+            recipeNewList.clear(); // Clear if already initialized
+        }
+
+        // Compare the two recipe lists (recipeList and APIRecipeList)
+        for (Recipe recipe1 : recipeList) {
+            for (Recipe recipe2 : APIRecipeList) {
+                // Compare by both label and calories
+                if (recipe1.getLabel().equals(recipe2.getLabel())) {
+                    recipeNewList.add(recipe2); // Add matching recipe to the new list
+                    break;  // Exit inner loop once a match is found
+                }
+            }
+        }
+
+        // Notify the adapter that the data has changed
+        recipeList.clear();
+        recipeList.addAll(recipeNewList);
+        recipeAdapter.notifyDataSetChanged();
+    }
 
 
     private String getRandomSimpleFoodSearch() {
