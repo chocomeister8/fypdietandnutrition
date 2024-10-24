@@ -252,7 +252,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         // Notify the adapter about data changes
         recipeAdapter.notifyDataSetChanged();
 
-        Toast.makeText(getContext(), "Recipes retrieved successfully!", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), "Recipes retrieved successfully!", Toast.LENGTH_SHORT).show();
     }
 
     @Override

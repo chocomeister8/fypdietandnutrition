@@ -54,7 +54,6 @@ public class RecommendedRecipesEntity {
                                         }
                                     }
                                     listener.onRecipesRetrieved(recipes);
-                                    Toast.makeText(context, "Recipes retrieved successfully", Toast.LENGTH_SHORT).show();
                                 })
                                 .addOnFailureListener(e -> {
                                     listener.onError(e);
