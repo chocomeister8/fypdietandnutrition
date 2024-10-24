@@ -69,10 +69,6 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
-        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
-
-
-        searchEditText = view.findViewById(R.id.search_recipe);
 
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.recipe_recycler_view);
@@ -90,6 +86,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         fetchRecipes(getRandomSimpleFoodSearch(), null, null);
         displayFavouriteRecipes();
 
+        searchEditText = view.findViewById(R.id.search_recipe);
         // Setup spinners
         mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
         dishTypeSpinner = view.findViewById(R.id.spinner_dish_type);
@@ -112,8 +109,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
             // Apply the filters with the restored values
             filterRecipes();
         } else {
-            // Fetch recipes with default random query if no arguments exist
-//            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+            fetchFavoriteRecipes();
         }
 
         // Set up button click listeners
@@ -123,11 +119,12 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
-        button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
         clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
+
+        fetchFavoriteRecipes();
 
         return view;
     }
@@ -147,16 +144,43 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
     }
 
     private void filterRecipes() {
-        String searchQuery = searchEditText.getText().toString().trim();
+        Log.d("FilterRecipes", "Total Recipes Available: " + recipeList.size());
+
+        String searchQuery = searchEditText.getText().toString().trim().toLowerCase();
         String selectedMealType = mealTypeSpinner.getSelectedItem() != null ? mealTypeSpinner.getSelectedItem().toString() : "--Select Meal Type--";
         String selectedDishType = dishTypeSpinner.getSelectedItem() != null ? dishTypeSpinner.getSelectedItem().toString() : "--Select Dish Type--";
 
         // Log the current selections
         Log.d("FilterRecipes", "Search Query: " + searchQuery + ", Meal Type: " + selectedMealType + ", Dish Type: " + selectedDishType);
 
-        // Call fetchRecipes with all current parameters
-//        fetchRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
-//                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
+        // Create a new list to hold filtered recipes
+        List<Recipe> filteredList = new ArrayList<>();
+
+        // Check if search query is empty and both spinners are set to default
+        boolean isSearchEmpty = searchQuery.isEmpty();
+        boolean isMealTypeDefault = selectedMealType.equals("--Select Meal Type--");
+        boolean isDishTypeDefault = selectedDishType.equals("--Select Dish Type--");
+
+        for (Recipe recipe : recipeList) {
+            boolean matchesSearchQuery = isSearchEmpty || recipe.getLabel().toLowerCase().contains(searchQuery);
+            boolean matchesMealType = isMealTypeDefault || recipe.getMealType().equals(selectedMealType);
+            boolean matchesDishType = isDishTypeDefault || recipe.getDishType().equals(selectedDishType);
+
+            // Check if the recipe matches the search query and selected types
+            if (matchesSearchQuery && matchesMealType && matchesDishType) {
+                filteredList.add(recipe);
+            }
+        }
+        if (filteredList.isEmpty() && isSearchEmpty) {
+            filteredList.addAll(recipeList); // Show all recipes
+        }
+        if (isSearchEmpty)
+        {
+            fetchFavoriteRecipes();
+        }
+
+        // Update the adapter with the filtered list
+        recipeAdapter.updateRecipeList(filteredList);
     }
 
     private void setupSpinnerListeners() {
@@ -211,8 +235,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         // Clear the search bar
         searchEditText.setText(""); // This will clear the search bar
 
-        // Fetch recipes with a random query
-//        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        fetchFavoriteRecipes();
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -226,7 +249,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         // From NavAllRecipesFragment
         Bundle bundle = new Bundle();
         bundle.putParcelable("selected_recipe", recipe);  // Assuming selectedRecipe is the clicked recipe object
-        bundle.putString("source", "all");  // Pass "all" as the source
+        bundle.putString("source", "fav");  // Pass "all" as the source
         bundle.putString("search_query", searchEditText.getText().toString());  // Pass the search query
         bundle.putInt("spinner1_value", mealTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner1
         bundle.putInt("spinner2_value", dishTypeSpinner.getSelectedItemPosition());  // Pass the selected position of spinner2
@@ -259,6 +282,8 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 
         // Notify the adapter about data changes
         recipeAdapter.notifyDataSetChanged();
+
+        filterRecipes();
 
         Toast.makeText(getContext(), "Recipes retrieved successfully!", Toast.LENGTH_SHORT).show();
     }

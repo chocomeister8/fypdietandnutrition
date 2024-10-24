@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class viewPendingNutritionistFragment extends Fragment {
     private Spinner roleSpinner;
     private ProfileAdapter adapter; // Ensure you have a ProfileAdapter to handle Profile objects
     private EditText searchAdminEditText;
+    private TextView noPendingNutritionistText;
     private String selectedRole = "All Users"; // To keep track of the selected role
     private String searchText = ""; // To keep track of the search text
 
@@ -51,6 +53,7 @@ public class viewPendingNutritionistFragment extends Fragment {
 
         listView = view.findViewById(R.id.listView);
         searchAdminEditText = view.findViewById(R.id.searchNutriEditText);
+        noPendingNutritionistText = view.findViewById(R.id.no_pending_nutritionist_text); // Add the TextView reference
 
         // Initialize and set up the ProfileAdapter
         adapter = new ProfileAdapter(getContext(), profiles);
@@ -65,6 +68,14 @@ public class viewPendingNutritionistFragment extends Fragment {
                 originalProfiles.clear();
                 originalProfiles.addAll(accounts);
                 adapter.notifyDataSetChanged();
+
+                if (profiles.isEmpty()) {
+                    noPendingNutritionistText.setVisibility(View.VISIBLE);
+                    listView.setVisibility(View.GONE);
+                } else {
+                    noPendingNutritionistText.setVisibility(View.GONE);
+                    listView.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override

@@ -87,6 +87,17 @@
 
     </GridLayout>
 
+    <TextView
+        android:id="@+id/no_pending_nutritionist_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="No pending nutritionists yet"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayout" /> <!-- Initially hidden -->
+
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
@@ -94,6 +105,6 @@
         android:background="#9DF8EA"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gridLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/no_pending_nutritionist_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

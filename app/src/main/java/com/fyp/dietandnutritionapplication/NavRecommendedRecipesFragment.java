@@ -40,13 +40,10 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
 
     private FirebaseFirestore firestore;
     private double userCalorieGoal;
-    private String userDietaryPreference;
-    private String userAllergies;
-    private String calorieGoalString;
 
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
-    private List<Recipe> recipeList = new ArrayList<>();
+    private List<Recipe> recipeList;
     private EditText searchEditText;
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
@@ -72,15 +69,15 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
         View view = inflater.inflate(R.layout.nav_recommended_recipes, container, false);
 
         firestore = FirebaseFirestore.getInstance();
-        fetchUserCalorieGoal();
         // Initialize RecyclerView
         recyclerView = view.findViewById(R.id.recipe_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        recipeList = new ArrayList<>();
         APIRecipeList = new ArrayList<>();
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
-//        String userID = getUserId();
-//        retrieveRecommendedRecipes(userID);
+
         searchEditText = view.findViewById(R.id.search_recipe);
 
         // Setup spinners
@@ -111,10 +108,11 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
             searchEditText.setText(savedSearchQuery);
             mealTypeSpinner.setSelection(savedMealTypePos);
             dishTypeSpinner.setSelection(savedDishTypePos);
+            filterRecipes();
 
         } else if (!initialLoadDone) {
             // Fetch recipes with a default random query only if initial load is not done
-            fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+            fetchRecipes();
         }
 
         // Initialize buttons using view.findViewById
@@ -124,7 +122,6 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
-        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
 
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
         button_vegetarian.setOnClickListener(v -> navigateToFragment(new NavVegetarianRecipesFragment()));
@@ -132,48 +129,50 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
-        button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
 
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
         clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
 
         setupSpinnerListeners();
         setupSearchBar();
+        fetchRecipes();
 
         isViewInitialized = true;
 
         return view;
     }
 
-    private void fetchUserCalorieGoal() {
-        String userId = getUserId(); // Assume you have a method to retrieve the current user's ID
-        firestore.collection("Users")
-                .document(userId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        userCalorieGoal = documentSnapshot.getDouble("calorieLimit");
-                        String calorieGoalString = String.valueOf(userCalorieGoal);
-                        Log.d("Calorie Goal", "User's calorie goal: " + userCalorieGoal);
-                    } else {
-                        Log.w("Calorie Goal", "User document not found");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("Calorie Goal", "Failed to retrieve calorie goal", e));
-    }
-
-
     private void filterRecipes() {
-        String searchQuery = searchEditText.getText().toString().trim();
+        Log.d("FilterRecipes", "Total Recipes Available: " + recipeList.size());
+
+        String searchQuery = searchEditText.getText().toString().trim().toLowerCase();
         String selectedMealType = mealTypeSpinner.getSelectedItem() != null ? mealTypeSpinner.getSelectedItem().toString() : "--Select Meal Type--";
         String selectedDishType = dishTypeSpinner.getSelectedItem() != null ? dishTypeSpinner.getSelectedItem().toString() : "--Select Dish Type--";
 
         // Log the current selections
         Log.d("FilterRecipes", "Search Query: " + searchQuery + ", Meal Type: " + selectedMealType + ", Dish Type: " + selectedDishType);
 
-        // Call fetchRecipes with all current parameters
-        fetchRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
-                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
+        // Create a new list to hold filtered recipes
+        List<Recipe> filteredList = new ArrayList<>();
+
+        // Check if search query is empty and both spinners are set to default
+        boolean isSearchEmpty = searchQuery.isEmpty();
+        boolean isMealTypeDefault = selectedMealType.equals("--Select Meal Type--");
+        boolean isDishTypeDefault = selectedDishType.equals("--Select Dish Type--");
+
+        for (Recipe recipe : recipeList) {
+            boolean matchesSearchQuery = isSearchEmpty || recipe.getLabel().toLowerCase().contains(searchQuery);
+            boolean matchesMealType = isMealTypeDefault || recipe.getMealType().equals(selectedMealType);
+            boolean matchesDishType = isDishTypeDefault || recipe.getDishType().equals(selectedDishType);
+
+            // Check if the recipe matches the search query and selected types
+            if (matchesSearchQuery && matchesMealType && matchesDishType) {
+                filteredList.add(recipe);
+            }
+        }
+
+        // Update the adapter with the filtered list
+        recipeAdapter.updateRecipeList(filteredList);
     }
 
     private void setupSpinners() {
@@ -251,7 +250,7 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
         searchEditText.setText(""); // This will clear the search bar
 
         // Fetch recipes with a random query
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        fetchRecipes();
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -333,32 +332,20 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
     }
 
 
-    private void fetchRecipes(String query, String mealType, String dishType) {
+    private void fetchRecipes() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             NavRecommendedRecipesController navRecommendedRecipesController = new NavRecommendedRecipesController();
 
             // Call retrieveRecommendedRecipes with userId and an implementation of the listener
-            navRecommendedRecipesController.retrieveRecommendedRecipes(userId, getContext(), new NavRecommendedRecipesController.OnRecommendedRecipesRetrievedListener() {
-                @Override
-                public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
-                    // Handle the retrieved recipes
-                    recipeList.clear();
-                    recipeList.addAll(recipes);
-                    recipeAdapter.notifyDataSetChanged();
-                }
+            navRecommendedRecipesController.retrieveRecommendedRecipes(userId, getContext(), this);
 
-                @Override
-                public void onError(Exception e) {
-                    // Handle errors
-                    Toast.makeText(getContext(), "Error retrieving recommended recipes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
         } else {
             Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     public void displayRecommendedRecipes() {
         // Ensure recipeNewList is initialized
@@ -385,6 +372,7 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
         recipeAdapter.notifyDataSetChanged();
     }
 
+
     private String getRandomSimpleFoodSearch() {
         if (!simpleFoodSearches.isEmpty()) {
             return simpleFoodSearches.get(random.nextInt(simpleFoodSearches.size()));
@@ -399,29 +387,14 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
         return (auth.getCurrentUser() != null) ? auth.getCurrentUser().getUid() : null;
     }
 
-    private void retrieveRecommendedRecipes(String userId) {
-        NavRecommendedRecipesController recommendRecipesController = new NavRecommendedRecipesController();
-        recommendRecipesController.retrieveRecommendedRecipes(getUserId(), getContext(), new NavRecommendedRecipesController.OnRecommendedRecipesRetrievedListener() {
-            @Override
-            public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
-                recipeList.clear();
-                recipeList.addAll(recipes);
-                recipeAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.e("NavRecommendedRecipes", "Error retrieving recommended recipes: " + e.getMessage());
-            }
-        });
-    }
-
     @Override
     public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
         // Update the UI with the retrieved recommended recipes
         recipeList.clear();
         recipeList.addAll(recipes);
         recipeAdapter.notifyDataSetChanged();
+
+        filterRecipes();
     }
 
     @Override

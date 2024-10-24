@@ -133,6 +133,8 @@ public class RecipeDetailFragment extends Fragment {
             if (recipe != null) {
                 Log.d("RecipeDetailsFragment", "Recipe found: " + recipe.getLabel());
                 Log.d("RecipeDetailsFragment", "Instructions: " + (recipe.getUrl() != null ? recipe.getUrl() : "Instructions are null"));
+                Log.d("RecipeDetailsFragment", "Instructions: " + (recipe.getInstructions() != null ? recipe.getInstructions() : "Instructions are null"));
+
             } else {
                 Log.d("RecipeDetailsFragment", "No recipe found in bundle.");
             }
@@ -143,6 +145,7 @@ public class RecipeDetailFragment extends Fragment {
 
                     // Assuming recipe.getUrl() returns the instructions URL
                     String instructionsUrl = recipe.getUrl();
+                    String favRecipeInstructions = recipe.getInstructions();
 
                     if (instructionsUrl != null && !instructionsUrl.isEmpty()) {
                         // Create an instance of the WebViewFragment
@@ -153,7 +156,18 @@ public class RecipeDetailFragment extends Fragment {
                                 .replace(R.id.frame_layout, recipeInstructionsFragment) // Make sure 'frame_layout' is your container ID
                                 .addToBackStack(null) // Allows back navigation
                                 .commit();
-                    } else {
+                    }
+                    else if (favRecipeInstructions != null && !favRecipeInstructions.isEmpty()) {
+                        // Create an instance of the WebViewFragment
+                        RecipeInstructionsFragment recipeInstructionsFragment = RecipeInstructionsFragment.newInstance(favRecipeInstructions);
+
+                        // Replace the current fragment with the WebViewFragment
+                        requireActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame_layout, recipeInstructionsFragment) // Make sure 'frame_layout' is your container ID
+                                .addToBackStack(null) // Allows back navigation
+                                .commit();
+                    }
+                    else {
                         Toast.makeText(getActivity(), "No instructions available.", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -172,6 +186,9 @@ public class RecipeDetailFragment extends Fragment {
                 fragment = new NavAllRecipesFragment();
             } else if ("vegetarian".equals(source)) {
                 fragment = new NavVegetarianRecipesFragment();
+            } else if ("fav".equals(source)) {
+                fragment = new ViewFavouriteRecipesFragment();
+
             } else if ("recommended".equals(source)){ // "recommended"
                 fragment = new NavRecommendedRecipesFragment();
             }

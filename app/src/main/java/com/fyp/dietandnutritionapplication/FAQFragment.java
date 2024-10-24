@@ -28,9 +28,11 @@ public class FAQFragment extends Fragment{
     ArrayList<FAQ> faq = new ArrayList<>();
     ArrayList<FAQ> originalFAQ = new ArrayList<>(); // Keep the unfiltered original list
     private EditText searchFAQEditText;
-
-
     private Spinner filterFAQspinner;
+
+    private String savedSearchText = "";
+    private int savedFilterPosition = 0;
+    private int savedScrollPosition = 0;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -80,8 +82,13 @@ public class FAQFragment extends Fragment{
         //FAQAdapter adapter = new FAQAdapter(getContext(), faqs);
         adapter = new FAQAdapter(getContext(), faq);
         FAQListView.setAdapter(adapter);
-
         filterFAQspinner = view.findViewById(R.id.filterFAQSpinner);
+
+        searchFAQEditText.setText(savedSearchText);
+        filterFAQspinner.setSelection(savedFilterPosition);
+
+        // Scroll to the saved scroll position
+        FAQListView.post(() -> FAQListView.setSelection(savedScrollPosition));
 
         List<String> sortFAQ = new ArrayList<>();
         sortFAQ.add("Latest to oldest");
@@ -142,6 +149,11 @@ public class FAQFragment extends Fragment{
 
 
         FAQListView.setOnItemClickListener((parent, view1, position, id) -> {
+
+            savedSearchText = searchFAQEditText.getText().toString();
+            savedFilterPosition = filterFAQspinner.getSelectedItemPosition();
+            savedScrollPosition = FAQListView.getFirstVisiblePosition();
+
             FAQ selectedFAQ = faq.get(position); // Get the selected FAQ
 
             // Create a new instance of FAQDetailsFragment and pass the selected FAQ

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.fyp.dietandnutritionapplication.databinding.ActivityMainBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class AdminLoginFragment extends Fragment {
@@ -33,7 +34,6 @@ public class AdminLoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.adminlogin, container, false);
@@ -60,7 +60,6 @@ public class AdminLoginFragment extends Fragment {
                 loginController.checkLogin(enteredUsername, enteredPassword, getActivity());
             }
         });
-
 
         return view;
     }

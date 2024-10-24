@@ -3,6 +3,7 @@ package com.fyp.dietandnutritionapplication;
 import static java.lang.Double.parseDouble;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -122,6 +123,10 @@ public class RecommendedRecipesEntity {
         List<String> ingredients = Arrays.asList(document.getString("ingredients").split(INGREDIENT_DELIMITER));
         recipe.setIngredientLines(ingredients);
 
+        String instructionsUrl = document.getString("instructions");
+        Log.d("FirestoreDebug", "Instructions URL: " + instructionsUrl); // Log the URL
+        recipe.setInstructions(instructionsUrl);
+
         return recipe;
     }
 
@@ -148,6 +153,7 @@ public class RecommendedRecipesEntity {
             recipeData.put("diet_labels", String.join(", ", recipe.getDietLabels()));
             recipeData.put("health_labels", String.join(", ", recipe.getHealthLabels()));
             recipeData.put("image_url", recipe.getImage());
+            recipeData.put("instructions", recipe.getUrl());
 
             // Format ingredients as a string
             StringBuilder ingredientsBuilder = new StringBuilder();

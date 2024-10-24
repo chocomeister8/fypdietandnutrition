@@ -34,6 +34,7 @@ public class FAQDetailsFragment extends Fragment {
         TextView answerTextView = view.findViewById(R.id.answer);
         TextView datecreatedTextView = view.findViewById(R.id.datecreated);
         Button updateFAQButton = view.findViewById(R.id.updateFAQ);  // Find the updateFAQ button
+        Button backButton = view.findViewById(R.id.faqBack);  // Find the back button
 
 
 
@@ -61,6 +62,14 @@ public class FAQDetailsFragment extends Fragment {
                 transaction.replace(R.id.frame_layout, updateFAQFragment); // Assuming your container ID is fragment_container
                 transaction.addToBackStack(null); // This allows the user to navigate back
                 transaction.commit();
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate back to the previous fragment in the back stack
+                getParentFragmentManager().popBackStack();
             }
         });
 

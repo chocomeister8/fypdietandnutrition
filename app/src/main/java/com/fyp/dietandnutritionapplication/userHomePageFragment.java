@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -53,7 +54,7 @@ public class userHomePageFragment extends Fragment {
             "lunch","dinner"
     );
 
-    private TextView carbsTextView, proteinsTextView, fatsTextView;
+    private TextView carbsTextView, proteinsTextView, fatsTextView, noRecommendationText;
     private int totalCarbs;
     private int totalProteins;
     private int totalFats;
@@ -88,9 +89,11 @@ public class userHomePageFragment extends Fragment {
         Button button_faq = view.findViewById(R.id.FAQ);
         Button button_profile = view.findViewById(R.id.profile);
         Button button_mealLog1 = view.findViewById(R.id.button_MealLog1);
+        noRecommendationText = view.findViewById(R.id.no_recommendation_text);
 
         recyclerView = view.findViewById(R.id.recipeRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
 
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
@@ -98,7 +101,7 @@ public class userHomePageFragment extends Fragment {
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
-        fetchRecipes(getRandomSimpleFoodSearch(), getRandomSMealType(), null);
+        fetchRecipes();
 
         // Set up button click listeners to navigate between fragments
         button_recipes.setOnClickListener(v -> {
@@ -285,85 +288,43 @@ public class userHomePageFragment extends Fragment {
 
                         }
                      });
-
-
                 }
             }
         });
     }
 
-    private void fetchRecipes(String query, String mealType, String dishType) {
-        String app_id = "2c7710ea"; // Your Edamam API app ID
-        String app_key = "97f5e9187c865600f74e2baa358a9efb";
-        String type = "public";
+    private void fetchRecipes() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            NavRecommendedRecipesController navRecommendedRecipesController = new NavRecommendedRecipesController();
 
-        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
-
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type, null, mealType, dishType, null);
-
-        call.enqueue(new Callback<RecipeResponse>() {
-            @Override
-            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<RecipeResponse.Hit> hits = response.body().getHits();
-
-                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
-
-                    // Clear previous recipes
+            // Call retrieveRecommendedRecipes with userId and an implementation of the listener
+            navRecommendedRecipesController.retrieveRecommendedRecipes(userId, getContext(), new NavRecommendedRecipesController.OnRecommendedRecipesRetrievedListener() {
+                @Override
+                public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
+                    // Handle the retrieved recipes
                     recipeList.clear();
-
-                    // Limit to 3 recipes
-                    int count = 0;
-
-                    for (RecipeResponse.Hit hit : hits) {
-                        if (count >= 5) {
-                            break; // Exit the loop after fetching 3 recipes
-                        }
-
-                        Recipe recipe = hit.getRecipe();
-                        double caloriesPer100g = recipe.getCaloriesPer100g();
-
-                        if (recipe.getTotalWeight() > 0) {
-                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
-                        }
-
-                        recipe.setCaloriesPer100g(caloriesPer100g);
-
-                        // Filter recipes based on user's calorie goal
-                        if (recipe.getCalories() <= userCalorieGoal) {
-                            recipeList.add(recipe); // Add only recipes that meet the calorie goal
-                            count++; // Increment the count of recipes added
-                        }
-                    }
-
+                    recipeList.addAll(recipes);
                     recipeAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
+
+                    if (recipes.isEmpty()) {
+                        noRecommendationText.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        noRecommendationText.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<RecipeResponse> call, Throwable t) {
-                Log.e("Fetch Recipes", "Error: " + t.getMessage());
-            }
-        });
-    }
-
-    private String getRandomSimpleFoodSearch() {
-        if (!simpleFoodSearches.isEmpty()) {
-            return simpleFoodSearches.get(random.nextInt(simpleFoodSearches.size()));
+                @Override
+                public void onError(Exception e) {
+                    // Handle errors
+                    Toast.makeText(getContext(), "Error retrieving recommended recipes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
-            Log.w("Random Search", "Simple food searches list is empty!");
-            return ""; // Return an empty string or handle it appropriately
-        }
-    }
-
-    private String getRandomSMealType() {
-        if (!mealtype.isEmpty()) {
-            return mealtype.get(random.nextInt(mealtype.size()));
-        } else {
-            Log.w("Random Search", "Simple food searches list is empty!");
-            return ""; // Return an empty string or handle it appropriately
+            Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
         }
     }
 }

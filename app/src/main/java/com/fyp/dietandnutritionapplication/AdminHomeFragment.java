@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.fyp.dietandnutritionapplication.databinding.ActivityMainBinding;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
@@ -32,11 +34,14 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AdminHomeFragment extends Fragment {
     private BarChart barChart;
@@ -48,6 +53,8 @@ public class AdminHomeFragment extends Fragment {
     private TextView faqCountTextView;
     private EditText promoCodeInput, discountValuesInput; // Add references for promo code and discount
     private Button addPromoCodeButton;
+
+    private ActivityMainBinding binding;
 
     @Nullable
     @Override
@@ -72,6 +79,8 @@ public class AdminHomeFragment extends Fragment {
 
         // Set OnClickListener for the add promo code button
         addPromoCodeButton.setOnClickListener(v -> addPromoCode());
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         // Set an OnClickListener on the viewAccountsButton
         viewAccountsButton.setOnClickListener(v -> {
@@ -163,6 +172,14 @@ public class AdminHomeFragment extends Fragment {
 
         return view;
     }
+
+    private void hideBottomNavigationView() {
+        if (getActivity() instanceof MainActivity) {
+            // Assuming there's a method in MainActivity to hide the bottom navigation
+            ((MainActivity) getActivity()).hideBottomNavigationView();
+        }
+    }
+
     private void fetchAndUpdateProfileData() {
         // Check if barChart is not null before using it
         if (barChart != null) {
@@ -277,7 +294,7 @@ public class AdminHomeFragment extends Fragment {
                         // User confirmed to log out
                         Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                         if (getActivity() instanceof MainActivity) {
-                            ((MainActivity) getActivity()).switchToGuestMode();
+                            hideBottomNavigationView();
                             ((MainActivity) getActivity()).replaceFragment(new AdminLoginFragment());
                         }
                     })

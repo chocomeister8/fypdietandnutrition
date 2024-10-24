@@ -66,7 +66,7 @@
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
                 android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@+id/add_recipe_button"
+                android:layout_toStartOf="@+id/clear_filters_button"
                 android:background="@drawable/rounded_search_bar_background"
                 android:drawableStart="@drawable/ic_search"
                 android:drawablePadding="10dp"
@@ -74,21 +74,6 @@
                 android:inputType="text"
                 android:padding="10dp"
                 android:textColor="#000000" />
-
-            <!-- Add Recipe Button -->
-
-            <!-- Clear Filters Button -->
-
-            <Button
-                android:id="@+id/add_recipe_button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:layout_toStartOf="@+id/clear_filters_button"
-                android:padding="5dp"
-                android:text="Add"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/clear_filters_button"
