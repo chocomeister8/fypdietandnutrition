@@ -135,8 +135,6 @@ public class NavRecommendedRecipesFragment extends Fragment implements NavRecomm
 
         setupSpinnerListeners();
         setupSearchBar();
-        fetchRecipes();
-
         isViewInitialized = true;
 
         return view;

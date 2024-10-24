@@ -80,9 +80,6 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
-        // Fetch recipes
-//        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
-        fetchFavoriteRecipes();
         fetchRecipes(getRandomSimpleFoodSearch(), null, null);
         displayFavouriteRecipes();
 
@@ -108,8 +105,9 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 
             // Apply the filters with the restored values
             filterRecipes();
+
         } else {
-            fetchFavoriteRecipes();
+            fetchFavoriteRecipes("", null,null);
         }
 
         // Set up button click listeners
@@ -123,8 +121,6 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
         clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
-
-        fetchFavoriteRecipes();
 
         return view;
     }
@@ -144,43 +140,16 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
     }
 
     private void filterRecipes() {
-        Log.d("FilterRecipes", "Total Recipes Available: " + recipeList.size());
-
-        String searchQuery = searchEditText.getText().toString().trim().toLowerCase();
+        String searchQuery = searchEditText.getText().toString().trim();
         String selectedMealType = mealTypeSpinner.getSelectedItem() != null ? mealTypeSpinner.getSelectedItem().toString() : "--Select Meal Type--";
         String selectedDishType = dishTypeSpinner.getSelectedItem() != null ? dishTypeSpinner.getSelectedItem().toString() : "--Select Dish Type--";
 
         // Log the current selections
         Log.d("FilterRecipes", "Search Query: " + searchQuery + ", Meal Type: " + selectedMealType + ", Dish Type: " + selectedDishType);
 
-        // Create a new list to hold filtered recipes
-        List<Recipe> filteredList = new ArrayList<>();
-
-        // Check if search query is empty and both spinners are set to default
-        boolean isSearchEmpty = searchQuery.isEmpty();
-        boolean isMealTypeDefault = selectedMealType.equals("--Select Meal Type--");
-        boolean isDishTypeDefault = selectedDishType.equals("--Select Dish Type--");
-
-        for (Recipe recipe : recipeList) {
-            boolean matchesSearchQuery = isSearchEmpty || recipe.getLabel().toLowerCase().contains(searchQuery);
-            boolean matchesMealType = isMealTypeDefault || recipe.getMealType().equals(selectedMealType);
-            boolean matchesDishType = isDishTypeDefault || recipe.getDishType().equals(selectedDishType);
-
-            // Check if the recipe matches the search query and selected types
-            if (matchesSearchQuery && matchesMealType && matchesDishType) {
-                filteredList.add(recipe);
-            }
-        }
-        if (filteredList.isEmpty() && isSearchEmpty) {
-            filteredList.addAll(recipeList); // Show all recipes
-        }
-        if (isSearchEmpty)
-        {
-            fetchFavoriteRecipes();
-        }
-
-        // Update the adapter with the filtered list
-        recipeAdapter.updateRecipeList(filteredList);
+        // Call fetchRecipes with all current parameters
+        fetchFavoriteRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
+                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
     }
 
     private void setupSpinnerListeners() {
@@ -235,7 +204,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         // Clear the search bar
         searchEditText.setText(""); // This will clear the search bar
 
-        fetchFavoriteRecipes();
+        fetchFavoriteRecipes("", null, null);
     }
 
     private void navigateToFragment(Fragment fragment) {
@@ -263,7 +232,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 
     }
 
-    private void fetchFavoriteRecipes() {
+    private void fetchFavoriteRecipes(String query, String mealType, String dishType) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
@@ -282,8 +251,6 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 
         // Notify the adapter about data changes
         recipeAdapter.notifyDataSetChanged();
-
-        filterRecipes();
 
         Toast.makeText(getContext(), "Recipes retrieved successfully!", Toast.LENGTH_SHORT).show();
     }
