@@ -566,7 +566,7 @@ public class UserMealRecordFragment extends Fragment {
                             username,
                             ingredient.getDisplayName(),
                             selectedMealType,
-                            "1 Serving",
+                            "1.0 Serving",
                             ingredient.getNutrition().getCalories(),
                             ingredient.getNutrition().getCarbs(),
                             ingredient.getNutrition().getProteins(),
@@ -580,34 +580,12 @@ public class UserMealRecordFragment extends Fragment {
             }
 
             if (!newIngredientName.isEmpty()) {
+                String selectedDate =  dateTextView.getText().toString();
                 Log.d("DEBUG", "Fetching nutrition info for manually entered ingredient: " + newIngredientName);
-                // Fetch nutrition info from Foodvisor
-                fetchNutritionalInfoFromFoodvisor(newIngredientName, (fetchedIngredient) -> {
-                    Log.d("DEBUG", "Returned ingredient: " + fetchedIngredient);
-                    if (fetchedIngredient != null) {
-                        Log.d("DEBUG", "line 587 Fetched ingredient: " + fetchedIngredient.getDisplayName());
-                            userMealRecordController.storeMealData(
-                                    userId,
-                                    username,
-                                    fetchedIngredient.getDisplayName(),
-                                    selectedMealType,
-                                    "1 Serving",
-                                    fetchedIngredient.getNutrition().getCalories(),
-                                    fetchedIngredient.getNutrition().getCarbs(),
-                                    fetchedIngredient.getNutrition().getProteins(),
-                                    fetchedIngredient.getNutrition().getFats(),
-                                    fetchedIngredient.getNutrition().getFibers(),
-                                    dateTextView.getText().toString(),
-                                    imageURL
-                            );
-                        Toast.makeText(requireContext(), "Ingredient saved successfully", Toast.LENGTH_SHORT).show();
-                        refreshMealData();
+                searchFoodInEdamam(userId, newIngredientName, 1.0 , "Serving", selectedMealType, selectedDate, false, "", imageURL);
 
-                    } else {
-                        Toast.makeText(requireContext(), "Failed to fetch nutrition info", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+                }
+
 
 
         });
@@ -615,7 +593,7 @@ public class UserMealRecordFragment extends Fragment {
         // Retry button
         builder.setNeutralButton("Retry", (dialog, which) -> {
             // Retry taking a picture
-            openCameraWithMealType(selectedMealType);
+            showMealOptionDialog(userId);
         });
 
         // Manual input button
@@ -631,60 +609,6 @@ public class UserMealRecordFragment extends Fragment {
         });
 
         builder.show();
-    }
-
-    private void fetchNutritionalInfoFromFoodvisor(String ingredientName, OnIngredientFetchedListener listener) {
-        Log.d("DEBUG NutritionalInfoFromFoodvisor", "Fetching nutritional info for ingredient: " + ingredientName);
-        String apiKey = "Api-Key RXpIy6iK.phqqXRhf9UwSh0EjBr4Rui8VticNXlB4";
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://vision.foodvisor.io/api/1.0/en/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        FoodvisorApi apiService = retrofit.create(FoodvisorApi.class);
-
-
-        Call<List<RecognizedIngredient>> call = apiService.getIngredientInfo(ingredientName, apiKey);
-
-        call.enqueue(new Callback<List<RecognizedIngredient>>() {
-            @Override
-            public void onResponse(Call<List<RecognizedIngredient>> call, Response<List<RecognizedIngredient>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<RecognizedIngredient> fetchedIngredients = response.body();
-                    Log.d("DEBUG Full API Response", response.body().toString());
-                    Log.d("DEBUG NutritionalInfoFromFoodvisor", "Fetched ingredients list: " + fetchedIngredients);
-
-                        RecognizedIngredient exactMatch = null;
-                        for (RecognizedIngredient ingredient : fetchedIngredients) {
-                            Log.d("DEBUG NutritionalInfoFromFoodvisor", "Checking ingredient: " + ingredient.getDisplayName());
-                            if (ingredient.getDisplayName().equalsIgnoreCase(ingredientName)) {
-                                exactMatch = ingredient;
-                                break;
-                            }
-                        }
-
-                        // If an exact match is found, return it, otherwise log no match found
-                        if (exactMatch != null) {
-                            Log.d("DEBUG NutritionalInfoFromFoodvisor", "Exact match found: " + exactMatch.getDisplayName());
-                            listener.onIngredientFetched(exactMatch);
-                        } else {
-                            Log.e("DEBUG NutritionalInfoFromFoodvisor", "No exact match found for: " + ingredientName);
-                            listener.onIngredientFetched(null);
-                        }
-                    } else {
-                        Log.e("DEBUG NutritionalInfoFromFoodvisor", "No ingredients found for: " + ingredientName);
-                        listener.onIngredientFetched(null);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<RecognizedIngredient>> call, Throwable t) {
-                    Log.e("DEBUG", "API call failed: " + t.getMessage(), t);
-                    listener.onIngredientFetched(null);
-                }
-            });
-
     }
 
     interface OnIngredientFetchedListener {
@@ -839,7 +763,7 @@ public class UserMealRecordFragment extends Fragment {
         servingBuilder.create().show();
     }
 
-    public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
+    public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageUrl) {
         userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
             @Override
             public void onDataFetched(String username, double calorielimit) {
@@ -878,21 +802,11 @@ public class UserMealRecordFragment extends Fragment {
                                                     // Extract and adjust nutrients
                                                     FoodResponse.Nutrients nutrients = food.getNutrients();
 
-                                                    if (nutrients != null) {
-                                                        // Log all nutrient values from the API response
-                                                        Log.d("FoodAPI", "Nutrient values from Edamam:");
-                                                        Log.d("FoodAPI", "Calories: " + nutrients.getCalories());
-                                                        Log.d("FoodAPI", "Carbs: " + nutrients.getCarbohydrates());
-                                                        Log.d("FoodAPI", "Protein: " + nutrients.getProtein());
-                                                        Log.d("FoodAPI", "Fat: " + nutrients.getFat());
-                                                        Log.d("FoodAPI", "Fiber: " + nutrients.getFiber());
-
-                                                    }
                                                     if (nutrients == null) {
                                                         Log.e("FoodAPI", "Nutrients are missing from the API response.");
                                                         return;
                                                     }
-                                                    String imageURL = food.getImage();
+                                                    String imageURL = (imageUrl != null) ? imageUrl : food.getImage();
                                                     if (imageURL == null) {
                                                         Log.e("FoodDebug", "Image URL is null for food: " + food.getLabel());
                                                     } else {

@@ -22,7 +22,7 @@ public interface FoodvisorApi {
     );
 
     @GET("food/list/")
-    Call<List<RecognizedIngredient>> getIngredientInfo(
+    Call<ResponseBody> getIngredientInfo(
             @Query("name") String ingredientName,
             @Header("Authorization") String apiKey
     );
