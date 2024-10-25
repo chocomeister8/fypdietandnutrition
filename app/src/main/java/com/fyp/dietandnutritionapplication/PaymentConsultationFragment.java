@@ -6,14 +6,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText; // Import EditText for promo code input
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -26,16 +29,17 @@ public class PaymentConsultationFragment extends Fragment {
     private String consultationId;
 
     // Static consultation price
-    private static final double CONSULTATION_PRICE = 150.00;  // Static value for consultation price
+    private static final double CONSULTATION_PRICE = 150.00;
 
     // Firestore instance
     private FirebaseFirestore db;
 
     // UI elements
-    private TextView discountTextView;  // The TextView to show discount
-    private TextView estimatedTotalTextView; // New TextView for estimated total
-    private EditText promoCodeEditText; // EditText for user to enter promo code
-    private Button applyPromoButton;      // Button to apply promo code
+    private TextView discountTextView;
+    private TextView estimatedTotalTextView;
+    private EditText promoCodeEditText;
+    private Button applyPromoButton;
+    private Button btnPayPal;
 
     // Factory method to create a new instance of the fragment with arguments
     public static PaymentConsultationFragment newInstance(String consultationId) {
@@ -61,56 +65,94 @@ public class PaymentConsultationFragment extends Fragment {
         }
 
         // Set the static consultation price in the corresponding TextView
-        TextView priceTextView = view.findViewById(R.id.tvSubtotalValue); // Assuming you have a TextView with this ID
-        priceTextView.setText("$" + String.format("%.2f", CONSULTATION_PRICE)); // Static price
+        TextView priceTextView = view.findViewById(R.id.tvSubtotalValue);
+        priceTextView.setText("$" + String.format("%.2f", CONSULTATION_PRICE));
 
         // Initialize UI elements
-        discountTextView = view.findViewById(R.id.discountValue); // Assuming this is the correct ID
-        estimatedTotalTextView = view.findViewById(R.id.tvEstimatedTotalValue); // New TextView for estimated total
-        promoCodeEditText = view.findViewById(R.id.promoCode); // Add this line to initialize the EditText
-        applyPromoButton = view.findViewById(R.id.applyPromoButton);  // Assuming you have an Apply button in your XML
+        discountTextView = view.findViewById(R.id.discountValue);
+        estimatedTotalTextView = view.findViewById(R.id.tvEstimatedTotalValue);
+        promoCodeEditText = view.findViewById(R.id.promoCode);
+        applyPromoButton = view.findViewById(R.id.applyPromoButton);
+        btnPayPal = view.findViewById(R.id.btnPayPal);
 
         // Set button click listener to apply promo code
         applyPromoButton.setOnClickListener(v -> {
-            String promoCode = promoCodeEditText.getText().toString().trim(); // Get the promo code from the EditText
+            String promoCode = promoCodeEditText.getText().toString().trim();
             validatePromoCode(promoCode);
         });
 
+        // Set button click listener for PayPal button
+        btnPayPal.setOnClickListener(v -> {
+//            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+//            String clientName = (currentUser != null && currentUser.getDisplayName() != null) ? currentUser.getDisplayName() : "clientName";
+//
+//            if (clientName != null) {
+//                updateConsultationWithClientName(clientName);
+//            } else {
+//                Toast.makeText(getContext(), "Unable to retrieve client name.", Toast.LENGTH_SHORT).show();
+//            }
+            showBookingSuccessMessage();
+//            updateConsultationWithClientName(clientName);
+            navigateToConsultationsFragment();
+        });
         // Initialize the estimated total with the original price
         estimatedTotalTextView.setText("$" + String.format("%.2f", CONSULTATION_PRICE));
 
         return view;
     }
 
+//    private void updateConsultationWithClientName(String clientName) {
+//        if (consultationId != null && !consultationId.isEmpty()) {
+//            db.collection("Consultation_slots").document(consultationId)
+//                    .update("clientName", clientName)
+//                    .addOnSuccessListener(aVoid -> Log.d("FirebaseUpdate", "Client name added successfully"))
+//                    .addOnFailureListener(e -> Log.e("FirebaseUpdate", "Error adding client name", e));
+//        } else {
+//            Log.e("FirebaseUpdate", "Consultation ID is null or empty");
+//        }
+//    }
+
+    // Method to show success message
+    private void showBookingSuccessMessage() {
+        Toast.makeText(getContext(), "Your booking was successful! Thank you for your payment.", Toast.LENGTH_SHORT).show();
+    }
+
+    // Method to navigate to the ConsultationsFragment
+    private void navigateToConsultationsFragment() {
+        try {
+            // Ensure the fragment container ID exists
+            FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame_layout, new ConsultationsFragment());
+            transaction.addToBackStack(null);  // Adds to back stack for proper back navigation
+            transaction.commit();
+
+        } catch (Exception e) {
+
+            Log.e("NavigationError", "Error navigating to ConsultationsFragment", e);
+            Toast.makeText(getContext(), "Navigation failed, please try again.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     // Method to validate promo code from Firestore
     private void validatePromoCode(String promoCode) {
-        // Query the Firestore to check if the promo code exists
         db.collection("promoCode")
                 .whereEqualTo("promocode", promoCode)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    // Check if any documents returned
                     if (queryDocumentSnapshots.isEmpty()) {
-                        // Promo code not found
                         showInvalidPromoCodeError();
                     } else {
-                        // Promo code exists; get the discount value
                         for (DocumentSnapshot document : queryDocumentSnapshots) {
-                            // Assuming your promo code document has a field named "discountValue"
-                            Double discountValue = document.getDouble("discountValue"); // Ensure this is the correct type
-
+                            Double discountValue = document.getDouble("discountValue");
                             if (discountValue != null) {
-                                // Apply the discount and update UI
                                 applyDiscount(discountValue);
                             } else {
-                                // Handle case where discountValue is null
                                 Toast.makeText(getContext(), "Discount value not found", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Handle errors
                     Log.e("PaymentConsultationFragment", "Error validating promo code", e);
                     Toast.makeText(getContext(), "Error checking promo code", Toast.LENGTH_SHORT).show();
                 });
@@ -123,12 +165,8 @@ public class PaymentConsultationFragment extends Fragment {
 
     // Method to apply discount when promo code is valid
     private void applyDiscount(Double discountValue) {
-        discountTextView.setText(String.format("-$%.2f", discountValue));  // Display the discount value
-
-        // Calculate the new estimated total after applying the discount
+        discountTextView.setText(String.format("-$%.2f", discountValue));
         double estimatedTotal = CONSULTATION_PRICE - discountValue;
-
-        // Update the estimated total TextView
         estimatedTotalTextView.setText("$" + String.format("%.2f", estimatedTotal));
     }
 }
