@@ -90,7 +90,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 //        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             // Start fetching recipes after the delay
-            testfetchRecipes();
+            fetchRecipesFromFavourite();
         }, 1000);
 
 
@@ -346,7 +346,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 //    }
 
 
-    private void testfetchRecipes() {
+    private void fetchRecipesFromFavourite() {
         // Clear previous recipe lists
         APIRecipeList.clear();
         recipeNewList.clear();

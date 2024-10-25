@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,10 +29,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,6 +47,8 @@ public class userHomePageFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList;
+    private List<Recipe> recipeNewList;
+    private List<Recipe> APIRecipeList;
 
     private final Random random = new Random();
 
@@ -97,11 +103,17 @@ public class userHomePageFragment extends Fragment {
 
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
+        APIRecipeList = new ArrayList<>();
+        recipeNewList = new ArrayList<>();
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
         // Fetch recipes
         fetchRecipes();
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            // Start fetching recipes after the delay
+            fetchRecipesFromRecommended();
+        }, 1000);
 
         // Set up button click listeners to navigate between fragments
         button_recipes.setOnClickListener(v -> {
@@ -306,7 +318,7 @@ public class userHomePageFragment extends Fragment {
                     // Handle the retrieved recipes
                     recipeList.clear();
                     recipeList.addAll(recipes);
-                    recipeAdapter.notifyDataSetChanged();
+//                    recipeAdapter.notifyDataSetChanged();
 
                     if (recipes.isEmpty()) {
                         noRecommendationText.setVisibility(View.VISIBLE);
@@ -327,4 +339,104 @@ public class userHomePageFragment extends Fragment {
             Toast.makeText(getContext(), "User is not logged in.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void fetchRecipesFromRecommended() {
+        // Clear previous recipe lists
+        APIRecipeList.clear();
+
+
+        String app_id = "2c7710ea"; // Your Edamam API app ID
+        String app_key = "97f5e9187c865600f74e2baa358a9efb";
+        String type = "public";
+
+        // Fetch favorite recipes
+//        fetchFavoriteRecipes(null, null, null);
+
+        // Initialize AtomicInteger to track completed requests
+        AtomicInteger completedRequests = new AtomicInteger(0);
+        int totalRecipes = recipeList.size(); // Total number of recipes to fetch
+
+        // Log the number of recipes being fetched
+        Log.d("Fetch Recipes", "Total recipes to fetch: " + totalRecipes);
+
+
+        // Iterate through each recipe label
+        for (Recipe recipe : recipeList) {
+            String labelQuery = recipe.getLabel(); // Use the label from the current recipe
+            Log.d("API Call", "Fetching recipes for: " + labelQuery);
+
+            EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
+
+            // Call the API to fetch recipes based on the label
+            Call<RecipeResponse> call = api.searchRecipes(labelQuery, app_id, app_key, type, null, null, null, null);
+
+            call.enqueue(new Callback<RecipeResponse>() {
+                @Override
+                public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+
+                        // Log the number of recipes fetched
+                        Log.d("Fetched Recipes", "Number of recipes fetched for " + labelQuery + ": " + hits.size());
+
+                        for (RecipeResponse.Hit hit : hits) {
+                            Recipe apiRecipe = hit.getRecipe(); // Extract the Recipe from Hit
+
+                            // Calculate calories per 100g
+                            double caloriesPer100g = apiRecipe.getCaloriesPer100g();
+                            if (apiRecipe.getTotalWeight() > 0) {
+                                caloriesPer100g = (apiRecipe.getCalories() / apiRecipe.getTotalWeight()) * 100;
+                            }
+                            apiRecipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                            APIRecipeList.add(apiRecipe); // Add to the APIRecipeList
+                        }
+
+                        // Compare the retrieved recipes with the user's favorite recipes
+                        for (Recipe favoriteRecipe : recipeList) {
+                            for (Recipe apiRecipe : APIRecipeList) {
+                                // Compare by label
+                                if (favoriteRecipe.getLabel().equals(apiRecipe.getLabel())) {
+                                    Log.d("Matching Recipe:", favoriteRecipe.getLabel());
+                                    recipeNewList.add(apiRecipe); // Add matching recipe to the new list
+                                    break; // Exit inner loop once a match is found
+                                } else {
+                                    Log.d("No Match Found:", favoriteRecipe.getLabel() + " vs " + apiRecipe.getLabel());
+                                }
+                            }
+                        }
+                    } else {
+                        Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
+                    }
+
+                    // Increment completed requests
+                    if (completedRequests.incrementAndGet() == totalRecipes) {
+
+                        // Update the UI after all requests have completed
+                        recipeList.clear();
+                        recipeList.addAll(recipeNewList);
+                        HashSet<Recipe> recipeSet = new HashSet<>(recipeList);
+                        recipeList.clear();
+                        recipeList.addAll(recipeSet);
+                        Log.d("Recipe List Size", "Size before notify: " + recipeList.size());
+                        recipeAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<RecipeResponse> call, Throwable t) {
+                    Log.e("Fetch Recipes", "Error: " + t.getMessage());
+                    // Increment completed requests even if there was a failure
+                    if (completedRequests.incrementAndGet() == totalRecipes) {
+                        // Update the UI in case of failure as well
+                        recipeList.clear();
+                        recipeList.addAll(recipeNewList);
+                        Log.d("Recipe List Size", "Size before notify: " + recipeList.size());
+                        recipeAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
+    }
+
 }
