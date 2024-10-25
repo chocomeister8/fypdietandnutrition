@@ -1,11 +1,15 @@
 package com.fyp.dietandnutritionapplication;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,8 +32,10 @@ import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouriteRecipesController.OnFavoriteRecipesRetrievedListener {
     private RecyclerView recyclerView;
@@ -77,11 +83,18 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         // Initialize the recipe list and adapter
         recipeList = new ArrayList<>();
         APIRecipeList = new ArrayList<>();
+        recipeNewList = new ArrayList<>();
         recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
         recyclerView.setAdapter(recipeAdapter);
 
-        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
-        displayFavouriteRecipes();
+//        fetchRecipes(getRandomSimpleFoodSearch(), null, null);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            // Start fetching recipes after the delay
+            testfetchRecipes();
+        }, 1000);
+
+
+//        displayFavouriteRecipes();
 
         searchEditText = view.findViewById(R.id.search_recipe);
         // Setup spinners
@@ -250,7 +263,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
         recipeList.addAll(recipes); // Add new recipes
 
         // Notify the adapter about data changes
-        recipeAdapter.notifyDataSetChanged();
+//        recipeAdapter.notifyDataSetChanged();
 
 //        Toast.makeText(getContext(), "Recipes retrieved successfully!", Toast.LENGTH_SHORT).show();
     }
@@ -263,50 +276,173 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
 
 
 
-    private void fetchRecipes(String query, String mealType, String dishType) {
+//    private void fetchRecipes(String query, String mealType, String dishType) {
+//        String app_id = "2c7710ea"; // Your Edamam API app ID
+//        String app_key = "97f5e9187c865600f74e2baa358a9efb";
+//        String type = "public";
+//
+//        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
+//        String labelQuery = "Salt-and-Pepper Steak";
+//
+//
+//        // Assuming the API requires meal type and dish type as separate parameters
+//        Call<RecipeResponse> call = api.searchRecipes(labelQuery, app_id, app_key, type,null, mealType, dishType, null);
+//
+//        call.enqueue(new Callback<RecipeResponse>() {
+//            @Override
+//            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+//
+//                    // Debugging: Log the number of recipes fetched
+//                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
+//
+//                    // Clear previous recipes
+//                    APIRecipeList.clear();
+//
+//
+//                    for (RecipeResponse.Hit hit : hits) {
+//                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
+//
+//                        double caloriesPer100g = recipe.getCaloriesPer100g();
+//                        if (recipe.getTotalWeight() > 0) {
+//                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+//                        }
+//                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+//
+//                        APIRecipeList.add(recipe);
+//
+//                    }
+//
+////                    fetchFavoriteRecipes("test","test","test");
+//
+//                    for (Recipe recipe1 : recipeList) {
+//                        for (Recipe recipe2 : APIRecipeList) {
+//                            // Compare by both label and calories
+//                            if (recipe1.getLabel().equals(recipe2.getLabel())) {
+//                                Log.d("Favourite Name:", recipe1.getLabel());
+//                                recipeNewList.add(recipe2); // Add matching recipe to the new list
+//                                break;  // Exit inner loop once a match is found
+//                            }else{
+//                                Log.d("No NO Name:", recipe1.getLabel()+recipe2.getLabel());
+//                            }
+//                        }
+//                    }
+//                    recipeList.clear();
+//                    recipeList.addAll(recipeNewList);
+//                    recipeAdapter.notifyDataSetChanged();
+//
+//                } else {
+//                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<RecipeResponse> call, Throwable t) {
+//                Log.e("Fetch Recipes", "Error: " + t.getMessage());
+//            }
+//        });
+//
+//    }
+
+
+    private void testfetchRecipes() {
+        // Clear previous recipe lists
+        APIRecipeList.clear();
+        recipeNewList.clear();
+
         String app_id = "2c7710ea"; // Your Edamam API app ID
         String app_key = "97f5e9187c865600f74e2baa358a9efb";
         String type = "public";
 
-        EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
+        // Fetch favorite recipes
+//        fetchFavoriteRecipes(null, null, null);
 
-        // Assuming the API requires meal type and dish type as separate parameters
-        Call<RecipeResponse> call = api.searchRecipes(query, app_id, app_key, type,null, mealType, dishType, null);
+        // Initialize AtomicInteger to track completed requests
+        AtomicInteger completedRequests = new AtomicInteger(0);
+        int totalRecipes = recipeList.size(); // Total number of recipes to fetch
 
-        call.enqueue(new Callback<RecipeResponse>() {
-            @Override
-            public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+        // Log the number of recipes being fetched
+        Log.d("Fetch Recipes", "Total recipes to fetch: " + totalRecipes);
 
-                    // Debugging: Log the number of recipes fetched
-                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
 
-                    // Clear previous recipes
-                    APIRecipeList.clear();
+        // Iterate through each recipe label
+        for (Recipe recipe : recipeList) {
+            String labelQuery = recipe.getLabel(); // Use the label from the current recipe
+            Log.d("API Call", "Fetching recipes for: " + labelQuery);
 
-                    for (RecipeResponse.Hit hit : hits) {
-                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
+            EdamamApi api = ApiClient.getRetrofitInstance().create(EdamamApi.class);
 
-                        double caloriesPer100g = recipe.getCaloriesPer100g();
-                        if (recipe.getTotalWeight() > 0) {
-                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+            // Call the API to fetch recipes based on the label
+            Call<RecipeResponse> call = api.searchRecipes(labelQuery, app_id, app_key, type, null, null, null, null);
+
+            call.enqueue(new Callback<RecipeResponse>() {
+                @Override
+                public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+
+                        // Log the number of recipes fetched
+                        Log.d("Fetched Recipes", "Number of recipes fetched for " + labelQuery + ": " + hits.size());
+
+                        for (RecipeResponse.Hit hit : hits) {
+                            Recipe apiRecipe = hit.getRecipe(); // Extract the Recipe from Hit
+
+                            // Calculate calories per 100g
+                            double caloriesPer100g = apiRecipe.getCaloriesPer100g();
+                            if (apiRecipe.getTotalWeight() > 0) {
+                                caloriesPer100g = (apiRecipe.getCalories() / apiRecipe.getTotalWeight()) * 100;
+                            }
+                            apiRecipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
+
+                            APIRecipeList.add(apiRecipe); // Add to the APIRecipeList
                         }
-                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
 
-                        APIRecipeList.add(recipe);
+                        // Compare the retrieved recipes with the user's favorite recipes
+                        for (Recipe favoriteRecipe : recipeList) {
+                            for (Recipe apiRecipe : APIRecipeList) {
+                                // Compare by label
+                                if (favoriteRecipe.getLabel().equals(apiRecipe.getLabel())) {
+                                    Log.d("Matching Recipe:", favoriteRecipe.getLabel());
+                                    recipeNewList.add(apiRecipe); // Add matching recipe to the new list
+                                    break; // Exit inner loop once a match is found
+                                } else {
+                                    Log.d("No Match Found:", favoriteRecipe.getLabel() + " vs " + apiRecipe.getLabel());
+                                }
+                            }
+                        }
+                    } else {
+                        Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
                     }
 
-                } else {
-                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
-                }
-            }
+                    // Increment completed requests
+                    if (completedRequests.incrementAndGet() == totalRecipes) {
 
-            @Override
-            public void onFailure(Call<RecipeResponse> call, Throwable t) {
-                Log.e("Fetch Recipes", "Error: " + t.getMessage());
-            }
-        });
+                        // Update the UI after all requests have completed
+                        recipeList.clear();
+                        recipeList.addAll(recipeNewList);
+                        HashSet<Recipe> recipeSet = new HashSet<>(recipeList);
+                        recipeList.clear();
+                        recipeList.addAll(recipeSet);
+                        Log.d("Recipe List Size", "Size before notify: " + recipeList.size());
+                        recipeAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<RecipeResponse> call, Throwable t) {
+                    Log.e("Fetch Recipes", "Error: " + t.getMessage());
+                    // Increment completed requests even if there was a failure
+                    if (completedRequests.incrementAndGet() == totalRecipes) {
+                        // Update the UI in case of failure as well
+                        recipeList.clear();
+                        recipeList.addAll(recipeNewList);
+                        Log.d("Recipe List Size", "Size before notify: " + recipeList.size());
+                        recipeAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
     }
 
     public void displayFavouriteRecipes() {
@@ -317,20 +453,27 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
             recipeNewList.clear(); // Clear if already initialized
         }
 
+        for (Recipe apiRecipe : APIRecipeList) {
+            if (apiRecipe.getImage() != null && !apiRecipe.getImage().isEmpty()) {
+                Log.d(TAG, "Image URL: " + apiRecipe.getImage());
+            } else {
+                Log.d(TAG, "No image for recipe: " + apiRecipe.getLabel());
+            }
+        }
+        recipeList.clear();
+
         // Compare the two recipe lists (recipeList and APIRecipeList)
         for (Recipe recipe1 : recipeList) {
             for (Recipe recipe2 : APIRecipeList) {
                 // Compare by both label and calories
                 if (recipe1.getLabel().equals(recipe2.getLabel())) {
-                    recipeNewList.add(recipe2); // Add matching recipe to the new list
+                    recipeList.add(recipe2); // Add matching recipe to the new list
                     break;  // Exit inner loop once a match is found
                 }
             }
         }
 
         // Notify the adapter that the data has changed
-        recipeList.clear();
-        recipeList.addAll(recipeNewList);
         recipeAdapter.notifyDataSetChanged();
     }
 

@@ -20,10 +20,10 @@ public class NavFavouriteRecipesController {
             public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
                 // Save the retrieved recipes locally
                 retrievedRecipes.clear();  // Clear any previously stored recipes
-                retrievedRecipes.addAll(recipes);  // Add the newly retrieved recipes
-
-                // Notify the listener (e.g., UI) that the recipes are available
+                retrievedRecipes.addAll(recipes);
                 listener.onFavoriteRecipesRetrieved(recipes);
+
+
             }
 
             @Override

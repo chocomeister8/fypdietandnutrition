@@ -96,9 +96,21 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         // Load image with Picasso
         if (recipe.getImage() != null && !recipe.getImage().isEmpty()) {
-            Picasso.get().load(recipe.getImage()).into(holder.imageView);
+            Picasso.get().load(recipe.getImage())
+                    .error(R.drawable.accounts_flat_icon_vector_7303401) // Use a placeholder in case of error
+                    .into(holder.imageView, new com.squareup.picasso.Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "Image loaded successfully: " + recipe.getLabel());
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Log.e(TAG, "Failed to load image for: " + recipe.getLabel(), e);
+                        }
+                    });
         } else {
-            holder.imageView.setImageResource(R.drawable.recipe_image); // Use a placeholder image if no URL is available
+            holder.imageView.setImageResource(R.drawable.accounts_flat_icon_vector_7303401); // Placeholder image for missing URL
         }
 
         // Set the click listener for the recipe item
