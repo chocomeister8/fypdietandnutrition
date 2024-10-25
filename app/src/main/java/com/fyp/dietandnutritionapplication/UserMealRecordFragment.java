@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +30,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -50,8 +53,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -92,6 +97,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import android.graphics.drawable.GradientDrawable;
 
 
 public class UserMealRecordFragment extends Fragment {
@@ -289,8 +295,6 @@ public class UserMealRecordFragment extends Fragment {
                     } catch (IOException e) {
                         Log.e("DEBUG", "Error getting bitmap from URI", e);
                     }
-                } else {
-                    Toast.makeText(getActivity(), "Failed to capture or select image.", Toast.LENGTH_SHORT).show();
                 }
             }
         } else {
@@ -419,22 +423,25 @@ public class UserMealRecordFragment extends Fragment {
                                         for (int j = 0; j < foodArray.length(); j++) {
                                             JSONObject food = foodArray.getJSONObject(j);
                                             JSONObject foodInfo = food.getJSONObject("food_info");
-                                            JSONObject nutrition = foodInfo.getJSONObject("nutrition");
+                                            JSONObject nutritionJson = foodInfo.getJSONObject("nutrition");
 
                                             String foodName = foodInfo.optString("display_name", "Unknown");
-                                            double calories = nutrition.optDouble("calories_100g", 0);
-                                            double carbs = nutrition.optDouble("carbs_100g", 0);
-                                            double fats = nutrition.optDouble("fat_100g", 0);
-                                            double proteins = nutrition.optDouble("proteins_100g", 0);
-                                            double fibers = nutrition.optDouble("fibers_100g", 0);
+                                            double calories = nutritionJson.optDouble("calories_100g", 0);
+                                            double carbs = nutritionJson.optDouble("carbs_100g", 0);
+                                            double fats = nutritionJson.optDouble("fat_100g", 0);
+                                            double proteins = nutritionJson.optDouble("proteins_100g", 0);
+                                            double fibers = nutritionJson.optDouble("fibers_100g", 0);
+
+                                            RecognizedIngredient.Nutrition nutrition = new RecognizedIngredient.Nutrition();
+                                            nutrition.setCalories((float) calories);
+                                            nutrition.setCarbs((float) carbs);
+                                            nutrition.setFats((float) fats);
+                                            nutrition.setProteins((float) proteins);
+                                            nutrition.setFibers((float) fibers);
 
                                             RecognizedIngredient ingredient = new RecognizedIngredient();
                                             ingredient.setDisplayName(foodName);
-                                            ingredient.setCalories((float) calories);
-                                            ingredient.setCarbs((float) carbs);
-                                            ingredient.setFats((float) fats);
-                                            ingredient.setProteins((float) proteins);
-                                            ingredient.setFibers((float) fibers);
+                                            ingredient.setNutrition(nutrition);
 
                                             ingredients.add(ingredient);
                                         }
@@ -464,19 +471,50 @@ public class UserMealRecordFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Review Ingredients");
 
+        Set<String> uniqueIngredientNames = new HashSet<>();
+        List<RecognizedIngredient> uniqueIngredients = new ArrayList<>();
+
+        for (RecognizedIngredient ingredient : ingredients) {
+            if (uniqueIngredientNames.add(ingredient.getDisplayName().toLowerCase())) {
+                uniqueIngredients.add(ingredient);
+            }
+        }
         // Create a LinearLayout to hold the checkboxes
-        LinearLayout layout = new LinearLayout(requireContext());
-        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout mainLayout = new LinearLayout(requireContext());
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+
+        TextView scrollReminderText = new TextView(requireContext());
+        scrollReminderText.setText("Scroll to see more ingredients");
+        scrollReminderText.setGravity(Gravity.CENTER);
+        scrollReminderText.setTextColor(Color.DKGRAY);
+        scrollReminderText.setPadding(0, 10, 0, 10);
+        mainLayout.addView(scrollReminderText);
+
+        ScrollView scrollView = new ScrollView(requireContext());
+        scrollView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                500
+        ));
+
+
+        GradientDrawable gradient = new GradientDrawable(
+                GradientDrawable.Orientation.BOTTOM_TOP,
+                new int[]{Color.parseColor("#FFFFFF"), Color.parseColor("#DDFFFFFF")}
+        );
+        scrollView.setBackground(gradient);
+
+        LinearLayout checkboxContainer = new LinearLayout(requireContext());
+        checkboxContainer.setOrientation(LinearLayout.VERTICAL);
 
         // Create an array to store the user's selections
-        final boolean[] checkedItems = new boolean[ingredients.size()];
+        final boolean[] checkedItems = new boolean[uniqueIngredients.size()];
 
         // Create checkboxes for each ingredient
-        for (int i = 0; i < ingredients.size(); i++) {
-            RecognizedIngredient ingredient = ingredients.get(i);
+        for (int i = 0; i < uniqueIngredients.size(); i++) {
+            RecognizedIngredient ingredient = uniqueIngredients.get(i);
             CheckBox checkBox = new CheckBox(requireContext());
-            checkBox.setText(ingredient.getDisplayName() + " - Calories: " + ingredient.calories + " kcal");
-            layout.addView(checkBox);
+            checkBox.setText(ingredient.getDisplayName() + " - Calories: " + ingredient.getNutrition().getCalories() + " kcal");
+            checkboxContainer.addView(checkBox);
 
             // Set the checkbox listener to track selections
             final int index = i;
@@ -487,31 +525,53 @@ public class UserMealRecordFragment extends Fragment {
             });
         }
 
+        scrollView.addView(checkboxContainer);
+        mainLayout.addView(scrollView);
+
+
         TextView manualEntryLabel = new TextView(requireContext());
         manualEntryLabel.setText("Or Add a New Ingredient:");
-        layout.addView(manualEntryLabel);
+        mainLayout.addView(manualEntryLabel);
 
         EditText manualIngredientName = new EditText(requireContext());
         manualIngredientName.setHint("Ingredient Name");
-        layout.addView(manualIngredientName);
+        mainLayout.addView(manualIngredientName);
 
-        builder.setView(layout);
+        builder.setView(mainLayout);
 
         builder.setPositiveButton("Confirm", (dialog, which) -> {
-            for (int i = 0; i < ingredients.size(); i++) {
+            boolean hasSelectedIngredient = false;
+            for (boolean isSelected : checkedItems) {
+                if (isSelected) {
+                    hasSelectedIngredient = true;
+                    break;
+                }
+            }
+
+            String newIngredientName = manualIngredientName.getText().toString().trim();
+
+            if (!hasSelectedIngredient && newIngredientName.isEmpty()) {
+                // Show toast if neither condition is met
+                Toast.makeText(requireContext(), "Please select at least one ingredient or enter a new ingredient.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
+
+            for (int i = 0; i < uniqueIngredients.size(); i++) {
                 if (checkedItems[i]) {
-                    RecognizedIngredient ingredient = ingredients.get(i);
+                    RecognizedIngredient ingredient = uniqueIngredients.get(i);
                     userMealRecordController.storeMealData(
                             userId,
                             username,
                             ingredient.getDisplayName(),
                             selectedMealType,
                             "1 Serving",
-                            ingredient.calories,
-                            ingredient.carbs,
-                            ingredient.proteins,
-                            ingredient.fats,
-                            ingredient.fibers,
+                            ingredient.getNutrition().getCalories(),
+                            ingredient.getNutrition().getCarbs(),
+                            ingredient.getNutrition().getProteins(),
+                            ingredient.getNutrition().getFats(),
+                            ingredient.getNutrition().getFibers(),
                             dateTextView.getText().toString(),
                             imageURL
                     );
@@ -519,31 +579,30 @@ public class UserMealRecordFragment extends Fragment {
                 }
             }
 
-
-            //Toast.makeText(requireContext(), "Selected meals saved successfully", Toast.LENGTH_SHORT).show();
-            String newIngredientName = manualIngredientName.getText().toString().trim();
             if (!newIngredientName.isEmpty()) {
                 Log.d("DEBUG", "Fetching nutrition info for manually entered ingredient: " + newIngredientName);
                 // Fetch nutrition info from Foodvisor
                 fetchNutritionalInfoFromFoodvisor(newIngredientName, (fetchedIngredient) -> {
+                    Log.d("DEBUG", "Returned ingredient: " + fetchedIngredient);
                     if (fetchedIngredient != null) {
-                        Log.d("DEBUG", "Fetched ingredient: " + fetchedIngredient.getDisplayName());
-                        userMealRecordController.storeMealData(
-                                userId,
-                                username,
-                                fetchedIngredient.getDisplayName(),
-                                selectedMealType,
-                                "1 Serving",
-                                fetchedIngredient.calories,
-                                fetchedIngredient.carbs,
-                                fetchedIngredient.proteins,
-                                fetchedIngredient.fats,
-                                fetchedIngredient.fibers,
-                                dateTextView.getText().toString(),
-                                imageURL
-                        );
+                        Log.d("DEBUG", "line 587 Fetched ingredient: " + fetchedIngredient.getDisplayName());
+                            userMealRecordController.storeMealData(
+                                    userId,
+                                    username,
+                                    fetchedIngredient.getDisplayName(),
+                                    selectedMealType,
+                                    "1 Serving",
+                                    fetchedIngredient.getNutrition().getCalories(),
+                                    fetchedIngredient.getNutrition().getCarbs(),
+                                    fetchedIngredient.getNutrition().getProteins(),
+                                    fetchedIngredient.getNutrition().getFats(),
+                                    fetchedIngredient.getNutrition().getFibers(),
+                                    dateTextView.getText().toString(),
+                                    imageURL
+                            );
                         Toast.makeText(requireContext(), "Ingredient saved successfully", Toast.LENGTH_SHORT).show();
                         refreshMealData();
+
                     } else {
                         Toast.makeText(requireContext(), "Failed to fetch nutrition info", Toast.LENGTH_SHORT).show();
                     }
@@ -565,11 +624,17 @@ public class UserMealRecordFragment extends Fragment {
             handleFoodNameInput(userId, selectedMealType);
         });
 
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            // Log cancellation
+            Log.d("DEBUG", "User canceled the ingredient selection.");
+            dialog.dismiss();
+        });
+
         builder.show();
     }
 
     private void fetchNutritionalInfoFromFoodvisor(String ingredientName, OnIngredientFetchedListener listener) {
-        Log.d("DEBUG", "Fetching nutritional info for ingredient: " + ingredientName);
+        Log.d("DEBUG NutritionalInfoFromFoodvisor", "Fetching nutritional info for ingredient: " + ingredientName);
         String apiKey = "Api-Key RXpIy6iK.phqqXRhf9UwSh0EjBr4Rui8VticNXlB4";
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -579,48 +644,47 @@ public class UserMealRecordFragment extends Fragment {
 
         FoodvisorApi apiService = retrofit.create(FoodvisorApi.class);
 
+
         Call<List<RecognizedIngredient>> call = apiService.getIngredientInfo(ingredientName, apiKey);
 
         call.enqueue(new Callback<List<RecognizedIngredient>>() {
             @Override
             public void onResponse(Call<List<RecognizedIngredient>> call, Response<List<RecognizedIngredient>> response) {
-
                 if (response.isSuccessful() && response.body() != null) {
-
                     List<RecognizedIngredient> fetchedIngredients = response.body();
-                    if (!fetchedIngredients.isEmpty()) {
-                        Log.d("DEBUG", "!fetchedIngredients.isEmpty()");
-                        RecognizedIngredient firstIngredient = fetchedIngredients.get(0);
+                    Log.d("DEBUG Full API Response", response.body().toString());
+                    Log.d("DEBUG NutritionalInfoFromFoodvisor", "Fetched ingredients list: " + fetchedIngredients);
 
-                        Log.d("DEBUG", "Fetched ingredient: " + firstIngredient.getDisplayName());
-                        Log.d("DEBUG", "Calories: " + firstIngredient.getCalories());
-                        Log.d("DEBUG", "Proteins: " + firstIngredient.getProteins());
-                        Log.d("DEBUG", "Carbs: " + firstIngredient.getCarbs());
-                        Log.d("DEBUG", "Fats: " + firstIngredient.getFats());
-                        Log.d("DEBUG", "Fibers: " + firstIngredient.getFibers());
+                        RecognizedIngredient exactMatch = null;
+                        for (RecognizedIngredient ingredient : fetchedIngredients) {
+                            Log.d("DEBUG NutritionalInfoFromFoodvisor", "Checking ingredient: " + ingredient.getDisplayName());
+                            if (ingredient.getDisplayName().equalsIgnoreCase(ingredientName)) {
+                                exactMatch = ingredient;
+                                break;
+                            }
+                        }
 
-
-                        listener.onIngredientFetched(firstIngredient);
+                        // If an exact match is found, return it, otherwise log no match found
+                        if (exactMatch != null) {
+                            Log.d("DEBUG NutritionalInfoFromFoodvisor", "Exact match found: " + exactMatch.getDisplayName());
+                            listener.onIngredientFetched(exactMatch);
+                        } else {
+                            Log.e("DEBUG NutritionalInfoFromFoodvisor", "No exact match found for: " + ingredientName);
+                            listener.onIngredientFetched(null);
+                        }
                     } else {
-                        Log.e("DEBUG", "No ingredients found for: " + ingredientName);
+                        Log.e("DEBUG NutritionalInfoFromFoodvisor", "No ingredients found for: " + ingredientName);
                         listener.onIngredientFetched(null);
                     }
-                } else {
-                    try {
-                        Log.e("DEBUG", "Error body: " + response.errorBody().string());
-                    } catch (IOException e) {
-                        Log.e("DEBUG", "Failed to log error body");
-                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<RecognizedIngredient>> call, Throwable t) {
+                    Log.e("DEBUG", "API call failed: " + t.getMessage(), t);
                     listener.onIngredientFetched(null);
                 }
-            }
+            });
 
-            @Override
-            public void onFailure(Call<List<RecognizedIngredient>> call, Throwable t) {
-                Log.e("DEBUG", "API call failed: " + t.getMessage(), t);
-                listener.onIngredientFetched(null);
-            }
-        });
     }
 
     interface OnIngredientFetchedListener {

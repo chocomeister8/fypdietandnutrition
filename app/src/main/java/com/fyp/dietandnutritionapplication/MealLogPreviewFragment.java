@@ -803,7 +803,7 @@ public class MealLogPreviewFragment extends Fragment {
         for (int i = 0; i < ingredients.size(); i++) {
             RecognizedIngredient ingredient = ingredients.get(i);
             CheckBox checkBox = new CheckBox(requireContext());
-            checkBox.setText(ingredient.getDisplayName() + " - Calories: " + ingredient.calories + " kcal");
+            checkBox.setText(ingredient.getDisplayName() + " - Calories: " + ingredient.getNutrition().getCalories() + " kcal");
             layout.addView(checkBox);
 
             // Set the checkbox listener to track selections
@@ -835,10 +835,10 @@ public class MealLogPreviewFragment extends Fragment {
                     displayMealLogForGuest(
                             ingredient.getDisplayName(),
                             "1 Serving",
-                            ingredient.calories,
-                            ingredient.carbs,
-                            ingredient.proteins,
-                            ingredient.fats,
+                            ingredient.getNutrition().getCalories(),
+                            ingredient.getNutrition().getCarbs(),
+                            ingredient.getNutrition().getProteins(),
+                            ingredient.getNutrition().getFats(),
                             imageUrl,
                             selectedMealType
                     );
@@ -939,11 +939,11 @@ public class MealLogPreviewFragment extends Fragment {
 
                                             RecognizedIngredient ingredient = new RecognizedIngredient();
                                             ingredient.setDisplayName(foodName);
-                                            ingredient.setCalories((float) calories);
-                                            ingredient.setCarbs((float) carbs);
-                                            ingredient.setFats((float) fats);
-                                            ingredient.setProteins((float) proteins);
-                                            ingredient.setFibers((float) fibers);
+                                            ingredient.getNutrition().setCalories((float) calories);
+                                            ingredient.getNutrition().setCarbs((float) carbs);
+                                            ingredient.getNutrition().setFats((float) fats);
+                                            ingredient.getNutrition().setProteins((float) proteins);
+                                            ingredient.getNutrition().setFibers((float) fibers);
 
                                             ingredients.add(ingredient);
                                         }
@@ -993,36 +993,20 @@ public class MealLogPreviewFragment extends Fragment {
 
         Call<List<RecognizedIngredient>> call = apiService.getIngredientInfo(ingredientName, apiKey);
 
-        call.enqueue(new Callback<List<RecognizedIngredient>>() {
+        call.enqueue(new Callback<List<RecognizedIngredient>>()  {
             @Override
             public void onResponse(Call<List<RecognizedIngredient>> call, Response<List<RecognizedIngredient>> response) {
-
                 if (response.isSuccessful() && response.body() != null) {
-
                     List<RecognizedIngredient> fetchedIngredients = response.body();
-                    if (!fetchedIngredients.isEmpty()) {
-                        Log.d("DEBUG", "!fetchedIngredients.isEmpty()");
+                    if (fetchedIngredients != null && !fetchedIngredients.isEmpty()) {
                         RecognizedIngredient firstIngredient = fetchedIngredients.get(0);
-
-                        Log.d("DEBUG", "Fetched ingredient: " + firstIngredient.getDisplayName());
-                        Log.d("DEBUG", "Calories: " + firstIngredient.getCalories());
-                        Log.d("DEBUG", "Proteins: " + firstIngredient.getProteins());
-                        Log.d("DEBUG", "Carbs: " + firstIngredient.getCarbs());
-                        Log.d("DEBUG", "Fats: " + firstIngredient.getFats());
-                        Log.d("DEBUG", "Fibers: " + firstIngredient.getFibers());
-
-
-                        listener.onIngredientFetched(firstIngredient);
+                        listener.onIngredientFetched(firstIngredient); // Pass the ingredient back
                     } else {
                         Log.e("DEBUG", "No ingredients found for: " + ingredientName);
                         listener.onIngredientFetched(null);
                     }
                 } else {
-                    try {
-                        Log.e("DEBUG", "Error body: " + response.errorBody().string());
-                    } catch (IOException e) {
-                        Log.e("DEBUG", "Failed to log error body");
-                    }
+                    Log.e("DEBUG", "API call unsuccessful or response body null.");
                     listener.onIngredientFetched(null);
                 }
             }
