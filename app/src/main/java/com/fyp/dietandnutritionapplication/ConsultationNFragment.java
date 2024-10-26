@@ -73,14 +73,22 @@ public class ConsultationNFragment extends Fragment {
         // Date Picker
         datePickerButton.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
+            // Set the calendar to tomorrow
+            calendar.add(Calendar.DAY_OF_YEAR, 1); // Add 1 day to today
+
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
                     (view1, year, month, dayOfMonth) -> {
                         selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
                         datePickerButton.setText(selectedDate);
                     },
                     calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+            // Set the minimum date for the DatePicker
+            datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+
             datePickerDialog.show();
         });
+
 
         // Time Picker
         timePickerButton.setOnClickListener(v -> {
@@ -148,7 +156,7 @@ public class ConsultationNFragment extends Fragment {
 
         button_pendingConsultation.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BookingHistoryFragment())
+                    .replace(R.id.frame_layout, new PendingConsultationsFragment())
                     .addToBackStack(null)
                     .commit();
         });
@@ -157,23 +165,50 @@ public class ConsultationNFragment extends Fragment {
     }
 
     private void fetchSlotsFromFirestore() {
-        firestore.collection("Consultation_slots").get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    availableSlotsList.clear();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        String date = document.getString("date");
-                        String time = document.getString("time");
-                        String nutritionistName = document.getString("nutritionistName");
-                        if (date != null && time != null && nutritionistName != null) {
-                            availableSlotsList.add(date + ", " + time + " - " + nutritionistName);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            // Get the logged-in user's ID
+            String userId = currentUser.getUid();
+
+            // Fetch the nutritionist's name for comparison
+            firestore.collection("Users").document(userId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String loggedInNutritionistName = documentSnapshot.getString("username");
+
+                            // Query consultation slots where `nutritionistName` matches the logged-in user
+                            firestore.collection("Consultation_slots")
+                                    .whereEqualTo("nutritionistName", loggedInNutritionistName)
+                                    .get()
+                                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                                        availableSlotsList.clear();
+                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                            String date = document.getString("date");
+                                            String time = document.getString("time");
+                                            String nutritionistName = document.getString("nutritionistName");
+
+                                            if (date != null && time != null && nutritionistName != null) {
+                                                availableSlotsList.add(date + ", " + time + " - " + nutritionistName);
+                                            }
+                                        }
+                                        slotsAdapter.notifyDataSetChanged();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Failed to fetch slots", Toast.LENGTH_SHORT).show();
+                                    });
                         }
-                    }
-                    slotsAdapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to fetch slots", Toast.LENGTH_SHORT).show();
-                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to fetch user details", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+        }
     }
+
 
     private void saveSlotToFirestore(String consultationId, String date, String time, String nutritionistName, String status, String userName) {
         Slot slot = new Slot(consultationId, date, time, nutritionistName, status, userName);

@@ -18,9 +18,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class NutriHomeFragment extends Fragment {
 
@@ -30,6 +36,7 @@ public class NutriHomeFragment extends Fragment {
     private List<String> bookingsList;
     private FirebaseFirestore firestore;
     private BookingsAdapter adapter;
+    private TextView totalConsultationsText;
 
     @Nullable
     @Override
@@ -44,6 +51,7 @@ public class NutriHomeFragment extends Fragment {
         Button button_recommendation = view.findViewById(R.id.button_recommendRecipes);
         bookingsRecyclerView = view.findViewById(R.id.bookings_recycler_view);
         addBookingButton = view.findViewById(R.id.add_booking_button);
+        totalConsultationsText = view.findViewById(R.id.carbohydrates_value);
 
         firestore = FirebaseFirestore.getInstance();
 
@@ -129,26 +137,71 @@ public class NutriHomeFragment extends Fragment {
     }
 
     private void fetchBookingsFromFirestore() {
-        firestore.collection("Consultation_slots").get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    bookingsList.clear();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Slot slot = document.toObject(Slot.class);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
 
-                        // Create a string to display in the RecyclerView
-                        String bookingInfo = "Nutritionist: " + slot.getNutritionistName() +
-                                "\nDate: " + slot.getDate() +
-                                "\nTime: " + slot.getTime() +
-                                "\nStatus: " + slot.getStatus();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
 
-                        // Add the formatted string to the bookings list
-                        bookingsList.add(bookingInfo);
-                    }
-                    adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to fetch bookings", Toast.LENGTH_SHORT).show();
-                });
+            firestore.collection("Users").document(userId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String loggedInNutritionistName = documentSnapshot.getString("username");
+
+                            // Query consultation slots where `nutritionistName` matches the logged-in user
+                            firestore.collection("Consultation_slots")
+                                    .whereEqualTo("nutritionistName", loggedInNutritionistName)
+                                    .get()
+                                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                                        bookingsList.clear();
+
+                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                            Slot slot = document.toObject(Slot.class);
+
+                                            // Create a string to display in the RecyclerView
+                                            String bookingInfo = "Nutritionist: " + slot.getNutritionistName() +
+                                                    "\nDate: " + slot.getDate() +
+                                                    "\nTime: " + slot.getTime() +
+                                                    "\nStatus: " + slot.getStatus() + "\n";
+
+                                            // Add the formatted string to the bookings list
+                                            bookingsList.add(bookingInfo);
+                                        }
+
+                                        // Update counts
+                                        totalConsultationsText.setText(" " + bookingsList.size());
+
+                                        adapter.notifyDataSetChanged();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Failed to fetch bookings", Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to fetch user details", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean isUpcoming(String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        try {
+            // Parse the provided date string into a Date object
+            Date parsedDate = dateFormat.parse(date);
+            Date currentDate = new Date();
+
+            // Compare the parsed date with the current date
+            return parsedDate != null && parsedDate.after(currentDate);
+        } catch (ParseException e) {
+            // Handle the parsing exception
+            e.printStackTrace();
+            return false; // Return false if there's an error in parsing
+        }
     }
 
 

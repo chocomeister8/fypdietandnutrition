@@ -218,38 +218,13 @@
                             android:id="@+id/carbohydrates_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10"
+                            android:text="0"
                             android:textAlignment="center"
                             android:textColor="@android:color/black"
                             android:textSize="16sp" />
                     </LinearLayout>
 
                     <!-- Proteins Column -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/proteins_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Upcoming Consultations"
-                            android:textAlignment="center"
-                            android:textColor="@android:color/black"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/proteins_value"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="3"
-                            android:textAlignment="center"
-                            android:textColor="@android:color/black"
-                            android:textSize="16sp" />
-                    </LinearLayout>
                 </LinearLayout>
             </FrameLayout>
 
