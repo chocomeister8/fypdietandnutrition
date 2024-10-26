@@ -15,7 +15,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -53,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -566,7 +569,7 @@ public class UserMealRecordFragment extends Fragment {
                             username,
                             ingredient.getDisplayName(),
                             selectedMealType,
-                            "1.0 Serving",
+                            "Image-based 1.0 Serving",
                             ingredient.getNutrition().getCalories(),
                             ingredient.getNutrition().getCarbs(),
                             ingredient.getNutrition().getProteins(),
@@ -1001,7 +1004,11 @@ public class UserMealRecordFragment extends Fragment {
                             String mealRecordID = mealRecord.getMealRecordID();
                             switch (item.getItemId()) {
                                 case R.id.update_meal:
-                                    updateMealRecord(mealRecord, mealRecordID);
+                                    if (mealRecord.getServingSize().contains("Image-based")) {
+                                        updateImageBasedMealRecord(mealRecord, mealRecordID);
+                                    } else {
+                                        updateMealRecord(mealRecord, mealRecordID);
+                                    }
                                     return true;
                                 case R.id.delete_meal:
                                     String mealTypeD = mealRecord.getMealType();
@@ -1032,6 +1039,92 @@ public class UserMealRecordFragment extends Fragment {
         }
 
     }
+
+    private void updateImageBasedMealRecord(MealRecord mealRecord, String mealRecordID) {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View dialogView = inflater.inflate(R.layout.dialog_update_meal_image_based, null);
+
+        Spinner spinnerMealType = dialogView.findViewById(R.id.spinnerMealType);
+        EditText editTextServingSize = dialogView.findViewById(R.id.editTextServingSize);
+
+        ArrayAdapter<CharSequence> mealAdapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.meal_types_array, android.R.layout.simple_spinner_item);
+        mealAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMealType.setAdapter(mealAdapter);
+
+        int spinnerPosition = mealAdapter.getPosition(mealRecord.getMealType());
+        spinnerMealType.setSelection(spinnerPosition);
+
+        String servingSizeWithUnit = mealRecord.getServingSize(); // e.g., "Image-based 1.0 Serving"
+        double originalServingSize;
+        if (servingSizeWithUnit.startsWith("Image-based")) {
+            String[] parts = servingSizeWithUnit.split(" ");
+            if (parts.length > 1 && isNumeric(parts[1])) {
+                originalServingSize = Double.parseDouble(parts[1]);  // Extract the numeric portion
+                editTextServingSize.setText(parts[1]);  // Set extracted size in EditText for user to edit
+            } else {
+                Toast.makeText(getActivity(), "Invalid serving size format.", Toast.LENGTH_SHORT).show();
+                return;  // Exit if format is invalid
+            }
+        } else {
+            Toast.makeText(getActivity(), "Invalid format for Image-based serving.", Toast.LENGTH_SHORT).show();
+            return;  // Exit if format is invalid
+        }
+
+        double originalCalories = mealRecord.getCalories();
+        double originalProteins = mealRecord.getProteins();
+        double originalFats = mealRecord.getFats();
+        double originalCarbohydrates = mealRecord.getCarbs();
+        double originalFiber = mealRecord.getFiber();
+
+
+        // Create and show dialog
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Update Meal Record")
+                .setView(dialogView)
+                .setPositiveButton("Update", (dialog, which) -> {
+                    // Get updated values from user input
+                    String updatedMealType = spinnerMealType.getSelectedItem().toString();
+                    double updatedServingSize = Double.parseDouble(editTextServingSize.getText().toString());
+
+                    // Calculate adjusted nutrients based on updated serving size
+                    double adjustedCalories = originalCalories * (updatedServingSize / originalServingSize);
+                    double adjustedProteins = originalProteins * (updatedServingSize / originalServingSize);
+                    double adjustedFats = originalFats * (updatedServingSize / originalServingSize);
+                    double adjustedCarbohydrates = originalCarbohydrates * (updatedServingSize / originalServingSize);
+                    double adjustedFiber = originalFiber * (updatedServingSize / originalServingSize);
+
+                    // Update the meal record with the adjusted values
+                    mealRecord.setMealType(updatedMealType);
+                    mealRecord.setServingSize("Image-based " + updatedServingSize + " Serving"); // Keep the original unit
+                    mealRecord.setCalories(adjustedCalories);
+                    mealRecord.setProteins(adjustedProteins);
+                    mealRecord.setFats(adjustedFats);
+                    mealRecord.setCarbs(adjustedCarbohydrates);
+                    mealRecord.setFiber(adjustedFiber);
+
+                    // Save the updated record
+                    userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
+                    refreshMealData();
+                    Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
+    }
+
+    private boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
     private void updateMealRecord(MealRecord mealRecord, String mealRecordID) {
         // Inflate the dialog layout
@@ -1136,7 +1229,7 @@ public class UserMealRecordFragment extends Fragment {
                                     })
                                     .create()
                                     .show();
-                         } else {
+                        } else {
                             Toast.makeText(getActivity(), "No serving units found for: " + foodName, Toast.LENGTH_SHORT).show();
                         }
                     } else {
@@ -1307,9 +1400,8 @@ public class UserMealRecordFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case 0:
-                                        // Handle snapping a photo
                                         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                                            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                                         } else {
                                             openCameraWithMealType(selectedMealType);
                                         }
@@ -1331,6 +1423,20 @@ public class UserMealRecordFragment extends Fragment {
 
         builder.setNegativeButton("Cancel", null);
         builder.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCameraWithMealType(selectedMealType);
+            } else {
+                // Permission denied, show a message
+                Toast.makeText(getContext(), "Camera permission is required to take photos.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void updateDateTextView(Calendar calendar, String username, String userId) {

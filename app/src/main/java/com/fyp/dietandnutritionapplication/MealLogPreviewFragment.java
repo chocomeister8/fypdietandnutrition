@@ -17,10 +17,13 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import java.io.ByteArrayOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import android.view.ViewGroup;
@@ -163,7 +166,7 @@ public class MealLogPreviewFragment extends Fragment {
         calendar = Calendar.getInstance();
 
         calorieLimitView = view.findViewById(R.id.progress_calorielimit);
-        calorieLimit = 2000;
+        calorieLimit = 1500;
         calorieLimitView.setText("Calorie Limit: " + calorieLimit);
 
         remainingCaloriesView = view.findViewById(R.id.progress_remainingcalorie);
@@ -194,6 +197,20 @@ public class MealLogPreviewFragment extends Fragment {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted, open the camera
+                openCameraWithMealType(selectedMealType);
+            } else {
+                // Permission denied, show a message to the user
+                Toast.makeText(getContext(), "Camera permission is required to take photos.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -207,11 +224,8 @@ public class MealLogPreviewFragment extends Fragment {
                     if (imageBitmap != null) {
                         String selectedMealType = this.selectedMealType;
 
-                        uploadImageToFirebaseStorage(imageBitmap, imageUrl -> {
-                            downloadImageFromFirebase(imageUrl, downloadedBitmap -> {
-                                sendImageToFoodvisor(imageUrl, downloadedBitmap, selectedMealType);
-                            });
-                        });
+                      sendImageToFoodvisor(null, imageBitmap, selectedMealType);
+
                     }
                 }
 
@@ -236,71 +250,6 @@ public class MealLogPreviewFragment extends Fragment {
         } else {
             Toast.makeText(getActivity(), "Operation canceled.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-
-
-    private void uploadImageToFirebaseStorage(Bitmap imageBitmap, UserMealRecordFragment.OnImageUploadListener listener) {
-        // Generate a unique ID for guest user if no authenticated user is found
-        String userId = (FirebaseAuth.getInstance().getCurrentUser() != null) ?
-                FirebaseAuth.getInstance().getCurrentUser().getUid() :
-                "guest_" + UUID.randomUUID().toString(); // or use System.currentTimeMillis()
-
-        // Create a file to save the bitmap
-        File file = new File(getContext().getCacheDir(), "meal_image.jpg");
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-        } catch (IOException e) {
-            Log.e("Meal Record", "Failed to save bitmap to file: " + e.getMessage());
-            Toast.makeText(getContext(), "Failed to save image", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Get the Uri of the file
-        Uri imageUri = Uri.fromFile(file);
-
-        // Upload the image to Firebase Storage
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference()
-                .child("meal_Records/" + userId + ".jpg");
-
-        storageReference.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    storageReference.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                listener.onImageUploaded(uri.toString());
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(getContext(), "Failed to retrieve download URL", Toast.LENGTH_SHORT).show();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Meal Record", "Failed to upload image: " + e.getMessage());
-                    Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void downloadImageFromFirebase(String imageUrl, OnImageDownloadListener listener) {
-        Glide.with(getContext())
-                .asBitmap()
-                .load(imageUrl)
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        // Pass the downloaded image to the listener
-                        listener.onImageDownloaded(resource);
-                    }
-
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-                        // Handle cleanup, if needed
-                    }
-
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        Log.e("Firebase Image", "Failed to download image");
-                    }
-                });
     }
 
 
@@ -375,7 +324,7 @@ public class MealLogPreviewFragment extends Fragment {
                 calendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH);
     }
 
-    private void displayMealLogForGuest(String foodName, String servingSize, double calories, double carbs, double proteins, double fats, String imageUrl, String mealType) {
+    private void displayMealLogForGuest(String foodName, String servingSize, double calories, double carbs, double proteins, double fats, String imageUrl, String mealType, Bitmap imageBitmap) {
         totalCalories += calories;
         totalCarbs += carbs;
         totalProteins += proteins;
@@ -393,11 +342,20 @@ public class MealLogPreviewFragment extends Fragment {
         mealImageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // Set scale type
         mealImageView.setPadding(8, 0, 8, 16);
 
-        // Load the image into the ImageView using Glide
-        Glide.with(getContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.foodimage) // Placeholder image while loading
-                .into(mealImageView);
+        if (imageBitmap != null) {
+
+            Glide.with(getContext())
+                    .load(imageBitmap)
+                    .placeholder(R.drawable.foodimage)
+                    .into(mealImageView);
+        } else if (imageUrl != null && !imageUrl.isEmpty()) {
+            Glide.with(getContext())
+                    .load(imageUrl)
+                    .placeholder(R.drawable.foodimage)
+                    .into(mealImageView);
+        } else {
+            mealImageView.setImageResource(R.drawable.foodimage);
+        }
 
         // Add the image view to the meal entry layout
         mealEntryLayout.addView(mealImageView);
@@ -584,66 +542,6 @@ public class MealLogPreviewFragment extends Fragment {
 
         builder.setNegativeButton("Cancel", null);
         builder.show();
-    }
-
-    private void handleMealLogForGuest(String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageURL) {
-        // Using a default or guest-specific username for guest users
-        String guestUsername = "GuestUser";
-
-        String appId = "997e8d42";
-        String appKey = "4483ab153d93c4a64d6f156fcffa78ff";
-
-        EdamamApiService apiService = ApiClient.getRetrofitInstance().create(EdamamApiService.class);
-        Call<FoodResponse> call = apiService.parseFood(appId, appKey, foodName);
-        Log.d("FoodAPI", "API call initiated for food: " + foodName);
-
-        call.enqueue(new retrofit2.Callback<FoodResponse>() {
-            @Override
-            public void onResponse(Call<FoodResponse> call, retrofit2.Response<FoodResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.d("FoodAPI", "Full API Response: " + response.body().toString());
-
-                    List<FoodResponse.Hint> hints = response.body().getHints();
-                    if (hints != null && !hints.isEmpty()) {
-                        FoodResponse.Hint hint = hints.get(0);
-                        FoodResponse.Food food = hint.getFood();
-                        if (food != null) {
-                            List<FoodResponse.Measure> measures = hints.get(0).getMeasures();
-                            if (measures != null && !measures.isEmpty()) {
-                                for (FoodResponse.Measure measure : measures) {
-                                    if (measure.getLabel().equalsIgnoreCase(servingUnit)) {
-                                        double referenceWeight = measure.getWeight();
-                                        if (referenceWeight == 0) {
-                                            Log.e("FoodAPI", "Reference weight is zero, cannot scale nutrients.");
-                                            return;
-                                        }
-
-                                        double scaleFactor = (servingSize * referenceWeight) / 100;
-
-                                        // Extract and adjust nutrients
-                                        FoodResponse.Nutrients nutrients = food.getNutrients();
-                                        if (nutrients != null) {
-                                            double adjustedCalories = nutrients.getCalories() * scaleFactor;
-                                            double adjustedProtein = nutrients.getProtein() * scaleFactor;
-                                            double adjustedFat = nutrients.getFat() * scaleFactor;
-                                            double adjustedCarbohydrates = nutrients.getCarbohydrates() * scaleFactor;
-
-                                            displayMealLogForGuest(foodName, servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, imageURL, selectedMealType);
-
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<FoodResponse> call, Throwable t) {
-                Log.e("FoodAPI", "Error fetching food data", t);
-            }
-        });
     }
 
     private void handleFoodNameInput(String selectedMealType, String imageUrl) {
@@ -840,7 +738,7 @@ public class MealLogPreviewFragment extends Fragment {
                                         Log.d("FoodAPI", "Adjusted Carbs: " + adjustedCarbohydrates);
                                         Log.d("FoodAPI", "Adjusted Fiber: " + adjustedFiber);
 
-                                        displayMealLogForGuest(foodName, servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, imageURL, selectedMealType);
+                                        displayMealLogForGuest(foodName, servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, imageURL, selectedMealType, null);
                                     }
                                 }
                             } else {
@@ -954,10 +852,11 @@ public class MealLogPreviewFragment extends Fragment {
                 return;
             }
 
+
+
             for (int i = 0; i <  uniqueIngredients.size(); i++) {
                 if (checkedItems[i]) {
                     RecognizedIngredient ingredient = uniqueIngredients.get(i);
-
                     // Display or handle selected ingredient (replace displayMealLogForGuest with your logic)
                     displayMealLogForGuest(
                             ingredient.getDisplayName(),
@@ -967,7 +866,8 @@ public class MealLogPreviewFragment extends Fragment {
                             ingredient.getNutrition().getProteins(),
                             ingredient.getNutrition().getFats(),
                             imageUrl,
-                            selectedMealType
+                            selectedMealType,
+                            imageBitmap
                     );
                 }
             }
@@ -997,6 +897,7 @@ public class MealLogPreviewFragment extends Fragment {
 
         builder.show();
     }
+
 
     private void sendImageToFoodvisor(String imageUrl, Bitmap imageBitmap, String selectedMealType) {
 
