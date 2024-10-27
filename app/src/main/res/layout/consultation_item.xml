@@ -20,7 +20,7 @@
             android:id="@+id/consultation_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consultation ID:"
+            android:text="Consultation ID: "
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,7 @@
             android:id="@+id/nutritionist_name_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nutritionist:"
+            android:text="Nutritionist: "
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,60 +58,38 @@
             app:layout_constraintTop_toTopOf="@+id/nutritionist_name_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Client Name Label -->
-        <TextView
-            android:id="@+id/client_name_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Client:"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nutritionist_name_label"
-            android:layout_marginTop="8dp" />
+<!--        &lt;!&ndash; Client Name Label &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/client_name_label"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Client:"-->
+<!--            android:textSize="15sp"-->
+<!--            android:textStyle="bold"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/nutritionist_name_label"-->
+<!--            android:layout_marginTop="8dp" />-->
 
-        <!-- Dynamic Client Name Value -->
-        <TextView
-            android:id="@+id/client_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/client_name_label"
-            app:layout_constraintTop_toTopOf="@+id/client_name_label"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <!-- Consultation Details Label -->
-        <TextView
-            android:id="@+id/details_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Details:"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/client_name_label"
-            android:layout_marginTop="8dp" />
-
-        <!-- Dynamic Consultation Details Value -->
-        <TextView
-            android:id="@+id/details"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/details_label"
-            app:layout_constraintTop_toTopOf="@+id/details_label"
-            app:layout_constraintEnd_toEndOf="parent" />
+<!--        &lt;!&ndash; Dynamic Client Name Value &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/client_name"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="15sp"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/client_name_label"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/client_name_label"-->
+<!--            app:layout_constraintEnd_toEndOf="parent" />-->
 
         <!-- Date Label -->
         <TextView
             android:id="@+id/date_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date:"
+            android:text="Date: "
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/details_label"
+            app:layout_constraintTop_toBottomOf="@+id/nutritionist_name"
             android:layout_marginTop="8dp" />
 
         <!-- Dynamic Date Value -->
@@ -129,7 +107,7 @@
             android:id="@+id/time_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time:"
+            android:text="Time: "
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -147,39 +125,10 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Status Label -->
-        <TextView
-            android:id="@+id/status_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Status:"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/time_label"
-            android:layout_marginTop="8dp" />
 
         <!-- Dynamic Status Value -->
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/status_label"
-            app:layout_constraintTop_toTopOf="@+id/status_label"
-            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Book Button -->
-        <Button
-            android:id="@+id/book_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Book"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/status_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

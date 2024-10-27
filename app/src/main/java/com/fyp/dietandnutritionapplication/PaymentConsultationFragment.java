@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -83,17 +84,7 @@ public class PaymentConsultationFragment extends Fragment {
 
         // Set button click listener for PayPal button
         btnPayPal.setOnClickListener(v -> {
-//            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-//            String clientName = (currentUser != null && currentUser.getDisplayName() != null) ? currentUser.getDisplayName() : "clientName";
-//
-//            if (clientName != null) {
-//                updateConsultationWithClientName(clientName);
-//            } else {
-//                Toast.makeText(getContext(), "Unable to retrieve client name.", Toast.LENGTH_SHORT).show();
-//            }
-            showBookingSuccessMessage();
-//            updateConsultationWithClientName(clientName);
-            navigateToConsultationsFragment();
+            processPayment(); // Call the payment process method here
         });
         // Initialize the estimated total with the original price
         estimatedTotalTextView.setText("$" + String.format("%.2f", CONSULTATION_PRICE));
@@ -101,16 +92,36 @@ public class PaymentConsultationFragment extends Fragment {
         return view;
     }
 
-//    private void updateConsultationWithClientName(String clientName) {
-//        if (consultationId != null && !consultationId.isEmpty()) {
-//            db.collection("Consultation_slots").document(consultationId)
-//                    .update("clientName", clientName)
-//                    .addOnSuccessListener(aVoid -> Log.d("FirebaseUpdate", "Client name added successfully"))
-//                    .addOnFailureListener(e -> Log.e("FirebaseUpdate", "Error adding client name", e));
-//        } else {
-//            Log.e("FirebaseUpdate", "Consultation ID is null or empty");
-//        }
-//    }
+    private void processPayment() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String clientName = currentUser.getDisplayName(); // Get the current user's display name
+            Log.d("PaymentConsultationFragment", "Current user: " + clientName); // Log user info
+            updateConsultationWithClientName(clientName); // Update Firestore
+        } else {
+            Log.e("PaymentConsultationFragment", "No user is currently logged in");
+            Toast.makeText(getContext(), "You must be logged in to make a payment.", Toast.LENGTH_SHORT).show();
+        }
+
+        // This assumes payment processing is successful
+        showBookingSuccessMessage();
+        navigateToConsultationsFragment();
+    }
+
+    private void updateConsultationWithClientName(String clientName) {
+        if (consultationId != null && !consultationId.isEmpty()) {
+            db.collection("Consultation_slots").document(consultationId)
+                    .update("clientName", "hi")
+                    .addOnSuccessListener(aVoid -> Log.d("FirebaseUpdate", "Client name added successfully"))
+                    .addOnFailureListener(e -> {
+                        Log.e("FirebaseUpdate", "Error adding client name", e);
+                        Toast.makeText(getContext(), "Failed to update client name. Please try again.", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Log.e("FirebaseUpdate", "Consultation ID is null or empty");
+        }
+    }
+
 
     // Method to show success message
     private void showBookingSuccessMessage() {
@@ -120,14 +131,12 @@ public class PaymentConsultationFragment extends Fragment {
     // Method to navigate to the ConsultationsFragment
     private void navigateToConsultationsFragment() {
         try {
-            // Ensure the fragment container ID exists
             FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.frame_layout, new ConsultationsFragment());
             transaction.addToBackStack(null);  // Adds to back stack for proper back navigation
             transaction.commit();
 
         } catch (Exception e) {
-
             Log.e("NavigationError", "Error navigating to ConsultationsFragment", e);
             Toast.makeText(getContext(), "Navigation failed, please try again.", Toast.LENGTH_SHORT).show();
         }

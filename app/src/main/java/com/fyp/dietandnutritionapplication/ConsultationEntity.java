@@ -3,6 +3,7 @@ package com.fyp.dietandnutritionapplication;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -28,7 +29,13 @@ public class ConsultationEntity {
 
     // Retrieve all consultations
     public void retrieveConsultationSlots(final DataCallback callback) {
-        String username = "null";
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String username = (currentUser != null) ? currentUser.getDisplayName() : null; // Get the actual username
+
+        if (username == null) {
+            callback.onFailure(new Exception("User is not logged in"));
+            return; // Exit if user is not logged in
+        }
         db.collection("Consultation_slots")
                 .whereEqualTo("username", username)  // Assumes there is a userId field in the consultation documents
                 .get()
@@ -83,6 +90,7 @@ public class ConsultationEntity {
         slot.setConsultationId(document.getString("consultationId"));
         slot.setDate(document.getString("date"));
         slot.setTime(document.getString("time"));
+        slot.setClientName(document.getString("clientName"));
         slot.setStatus(document.getString("booked"));
         return slot;
     }

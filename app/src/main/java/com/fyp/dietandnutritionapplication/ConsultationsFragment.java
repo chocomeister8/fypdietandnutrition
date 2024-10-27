@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,7 @@ public class ConsultationsFragment extends Fragment {
     private ArrayList<Consultation> consultationList = new ArrayList<>();
     private ArrayList<Consultation> consultationList2 = new ArrayList<>();
     private FirebaseFirestore db;
-    private ConsultationAdapter consultationAdapter;
+    private ConsultationsFragmentAdapter_u_consult consultationAdapter;
     private ArrayList<Consultation> originalConsultations = new ArrayList<>(); // unfilter list
     private Button viewNutriButton, viewConsultationButton;
     private EditText searchBar;
@@ -64,19 +65,21 @@ public class ConsultationsFragment extends Fragment {
 //        Consultation consultation1 = new Consultation("123","John Wick","ahmoytan1956","123456","time","pending");
 //        consultationList.add(consultation1);
         // Set up the ConsultationAdapter to bind data to the ListView
-        consultationAdapter = new ConsultationAdapter(requireContext(), consultationList2);
+        consultationAdapter = new ConsultationsFragmentAdapter_u_consult(requireContext(), consultationList2);
         consultationListView.setAdapter(consultationAdapter);
+
+        fetchConsultationsFromFirestore();
 
         String currentUserId = getCurrentUserId();
 
         ConsultationEntity consultationEntity = new ConsultationEntity();
-        consultationEntity.retrieveConsultationSlots(new ConsultationEntity.DataCallback() {
+        consultationEntity.retrieveCons(new ConsultationEntity.DataCallback() {
             @Override
             public void onSuccess(ArrayList<Consultation> consultationList) {
-                if (consultationList.isEmpty()) {
-                    // No consultations found for the user, show a toast message
-                    Toast.makeText(getContext(), "You haven't booked any consultation yet, our nutritionist is always there for you.", Toast.LENGTH_LONG).show();
-                } else {
+                if (!consultationList.isEmpty()) {
+//                    // No consultations found for the user, show a toast message
+//                    Toast.makeText(getContext(), "You haven't booked any consultation yet, our nutritionist is always there for you.", Toast.LENGTH_LONG).show();
+//                } else {
                     // Success, consultations found, update the list
                     Toast.makeText(getContext(), "Success to load your consultations.", Toast.LENGTH_SHORT).show();
                     consultationList2.clear();
@@ -184,4 +187,35 @@ public class ConsultationsFragment extends Fragment {
         consultationList.addAll(filteredConsultations);
         consultationAdapter.notifyDataSetChanged(); // Refresh the adapter
     }
+    // Method to add hardcoded consultations for testing
+    private void fetchConsultationsFromFirestore() {
+        // Clear the existing list to avoid duplication
+        consultationList2.clear();
+
+        db.collection("Consultation_slots")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Get the document ID and other fields
+                            String id = document.getId(); // Get the document ID
+                            String nutritionistName = document.getString("nutritionistName");
+                            String clientName = document.getString("clientName");
+                            String date = document.getString("date");
+                            String time = document.getString("time");
+                            String status = document.getString("status"); // Ensure this matches your Firestore structure
+
+                            // Create a new Consultation object and add it to the list
+                            Consultation consultation = new Consultation(id, nutritionistName, clientName, date, time, status, 150);
+                            consultationList2.add(consultation);
+                        }
+                        // Notify the adapter that the data has changed
+                        consultationAdapter.notifyDataSetChanged();
+                    } else {
+                        // Handle the error
+                        Toast.makeText(getContext(), "Failed to fetch consultations: " + task.getException(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
 }
