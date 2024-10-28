@@ -1,5 +1,7 @@
 package com.fyp.dietandnutritionapplication;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 public class NavUserFolderController {
@@ -18,6 +20,7 @@ public class NavUserFolderController {
             public void onRecipesFetched(ArrayList<Recipe> fetchedRecipes) {
                 // Call the listener to handle the fetched recipes
                 if (listener != null) {
+                    Log.d("NavUserFolderController", "Fetched recipes: " + fetchedRecipes.size());
                     listener.onRecipesFetched(fetchedRecipes);
                 }
             }

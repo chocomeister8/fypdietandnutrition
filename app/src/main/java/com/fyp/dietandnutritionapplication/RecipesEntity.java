@@ -73,6 +73,7 @@ public class RecipesEntity {
 
                             // Pass the fetched recipes to the listener
                             listener.onRecipesFetched(recipeList);
+                            Log.d("Firestore", "Fetching recipes for folder: " + folderNameInput);
                         } else {
                             Log.d("Firestore", "Error getting documents: ", task.getException());
                         }
