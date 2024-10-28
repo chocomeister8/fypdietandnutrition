@@ -238,12 +238,12 @@
                         android:id="@+id/roleLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Role:"
+                        android:text="Dietary preference:"
                         android:textColor="#000000"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/role"
+                        android:id="@+id/DietaryPreferenceTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
@@ -262,12 +262,12 @@
                         android:id="@+id/accountActiveSinceLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Account Active Since:"
+                        android:text="Allergy:"
                         android:textColor="#000000"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/accountActiveSince"
+                        android:id="@+id/AllergyTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"

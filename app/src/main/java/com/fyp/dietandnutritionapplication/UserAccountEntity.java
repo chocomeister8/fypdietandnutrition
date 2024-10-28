@@ -277,7 +277,7 @@ public class UserAccountEntity {
         }
 
         // Set other fields
-        user.setDietaryPreference(document.getString("dietPreference"));
+        user.setDietaryPreference(document.getString("dietaryPreference"));
         user.setFoodAllergies(document.getString("foodAllergies"));
         user.setHealthGoal(document.getString("healthGoal"));
 

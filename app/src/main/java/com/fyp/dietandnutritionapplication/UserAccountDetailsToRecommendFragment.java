@@ -41,8 +41,8 @@ public class UserAccountDetailsToRecommendFragment extends Fragment {
         TextView phonenumberTextView = view.findViewById(R.id.phone);
         TextView genderTextView = view.findViewById(R.id.gender);
         TextView emailTextView = view.findViewById(R.id.email);
-        TextView roleTextView = view.findViewById(R.id.role);
-        TextView datejoinedTextView = view.findViewById(R.id.accountActiveSince);
+        TextView dieteryPreference = view.findViewById(R.id.DietaryPreferenceTextView);
+        TextView allergy = view.findViewById(R.id.AllergyTextView);
         Button recommendButton = view.findViewById(R.id.recommendRecipeButton);
 
 
@@ -54,8 +54,17 @@ public class UserAccountDetailsToRecommendFragment extends Fragment {
             phonenumberTextView.setText(selectedProfile.getPhoneNumber());
             genderTextView.setText(selectedProfile.getGender());
             emailTextView.setText(selectedProfile.getEmail());
-            roleTextView.setText(selectedProfile.getRole());
-            datejoinedTextView.setText(selectedProfile.getDateJoined());
+//            roleTextView.setText(selectedProfile.getRole());
+            if (selectedProfile instanceof User) {
+                User user = (User) selectedProfile;
+                String dietaryPreferenceString = user.getDietaryPreference();
+                dieteryPreference.setText(dietaryPreferenceString); // Display in TextView
+            }
+            if (selectedProfile instanceof User) {
+                User user = (User) selectedProfile;
+                String allergyString = user.getFoodAllergies();
+                allergy.setText(allergyString); // Display in TextView
+            }
 
             String userStatus = selectedProfile.getStatus();
             Log.d("AccountDetailsFragment", "User status: " + userStatus); // Debug log
