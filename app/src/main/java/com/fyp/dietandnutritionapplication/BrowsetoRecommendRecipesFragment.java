@@ -56,6 +56,7 @@ public class BrowsetoRecommendRecipesFragment extends Fragment {
 
         // Initialize views
         Button button_all_recipes = view.findViewById(R.id.button_all_recipes);
+        Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
 
         searchEditText = view.findViewById(R.id.search_recipe);
 
@@ -100,7 +101,8 @@ public class BrowsetoRecommendRecipesFragment extends Fragment {
         }
 
         // Set up button click listeners
-        button_all_recipes.setOnClickListener(v -> navigateToFragment(new NutriAllRecipesFragment()));
+        button_all_recipes.setOnClickListener(v -> navigateToFragment(new BrowsetoRecommendRecipesFragment()));
+        button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new RecommendedRecipesFragment()));
 
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);

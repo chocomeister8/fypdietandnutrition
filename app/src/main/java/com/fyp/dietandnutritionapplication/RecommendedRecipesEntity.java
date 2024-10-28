@@ -1,5 +1,6 @@
 package com.fyp.dietandnutritionapplication;
 
+import static android.content.ContentValues.TAG;
 import static java.lang.Double.parseDouble;
 
 import android.content.Context;
@@ -10,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -177,5 +179,55 @@ public class RecommendedRecipesEntity {
             // Handle the case where the user is not logged in
             Toast.makeText(context, "You need to log in to recommand", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void getRecommendedRecipesByUsername(String username, Context context, OnRecommendedRecipesRetrievedListener listener) {
+        db.collection("RecommendedRecipes")
+                .whereEqualTo("username", username)  // Filter by the retrieved username
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    recipes.clear();
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+                        try {
+                            Recipe recipe = createRecipeFromDocument(document);
+                            recipes.add(recipe);
+                        } catch (Exception e) {
+                            listener.onError(e);  // Notify listener about the error
+                            Toast.makeText(context, "Error retrieving recipes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    listener.onRecipesRetrieved(recipes);
+                })
+                .addOnFailureListener(e -> {
+                    listener.onError(e);
+                    Toast.makeText(context, "Failed to retrieve recommended recipes", Toast.LENGTH_SHORT).show();
+                });
+    }
+    public void removeRecipeFromFirestore(String username,String title){
+        db.collection("RecommendedRecipes")
+                .whereEqualTo("username", username)
+                .whereEqualTo("title", title)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Get the document ID
+                            String documentId = document.getId();
+
+                            // Step 2: Delete the recipe
+                            db.collection("RecommendedRecipes").document(documentId)
+                                    .delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "Recipe successfully deleted!");
+                                        // Optionally, update UI to reflect deletion
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w(TAG, "Error deleting recipe", e);
+                                    });
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
     }
 }

@@ -35,6 +35,26 @@ public class NavRecommendedRecipesController {
             }
         });
     }
+    public void retrieveRecommendedRecipesByUserName(String username, Context context, final OnRecommendedRecipesRetrievedListener listener) {
+        // Call getRecommendedRecipesByUserId from RecommendedRecipesEntity
+        recommendedRecipesEntity.getRecommendedRecipesByUsername(username, context,new RecommendedRecipesEntity.OnRecommendedRecipesRetrievedListener() {
+            @Override
+            public void onRecipesRetrieved(ArrayList<Recipe> recipes) {
+                // Save the retrieved recipes locally
+                retrievedRecipes.clear();  // Clear previously stored recipes
+                retrievedRecipes.addAll(recipes);  // Add the newly retrieved recipes
+
+                // Notify the listener (e.g., UI) that the recipes are available
+                listener.onRecipesRetrieved(recipes);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // If there's an error, pass it to the listener
+                listener.onError(e);
+            }
+        });
+    }
 
 
     // Method to save a recipe to Firestore

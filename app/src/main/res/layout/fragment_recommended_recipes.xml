@@ -39,10 +39,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="20dp"
-                android:text="All Recipes"
+                android:layout_toEndOf="@+id/logo"
+                android:text="Recommended Recipes"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -57,42 +57,8 @@
             android:layout_alignParentEnd="true"
             android:layout_marginStart="8dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="8dp">
+            android:layout_marginEnd="8dp"/>
 
-            <!-- Search Bar -->
-            <EditText
-                android:id="@+id/search_recipe"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_alignParentStart="true"
-                android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@+id/clear_filters_button"
-                android:background="@drawable/rounded_search_bar_background"
-                android:drawableStart="@drawable/ic_search"
-                android:drawablePadding="10dp"
-                android:hint="Enter Recipe Name:"
-                android:inputType="text"
-                android:padding="10dp"
-                android:textColor="#000000" />
-
-            <!-- Clear Filters Button -->
-
-            <Button
-                android:id="@+id/clear_filters_button"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/decline_background"
-                android:padding="4dp"
-                android:text="Clear Filters"
-                android:textColor="@android:color/white"
-                android:textSize="12sp" />
-
-        </RelativeLayout>
-
-        <!-- Spinners for Meal Type and Dish Type -->
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
@@ -126,7 +92,6 @@
 
         </LinearLayout>
 
-        <!-- Column: Content -->
         <FrameLayout
             android:id="@+id/navigationBar"
             android:layout_width="100dp"
@@ -173,6 +138,7 @@
 
 
             </LinearLayout>
+
         </FrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -191,6 +157,7 @@
             android:paddingTop="4dp"
             android:scrollbars="vertical" />
 
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -205,15 +172,8 @@
             android:layout_margin="8dp"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="© Recipe API resource from Edamam"
-                android:textColor="#555555"
-                android:textSize="12sp" />
-        </LinearLayout>
     </RelativeLayout>
+</androidx.drawerlayout.widget.DrawerLayout>
 
-    </androidx.drawerlayout.widget.DrawerLayout>
