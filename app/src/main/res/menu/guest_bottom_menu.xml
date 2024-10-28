@@ -10,9 +10,6 @@
         android:icon="@drawable/baseline_recipes_24"
         android:id="@+id/recipe"/>
     <item
-        android:title=""
-        android:enabled="false"/>
-    <item
         android:title="Meal Log"
         android:icon="@drawable/baseline_meal_24"
         android:id="@+id/meallog"/>

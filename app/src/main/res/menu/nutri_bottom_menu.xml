@@ -8,9 +8,7 @@
         android:title="Recipe"
         android:icon="@drawable/baseline_recipes_24"
         android:id="@+id/recipe"/>
-    <item
-        android:title=""
-        android:enabled="false"/>
+
     <item
         android:title="Booking"
         android:icon="@drawable/baseline_book_online_24"

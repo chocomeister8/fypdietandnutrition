@@ -9,9 +9,7 @@
         android:title="Accounts"
         android:icon="@drawable/ic_baseline_view_accounts_24"
         android:id="@+id/viewallaccounts"/>
-    <item
-        android:title=""
-        android:enabled="false"/>
+
     <item
         android:title="FAQs"
         android:icon="@drawable/ic_baseline_faq_24"
