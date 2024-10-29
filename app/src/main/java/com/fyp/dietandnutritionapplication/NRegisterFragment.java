@@ -136,7 +136,7 @@ public class NRegisterFragment extends Fragment {
                 String confirmPassword = passwordEditText.getText().toString();
                 String specialization = specializationSpinner.getSelectedItem().toString();
 
-                if (specialization.equals("-- Select Specialization --")) {
+                if (specialization.equals("--Select Specialization--")) {
                     Toast.makeText(getActivity(), "Please select a specialization", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -194,7 +194,8 @@ public class NRegisterFragment extends Fragment {
             @Override
             public void onSuccess(ArrayList<Specialization> specializations) {
                 ArrayList<String> specializationNames = new ArrayList<>();
-                specializationNames.add("-- Select Specialization --");
+
+                specializationNames.add("--Select Specialization--");
                 for (Specialization specialization : specializations) {
                     specializationNames.add(specialization.getName()); // Assuming the Specialization class has a getName() method
                 }
@@ -212,11 +213,10 @@ public class NRegisterFragment extends Fragment {
     }
 
     private void populateSpecializationSpinner(ArrayList<String> specializations) {
-        if (!specializations.contains("-- Select Specialization --")) {
-            specializations.add(0, "-- Select Specialization --");
-        }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, specializations);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         specializationSpinner.setAdapter(adapter);
+
+        specializationSpinner.setSelection(0);
     }
 }

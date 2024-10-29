@@ -406,7 +406,6 @@ public class UserAccountEntity {
                             userCreate.setDateJoined(datejoined);
                             userCreate.setRole("nutritionist");
                             userCreate.setBio(" ");
-                            userCreate.setExpertise(" ");
                             userCreate.setEducation(" ");
                             userCreate.setContactInfo(" ");
                             db.collection("Users").document(userId).set(userCreate)
