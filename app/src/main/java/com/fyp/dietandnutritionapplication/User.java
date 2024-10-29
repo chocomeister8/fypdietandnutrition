@@ -9,6 +9,7 @@ public class User extends Profile {
     private String healthGoal;
     private double currentWeight;
     private double currentHeight;
+    private double weightGoal;
     private String activityLevel;
     private String dob;
     private String profileImageUrl;
@@ -18,7 +19,7 @@ public class User extends Profile {
         this.setStatus("active");
     }
 
-    public User(String firstName, String lastName, String username, String phoneNumber, String email, String gender, String role, String dateJoined, int calorieLimit, String dob, String dietaryPreference, String foodAllergies, String healthGoal, double currentWeight, double currentHeight, String activityLevel, String profileImageUrl) {
+    public User(String firstName, String lastName, String username, String phoneNumber, String email, String gender, String role, String dateJoined, int calorieLimit, String dob, String dietaryPreference, String foodAllergies, String healthGoal, double currentWeight, double currentHeight, double weightGoal, String activityLevel, String profileImageUrl) {
         super(firstName, lastName, username, phoneNumber, email, gender, role, dateJoined);
         this.dob = dob;
         this.calorieLimit = calorieLimit;
@@ -27,18 +28,20 @@ public class User extends Profile {
         this.healthGoal = healthGoal;
         this.currentWeight = currentWeight;
         this.currentHeight = currentHeight;
+        this.weightGoal = weightGoal;
         this.activityLevel = activityLevel;
         this.profileImageUrl = profileImageUrl;
     }
 
     public User(String username, String firstName, String lastName, String email,
                 String gender, String phoneNumber, String healthGoal, double currentWeight,
-                double currentHeight, String dietaryPreference, String foodAllergies,
+                double currentHeight, double weightGoal, String dietaryPreference, String foodAllergies,
                 String activityLevel) {
         super(firstName, lastName, username, phoneNumber, email, gender);
         this.healthGoal = healthGoal;
         this.currentWeight = currentWeight;
         this.currentHeight = currentHeight;
+        this.weightGoal = weightGoal;
         this.dietaryPreference = dietaryPreference;
         this.foodAllergies = foodAllergies;
         this.activityLevel = activityLevel;
@@ -91,6 +94,14 @@ public class User extends Profile {
 
     public void setCurrentHeight(double currentHeight) {
         this.currentHeight = currentHeight;
+    }
+
+    public double getWeightGoal() {
+        return weightGoal;
+    }
+
+    public void setWeightGoal(double weightGoal) {
+        this.weightGoal = weightGoal;
     }
 
     public String getActivityLevel() {

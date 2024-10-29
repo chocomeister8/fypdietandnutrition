@@ -70,7 +70,7 @@ public class ProfileUFragment extends Fragment {
     private ViewUserProfileController viewUserProfileController;
     private EditText aOthersText, dpOthersText;
     private EditText calorieLimitData, userNameData, firstNameData, lastNameData, dateOfBirthData, phoneNumberData;
-    private EditText emailAddressData, currentWeightData, currentHeightData;
+    private EditText emailAddressData, currentWeightData, currentHeightData, weightGoalData;
     private Spinner genderSpinner, activityLevelSpinner, healthGoalsSpinner;
     private Button saveButton;
     private CheckBox aNoneCheckbox, peanutsCheckbox, dairyCheckbox, eggsCheckbox, soyCheckbox, seafoodCheckbox, wheatCheckbox, aOthersCheckbox;
@@ -203,6 +203,7 @@ public class ProfileUFragment extends Fragment {
         currentWeightData = view.findViewById(R.id.current_weight_data);
         currentHeightData = view.findViewById(R.id.current_height_data);
         calorieLimitData = view.findViewById(R.id.daily_calorie_limit_data);
+        weightGoalData = view.findViewById(R.id.weight_goal);
 
         activityLevelSpinner = view.findViewById(R.id.activity_level_data);
 
@@ -351,6 +352,7 @@ public class ProfileUFragment extends Fragment {
                 String phone = phoneNumberData.getText().toString();
                 String email = emailAddressData.getText().toString();
                 String healthGoals = healthGoalsSpinner.getSelectedItem().toString();
+                double weightGoal;
                 double currentWeight;
                 double currentHeight;
                 String dietaryPreferences = getDietaryPreferences();
@@ -371,6 +373,13 @@ public class ProfileUFragment extends Fragment {
                 } catch (NumberFormatException e) {
                     currentHeight = 0;
                     Toast.makeText(getContext(), "Invalid height input", Toast.LENGTH_SHORT).show();
+                }
+
+                try {
+                    weightGoal = Double.parseDouble(weightGoalData.getText().toString());
+                } catch (NumberFormatException e) {
+                    weightGoal = 0;
+                    Toast.makeText(getContext(), "Invalid weight input", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -424,6 +433,7 @@ public class ProfileUFragment extends Fragment {
                 updatedUser.setFoodAllergies(allergies.equals(currentUser.getFoodAllergies()) ? currentUser.getFoodAllergies() : allergies);
                 updatedUser.setActivityLevel(activityLevel.equals(currentUser.getActivityLevel()) ? currentUser.getActivityLevel() : activityLevel);
                 updatedUser.setCalorieLimit(calorieLimit);
+                updatedUser.setWeightGoal(weightGoal);
 
                 viewUserProfileController.updateUserProfile(userId, updatedUser, getContext());
                 calorieLimitData.setText(String.valueOf(updatedUser.getCalorieLimit()));

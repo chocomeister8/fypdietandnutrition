@@ -63,7 +63,8 @@ public class ViewUserProfileController {
                 user.getActivityLevel() == "" ||
                 user.getHealthGoal() == "" ||
                 user.getHealthGoal().equals("Select your health goal") ||
-                user.getDietaryPreference() == null;
+                user.getDietaryPreference() == null ||
+                user.getWeightGoal() == 0;
     }
 
 
@@ -122,6 +123,9 @@ public class ViewUserProfileController {
                 }
                 if (updatedUser.getCalorieLimit() != existingUser.getCalorieLimit()) {
                     updatedFields.put("calorieLimit", updatedUser.getCalorieLimit());
+                }
+                if (updatedUser.getWeightGoal() != existingUser.getWeightGoal()) {
+                    updatedFields.put("weightGoal", updatedUser.getWeightGoal());
                 }
 
 
