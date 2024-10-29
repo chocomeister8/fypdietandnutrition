@@ -13,7 +13,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#9DF8EA"
         android:padding="16dp">
 
         <ImageView
@@ -109,6 +108,26 @@
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/datejoinedLabel"
             app:layout_constraintTop_toTopOf="@+id/datejoinedLabel" />
+
+        <TextView
+            android:id="@+id/statusLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:text="Status:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/usernamelabel"
+            app:layout_constraintTop_toBottomOf="@+id/datejoinedLabel" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/statusLabel"
+            app:layout_constraintTop_toTopOf="@+id/statusLabel" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
             viewHolder.fullnameTextView = convertView.findViewById(R.id.fullname);
             viewHolder.roleTextView = convertView.findViewById(R.id.role);
             viewHolder.dateJoinedTextView = convertView.findViewById(R.id.dateJoined);
+            viewHolder.statusTextView = convertView.findViewById(R.id.status);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -46,6 +49,13 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
         viewHolder.fullnameTextView.setText(fullName);
         viewHolder.roleTextView.setText(currentProfile.getRole());
         viewHolder.dateJoinedTextView.setText(currentProfile.getDateJoined());
+        viewHolder.statusTextView.setText(currentProfile.getStatus());
+
+        if ("deactivated".equalsIgnoreCase(currentProfile.getStatus())) {
+            convertView.setBackgroundColor(ContextCompat.getColor(context, R.color.suspendedAccountRed));
+        } else {
+            convertView.setBackgroundColor(ContextCompat.getColor(context, R.color.activeAccountGreen));
+        }
 
         return convertView;
     }
@@ -55,5 +65,6 @@ public class ProfileAdapter extends ArrayAdapter<Profile> {
         TextView roleTextView;
         TextView fullnameTextView;
         TextView dateJoinedTextView;
+        TextView statusTextView;
     }
 }

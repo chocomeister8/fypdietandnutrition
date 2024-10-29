@@ -21,10 +21,11 @@ public class viewAccountsFragment extends Fragment {
     ListView listView;
     ArrayList<Profile> profiles = new ArrayList<>();
     ArrayList<Profile> originalProfiles = new ArrayList<>(); // Keep the unfiltered original list
-    private Spinner roleSpinner;
+    private Spinner roleSpinner, statusSpinner;
     private ProfileAdapter adapter; // Ensure you have a ProfileAdapter to handle Profile objects
     private EditText searchAdminEditText;
     private String selectedRole = "All Users"; // To keep track of the selected role
+    private String selectedStatus = "All Status";
     private String searchText = ""; // To keep track of the search text
 
     public viewAccountsFragment() {
@@ -51,6 +52,7 @@ public class viewAccountsFragment extends Fragment {
 
         listView = view.findViewById(R.id.listView);
         roleSpinner = view.findViewById(R.id.filterRoleSpinner);
+        statusSpinner = view.findViewById(R.id.statusSpinner);
         searchAdminEditText = view.findViewById(R.id.searchAdminEditText);
 
         // Initialize and set up the ProfileAdapter
@@ -90,6 +92,28 @@ public class viewAccountsFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedRole = sortRole.get(position); // Update the selected role
+                filterProfiles(); // Apply combined filter
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle no selection
+            }
+        });
+
+        List<String> sortStatus = new ArrayList<>();
+        sortStatus.add("All Status");
+        sortStatus.add("Active");
+        sortStatus.add("Deactivated");
+
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, sortStatus);
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        statusSpinner.setAdapter(statusAdapter);
+
+        statusSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedStatus = sortStatus.get(position); // Update the selected role
                 filterProfiles(); // Apply combined filter
             }
 
@@ -159,6 +183,10 @@ public class viewAccountsFragment extends Fragment {
                     (profile instanceof Nutritionist && selectedRole.equals("Nutritionist")) ||
                     (profile instanceof User && selectedRole.equals("User"));
 
+            boolean matchesStatus = selectedStatus.equals("All Status") ||
+                    (selectedStatus.equalsIgnoreCase("Active") && "active".equalsIgnoreCase(profile.getStatus())) ||
+                    (selectedStatus.equalsIgnoreCase("Deactivated") && "deactivated".equalsIgnoreCase(profile.getStatus()));
+
             boolean matchesName = searchText.isEmpty() || (
                     (profile instanceof Admin && ((Admin) profile).getUsername().toLowerCase().contains(searchText)) ||
                             (profile instanceof Nutritionist && ((Nutritionist) profile).getUsername().toLowerCase().contains(searchText)) ||
@@ -166,7 +194,7 @@ public class viewAccountsFragment extends Fragment {
             );
 
             // Add to filtered list only if it matches both the role and the name
-            if (matchesRole && matchesName) {
+            if (matchesRole && matchesName && matchesStatus) {
                 filteredProfiles.add(profile);
             }
         }

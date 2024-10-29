@@ -7,4 +7,6 @@
     <color name="grey">#DCDCDC</color>
     <color name="lightGreen">#e8f5e1</color>
     <color name="lightGrey">#D3D3D3</color>
+    <color name="suspendedAccountRed">#FFCDD2</color>
+    <color name="activeAccountGreen">#C8E6C9</color>
 </resources>

@@ -101,7 +101,7 @@ public class UserAccountEntity {
 
                                     case "nutritionist":
                                         // Only add if the nutritionist has an "active" status
-                                        if ("active".equalsIgnoreCase(status)) {
+                                        if ("active".equalsIgnoreCase(status) || "deactivated".equalsIgnoreCase(status)) {
                                             Nutritionist nutritionist = createNutritionistFromDocument(document);
                                             nutritionist.setStatus(status);
                                             nutritionists.add(nutritionist);

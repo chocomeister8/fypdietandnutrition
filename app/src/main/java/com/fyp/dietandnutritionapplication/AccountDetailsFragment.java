@@ -81,7 +81,7 @@ public class AccountDetailsFragment extends Fragment {
                 reactivateUserButton.setVisibility(View.GONE);   // Hide reactivate button
                 approveNutritionistButton.setVisibility(View.GONE);   // Hide approve button
                 rejectNutritionistButton.setVisibility(View.GONE);    // Hide reject button
-            } else if ("suspended".equalsIgnoreCase(userStatus)) {
+            } else if ("deactivated".equalsIgnoreCase(userStatus)) {
                 suspendUserButton.setVisibility(View.GONE);   // Hide suspend button
                 reactivateUserButton.setVisibility(View.VISIBLE);  // Show reactivate button
                 approveNutritionistButton.setVisibility(View.GONE);   // Hide approve button
