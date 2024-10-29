@@ -50,7 +50,7 @@ public class AdminHomeFragment extends Fragment {
     private int numberOfUsers = 0;
     private int numberOfNutritionists = 0;
     private int numberOfAdmins = 0;
-    private TextView faqCountTextView;
+    private TextView faqCountTextView, specializationTextView;
     private EditText promoCodeInput, discountValuesInput; // Add references for promo code and discount
     private Button addPromoCodeButton;
 
@@ -62,6 +62,7 @@ public class AdminHomeFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.adminhomepage, container, false);
         faqCountTextView = view.findViewById(R.id.faqcount);
+        specializationTextView = view.findViewById(R.id.specializationcount);
         barChart = view.findViewById(R.id.accountBarchart);
         ImageView logoutImage = view.findViewById(R.id.logout_button);
 
@@ -71,6 +72,8 @@ public class AdminHomeFragment extends Fragment {
         Button viewFAQsButton = view.findViewById(R.id.viewFAQbutton);
         Button addFAQButton = view.findViewById(R.id.addFAQbutton);
         Button viewPendingNutri = view.findViewById(R.id.viewPendingNutri);
+        Button viewSpecialization = view.findViewById(R.id.viewSpecializationbutton);
+        Button addSpecialization = view.findViewById(R.id.addSpecializationbutton);
 
         // Initialize promo code input and button
         promoCodeInput = view.findViewById(R.id.promoCodeInput);
@@ -106,6 +109,24 @@ public class AdminHomeFragment extends Fragment {
             FragmentManager fragmentManager = getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.frame_layout, new viewPendingNutritionistFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        viewSpecialization.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new SpecializationFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        addSpecialization.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AddSpecializationFragment()); // Ensure R.id.frame_layout is the container in your activity
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });
@@ -157,6 +178,7 @@ public class AdminHomeFragment extends Fragment {
                 // Update the chart with new data
                 fetchAndUpdateProfileData();
                 fetchFAQCount();
+                fetchSpecializationCount();
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
 
@@ -323,6 +345,23 @@ public class AdminHomeFragment extends Fragment {
             public void onSuccess(ArrayList<FAQ> faqs) {
                 int faqCount = faqs.size(); // Get the number of FAQs
                 faqCountTextView.setText("FAQs: " + faqCount); // Update the TextView
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load FAQs.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchSpecializationCount() {
+        SpecializationEntity specializationEntity = new SpecializationEntity();
+        specializationEntity.fetchSpecialization(new SpecializationEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Specialization> specializations) {
+                int specCount = specializations.size(); // Get the number of FAQs
+                specializationTextView.setText("Specializations: " + specCount); // Update the TextView
             }
 
             @Override

@@ -12,10 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,11 +41,11 @@ import java.util.Locale;
  */
 public class NRegisterFragment extends Fragment {
 
-    private EditText firstNameEditText, lastNameEditText, userNameEditText, emailEditText, phoneEditText, passwordEditText, confirmPW, specializationEditText, experienceEditText;
+    private EditText firstNameEditText, lastNameEditText, userNameEditText, emailEditText, phoneEditText, passwordEditText, confirmPW, experienceEditText;
     private RadioButton maleRadioButton, femaleRadioButton,selectedRadioButtonRole;
-    private RadioGroup radioGroupRole;
     private Button registerButton;
-    private ArrayList<Profile> accountArray = new ArrayList<>();
+    private Spinner specializationSpinner;
+
     FirebaseAuth mAuth;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -104,10 +106,9 @@ public class NRegisterFragment extends Fragment {
         maleRadioButton = view.findViewById(R.id.rbMale);
         femaleRadioButton = view.findViewById(R.id.rbFemale);
         registerButton = view.findViewById(R.id.loginbutton);
-        radioGroupRole = view.findViewById(R.id.radioGroupRole);
         RadioButton userRadioButton = view.findViewById(R.id.rbUser);
         RadioButton nutritionistRadioButton = view.findViewById(R.id.rbnutri);
-        specializationEditText = view.findViewById(R.id.specializationEditText);
+        specializationSpinner = view.findViewById(R.id.specializationSpinner);
         experienceEditText = view.findViewById(R.id.experienceEditText);
 
         if (getArguments() != null) {
@@ -133,7 +134,13 @@ public class NRegisterFragment extends Fragment {
                 String phone = phoneEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 String confirmPassword = passwordEditText.getText().toString();
-                String specialization = specializationEditText.getText().toString();
+                String specialization = specializationSpinner.getSelectedItem().toString();
+
+                if (specialization.equals("-- Select Specialization --")) {
+                    Toast.makeText(getActivity(), "Please select a specialization", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String experience = experienceEditText.getText().toString();
                 String role = "nutritionist";
 
@@ -175,9 +182,41 @@ public class NRegisterFragment extends Fragment {
             }
         });
 
+        fetchSpecializations();
+
         return view;
     }
 
+    private void fetchSpecializations() {
 
+        SpecializationController specializationController= new SpecializationController(); // Ensure you have a member variable for ViewFAQController
+        specializationController.getAllSpecializations(new SpecializationEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Specialization> specializations) {
+                ArrayList<String> specializationNames = new ArrayList<>();
+                specializationNames.add("-- Select Specialization --");
+                for (Specialization specialization : specializations) {
+                    specializationNames.add(specialization.getName()); // Assuming the Specialization class has a getName() method
+                }
 
+                // Populate the Spinner with the names
+                populateSpecializationSpinner(specializationNames);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load Specializations.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void populateSpecializationSpinner(ArrayList<String> specializations) {
+        if (!specializations.contains("-- Select Specialization --")) {
+            specializations.add(0, "-- Select Specialization --");
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, specializations);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        specializationSpinner.setAdapter(adapter);
+    }
 }
