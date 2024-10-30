@@ -440,7 +440,7 @@ public class AdminHomeFragment extends Fragment {
             @Override
             public void onSuccess(ArrayList<AllergyOptions> alleryOptions) {
                 int allergyoptionsCount = alleryOptions.size(); // Get the number of FAQs
-                allergyTextView.setText("Diet Preference: " + allergyoptionsCount); // Update the TextView
+                allergyTextView.setText("Allergy Options: " + allergyoptionsCount); // Update the TextView
             }
 
             @Override

@@ -16,8 +16,7 @@ import androidx.fragment.app.Fragment;
 public class UserAccountDetailsToRecommendFragment extends Fragment {
 
     private Profile selectedProfile; // Declare selectedProfile at class level
-    private SuspendUserController suspendUserController;
-    private ReactivateUserController reactivateUserController; // Declare an instance for ReactivateUserController
+
 
 
     @Override
@@ -25,9 +24,6 @@ public class UserAccountDetailsToRecommendFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_account_details_to_recommend, container, false);
-        suspendUserController = new SuspendUserController();
-        reactivateUserController = new ReactivateUserController(); // Initialize the controller
-
 
         // Retrieve the profile from the arguments
         if (getArguments() != null) {
@@ -44,7 +40,11 @@ public class UserAccountDetailsToRecommendFragment extends Fragment {
         TextView dieteryPreference = view.findViewById(R.id.DietaryPreferenceTextView);
         TextView allergy = view.findViewById(R.id.AllergyTextView);
         Button recommendButton = view.findViewById(R.id.recommendRecipeButton);
+        Button backButton = view.findViewById(R.id.backButton);
 
+        backButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
+        });
 
         // Set the details in the UI
         if (selectedProfile != null) {
@@ -71,52 +71,12 @@ public class UserAccountDetailsToRecommendFragment extends Fragment {
 
             Log.d("FirestoreData", "Fetched status: " + selectedProfile.getStatus());
 
-
-            // Determine user status and set button visibility
-//            if ("active".equalsIgnoreCase(userStatus)) {
-//                suspendUserButton.setVisibility(View.VISIBLE);  // Show suspend button for active users
-//                reactivateUserButton.setVisibility(View.GONE);  // Hide reactivate button
-//            } else if ("deactivated".equalsIgnoreCase(userStatus)) {
-//                suspendUserButton.setVisibility(View.GONE);  // Hide suspend button for deactivated users
-//                reactivateUserButton.setVisibility(View.VISIBLE);  // Show reactivate button
-//            } else {
-//                // Handle unexpected status
-//                Log.d("AccountDetailsFragment", "Unexpected status: " + userStatus);
-//                suspendUserButton.setVisibility(View.GONE);  // Hide both buttons if status is unexpected
-//                reactivateUserButton.setVisibility(View.GONE);
-//            }
         }
-//        recommendButton.setOnClickListener(v -> {
-//            // Create a new Bundle to pass data
-//            Bundle bundle = new Bundle();
-//
-//            // Put the selectedProfile into the Bundle (assuming Profile implements Serializable)
-//            bundle.putSerializable("selectedProfile", selectedProfile);
-//
-//            // Set up the target fragment where you want to pass the data
-//            NutriAllRecipesFragment fragment = new NutriAllRecipesFragment(); // Replace with your actual target fragment
-//
-//            // Attach the bundle to the fragment
-//            fragment.setArguments(bundle);
-//
-//            // Start the fragment transaction
-//            requireActivity().getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.frame_layout, fragment)  // Replace with the actual container ID
-//                    .addToBackStack(null)  // Optional: adds this transaction to the back stack
-//                    .commit();
-//        });
+
         recommendButton.setOnClickListener(v -> navigateToFragment(new BrowsetoRecommendRecipesFragment()));
 
 
         return view;
-    }
-
-    private void redirectToViewAccountsFragment() {
-        viewAccountsFragment viewAccountsFragment = new viewAccountsFragment();
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, viewAccountsFragment)  // Replace with your fragment container ID
-                .addToBackStack(null)  // Optionally add to backstack
-                .commit();
     }
 
     private void navigateToFragment(Fragment fragment) {

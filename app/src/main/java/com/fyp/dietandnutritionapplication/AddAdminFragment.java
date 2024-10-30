@@ -109,6 +109,7 @@ public class AddAdminFragment extends Fragment {
         dobEditText = view.findViewById(R.id.dob);
         radioGroupGender = view.findViewById(R.id.radioGroupGender);
         addAdmin = view.findViewById(R.id.addButton);
+        Button backButton = view.findViewById(R.id.backButton);
 
         pd = new ProgressDialog(getActivity());
 
@@ -120,6 +121,10 @@ public class AddAdminFragment extends Fragment {
             public void onClick(View v) {
                 showDatePickerDialog();
             }
+        });
+
+        backButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         addAdmin.setOnClickListener(new View.OnClickListener() {
@@ -190,8 +195,6 @@ public class AddAdminFragment extends Fragment {
                                         AddAdminController addAdminController = new AddAdminController();
                                         addAdminController.checkRegisterAdmin(firstName, lastName, userName, dob, email, phone, selectedGender, password, date, getActivity());
 
-                                        // Redirect to the view all accounts screen after successful registration
-                                        redirectToViewAllAccounts();
                                     }
                                 }
                             });

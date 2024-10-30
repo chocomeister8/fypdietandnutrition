@@ -1,6 +1,8 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -128,6 +130,53 @@ public class SpecializationFragment extends Fragment{
             savedScrollPosition = specializationListView.getFirstVisiblePosition();
 
         });
+
+        specializationListView.setOnItemLongClickListener((parent, view1, position, id) -> {
+            // Retrieve the specialization to delete
+            Specialization selectedSpecialization = specialization.get(position);
+
+            // Show a confirmation dialog
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Delete Specialization")
+                    .setMessage("Are you sure you want to delete this specialization?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        // Call the delete function if the user confirms
+                        deleteSpecializationFromDatabase(selectedSpecialization);
+
+                        // Remove the specialization from the list and notify the adapter
+                        specialization.remove(position);
+                        adapter.notifyDataSetChanged();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+            return true;
+        });
+
         return view;
+    }
+
+    private void deleteSpecializationFromDatabase(Specialization specialization) {
+        ProgressDialog pd = new ProgressDialog(getContext());
+        pd.setMessage("Deleting specialization...");
+        pd.show();
+
+        // Get the ID of the specialization to delete
+        String specializationId = specialization.getSpecId();
+
+        SpecializationController controller = new SpecializationController();
+        controller.deleteSpecialization(specializationId, new SpecializationEntity.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+                pd.dismiss();
+                Toast.makeText(getContext(), "Specialization deleted successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                pd.dismiss();
+                Toast.makeText(getContext(), "Failed to delete specialization: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

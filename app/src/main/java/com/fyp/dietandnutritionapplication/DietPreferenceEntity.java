@@ -86,4 +86,22 @@ public class DietPreferenceEntity {
         retrieveDietPreferences(callback);
     }
 
+    public void deleteDietPreferenceById(String dietPreferenceId, DietPreferenceEntity.DeleteCallback callback) {
+        db.collection("DietOptions").document(dietPreferenceId)
+                .delete()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onSuccess(); // Notify success
+                    } else {
+                        callback.onFailure(task.getException()); // Notify failure
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public interface DeleteCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
 }

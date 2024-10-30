@@ -7,6 +7,12 @@ import java.util.ArrayList;
 
 public class SpecializationController {
     private ArrayList<Specialization> allspecializations = new ArrayList<>();
+    private SpecializationEntity specializationEntity;
+
+    public SpecializationController() {
+        // Ensure the entity instance is created
+        this.specializationEntity = new SpecializationEntity();
+    }
 
     public void getAllSpecializations(SpecializationEntity.DataCallback callback) {
         SpecializationEntity specializationEntity = new SpecializationEntity();
@@ -31,4 +37,23 @@ public class SpecializationController {
         specializationEntityEntity.insertSpecialization(name,pd,context);
     }
 
+    public void deleteSpecialization(String specializationId, SpecializationEntity.DeleteCallback callback) {
+        // Ensure that specializationEntity is not null before calling its methods
+        if (specializationEntity != null) {
+            specializationEntity.deleteSpecializationById(specializationId, new SpecializationEntity.DeleteCallback() {
+                @Override
+                public void onSuccess() {
+                    callback.onSuccess();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    callback.onFailure(e);
+                }
+            });
+        } else {
+            // Handle the case where specializationEntity is null
+            callback.onFailure(new NullPointerException("SpecializationEntity is not initialized"));
+        }
+    }
 }

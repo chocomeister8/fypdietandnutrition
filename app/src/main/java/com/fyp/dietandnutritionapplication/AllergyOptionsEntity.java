@@ -86,4 +86,21 @@ public class AllergyOptionsEntity {
                 });
     }
 
+    public void deleteAllergyOptionsById(String allergyOptionsId, AllergyOptionsEntity.DeleteCallback callback) {
+        db.collection("AllergyOptions").document(allergyOptionsId)
+                .delete()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onSuccess(); // Notify success
+                    } else {
+                        callback.onFailure(task.getException()); // Notify failure
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public interface DeleteCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
 }

@@ -1,6 +1,8 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -128,6 +130,53 @@ public class AllergyOptionsFragment extends Fragment{
             savedScrollPosition = allergyOptionsListView.getFirstVisiblePosition();
 
         });
+
+        allergyOptionsListView.setOnItemLongClickListener((parent, view1, position, id) -> {
+            // Retrieve the specialization to delete
+            AllergyOptions selectedAllergyOption = allergyoptions.get(position);
+
+            // Show a confirmation dialog
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Delete Allergy Option")
+                    .setMessage("Are you sure you want to delete this allergy option?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        // Call the delete function if the user confirms
+                        deleteAllergyOptionFromDatabase(selectedAllergyOption);
+
+                        // Remove the specialization from the list and notify the adapter
+                        allergyoptions.remove(position);
+                        adapter.notifyDataSetChanged();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+            return true;
+        });
+
         return view;
+    }
+
+    private void deleteAllergyOptionFromDatabase(AllergyOptions allergyOptions) {
+        ProgressDialog pd = new ProgressDialog(getContext());
+        pd.setMessage("Deleting specialization...");
+        pd.show();
+
+        // Get the ID of the specialization to delete
+        String allergyOptionId = allergyOptions.getAllergyOptionId();
+
+        AllergyOptionsController controller = new AllergyOptionsController();
+        controller.deleteAllergyOption(allergyOptionId, new AllergyOptionsEntity.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+                pd.dismiss();
+                Toast.makeText(getContext(), "Allergy Option deleted successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                pd.dismiss();
+                Toast.makeText(getContext(), "Failed to delete allergy option: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

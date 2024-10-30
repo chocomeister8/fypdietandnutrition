@@ -102,6 +102,7 @@ public class AddFAQFragment extends Fragment {
         answerEditText = view.findViewById(R.id.answer);
         addFAQ = view.findViewById(R.id.addFAQ);
         categorySpinner = view.findViewById(R.id.faq_category_spinner);
+        Button backButton = view.findViewById(R.id.backButton);
 
         // Create a list of FAQ categories
         List<String> categories = Arrays.asList("General Information", "Account and Profile Management", "Nutrition and Diet Tracking", "Meal Plans and Recipes", "Supported Diets and Preferences", "Health and Fitness Goals");
@@ -142,6 +143,10 @@ public class AddFAQFragment extends Fragment {
                 // Redirect to view all FAQs
                 redirectToViewAllFAQs();
             }
+        });
+
+        backButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         return view;

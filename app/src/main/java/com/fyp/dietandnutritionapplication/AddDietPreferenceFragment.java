@@ -78,6 +78,7 @@ public class AddDietPreferenceFragment extends Fragment {
 
         dietpreferenceEditText = view.findViewById(R.id.dietpreference);
         addDietPreference = view.findViewById(R.id.addDietPreference);
+        Button backButton = view.findViewById(R.id.backButton);
 
         pd = new ProgressDialog(getActivity());
         mAuth = FirebaseAuth.getInstance();
@@ -101,6 +102,10 @@ public class AddDietPreferenceFragment extends Fragment {
                 // Redirect to view all FAQs
                 redirectToViewAllDietPreference();
             }
+        });
+
+        backButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         return view;

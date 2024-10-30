@@ -99,6 +99,7 @@ public class AddAllergyOptionsFragment extends Fragment {
 
         allergyOptionEditText = view.findViewById(R.id.allergyoptionEditText);
         addAllergyOption = view.findViewById(R.id.addAllergyoption);
+        Button backButton = view.findViewById(R.id.backButton);
 
 
         pd = new ProgressDialog(getActivity());
@@ -123,6 +124,10 @@ public class AddAllergyOptionsFragment extends Fragment {
                 // Redirect to view all FAQs
                 redirectToViewAllALlergyOptions();
             }
+        });
+
+        backButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         return view;

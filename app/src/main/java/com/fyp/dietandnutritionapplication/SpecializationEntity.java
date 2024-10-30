@@ -69,9 +69,6 @@ public class SpecializationEntity {
         retrieveSpecializations(callback);
     }
 
-    public void updateFAQ() {
-        // Implementation for updating FAQ
-    }
 
     public void insertSpecialization(String name, ProgressDialog pd, Context context) {
         String id = UUID.randomUUID().toString();
@@ -90,7 +87,21 @@ public class SpecializationEntity {
                 });
     }
 
-    private void fetchSpecializations() {
+    public void deleteSpecializationById(String specializationId, DeleteCallback callback) {
+        db.collection("Specializations").document(specializationId)
+                .delete()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onSuccess(); // Notify success
+                    } else {
+                        callback.onFailure(task.getException()); // Notify failure
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
 
+    public interface DeleteCallback {
+        void onSuccess();
+        void onFailure(Exception e);
     }
 }

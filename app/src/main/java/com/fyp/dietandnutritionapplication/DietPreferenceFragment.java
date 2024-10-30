@@ -1,6 +1,8 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -122,6 +124,52 @@ public class DietPreferenceFragment extends Fragment{
 
         });
 
+        DietPreferenceListView.setOnItemLongClickListener((parent, view1, position, id) -> {
+            // Retrieve the specialization to delete
+            DietPreference selectedDietPreference = dietpreference.get(position);
+
+            // Show a confirmation dialog
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Delete Diet Preference")
+                    .setMessage("Are you sure you want to delete this diet preference?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        // Call the delete function if the user confirms
+                        deleteDietPreferenceFromDatabase(selectedDietPreference);
+
+                        // Remove the specialization from the list and notify the adapter
+                        dietpreference.remove(position);
+                        adapter.notifyDataSetChanged();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+            return true;
+        });
+
         return view;
+    }
+
+    private void deleteDietPreferenceFromDatabase(DietPreference dietPreference) {
+        ProgressDialog pd = new ProgressDialog(getContext());
+        pd.setMessage("Deleting diet preference...");
+        pd.show();
+
+        // Get the ID of the specialization to delete
+        String dietPreferenceId = dietPreference.getDietPreferenceId();
+
+        DietPreferenceController controller = new DietPreferenceController();
+        controller.deleteDietPreference(dietPreferenceId, new DietPreferenceEntity.DeleteCallback() {
+            @Override
+            public void onSuccess() {
+                pd.dismiss();
+                Toast.makeText(getContext(), "Diet Preference deleted successfully", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                pd.dismiss();
+                Toast.makeText(getContext(), "Failed to delete specialization: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

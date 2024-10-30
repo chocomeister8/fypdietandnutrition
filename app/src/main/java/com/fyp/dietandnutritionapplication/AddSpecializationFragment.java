@@ -99,6 +99,7 @@ public class AddSpecializationFragment extends Fragment {
 
         nameEditText = view.findViewById(R.id.specializationEditText);
         addSpecialization = view.findViewById(R.id.addSpecialization);
+        Button backButton = view.findViewById(R.id.backButton);
 
 
         pd = new ProgressDialog(getActivity());
@@ -123,6 +124,10 @@ public class AddSpecializationFragment extends Fragment {
                 // Redirect to view all FAQs
                 redirectToViewAllSpecializations();
             }
+        });
+
+        backButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         return view;
