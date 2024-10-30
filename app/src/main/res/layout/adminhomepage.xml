@@ -304,7 +304,7 @@
                 android:layout_height="50dp"
                 android:backgroundTint="#009688"
                 android:radius="15dp"
-                android:text="View all Diet Preference"
+                android:text="View all Allergy Options"
                 android:textSize="10sp"
                 tools:ignore="HardcodedText,MissingConstraints,SmallSp" />
 
@@ -314,7 +314,7 @@
                 android:layout_height="50dp"
                 android:backgroundTint="#009688"
                 android:radius="15dp"
-                android:text="Add Diet Preference"
+                android:text="Add Allergy Option"
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="@+id/addAdminButton"
                 app:layout_constraintStart_toStartOf="@+id/addAdminButton"

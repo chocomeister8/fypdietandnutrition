@@ -174,6 +174,25 @@ public class AdminHomeFragment extends Fragment {
             fragmentTransaction.commit();
         });
 
+        viewAllergy.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AllergyOptionsFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        addAllergy.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AddAllergyOptionsFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+
         adapter = new ProfileAdapter(getContext(), profiles);
 
         // Create an instance of UserAccountEntity and fetch accounts
@@ -204,6 +223,7 @@ public class AdminHomeFragment extends Fragment {
                 fetchFAQCount();
                 fetchSpecializationCount();
                 fetchDietPreferenceCount();
+                fetchAllergyOptionCount();
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
 
@@ -414,6 +434,22 @@ public class AdminHomeFragment extends Fragment {
         });
     }
 
+    private void fetchAllergyOptionCount() {
+        AllergyOptionsEntity allergyOptionsEntity = new AllergyOptionsEntity();
+        allergyOptionsEntity.retrieveAllergyOptions(new AllergyOptionsEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<AllergyOptions> alleryOptions) {
+                int allergyoptionsCount = alleryOptions.size(); // Get the number of FAQs
+                allergyTextView.setText("Diet Preference: " + allergyoptionsCount); // Update the TextView
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load FAQs.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getParentFragmentManager();
