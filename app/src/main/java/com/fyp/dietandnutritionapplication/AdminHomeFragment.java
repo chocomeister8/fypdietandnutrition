@@ -50,7 +50,7 @@ public class AdminHomeFragment extends Fragment {
     private int numberOfUsers = 0;
     private int numberOfNutritionists = 0;
     private int numberOfAdmins = 0;
-    private TextView faqCountTextView, specializationTextView;
+    private TextView faqCountTextView, specializationTextView, dietpreferenceTextView, allergyTextView;
     private EditText promoCodeInput, discountValuesInput; // Add references for promo code and discount
     private Button addPromoCodeButton;
 
@@ -63,6 +63,8 @@ public class AdminHomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.adminhomepage, container, false);
         faqCountTextView = view.findViewById(R.id.faqcount);
         specializationTextView = view.findViewById(R.id.specializationcount);
+        dietpreferenceTextView = view.findViewById(R.id.dietpreferencecount);
+        allergyTextView = view.findViewById(R.id.allergycount);
         barChart = view.findViewById(R.id.accountBarchart);
         ImageView logoutImage = view.findViewById(R.id.logout_button);
 
@@ -74,6 +76,10 @@ public class AdminHomeFragment extends Fragment {
         Button viewPendingNutri = view.findViewById(R.id.viewPendingNutri);
         Button viewSpecialization = view.findViewById(R.id.viewSpecializationbutton);
         Button addSpecialization = view.findViewById(R.id.addSpecializationbutton);
+        Button viewDietPreference = view.findViewById(R.id.viewDietPreferencebutton);
+        Button addDietPreference = view.findViewById(R.id.addDietPreferencebutton);
+        Button viewAllergy = view.findViewById(R.id.allergybutton);
+        Button addAllergy = view.findViewById(R.id.addallergybutton);
 
         // Initialize promo code input and button
         promoCodeInput = view.findViewById(R.id.promoCodeInput);
@@ -150,6 +156,24 @@ public class AdminHomeFragment extends Fragment {
             fragmentTransaction.commit();
         });
 
+        viewDietPreference.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new DietPreferenceFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
+        addDietPreference.setOnClickListener(v -> {
+            // Replace the current fragment with AccountsFragment
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, new AddDietPreferenceFragment()); // Ensure R.id.frame_layout is the container in your activity
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
         adapter = new ProfileAdapter(getContext(), profiles);
 
         // Create an instance of UserAccountEntity and fetch accounts
@@ -179,6 +203,7 @@ public class AdminHomeFragment extends Fragment {
                 fetchAndUpdateProfileData();
                 fetchFAQCount();
                 fetchSpecializationCount();
+                fetchDietPreferenceCount();
                 adapter.notifyDataSetChanged(); // Notify adapter of data changes
             }
 
@@ -362,6 +387,23 @@ public class AdminHomeFragment extends Fragment {
             public void onSuccess(ArrayList<Specialization> specializations) {
                 int specCount = specializations.size(); // Get the number of FAQs
                 specializationTextView.setText("Specializations: " + specCount); // Update the TextView
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Failed to load FAQs.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchDietPreferenceCount() {
+        DietPreferenceEntity dietPreferenceEntity = new DietPreferenceEntity();
+        dietPreferenceEntity.fetchDietPreference(new DietPreferenceEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<DietPreference> dietPreferences) {
+                int dietpreferenceCount = dietPreferences.size(); // Get the number of FAQs
+                dietpreferenceTextView.setText("Diet Preference: " + dietpreferenceCount); // Update the TextView
             }
 
             @Override
