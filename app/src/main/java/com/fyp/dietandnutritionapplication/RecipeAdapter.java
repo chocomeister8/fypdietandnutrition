@@ -54,9 +54,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         String mealTypes = String.join(", ", recipe.getMealType());
         holder.mealTypeTextView.setText("Type: " + mealTypes);
 
-        String cuisineTypes = String.join(", ", recipe.getCuisineType());
-        holder.cuisineTypeTextView.setText("Cuisine: " + cuisineTypes);
-
         holder.caloriesper100gTextView.setText(String.format("Calories per 100g: %.1f", recipe.getCaloriesPer100g()));
 
         // Check if user_ID is available
@@ -137,7 +134,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     // ViewHolder class to represent each recipe item view
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
-        TextView titleTextView, totaltimeTextView, mealTypeTextView, cuisineTypeTextView, caloriesper100gTextView, weightTextView, statusViewText, usernameViewText;
+        TextView titleTextView, totaltimeTextView, mealTypeTextView, caloriesper100gTextView, weightTextView, statusViewText, usernameViewText;
         ImageView imageView;
 
         public RecipeViewHolder(View itemView) {
@@ -145,7 +142,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             // Initialize the views
             titleTextView = itemView.findViewById(R.id.recipe_title);
             mealTypeTextView = itemView.findViewById(R.id.meal_type);
-            cuisineTypeTextView = itemView.findViewById(R.id.cuisine_type);
             caloriesper100gTextView = itemView.findViewById(R.id.calories_per_100g);
             weightTextView = itemView.findViewById(R.id.recipe_weight); // Initialize the weight TextView
             imageView = itemView.findViewById(R.id.recipe_image);

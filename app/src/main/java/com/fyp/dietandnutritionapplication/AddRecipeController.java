@@ -14,7 +14,7 @@ public class AddRecipeController {
 
     // Method to add a recipe to Firestore via RecipesEntity
     public void addRecipe(String recipeTitle, double calories, double weight, double totalTime,
-                          List<String> mealTypes, List<String> cuisineTypes, List<String> dishTypes,
+                          List<String> mealTypes, List<String> dishTypes,
                           List<String> ingredientsList, List<String> recipeStepsList, String userId, String status) {
         // Create the Recipe data structure
         Recipe recipe = new Recipe();
@@ -23,7 +23,6 @@ public class AddRecipeController {
         recipe.setTotalWeight(weight);
         recipe.setTotal_Time((int) totalTime);  // Assuming total time is an integer value
         recipe.setMealType(mealTypes);
-        recipe.setCuisineType(cuisineTypes);
         recipe.setDishType(dishTypes);
         recipe.setIngredientLines(ingredientsList);
         recipe.setRecipeStepsLines(recipeStepsList);

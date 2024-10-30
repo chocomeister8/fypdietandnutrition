@@ -33,7 +33,7 @@ public class AddRecipeFragment extends Fragment {
 
     private LinearLayout ingredientsSection, recipeStepsSection;
     private Button addIngredientButton, addRecipeStepsButton, saveRecipeButton;
-    private LinearLayout mealTypeCheckboxes, cuisineTypeCheckboxes, dishTypeCheckboxes;
+    private LinearLayout mealTypeCheckboxes, dishTypeCheckboxes;
     private EditText recipeTitleInput, caloriesInput, weightInput, totalTimeInput;
     private ImageView imagePreview;
 
@@ -62,7 +62,6 @@ public class AddRecipeFragment extends Fragment {
 
         // CheckBox Layouts
         mealTypeCheckboxes = view.findViewById(R.id.meal_type_checkboxes);
-        cuisineTypeCheckboxes = view.findViewById(R.id.cuisine_type_checkboxes);
         dishTypeCheckboxes = view.findViewById(R.id.dish_type_checkboxes);
 
         // Initialize Firebase Firestore
@@ -248,7 +247,6 @@ public class AddRecipeFragment extends Fragment {
 
         // Get selected values from checkboxes
         List<String> mealTypes = getSelectedCheckboxes(mealTypeCheckboxes, false);
-        List<String> cuisineTypes = getSelectedCheckboxes(cuisineTypeCheckboxes, false);
         List<String> dishTypes = getSelectedCheckboxes(dishTypeCheckboxes, false);
 
         // Collect dynamic ingredients
@@ -292,7 +290,7 @@ public class AddRecipeFragment extends Fragment {
         }
 
         AddRecipeController addRecipeController = new AddRecipeController();
-        addRecipeController.addRecipe(recipeTitle, calories, weight, totalTime, mealTypes, cuisineTypes, dishTypes, ingredientsList, recipeStepsList, userId, status);
+        addRecipeController.addRecipe(recipeTitle, calories, weight, totalTime, mealTypes, dishTypes, ingredientsList, recipeStepsList, userId, status);
 
         redirectToViewPendingRecipes();
     }
