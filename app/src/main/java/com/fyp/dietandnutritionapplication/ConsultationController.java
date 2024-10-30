@@ -1,5 +1,6 @@
 package com.fyp.dietandnutritionapplication;
 
+import android.content.Context;
 import android.util.Log;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,6 +33,11 @@ public class ConsultationController {
                 callback.onFailure(e);
             }
         });
+    }
+
+    public void checkUpdateConsult(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, int price, Context context){
+        ConsultationEntity conEntity = new ConsultationEntity();
+        conEntity.updateConsultInFirestore(consultationId, nutritionistName,date, time, ClientName,status,price,context);
     }
 
     // Set Consultation ID

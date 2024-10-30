@@ -1,6 +1,10 @@
 package com.fyp.dietandnutritionapplication;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -10,6 +14,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class ConsultationEntity {
     private FirebaseFirestore db;
@@ -67,12 +74,13 @@ public class ConsultationEntity {
                     consultationList.clear(); // Clear existing list
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot != null) {
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            ArrayList<Consultation> consultations = new ArrayList<>();
                             for (QueryDocumentSnapshot document : querySnapshot) {
                                 Consultation consultation = createSlotFromDocument(document);
-                                consultationList.add(consultation);
+                                consultations.add(consultation);
                             }
-                            callback.onSuccess(consultationList);
+                            callback.onSuccess(consultations);
                         } else {
                             callback.onFailure(new Exception("QuerySnapshot is null"));
                         }
@@ -86,48 +94,97 @@ public class ConsultationEntity {
 
     private Consultation createSlotFromDocument(QueryDocumentSnapshot document) {
         Consultation slot = new Consultation();
-        slot.setNutritionistName(document.getString("nutritionistName"));
         slot.setConsultationId(document.getString("consultationId"));
+        slot.setNutritionistName(document.getString("nutritionistName"));
         slot.setDate(document.getString("date"));
         slot.setTime(document.getString("time"));
         slot.setClientName(document.getString("clientName"));
-        slot.setStatus(document.getString("booked"));
+        slot.setStatus(document.getString("status"));
         return slot;
     }
 
-//    public void fetchAccounts(ConsultationEntity.DataCallback callback) {
-//        retrieveConsultationSlots(callback);
-//    }
+    public void fetchAccounts(DataCallback callback) {
+        retrieveCons(callback);
+    }
 
-    public void addConsultation(String nutritionistName, String date, String time, String status, String userId, DataCallback callback) {
-        // Create a new consultation object
-        Consultation consultation = new Consultation();
-        consultation.setNutritionistName(nutritionistName);
-        consultation.setDate(date);
-        consultation.setTime(time);
-        consultation.setStatus(status);
+    public void insertConsult(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, ProgressDialog pd, Context context){
+        Map<String, Object> consult = new HashMap<>();
+        consult.put("Consultation Id", consultationId);
+        consult.put("Nutritionist Name", nutritionistName);
+        consult.put("Date", date);
+        consult.put("Time", time);
+        consult.put("Client Name", ClientName);
+        consult.put("Status", status);
 
-        // Store the consultation in Firestore
-        db.collection("Consultation_slots").add(consultation)
-                .addOnSuccessListener(documentReference -> {
-                    // Set the consultation ID in the consultation object
-                    consultation.setConsultationId(documentReference.getId());
-
-                    // Optionally: Save the consultation ID back to Firestore under the user's document
-                    db.collection("Users").document(userId)
-                            .update("consultationIds", FieldValue.arrayUnion(documentReference.getId()))
-                            .addOnCompleteListener(task1 -> {
-                                if (task1.isSuccessful()) {
-                                    callback.onSuccess(consultationList); // Notify success
-                                } else {
-                                    callback.onFailure(new Exception("Failed to update user document with consultation ID"));
-                                }
-                            });
+        db.collection("Consultation_slots").document(consultationId).set(consult)
+                .addOnCompleteListener(task -> {
+                    pd.dismiss();
+                    Toast.makeText(context, "Consultation added", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    callback.onFailure(new Exception(e.getMessage())); // Notify failure
+                    pd.dismiss();
+                    Toast.makeText(context, "Failed to add consultation", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    public void updateConsultInFirestore(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, int price, Context context) {
+        if (consultationId != null) {
+            Map<String, Object> updatedFields = new HashMap<>();
+            updatedFields.put("ClientName", ClientName);
+            updatedFields.put("status", status);
+            updatedFields.put("date", date);
+            updatedFields.put("time", time);
+
+            db.collection("Consultation_slots").document(consultationId)
+                    .update(updatedFields)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, "Consultation updated successfully", Toast.LENGTH_SHORT).show();
+
+                        Consultation updateConsult = new Consultation(consultationId, nutritionistName,date, time, ClientName,status,price);
+                        ConsultationsFragment viewConsultationFragment = new ConsultationsFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("selectedConsultation", updateConsult);
+                        viewConsultationFragment.setArguments(bundle);
+
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "Failed to update consultation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(context, "Error: consultation ID is null", Toast.LENGTH_SHORT).show();
+        }
+    }
+    }
+
+//    public void addConsultation(String nutritionistName, String date, String time, String status, String userId, DataCallback callback) {
+//        // Create a new consultation object
+//        Consultation consultation = new Consultation();
+//        consultation.setNutritionistName(nutritionistName);
+//        consultation.setDate(date);
+//        consultation.setTime(time);
+//        consultation.setStatus(status);
+//
+//        // Store the consultation in Firestore
+//        db.collection("Consultation_slots").add(consultation)
+//                .addOnSuccessListener(documentReference -> {
+//                    // Set the consultation ID in the consultation object
+//                    consultation.setConsultationId(documentReference.getId());
+//
+//                    // Optionally: Save the consultation ID back to Firestore under the user's document
+//                    db.collection("Users").document(userId)
+//                            .update("consultationIds", FieldValue.arrayUnion(documentReference.getId()))
+//                            .addOnCompleteListener(task1 -> {
+//                                if (task1.isSuccessful()) {
+//                                    callback.onSuccess(consultationList); // Notify success
+//                                } else {
+//                                    callback.onFailure(new Exception("Failed to update user document with consultation ID"));
+//                                }
+//                            });
+//                })
+//                .addOnFailureListener(e -> {
+//                    callback.onFailure(new Exception(e.getMessage())); // Notify failure
+//                });
+//    }
 
 
 
@@ -200,4 +257,4 @@ public class ConsultationEntity {
 //                });
 //    }
 
-}
+

@@ -97,10 +97,11 @@ public class PaymentConsultationFragment extends Fragment {
         if (currentUser != null) {
             String clientName = currentUser.getDisplayName(); // Get the current user's display name
             Log.d("PaymentConsultationFragment", "Current user: " + clientName); // Log user info
-            updateConsultationWithClientName(clientName); // Update Firestore
+            updateConsultationWithClientName(consultationId,clientName); // Update Firestore
         } else {
             Log.e("PaymentConsultationFragment", "No user is currently logged in");
             Toast.makeText(getContext(), "You must be logged in to make a payment.", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         // This assumes payment processing is successful
@@ -108,19 +109,59 @@ public class PaymentConsultationFragment extends Fragment {
         navigateToConsultationsFragment();
     }
 
-    private void updateConsultationWithClientName(String clientName) {
-        if (consultationId != null && !consultationId.isEmpty()) {
-            db.collection("Consultation_slots").document(consultationId)
-                    .update("clientName", "hi")
-                    .addOnSuccessListener(aVoid -> Log.d("FirebaseUpdate", "Client name added successfully"))
-                    .addOnFailureListener(e -> {
-                        Log.e("FirebaseUpdate", "Error adding client name", e);
-                        Toast.makeText(getContext(), "Failed to update client name. Please try again.", Toast.LENGTH_SHORT).show();
-                    });
-        } else {
-            Log.e("FirebaseUpdate", "Consultation ID is null or empty");
-        }
+
+private void updateConsultationWithClientName(String consultationId, String clientName) {
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseUser currentUser = auth.getCurrentUser();
+
+    if (currentUser != null) {
+        String userId = currentUser.getUid();
+
+        // Fetch the current user's username
+        firestore.collection("Users").document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String currentUsername = documentSnapshot.getString("username");
+
+                        if (consultationId != null && !consultationId.isEmpty()) {
+                            // Query the Consultation_slots collection for the matching consultationId
+                            firestore.collection("Consultation_slots")
+                                    .whereEqualTo("consultationId", consultationId)
+                                    .get()
+                                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                                        if (!queryDocumentSnapshots.isEmpty()) {
+                                            // Assume updating the first matching document
+                                            String documentId = queryDocumentSnapshots.getDocuments().get(0).getId();
+
+                                            // Update the clientName in the document
+                                            firestore.collection("Consultation_slots").document(documentId)
+                                                    .update("clientName", currentUsername)
+                                                    .addOnSuccessListener(aVoid -> Log.d("FirebaseUpdate", "Client and nutritionist names updated successfully"))
+                                                    .addOnFailureListener(e -> {
+                                                        Log.e("FirebaseUpdate", "Error updating client and nutritionist names", e);
+                                                        Toast.makeText(getContext(), "Failed to update names. Please try again.", Toast.LENGTH_SHORT).show();
+                                                    });
+                                        } else {
+                                            Log.e("FirebaseUpdate", "No document found with the specified consultationId.");
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> Log.e("FirebaseUpdate", "Error retrieving document", e));
+                        } else {
+                            Log.e("FirebaseUpdate", "Consultation ID is null or empty");
+                        }
+                    } else {
+                        Log.e("FirebaseUpdate", "User document does not exist.");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("FirebaseUpdate", "Error retrieving user document", e));
+    } else {
+        Log.e("FirebaseUpdate", "No user is currently logged in.");
+        Toast.makeText(getContext(), "You must be logged in to update consultation.", Toast.LENGTH_SHORT).show();
     }
+}
+
 
 
     // Method to show success message

@@ -90,8 +90,11 @@ public class ViewConsultationDetailsFragment extends Fragment {
 
                 // Filter consultations based on the selected nutritionist's username
                 for (Consultation consultation : consultationList) {
-                    if (selectedNutri != null && consultation.getNutritionistName().equals(selectedNutri.getUsername())) {
-                        consultationList2.add(consultation); // Add only consultations for the selected nutritionist
+                    if (selectedNutri != null &&
+                            consultation.getNutritionistName().equals(selectedNutri.getUsername()) &&
+                            (consultation.getClientName() == null || consultation.getClientName().isEmpty())) {
+
+                        consultationList2.add(consultation); // Add only consultations with null or empty clientName
                     }
                 }
 

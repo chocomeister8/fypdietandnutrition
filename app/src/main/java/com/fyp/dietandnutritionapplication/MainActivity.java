@@ -13,6 +13,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.fyp.dietandnutritionapplication.databinding.ActivityMainBinding;
 import com.google.android.gms.tasks.Task;
@@ -23,6 +25,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -56,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        scheduleWorkManager();
 
         // Navigate based on user role
         switch (userRole) {
@@ -211,6 +216,15 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    private void scheduleWorkManager() {
+        // Schedule WorkManager to run every hour
+        PeriodicWorkRequest workRequest =
+                new PeriodicWorkRequest.Builder(UpdateConsultationStatusWorker.class, 1, TimeUnit.HOURS)
+                        .build();
+
+        WorkManager.getInstance(getApplicationContext()).enqueue(workRequest);
     }
     
 }

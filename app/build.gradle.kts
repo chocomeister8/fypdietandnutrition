@@ -66,5 +66,8 @@ dependencies {
     implementation ("com.google.android.gms:play-services-location:21.0.1")
     implementation ("com.github.bumptech.glide:glide:4.15.1")
     implementation ("com.google.android.material:material:1.6.1")
+    implementation ("androidx.work:work-runtime-ktx:2.7.1")
+    implementation ("com.google.guava:guava:30.1.1-android")
+
 }
 

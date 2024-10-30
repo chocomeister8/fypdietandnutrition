@@ -3,14 +3,18 @@ package com.fyp.dietandnutritionapplication;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,6 +26,7 @@ import java.util.ArrayList;
 
 public class ConsultationsFragment extends Fragment {
 
+    private Consultation selectedConsultation;
     private ListView consultationListView;
     private ArrayList<Consultation> consultationList = new ArrayList<>();
     private ArrayList<Consultation> consultationList2 = new ArrayList<>();
@@ -29,7 +34,15 @@ public class ConsultationsFragment extends Fragment {
     private ConsultationsFragmentAdapter_u_consult consultationAdapter;
     private ArrayList<Consultation> originalConsultations = new ArrayList<>(); // unfilter list
     private Button viewNutriButton, viewConsultationButton;
+    ArrayList<Profile> nutriAccounts = new ArrayList<>();
+    private ProfileAdapter adapter;
+    private NutriProfileAdapter nutriProfileAdapter;
+    private NutriAdapterTest nutriAdapterTest;
+    ArrayList<Profile> originalProfiles = new ArrayList<>();
     private EditText searchBar;
+    private String selectedRole = "All Users";    private TextView consultationIdTextView;
+    private EditText clientNameEditText;
+    private EditText statusEditText;
     private String searchText = "";
 
     public ConsultationsFragment() {
@@ -48,9 +61,9 @@ public class ConsultationsFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
     }
-
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_u_book_consultation, container, false);
 
@@ -65,7 +78,18 @@ public class ConsultationsFragment extends Fragment {
 //        Consultation consultation1 = new Consultation("123","John Wick","ahmoytan1956","123456","time","pending");
 //        consultationList.add(consultation1);
         // Set up the ConsultationAdapter to bind data to the ListView
-        consultationAdapter = new ConsultationsFragmentAdapter_u_consult(requireContext(), consultationList2);
+        if (getArguments() != null){
+            selectedConsultation = (Consultation) getArguments().getSerializable("selectedConsultation");
+
+            if (selectedConsultation != null) {
+                consultationIdTextView.setText(selectedConsultation.getConsultationId());
+
+                clientNameEditText.setText(selectedConsultation.getClientName());
+                statusEditText.setText(selectedConsultation.getStatus());
+            }
+        }
+
+        consultationAdapter = new ConsultationsFragmentAdapter_u_consult(requireContext(), consultationList);
         consultationListView.setAdapter(consultationAdapter);
 
         fetchConsultationsFromFirestore();
@@ -82,8 +106,8 @@ public class ConsultationsFragment extends Fragment {
 //                } else {
                     // Success, consultations found, update the list
                     Toast.makeText(getContext(), "Success to load your consultations.", Toast.LENGTH_SHORT).show();
-                    consultationList2.clear();
-                    consultationList2.addAll(consultationList);
+                    consultationList.clear();
+                    consultationList.addAll(consultationList);
                     consultationAdapter.notifyDataSetChanged();
                 }
             }
@@ -112,19 +136,20 @@ public class ConsultationsFragment extends Fragment {
 //            }
 //        });
 
-        // Search functionality
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchText = s.toString();
-                filterConsultations(); // Filter consultations based on the search text
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchText = s.toString(); // Update search text
+                filterProfiles(); // Apply combined filter
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         // Handle consultation item clicks
@@ -162,6 +187,42 @@ public class ConsultationsFragment extends Fragment {
         return view;
     }
 
+    private void filterProfiles() {
+        ArrayList<Profile> filteredProfiles = new ArrayList<>();
+
+        Log.d("SearchDebug", "Searching for: " + searchText);
+
+        if (originalProfiles.isEmpty()) {
+            Log.d("SearchDebug", "No original profiles available to filter.");
+            return; // No profiles to filter
+        }
+
+        for (Profile profile : originalProfiles) {
+            boolean matchesRole = selectedRole.equals("All Users") ||
+                    (profile instanceof Admin && selectedRole.equals("Admin")) ||
+                    (profile instanceof Nutritionist && selectedRole.equals("Nutritionist")) ||
+                    (profile instanceof User && selectedRole.equals("User"));
+
+            boolean matchesName = searchText.isEmpty() || (
+                    (profile instanceof Admin && ((Admin) profile).getUsername().toLowerCase().contains(searchText.toLowerCase())) ||
+                            (profile instanceof Nutritionist && ((Nutritionist) profile).getFullName().toLowerCase().contains(searchText.toLowerCase())) ||
+                            (profile instanceof User && ((User) profile).getUsername().toLowerCase().contains(searchText.toLowerCase()))
+            );
+
+            // Add to filtered list only if it matches both the role and the name
+            if (matchesRole && matchesName) {
+                filteredProfiles.add(profile);
+            }
+        }
+
+        nutriAccounts.clear();
+        nutriAccounts.addAll(filteredProfiles);
+        nutriProfileAdapter.notifyDataSetChanged(); // Refresh the adapter
+
+        Log.d("SearchDebug", "Filtered profiles count: " + filteredProfiles.size());
+    }
+
+
     private String getCurrentUserId() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -187,35 +248,66 @@ public class ConsultationsFragment extends Fragment {
         consultationList.addAll(filteredConsultations);
         consultationAdapter.notifyDataSetChanged(); // Refresh the adapter
     }
-    // Method to add hardcoded consultations for testing
+
     private void fetchConsultationsFromFirestore() {
         // Clear the existing list to avoid duplication
-        consultationList2.clear();
+        consultationList.clear();
 
-        db.collection("Consultation_slots")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Get the document ID and other fields
-                            String id = document.getId(); // Get the document ID
-                            String nutritionistName = document.getString("nutritionistName");
-                            String clientName = document.getString("clientName");
-                            String date = document.getString("date");
-                            String time = document.getString("time");
-                            String status = document.getString("status"); // Ensure this matches your Firestore structure
+        // Get the current user's information
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
 
-                            // Create a new Consultation object and add it to the list
-                            Consultation consultation = new Consultation(id, nutritionistName, clientName, date, time, status, 150);
-                            consultationList2.add(consultation);
+            // Retrieve the current user's username
+            db.collection("Users").document(userId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String currentUsername = documentSnapshot.getString("username");
+
+                            // Fetch consultations from Firestore
+                            db.collection("Consultation_slots")
+                                    .get()
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            // Loop through each document
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                // Retrieve consultation details from Firestore
+                                                String id = document.getId();
+                                                String nutritionistName = document.getString("nutritionistName");
+                                                String clientName = document.getString("clientName");
+                                                String date = document.getString("date");
+                                                String time = document.getString("time");
+                                                String status = document.getString("status");
+
+                                                // Only add consultations where clientName matches the logged-in user's username
+                                                if (clientName != null && clientName.equals(currentUsername)) {
+                                                    Consultation consultation = new Consultation(id, nutritionistName, clientName, date, time, status, 150);
+                                                    consultationList.add(consultation);
+                                                }
+                                            }
+
+                                            // Update ListView based on matching consultations
+                                            if (consultationList.isEmpty()) {
+                                                Toast.makeText(getContext(), "No consultations found for your account.", Toast.LENGTH_LONG).show();
+                                                consultationListView.setVisibility(View.GONE); // Hide ListView if no consultations
+                                            } else {
+                                                consultationListView.setVisibility(View.VISIBLE); // Show ListView if consultations exist
+                                                consultationAdapter.notifyDataSetChanged(); // Refresh the adapter
+                                            }
+                                        } else {
+                                            Toast.makeText(getContext(), "Failed to fetch consultations: " + task.getException(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(getContext(), "User data not found.", Toast.LENGTH_SHORT).show();
                         }
-                        // Notify the adapter that the data has changed
-                        consultationAdapter.notifyDataSetChanged();
-                    } else {
-                        // Handle the error
-                        Toast.makeText(getContext(), "Failed to fetch consultations: " + task.getException(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error retrieving user information.", Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
+
 
 }
