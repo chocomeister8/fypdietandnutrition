@@ -356,7 +356,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Current Weight"
+                    android:hint="Weight Goal"
                     android:inputType="numberDecimal"
                     android:text="" />
 

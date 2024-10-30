@@ -501,6 +501,7 @@ public class ProfileUFragment extends Fragment {
         currentWeightData.setText(String.valueOf(user.getCurrentWeight()));
         currentHeightData.setText(String.valueOf(user.getCurrentHeight()));
         calorieLimitData.setText(String.valueOf(user.getCalorieLimit()));
+        weightGoalData.setText(String.valueOf(user.getWeightGoal()));
 
         Log.d("ProfileDebug", "DOB: " + user.getDob() + ", Weight: " + user.getCurrentWeight() + ", Height: " + user.getCurrentHeight() + ", Activity Level: " + user.getActivityLevel());
         setSpinnerSelection(healthGoalsSpinner, user.getHealthGoal());
