@@ -97,7 +97,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     notification.setRead(true);
                     notifyItemChanged(position);
 
-                } else if (notification.getType() != null && notification.getType().toLowerCase().contains("booking")) {
+                } else if (notification.getType() != null &&
+                        (notification.getType().toLowerCase().contains("booking") ||
+                                notification.getType().toLowerCase().contains("consultation"))) {
                     // Create a new instance of BookingFragment
                     BookingHistoryFragment bookingFragment = new BookingHistoryFragment();
 

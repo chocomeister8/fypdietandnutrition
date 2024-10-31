@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import java.util.Locale;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,7 +23,18 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import android.content.SharedPreferences;
+import android.content.Context;
+
 
 public class ConsultationsFragment extends Fragment {
 
@@ -249,7 +261,7 @@ public class ConsultationsFragment extends Fragment {
         consultationAdapter.notifyDataSetChanged(); // Refresh the adapter
     }
 
-    private void fetchConsultationsFromFirestore() {
+    public void fetchConsultationsFromFirestore() {
         // Clear the existing list to avoid duplication
         consultationList.clear();
 
@@ -284,6 +296,11 @@ public class ConsultationsFragment extends Fragment {
                                                 if (clientName != null && clientName.equals(currentUsername)) {
                                                     Consultation consultation = new Consultation(id, nutritionistName, clientName, date, time, status, 150);
                                                     consultationList.add(consultation);
+
+                                                    if (isOneDayAway(date) && !isReminderSent(id)) {
+                                                        sendReminderNotification(userId, "Your consultation is scheduled for tomorrow at " + time);
+                                                        markReminderAsSent(id);
+                                                    }
                                                 }
                                             }
 
@@ -307,6 +324,65 @@ public class ConsultationsFragment extends Fragment {
                         Toast.makeText(getContext(), "Error retrieving user information.", Toast.LENGTH_SHORT).show();
                     });
         }
+    }
+
+    private boolean isOneDayAway(String dateString) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); // Assuming date format is yyyy-MM-dd
+            Date consultationDate = dateFormat.parse(dateString);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            Date tomorrow = calendar.getTime();
+
+            // Compare only the date part
+            return dateFormat.format(tomorrow).equals(dateFormat.format(consultationDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean isReminderSent(String consultationId) {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("SentReminders", Context.MODE_PRIVATE);
+        return sharedPreferences.contains(consultationId);
+    }
+
+    private void markReminderAsSent(String consultationId) {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("SentReminders", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(consultationId, true);
+        editor.apply();
+    }
+
+
+    // Method to send notification
+    private void sendReminderNotification(String userId, String message) {
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("userId", userId);
+        notificationData.put("message", message);
+        notificationData.put("type", "Consultation Reminder");
+        notificationData.put("isRead", false);
+        notificationData.put("timestamp", new Timestamp(System.currentTimeMillis()));
+
+        db.collection("Notifications")
+                .add(notificationData) // Use add() to create a new document
+                .addOnSuccessListener(documentReference -> {
+                    String notificationId = documentReference.getId(); // Get the document ID
+
+                    // Now update the document to include the ID as a field
+                    db.collection("Notifications").document(notificationId)
+                            .update("notificationId", notificationId) // Store the document ID
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Notification", "Notification added with ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Notification", "Error updating notification ID", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to send notification: " + e.getMessage());
+                });
     }
 
 
