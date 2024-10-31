@@ -291,7 +291,6 @@ public class AddRecipeFragment extends Fragment {
 
         AddRecipeController addRecipeController = new AddRecipeController();
         addRecipeController.addRecipe(recipeTitle, calories, weight, totalTime, mealTypes, dishTypes, ingredientsList, recipeStepsList, userId, status);
-
         redirectToViewPendingRecipes();
     }
 

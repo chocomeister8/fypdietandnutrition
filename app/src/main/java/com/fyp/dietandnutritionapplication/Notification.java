@@ -94,17 +94,18 @@ public class Notification {
                         String notificationUserId = document.getString("userId");
                         boolean isRead = document.getBoolean("isRead") != null && document.getBoolean("isRead");
 
-                        Collections.sort(notifications, (n1, n2) -> {
-                            if (n1.getDate() == null && n2.getDate() == null) return 0;
-                            if (n1.getDate() == null) return 1;
-                            if (n2.getDate() == null) return -1;
-                            return n2.getDate().compareTo(n1.getDate()); // Newest to oldest
-                        });
-
                         // Create a new Notification object and add it to the list
                         Notification notification = new Notification(notificationId, message, date, type, notificationUserId, isRead);
                         notifications.add(notification);
                     }
+
+                    Collections.sort(notifications, (n1, n2) -> {
+                        if (n1.getDate() == null && n2.getDate() == null) return 0;
+                        if (n1.getDate() == null) return 1;
+                        if (n2.getDate() == null) return -1;
+                        return n2.getDate().compareTo(n1.getDate()); // Newest to oldest
+                    });
+
                     // Notify the listener with the fetched notifications
                     listener.onNotificationsFetched(notifications);
                 })

@@ -97,22 +97,27 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     notification.setRead(true);
                     notifyItemChanged(position);
 
-                } /*else if ("booking".equals(notification.getType())) {
+                } else if (notification.getType() != null && notification.getType().toLowerCase().contains("booking")) {
                     // Create a new instance of BookingFragment
-                    BookingFragment bookingFragment = new BookingFragment();
+                    BookingHistoryFragment bookingFragment = new BookingHistoryFragment();
 
                     // Pass the notification ID to the fragment if needed
                     Bundle bundle = new Bundle();
                     bundle.putString("notificationId", notification.getNotificationId());
                     bookingFragment.setArguments(bundle);
 
-                    // Replace the current fragment with BookingFragment
-                    requireActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frame_layout, bookingFragment) // Replace with your fragment container ID
-                            .addToBackStack(null) // Add to back stack
-                            .commit();*/
+                    if (context instanceof FragmentActivity) {
+                        ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frame_layout, new ConsultationsFragment())
+                                .addToBackStack(null)
+                                .commit();
+                    }
 
-            } else {
+
+                }  markNotificationAsRead(notification.getNotificationId());
+                notification.setRead(true);
+                notifyItemChanged(position);
+            }else {
                 Log.e("Notification", "Notification ID is null");
             }
         });

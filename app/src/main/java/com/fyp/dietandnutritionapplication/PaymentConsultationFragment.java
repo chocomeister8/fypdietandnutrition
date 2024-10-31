@@ -21,6 +21,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+
 public class PaymentConsultationFragment extends Fragment {
 
     // Define argument keys
@@ -106,8 +110,10 @@ public class PaymentConsultationFragment extends Fragment {
 
         // This assumes payment processing is successful
         showBookingSuccessMessage();
+        sendNotification(currentUser.getUid(), consultationId);
         navigateToConsultationsFragment();
     }
+
 
 
 private void updateConsultationWithClientName(String consultationId, String clientName) {
@@ -161,6 +167,39 @@ private void updateConsultationWithClientName(String consultationId, String clie
         Toast.makeText(getContext(), "You must be logged in to update consultation.", Toast.LENGTH_SHORT).show();
     }
 }
+
+    private void sendNotification(String userId, String consultationId) {
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("userId", userId);
+
+        notificationData.put("message", "Your booking (ID: " +  consultationId + ") has been confirmed successfully.");
+        notificationData.put("type", "Booking Confirmation");
+        notificationData.put("isRead", false);
+        // Add timestamp for when the notification is sent
+        Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
+        notificationData.put("timestamp", entryDateTime);
+
+        // Add notification data to Firestore
+        db.collection("Notifications")
+                .add(notificationData) // Use add() to create a new document
+                .addOnSuccessListener(documentReference -> {
+                    String notificationId = documentReference.getId(); // Get the document ID
+
+                    // Now update the document to include the ID as a field
+                    db.collection("Notifications").document(notificationId)
+                            .update("notificationId", notificationId) // Store the document ID
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Notification", "Notification added with ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Notification", "Error updating notification ID", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to send notification: " + e.getMessage());
+                });
+    }
 
 
 
