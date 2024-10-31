@@ -7,20 +7,27 @@ import java.sql.Timestamp;
 public class UserDiaryController {
 
     private UserDiary userDiary;
+    private MealRecord mealRecord;
 
     // Constructor to initialize the UserDiary instance
     public UserDiaryController() {
-        this.userDiary = new UserDiary(); // Assuming a no-argument constructor exists in UserDiary
+        this.userDiary = new UserDiary();
+        this.mealRecord = new MealRecord();
     }
 
-    public void handleDiaryEntry(Timestamp entryDateTime, String mealType, String thoughts, String tags, String username) {
-        if (validateDiaryEntry(entryDateTime, mealType, thoughts)) {
-            UserDiary userDiary = new UserDiary(entryDateTime, mealType, thoughts, tags, username, null);
+    public void handleDiaryEntry(Timestamp entryDateTime, String mealRecordID, String thoughts, String tags, String username, String mealRecordString) {
+        if (validateDiaryEntry(entryDateTime, mealRecordID, thoughts)) {
+            UserDiary userDiary = new UserDiary(null, entryDateTime, mealRecordID, thoughts, tags, username, mealRecordString);
             userDiary.saveDiaryEntry();
         } else {
             Log.w("UserDiaryController", "Validation failed for diary entry.");
         }
     }
+
+    public void fetchAllMealsLogged(String username, String selectedDateStr, MealRecord.OnMealsFetchedListener listener) {
+        mealRecord.fetchDiaryMealsLogged(username, selectedDateStr ,listener);
+    }
+
 
     public void fetchDiaryEntries(String username, UserDiary.OnDiaryEntriesFetchedListener listener) {
         userDiary.fetchDiaryEntries(username, listener);

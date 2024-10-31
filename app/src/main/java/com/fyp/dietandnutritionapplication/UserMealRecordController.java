@@ -25,8 +25,6 @@ public class UserMealRecordController {
                 selectedDateStr, imageURL);
     }
 
-
-
     public void fetchUsernameAndCalorieLimit(String userId, MealRecord.OnUsernameAndCalorieLimitFetchedListener listener) {
         mealRecord.fetchUsernameAndCalorielimit(userId, listener);
     }

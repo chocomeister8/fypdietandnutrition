@@ -15,22 +15,24 @@ public class UserDiary {
 
     // Private fields
     private Timestamp entryDateTime;
-    private String mealType;
     private String thoughts;
     private String tags;
     private String username;
+    private String mealRecordID;
     private String diaryID;
+    private String mealRecordString;
 
     public UserDiary() {
     }
 
-    public UserDiary(Timestamp entryDateTime, String mealType, String thoughts, String tags, String username, String diaryID) {
+    public UserDiary(String diaryID, Timestamp entryDateTime, String mealRecordID, String thoughts, String tags, String username, String mealRecordString) {
+        this.diaryID = diaryID;
         this.entryDateTime = entryDateTime;
-        this.mealType = mealType;
+        this.mealRecordID = mealRecordID;
         this.thoughts = thoughts;
         this.tags = tags;
         this.username = username;
-        this.diaryID = diaryID;
+        this.mealRecordString = mealRecordString;
     }
 
     public Timestamp getEntryDateTime() {
@@ -39,14 +41,6 @@ public class UserDiary {
 
     public void setEntryDateTime(Timestamp entryDateTime) {
         this.entryDateTime = entryDateTime;
-    }
-
-    public String getMealType() {
-        return mealType;
-    }
-
-    public void setMealType(String mealType) {
-        this.mealType = mealType;
     }
 
     public String getThoughts() {
@@ -81,6 +75,22 @@ public class UserDiary {
         this.diaryID = diaryID;
     }
 
+    public String getMealRecordID() {
+        return mealRecordID;
+    }
+
+    public void setMealRecordID(String mealRecordID) {
+        this.mealRecordID = mealRecordID;
+    }
+
+    public String getMealRecordString() {
+        return mealRecordString;
+    }
+
+    public void setMealRecordString(String mealRecordString) {
+        this.mealRecordString = mealRecordString;
+    }
+
 
     public void saveDiaryEntry() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -110,10 +120,12 @@ public class UserDiary {
                     List<UserDiary> diaryEntries = new ArrayList<>();
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                         UserDiary entry = new UserDiary();
-                        entry.setMealType(document.getString("mealType"));
+                        entry.setMealRecordID(document.getString("mealRecordID"));
                         entry.setThoughts(document.getString("thoughts"));
                         entry.setTags(document.getString("tags"));
                         entry.setDiaryID(document.getString("diaryID"));
+                        entry.setMealRecordString(document.getString("mealRecordString"));
+
 
                         // Convert the timestamp
                         Date date = document.getDate("entryDateTime");

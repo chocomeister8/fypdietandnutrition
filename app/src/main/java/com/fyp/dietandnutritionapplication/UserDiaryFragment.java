@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -21,6 +22,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +31,8 @@ import java.util.ArrayList;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -42,19 +46,23 @@ public class UserDiaryFragment extends Fragment {
     private List<UserDiary> diaryEntries;
     private LinearLayout diaryEntriesContainer;
     private TextView titleTextView, descriptionTextView, dateTextView, timestampTextView, selectedTagsTextView, tagsTextView;
-    private Spinner mealTypeSpinner;
+    private Spinner mealRecordSpinner;
     private EditText descriptionEditText;
     private Button addTagsButton, confirmTagsButton, cancelTagsButton, sortButton, clearFilterButton ;
     private boolean ascendingOrder = true;
     private EditText etDatePicker;
     private UserDiaryController userDiaryController;
     private ImageView moreOptionsIcon;
+    private UserMealRecordController userMealRecordController;
+
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_diary, container, false);
 
         userDiaryController = new UserDiaryController();
+        userMealRecordController = new UserMealRecordController();
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
         username = sharedPreferences.getString("loggedInUserName", null);
 
@@ -112,19 +120,48 @@ public class UserDiaryFragment extends Fragment {
         });
     }
 
+    private void fetchMealRecordsForDate(String selectedDateStr, String selectedMealRecordID) {
+        userDiaryController.fetchAllMealsLogged(username, selectedDateStr, new MealRecord.OnMealsFetchedListener() {
+            @Override
+            public void onMealsFetched(List<MealRecord> mealRecords) {
+                if (mealRecords != null && !mealRecords.isEmpty()) {
+                    List<String> mealRecordStrings = new ArrayList<>();
+                    final List<String> mealRecordIds = new ArrayList<>();
+
+                    for (MealRecord mealRecord : mealRecords) {
+                        String mealRecordString = mealRecord.getMealName() + " - " + mealRecord.getMealType() + " - " +
+                                mealRecord.getCalories() + " Cal";
+                        mealRecordStrings.add(mealRecordString);
+                        mealRecordIds.add(mealRecord.getMealRecordID());
+                    }
+
+                    Log.d("MealLogFragment", "Size of mealRecordStrings: " + mealRecordStrings.size());
+
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, mealRecordStrings);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    mealRecordSpinner.setAdapter(adapter);
+                    mealRecordSpinner.setTag(mealRecordIds);
+                } else {
+                    Log.w("MealLogFragment", "No meal records found for the selected date.");
+                    mealRecordSpinner.setAdapter(null); // Clear the spinner if no records are found
+                }
+            }
+        });
+    }
+
     private void filterDiaryEntriesByDate(String selectedDate) {
         userDiaryController.fetchDiaryEntries(username, new UserDiary.OnDiaryEntriesFetchedListener() {
             @Override
             public void onDiaryEntriesFetched(List<UserDiary> diaryEntries) {
                 diaryEntriesContainer.removeAllViews();
                 List<UserDiary> filteredEntries = new ArrayList<>();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
-                sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
                 Log.d("FilterDebug", "Selected Date: " + selectedDate);
                 Log.d("FilterDebug", "Fetched diary entries count: " + diaryEntries.size());
                 for (UserDiary entry : diaryEntries) {
                     if (entry.getEntryDateTime() != null) {
-                        String entryDate = sdf.format(entry.getEntryDateTime());
+                        String entryDate = dateFormat.format(entry.getEntryDateTime());
                         Log.d("FilterDebug", "Entry Date: " + entryDate);
                         if (entryDate.equals(selectedDate)) {
                             Log.d("FilterDebug", "Date matched: " + entryDate);
@@ -165,7 +202,9 @@ public class UserDiaryFragment extends Fragment {
 
         moreOptionsIcon = entryView.findViewById(R.id.moreOptionsIcon);
 
-        titleTextView.setText(entry.getMealType());
+        String mealRecordString = entry.getMealRecordString();
+        titleTextView.setText(mealRecordString);
+
         descriptionTextView.setText(entry.getThoughts());
 
         String tags = entry.getTags();
@@ -176,11 +215,10 @@ public class UserDiaryFragment extends Fragment {
 
 
         if (entry.getEntryDateTime() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 
             // Format the date using the correct time zone
-            String formattedDate = sdf.format(entry.getEntryDateTime());
+            String formattedDate = dateFormat.format(entry.getEntryDateTime());
             timestampTextView.setText(formattedDate);
         }
 
@@ -231,8 +269,7 @@ public class UserDiaryFragment extends Fragment {
     private String formatDate(int day, int month, int year) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
-        return sdf.format(calendar.getTime());
+        return dateFormat.format(calendar.getTime());
     }
 
     private void showAddDiaryEntryDialog() {
@@ -240,15 +277,12 @@ public class UserDiaryFragment extends Fragment {
         View dialogView = inflater.inflate(R.layout.dialog_add_diary_entry, null);
 
         dateTextView = dialogView.findViewById(R.id.dateTextView);
-        mealTypeSpinner = dialogView.findViewById(R.id.mealTypeSpinner);
+        mealRecordSpinner = dialogView.findViewById(R.id.mealRecordSpinner);
         descriptionEditText = dialogView.findViewById(R.id.descriptionEditText);
         addTagsButton = dialogView.findViewById(R.id.addTagsButton);
         selectedTagsTextView = dialogView.findViewById(R.id.selectedTagsTextView);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.meal_types, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mealTypeSpinner.setAdapter(adapter);
+        mealRecordSpinner.setEnabled(true);
 
         dateTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -261,16 +295,15 @@ public class UserDiaryFragment extends Fragment {
             showTagSelectionDialog(tags -> selectedTagsTextView.setText(tags));
         });
 
-        // Build the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(dialogView)
                 .setTitle("Add Diary Entry")
                 .setPositiveButton("Save", (dialog, which) -> {
 
                     String selectedDate = dateTextView.getText().toString();
-                    String selectedMealType = mealTypeSpinner.getSelectedItem().toString();
                     String description = descriptionEditText.getText().toString();
                     String selectedTags = selectedTagsTextView.getText().toString();
+                    String mealRecordString = mealRecordSpinner.getSelectedItem().toString(); // Ensure it's a string
 
                     if (selectedDate.equals("Select Date")) {
                         Toast.makeText(getContext(), "Please select a date.", Toast.LENGTH_SHORT).show();
@@ -281,21 +314,50 @@ public class UserDiaryFragment extends Fragment {
                         Toast.makeText(getContext(), "Please enter a description.", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    String[] dateParts = selectedDate.split("/");
-                    int day = Integer.parseInt(dateParts[0]);
+
+                    List<String> mealRecordIds = (List<String>) mealRecordSpinner.getTag();
+                    int selectedIndex = mealRecordSpinner.getSelectedItemPosition();
+                    String selectedMealRecordID = mealRecordIds != null && selectedIndex >= 0 ? mealRecordIds.get(selectedIndex) : null;
+
+                    // Validate the selected mealRecordID
+                    if (selectedMealRecordID == null) {
+                        Toast.makeText(getContext(), "Invalid meal record selection.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String[] dateParts = selectedDate.split("-");
+                    int year = Integer.parseInt(dateParts[0]);
                     int month = Integer.parseInt(dateParts[1]) - 1;
-                    int year = Integer.parseInt(dateParts[2]);
+                    int day = Integer.parseInt(dateParts[2]);
 
                     Calendar calendar = Calendar.getInstance();
-                    calendar.set(year, month, day);
+                    calendar.set(Calendar.YEAR, year);
+                    calendar.set(Calendar.MONTH, month);
+                    calendar.set(Calendar.DAY_OF_MONTH, day);
                     Timestamp entryDateTime = new Timestamp(calendar.getTimeInMillis());
 
-                    userDiaryController.handleDiaryEntry(entryDateTime, selectedMealType, description, selectedTags, username);
+                    userDiaryController.handleDiaryEntry(entryDateTime, selectedMealRecordID, description, selectedTags, username, mealRecordString);
                     fetchDiaryEntries();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         builder.create().show();
+
+        userDiaryController.fetchAllMealsLogged(username, dateTextView.getText().toString(), mealRecords -> {
+            List<String> mealRecordStrings = new ArrayList<>();
+            List<String> mealRecordIds = new ArrayList<>();
+
+            for (MealRecord mealRecord : mealRecords) {
+                String mealRecordString = mealRecord.getMealName() + " - " + mealRecord.getMealType() + " - " + mealRecord.getCalories() + " Cal";
+                mealRecordStrings.add(mealRecordString);
+                mealRecordIds.add(mealRecord.getMealRecordID()); // Store ID for retrieval on save
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, mealRecordStrings);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mealRecordSpinner.setAdapter(adapter);
+            mealRecordSpinner.setTag(mealRecordIds); // Store the mealRecordIds in the spinner's tag
+        });
     }
 
     private void searchshowDatePickerDialog() {
@@ -317,20 +379,22 @@ public class UserDiaryFragment extends Fragment {
     }
 
     private void showDatePickerDialog() {
-        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                (view, year, month, dayOfMonth) -> {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(year, month, dayOfMonth);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                // Set selected date to the TextView
-                String selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
-                dateTextView.setText(selectedDate);
-            }
-        }, year, month, day);
 
+                    String selectedDateStr = dateFormat.format(calendar.getTime());
+
+                    // Set the formatted date to the TextView and call fetchMealRecordsForDate
+                    dateTextView.setText(selectedDateStr);
+                    fetchMealRecordsForDate(selectedDateStr, null); // Pass in correctly formatted date
+                },
+                Calendar.getInstance().get(Calendar.YEAR),
+                Calendar.getInstance().get(Calendar.MONTH),
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        );
         datePickerDialog.show();
     }
 
@@ -407,55 +471,50 @@ public class UserDiaryFragment extends Fragment {
 
         // Initialize views
         dateTextView = dialogView.findViewById(R.id.dateTextView);
-        mealTypeSpinner = dialogView.findViewById(R.id.mealTypeSpinner);
+        mealRecordSpinner = dialogView.findViewById(R.id.mealRecordSpinner);
         descriptionEditText = dialogView.findViewById(R.id.descriptionEditText);
         addTagsButton = dialogView.findViewById(R.id.addTagsButton);
         selectedTagsTextView = dialogView.findViewById(R.id.selectedTagsTextView);
 
-        // Initialize the meal type spinner
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.meal_types, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mealTypeSpinner.setAdapter(adapter);
+        mealRecordSpinner.setEnabled(true);
 
         // Set existing data in the dialog
         if (entry.getEntryDateTime() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String formattedDate = sdf.format(entry.getEntryDateTime());
+            String formattedDate = dateFormat.format(entry.getEntryDateTime());
             dateTextView.setText(formattedDate);
         }
 
-        // Set the spinner selection for meal type
-        int position = adapter.getPosition(entry.getMealType());
-        mealTypeSpinner.setSelection(position >= 0 ? position : 0); // Fallback to first item if not found
+        List<String> mealRecordList = new ArrayList<>();
+        mealRecordList.add(entry.getMealRecordString()); // Add only the selected meal record
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, mealRecordList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mealRecordSpinner.setAdapter(adapter);
+        mealRecordSpinner.setSelection(0);
+
+        dateTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
+
         descriptionEditText.setText(entry.getThoughts());
         selectedTagsTextView.setText(entry.getTags());
-
-        // Set up date picker
-        dateTextView.setOnClickListener(v -> {
-            showDatePickerDialog(); // Ensure this method shows the date picker dialog correctly
-        });
-
-        // Set up tag selection
-        addTagsButton.setOnClickListener(v -> {
-            showTagSelectionDialog(tags -> selectedTagsTextView.setText(tags)); // Ensure this works properly
-        });
 
         // Build the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(dialogView)
                 .setTitle("Edit Diary Entry")
                 .setPositiveButton("Save", (dialog, which) -> {
-                    // Retrieve data from dialog inputs
                     String selectedDate = dateTextView.getText().toString();
-                    String selectedMealType = mealTypeSpinner.getSelectedItem().toString();
                     String description = descriptionEditText.getText().toString();
                     String selectedTags = selectedTagsTextView.getText().toString();
+                    String mealRecordString = (String) mealRecordSpinner.getSelectedItem();  // Get the selected text
 
-                    // Validate inputs
                     if (selectedDate.equals("Select Date") || selectedDate.isEmpty()) {
                         Toast.makeText(getContext(), "Please select a valid date.", Toast.LENGTH_SHORT).show();
-                        return; // Prevent further processing if invalid
+                        return;
                     }
 
                     if (description.isEmpty()) {
@@ -467,7 +526,7 @@ public class UserDiaryFragment extends Fragment {
                     String[] dateParts = selectedDate.split("/");
                     if (dateParts.length != 3) {
                         Toast.makeText(getContext(), "Invalid date format.", Toast.LENGTH_SHORT).show();
-                        return; // Ensure date parsing only proceeds if valid
+                        return; // Exit if format is incorrect
                     }
 
                     try {
@@ -479,13 +538,17 @@ public class UserDiaryFragment extends Fragment {
                         calendar.set(year, month, day);
                         Timestamp entryDateTime = new Timestamp(calendar.getTimeInMillis());
 
-                        // Update the diary entry with the new data
+                        List<String> mealRecordIds = (List<String>) mealRecordSpinner.getTag();
+                        int selectedIndex = mealRecordSpinner.getSelectedItemPosition();
+                        String selectedMealRecordID = mealRecordIds != null && selectedIndex >= 0 ? mealRecordIds.get(selectedIndex) : null;
+
                         entry.setEntryDateTime(entryDateTime);
-                        entry.setMealType(selectedMealType);
+                        entry.setMealRecordID(selectedMealRecordID);
                         entry.setThoughts(description);
                         entry.setTags(selectedTags);
                         Log.d("Debug", "Username: " + username);
                         entry.setUsername(username);
+                        entry.setMealRecordString(mealRecordString);
 
                         // Notify the controller to update the entry in the database
                         userDiaryController.updateDiaryEntry(diaryID, entry, success -> {
@@ -510,5 +573,6 @@ public class UserDiaryFragment extends Fragment {
         fetchDiaryEntries();
         etDatePicker.setText("");
     }
+
 
 }

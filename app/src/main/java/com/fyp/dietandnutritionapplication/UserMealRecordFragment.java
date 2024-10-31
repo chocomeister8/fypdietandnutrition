@@ -50,6 +50,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -196,6 +197,8 @@ public class UserMealRecordFragment extends Fragment {
         remainingCaloriesView = view.findViewById(R.id.progress_remainingcalorie);
 
         calendar = Calendar.getInstance();
+
+
 
         if (currentUser != null) {
             String userId = currentUser.getUid();
@@ -1039,6 +1042,7 @@ public class UserMealRecordFragment extends Fragment {
         }
 
     }
+
 
     private void updateImageBasedMealRecord(MealRecord mealRecord, String mealRecordID) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());

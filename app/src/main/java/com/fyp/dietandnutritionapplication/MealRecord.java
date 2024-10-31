@@ -183,7 +183,7 @@ public class MealRecord {
                 .whereEqualTo("username", username)
                 .get()
                 .addOnCompleteListener(task -> {
-                    Log.d("MealLogUFragment", "fetching username and date " + username);
+                    Log.d("MealLogUFragment", "fetching username" + username);
                     if (task.isSuccessful()) {
                         Log.d("MealLogUFragment", "task.isSuccessful()");
                         List<MealRecord> mealRecords = new ArrayList<>();
@@ -217,6 +217,76 @@ public class MealRecord {
                         Log.w("MealLogUFragment", "Error getting documents.", task.getException());
                     }
                 });
+    }
+
+    public void fetchDiaryMealsLogged(String username, String selectedDateStr, OnMealsFetchedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Log.d("MealLogUFragment", "fetchMealsLogged() date:" + selectedDateStr);
+
+        db.collection("MealRecords")
+                .whereEqualTo("username", username)
+                .get()
+                .addOnCompleteListener(task -> {
+                    Log.d("MealLogUFragment", "fetching username" + username);
+                    if (task.isSuccessful()) {
+                        Log.d("MealLogUFragment", "task.isSuccessful()");
+                        List<MealRecord> mealRecords = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            MealRecord mealRecord = document.toObject(MealRecord.class);
+                            // Check if createdDate is a String and convert it to Timestamp or Date
+                            if (document.contains("createdDate")) {
+                                Object createdDateObj = document.get("createdDate");
+                                if (createdDateObj instanceof Timestamp) {
+                                    mealRecord.setCreatedDate((Timestamp) createdDateObj);
+                                } else if (createdDateObj instanceof String) {
+                                    // If it's a string, convert to Timestamp
+                                    String dateString = (String) createdDateObj;
+                                    try {
+                                        // Assuming the date is stored in a standard format, e.g., "yyyy-MM-dd"
+                                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                                        Date parsedDate = sdf.parse(dateString);
+                                        mealRecord.setCreatedDate(new Timestamp(parsedDate)); // Convert to Timestamp
+                                    } catch (ParseException e) {
+                                        Log.e("MealLogUFragment", "Error parsing date string: " + dateString, e);
+                                    }
+                                }
+                                if (isSameDateDiary(mealRecord.getCreatedDate(), selectedDateStr)) {
+                                    mealRecords.add(mealRecord);
+                                }
+                            }
+                            listener.onMealsFetched(mealRecords);
+                        }
+                        Log.d("MealLogUFragment", "Fetched meal records: " + mealRecords.size());
+                    } else {
+                        Log.w("MealLogUFragment", "Error getting documents.", task.getException());
+                    }
+                });
+    }
+
+    private boolean isSameDateDiary(Timestamp mealDate, String selectedDateStr) {
+        if (mealDate == null) return false;
+
+        try {
+            // Convert Timestamp to Date
+            Date date = mealDate.toDate();
+
+            // Create a calendar instance for Singapore timezone
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Singapore"));
+            calendar.setTime(date);
+
+            // Format the date to "yyyy-MM-dd"
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            dateFormat.setTimeZone(calendar.getTimeZone()); // Set the formatter timezone to Singapore
+            String mealDateFormatted = dateFormat.format(calendar.getTime());
+            Log.d("MealLogFragment", "Comparing - Database date (formatted): " + mealDateFormatted + " | Selected date: " + selectedDateStr);
+
+            // Compare the formatted date with the selected date string
+            return selectedDateStr.equals(mealDateFormatted);
+        } catch (Exception e) {
+            Log.e("MealLogFragment", "Error formatting date: " + e.getMessage());
+            return false; // Return false in case of any formatting error
+        }
     }
 
     private boolean isSameDate(Timestamp mealDate, String selectedDateStr) {
