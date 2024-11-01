@@ -292,6 +292,19 @@
             tools:ignore="HardcodedText" />
 
         <Button
+            android:id="@+id/healthAdviceButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:text="Leave A Health Advice"
+            android:backgroundTint="#D7FDAA"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/container"
+            tools:ignore="HardcodedText" />
+
+        <Button
             android:id="@+id/backButton"
             android:layout_width="match_parent"
             android:layout_height="50dp"

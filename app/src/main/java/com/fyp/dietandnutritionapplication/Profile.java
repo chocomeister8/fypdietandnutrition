@@ -14,6 +14,7 @@ public class Profile implements Serializable {
     private String dateJoined;
     private String role;
     private String status;
+    private String userId;
 
     public String toString() {
         return firstName + " (" + lastName + ")"; // Customize as needed
@@ -42,6 +43,15 @@ public class Profile implements Serializable {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.gender = gender;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    // Add this if it doesn’t exist
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
     public String getStatus() {
         return status;

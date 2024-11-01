@@ -38,6 +38,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -58,6 +59,7 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private String userId;
+    private String username;
     private NotificationUController notificationUController;
     private TextView notificationBadgeTextView;
     private TextView calorieLimitTextView;
@@ -76,7 +78,6 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
         auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
 
-
         if (user != null) {
             userId = user.getUid();
 
@@ -89,7 +90,7 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
             averageProteins = view.findViewById(R.id.averageProtein);
             averageFats = view.findViewById(R.id.averageFats);
             averageCarbs = view.findViewById(R.id.averageCarbs);
-            averageFiber = view.findViewById(R.id.averageFiber); // Add this line
+            averageFiber = view.findViewById(R.id.averageFiber);
             pieChart = view.findViewById(R.id.pie_chart);
             calorieLimitTextView = view.findViewById(R.id.calorieLimit);
             barChart = view.findViewById(R.id.bar_chart);
@@ -102,7 +103,6 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
             notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
                 @Override
                 public void onNotificationsFetched(List<Notification> notifications) {
-                    // Notifications can be processed if needed
                     notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
                         @Override
                         public void onCountFetched(int count) {
@@ -119,6 +119,24 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
                         .replace(R.id.frame_layout, new NotificationUFragment())
                         .addToBackStack(null)
                         .commit();
+            });
+
+            // Fetch username from Firestore to get health advice
+            db.collection("Users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    String username = documentSnapshot.getString("username"); // Ensure "username" field exists
+                    if (username != null && !username.isEmpty()) {
+                        Log.d("FetchHealthAdvice", "Username: " + username);
+                        fetchHealthAdviceByUsername(username);
+                    } else {
+                        Toast.makeText(getContext(), "Username is missing for this user.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "User profile not found.", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(e -> {
+                Log.e("FetchHealthAdvice", "Error fetching username", e);
+                Toast.makeText(getContext(), "Failed to retrieve username.", Toast.LENGTH_SHORT).show();
             });
 
             // Set button listeners
@@ -148,6 +166,7 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
 
         return view;
     }
+
 
     // Check if the user is authenticated
     private boolean isUserAuthenticated() {
@@ -315,13 +334,13 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
                                 // Fetch the calorie limit
                                 fetchCalorieLimit();
 
-                                // Generate nutritional advice based on the totals
-                                generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats,(float) totalCalories);
+                                fetchHealthAdviceByUsername(username);
 
                             } else {
                                 // Clear chart and text when no records found
                                 resetDisplay();
                                 pieChart.invalidate();
+                                fetchHealthAdviceByUsername(username);
 
                                 Toast.makeText(getContext(), "No records found for the selected date.", Toast.LENGTH_SHORT).show();
                             }
@@ -405,12 +424,13 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
                             // Fetch the calorie limit
                             calculateMonthlyCalorieLimit();
 
-                            // Generate nutritional advice based on the totals
-                            generateNutritionalAdvice((float) totalProteins, (float) totalCarbs, (float) totalFats,(float)calorieLimit);
-                        } else {
+                            fetchHealthAdviceByUsername(username);
+                            } else {
                             // Display message for no records found
                             resetDisplay();
                             pieChart.invalidate();
+
+                            fetchHealthAdviceByUsername(username);
 
                             Toast.makeText(getContext(), "No records found for " + month + " " + year, Toast.LENGTH_SHORT).show();
                         }
@@ -517,57 +537,47 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
 
 
 
+    private void fetchHealthAdviceByUsername(String username) {
+        // Log the username to debug
+        Log.d("FetchHealthAdvice", "Username passed: " + username);
 
-    // Method to generate overall nutritional advice based on the percentage of macronutrients
-    private void generateNutritionalAdvice(float proteins, float carbs, float fats,float calorieLimit) {
-        StringBuilder advice = new StringBuilder();
-
-        // Calculate total calories from each macronutrient
-        float totalCalories = (proteins * 4) + (carbs * 4) + (fats * 9);
-
-
-        // Calculate the percentage of each macronutrient
-        float proteinPercentage = (proteins * 4 / totalCalories) * 100;
-        float carbPercentage = (carbs * 4 / totalCalories) * 100;
-        float fatPercentage = (fats * 9 / totalCalories) * 100;
-
-        // Determine advice based on how close the macronutrient percentages are to recommended ranges
-        if (proteinPercentage >= 15 && proteinPercentage <= 25 &&
-                carbPercentage >= 50 && carbPercentage <= 60 &&
-                fatPercentage >= 20 && fatPercentage <= 30) {
-
-            // Perfectly balanced intake
-            advice.append("Your nutrient intake is excellent! Keep it up for optimal health.");
-
-        } else if ((proteinPercentage >= 10 && proteinPercentage < 15) ||
-                (carbPercentage >= 45 && carbPercentage < 50) ||
-                (fatPercentage >= 15 && fatPercentage < 20)) {
-
-            // Slightly imbalanced but mostly good
-            advice.append("Your intake is quite good, but there is room for small improvements. Consider slightly adjusting your diet for better balance.");
-
-        } else if ((proteinPercentage >= 5 && proteinPercentage < 10) ||
-                (carbPercentage >= 35 && carbPercentage < 45) ||
-                (fatPercentage >= 10 && fatPercentage < 15)) {
-
-            // Moderately imbalanced intake
-            advice.append("Your intake is moderately imbalanced. It would be beneficial to adjust your macronutrient intake for better health.");
-
-        } else if ((proteinPercentage < 5) ||
-                (carbPercentage < 35) ||
-                (fatPercentage < 10)) {
-
-            // Severely imbalanced intake
-            advice.append("Your nutritional intake is quite imbalanced. Significant changes are recommended to improve your diet.");
-
-        } else {
-            // Significantly over in one area
-            advice.append("One or more macronutrients are excessively consumed. Consider reducing the intake of those nutrients for a healthier balance.");
+        if (username == null || username.isEmpty()) {
+            Toast.makeText(getContext(), " ", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // Set the generated advice to the adviceTextView
-        adviceTextView.setText(advice.toString());
+
+        // Reference the Firestore document for the unique user based on username
+        DocumentReference documentRef = db.collection("healthAdvice").document(username);
+
+        // Fetch the document data
+        documentRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Map Firestore document to HealthAdvice class
+                        UserAccountDetailsToRecommendFragment.HealthAdvice healthAdvice = documentSnapshot.toObject(UserAccountDetailsToRecommendFragment.HealthAdvice.class);
+                        if (healthAdvice != null && healthAdvice.getComment() != null) {
+                            // Display the health advice comment if view is available
+                            View rootView = getView();
+                            if (rootView != null) {
+                                TextView adviceTextView = rootView.findViewById(R.id.health_advice_text);
+                                adviceTextView.setText(healthAdvice.getComment());
+                            } else {
+                                Log.e("UserAccountFragment", "Root view is null. Cannot find TextView.");
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "No health advice found for this user.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "No health advice exists for this user.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("UserAccountFragment", "Error fetching health advice", e);
+                    Toast.makeText(getContext(), "Error fetching health advice.", Toast.LENGTH_SHORT).show();
+                });
     }
+
 
 
     private void resetDisplay() {
