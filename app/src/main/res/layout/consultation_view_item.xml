@@ -167,6 +167,17 @@
             app:layout_constraintTop_toTopOf="@+id/status_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Dynamic Status Value -->
+        <TextView
+            android:id="@+id/zoom"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteY="213dp"
+            tools:ignore="MissingConstraints" />
+
         <!-- Book Button -->
         <Button
             android:id="@+id/book_button"

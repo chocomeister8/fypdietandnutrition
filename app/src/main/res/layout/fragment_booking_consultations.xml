@@ -53,7 +53,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout5"
-        app:layout_constraintVertical_bias="0.03"
+        app:layout_constraintVertical_bias="0.057"
         tools:ignore="MissingConstraints,NotSibling">
 
         <LinearLayout
@@ -70,10 +70,10 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:text="Booking History"
-                android:textStyle="bold"
                 android:textAlignment="viewStart"
                 android:textColor="#333333"
-                android:textSize="11sp" />
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/consultation_slot"

@@ -124,6 +124,28 @@
             app:layout_constraintTop_toTopOf="@+id/time_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <TextView
+            android:id="@+id/consultation_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zoom Link: "
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/time_label"
+            android:layout_marginTop="8dp" />
+
+        <!-- Dynamic Status Value -->
+        <TextView
+            android:id="@+id/consultation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoLink="web"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/consultation_label"
+            app:layout_constraintTop_toTopOf="@+id/consultation_label"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <!-- Status Label -->
 
         <!-- Dynamic Status Value -->

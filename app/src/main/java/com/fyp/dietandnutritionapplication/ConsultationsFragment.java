@@ -54,6 +54,7 @@ public class ConsultationsFragment extends Fragment {
     private EditText searchBar;
     private String selectedRole = "All Users";    private TextView consultationIdTextView;
     private EditText clientNameEditText;
+    private EditText zoomLinkEditText;
     private EditText statusEditText;
     private String searchText = "";
 
@@ -98,6 +99,7 @@ public class ConsultationsFragment extends Fragment {
 
                 clientNameEditText.setText(selectedConsultation.getClientName());
                 statusEditText.setText(selectedConsultation.getStatus());
+                zoomLinkEditText.setText(selectedConsultation.getZoomLink());
             }
         }
 
@@ -291,10 +293,11 @@ public class ConsultationsFragment extends Fragment {
                                                 String date = document.getString("date");
                                                 String time = document.getString("time");
                                                 String status = document.getString("status");
+                                                String zoomLink = document.getString("zoomLink");
 
                                                 // Only add consultations where clientName matches the logged-in user's username
                                                 if (clientName != null && clientName.equals(currentUsername)) {
-                                                    Consultation consultation = new Consultation(id, nutritionistName, clientName, date, time, status, 150);
+                                                    Consultation consultation = new Consultation(id, nutritionistName, clientName, date, time, status, 150,zoomLink);
                                                     consultationList.add(consultation);
 
                                                     if (isOneDayAway(date) && !isReminderSent(id)) {

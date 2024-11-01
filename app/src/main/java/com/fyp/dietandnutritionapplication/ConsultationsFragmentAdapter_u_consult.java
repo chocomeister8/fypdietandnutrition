@@ -60,6 +60,7 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
             viewHolder.nutritionistNameTextView = convertView.findViewById(R.id.nutritionist_name);
             viewHolder.dateTextView = convertView.findViewById(R.id.date);
             viewHolder.timeTextView = convertView.findViewById(R.id.time);
+            viewHolder.zoomLinkTextView = convertView.findViewById(R.id.consultation);
 
             convertView.setTag(viewHolder);
         } else {
@@ -75,6 +76,7 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
             viewHolder.nutritionistNameTextView.setText(currentSlot.getNutritionistName());
             viewHolder.dateTextView.setText(currentSlot.getDate());
             viewHolder.timeTextView.setText(currentSlot.getTime());
+            viewHolder.zoomLinkTextView.setText(currentSlot.getZoomLink());
         } else {
             Toast.makeText(context, "Consultation slot data is not available.", Toast.LENGTH_SHORT).show();
         }
@@ -94,5 +96,6 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
         TextView nutritionistNameTextView;
         TextView dateTextView;
         TextView timeTextView;
+        TextView zoomLinkTextView;
     }
 }

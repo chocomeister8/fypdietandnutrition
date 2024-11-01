@@ -215,6 +215,7 @@ private void updateConsultationWithClientName(String consultationId, String clie
             transaction.replace(R.id.frame_layout, new ConsultationsFragment());
             transaction.addToBackStack(null);  // Adds to back stack for proper back navigation
             transaction.commit();
+            Toast.makeText(getContext(), "Try refresh your page, if your consultation wasn't there", Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             Log.e("NavigationError", "Error navigating to ConsultationsFragment", e);

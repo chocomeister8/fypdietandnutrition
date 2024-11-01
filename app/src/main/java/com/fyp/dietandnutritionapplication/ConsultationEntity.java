@@ -100,6 +100,7 @@ public class ConsultationEntity {
         slot.setTime(document.getString("time"));
         slot.setClientName(document.getString("clientName"));
         slot.setStatus(document.getString("status"));
+        slot.setZoomLink(document.getString("zoomLink"));
         return slot;
     }
 
@@ -107,7 +108,7 @@ public class ConsultationEntity {
         retrieveCons(callback);
     }
 
-    public void insertConsult(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, ProgressDialog pd, Context context){
+    public void insertConsult(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, String zoomLink, ProgressDialog pd, Context context){
         Map<String, Object> consult = new HashMap<>();
         consult.put("Consultation Id", consultationId);
         consult.put("Nutritionist Name", nutritionistName);
@@ -115,6 +116,7 @@ public class ConsultationEntity {
         consult.put("Time", time);
         consult.put("Client Name", ClientName);
         consult.put("Status", status);
+        consult.put("Zoom link", zoomLink);
 
         db.collection("Consultation_slots").document(consultationId).set(consult)
                 .addOnCompleteListener(task -> {
@@ -127,20 +129,21 @@ public class ConsultationEntity {
                 });
     }
 
-    public void updateConsultInFirestore(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, int price, Context context) {
+    public void updateConsultInFirestore(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, int price, String zoomLink, Context context) {
         if (consultationId != null) {
             Map<String, Object> updatedFields = new HashMap<>();
             updatedFields.put("ClientName", ClientName);
             updatedFields.put("status", status);
             updatedFields.put("date", date);
             updatedFields.put("time", time);
+            updatedFields.put("zoomLink", zoomLink);
 
             db.collection("Consultation_slots").document(consultationId)
                     .update(updatedFields)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(context, "Consultation updated successfully", Toast.LENGTH_SHORT).show();
 
-                        Consultation updateConsult = new Consultation(consultationId, nutritionistName,date, time, ClientName,status,price);
+                        Consultation updateConsult = new Consultation(consultationId, nutritionistName,date, time, ClientName,status,price, zoomLink);
                         ConsultationsFragment viewConsultationFragment = new ConsultationsFragment();
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("selectedConsultation", updateConsult);

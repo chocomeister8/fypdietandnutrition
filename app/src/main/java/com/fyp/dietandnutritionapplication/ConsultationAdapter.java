@@ -61,6 +61,7 @@ public class ConsultationAdapter extends BaseAdapter {
             viewHolder.timeTextView = convertView.findViewById(R.id.time);
             viewHolder.priceTextView = convertView.findViewById(R.id.price);
             viewHolder.statusTextView = convertView.findViewById(R.id.status);
+            viewHolder.zoomTextView = convertView.findViewById(R.id.zoom);
             viewHolder.bookButton = convertView.findViewById(R.id.book_button);
 
             convertView.setTag(viewHolder);
@@ -78,6 +79,7 @@ public class ConsultationAdapter extends BaseAdapter {
             viewHolder.clientNameTextView.setText(currentConsultation.getClientName());
             viewHolder.dateTextView.setText(currentConsultation.getDate());
             viewHolder.timeTextView.setText(currentConsultation.getTime());
+            viewHolder.zoomTextView.setText(currentConsultation.getZoomLink());
             viewHolder.priceTextView.setText("$150");
             viewHolder.statusTextView.setText(currentConsultation.getStatus());
         } else {
@@ -143,6 +145,7 @@ public class ConsultationAdapter extends BaseAdapter {
         TextView dateTextView;
         TextView timeTextView;
         TextView statusTextView;
+        TextView zoomTextView;
         TextView priceTextView;
         Button bookButton;
     }

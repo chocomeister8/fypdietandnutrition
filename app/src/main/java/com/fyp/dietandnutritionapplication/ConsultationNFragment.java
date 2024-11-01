@@ -3,10 +3,13 @@ package com.fyp.dietandnutritionapplication;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +34,7 @@ public class ConsultationNFragment extends Fragment {
     private RecyclerView recyclerViewSlots;
     private List<String> availableSlotsList;
     private SlotsAdapter slotsAdapter;
-    private String selectedDate = "", selectedTime = "";
+    private String selectedDate = "", selectedTime = "", selectedZoom = "";
     private FirebaseFirestore firestore;
     private String clientName;
 
@@ -54,6 +57,7 @@ public class ConsultationNFragment extends Fragment {
         timePickerButton = view.findViewById(R.id.time_picker_button);
         saveButton = view.findViewById(R.id.save_button);
         recyclerViewSlots = view.findViewById(R.id.recycler_view_slots);
+        EditText zoomLinkEditText = view.findViewById(R.id.zoom_link_edit_text);
 
         // Initialize list and adapter
         availableSlotsList = new ArrayList<>();
@@ -104,7 +108,10 @@ public class ConsultationNFragment extends Fragment {
 
         // Save Button Click
         saveButton.setOnClickListener(v -> {
-            if (!selectedDate.isEmpty() && !selectedTime.isEmpty()) {
+            String zoomLink = zoomLinkEditText.getText().toString().trim();
+            if (TextUtils.isEmpty(zoomLink) || !isValidZoomLink(zoomLink)) {
+                Toast.makeText(getContext(), "Please enter a valid Zoom link.", Toast.LENGTH_SHORT).show();
+            } else if (!selectedDate.isEmpty() && !selectedTime.isEmpty()) {
                 if (currentUser != null) {
                     String userId = currentUser.getUid();
 
@@ -120,7 +127,7 @@ public class ConsultationNFragment extends Fragment {
                                     String nutritionistName = documentSnapshot.getString("username");
                                     String status = documentSnapshot.getString("status"); // Default status
 
-                                    saveSlotToFirestore(consultationId, date, time, nutritionistName, clientName, status);
+                                    saveSlotToFirestore(consultationId, date, time, nutritionistName, clientName, status, zoomLink);
                                     Toast.makeText(getContext(), "Slot added: " + date + " " + time, Toast.LENGTH_SHORT).show();
                                     selectedDate = "";
                                     selectedTime = "";
@@ -164,6 +171,10 @@ public class ConsultationNFragment extends Fragment {
         return view;
     }
 
+    private boolean isValidZoomLink(String link) {
+        return Patterns.WEB_URL.matcher(link).matches() && link.contains("zoom.us");
+    }
+
     private void fetchSlotsFromFirestore() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -189,9 +200,10 @@ public class ConsultationNFragment extends Fragment {
                                             String date = document.getString("date");
                                             String time = document.getString("time");
                                             String nutritionistName = document.getString("nutritionistName");
+                                            String zoomlink = document.getString("zoomLink");
 
                                             if (date != null && time != null && nutritionistName != null) {
-                                                availableSlotsList.add(date + ", " + time + " - " + nutritionistName);
+                                                availableSlotsList.add(date + ", " + time + " - " + nutritionistName );
                                             }
                                         }
                                         slotsAdapter.notifyDataSetChanged();
@@ -210,13 +222,13 @@ public class ConsultationNFragment extends Fragment {
     }
 
 
-    private void saveSlotToFirestore(String consultationId, String date, String time, String nutritionistName, String status, String userName) {
-        Slot slot = new Slot(consultationId, date, time, nutritionistName, status, userName);
+    private void saveSlotToFirestore(String consultationId, String date, String time, String nutritionistName, String status, String userName, String zoomLink) {
+        Slot slot = new Slot(consultationId, date, time, nutritionistName, status, userName, zoomLink);
 
         // Save slot data to Firestore
         firestore.collection("Consultation_slots").add(slot)
                 .addOnSuccessListener(documentReference -> {
-                    availableSlotsList.add(date + ", " + time + " - " + nutritionistName); // Display the date, time, and nutritionist in the list
+                    availableSlotsList.add(date + ", " + time + " - " + nutritionistName + "\n" + zoomLink); // Display the date, time, and nutritionist in the list
                     slotsAdapter.notifyDataSetChanged();
                     Toast.makeText(getContext(), "Slot added: " + date + ", " + time, Toast.LENGTH_SHORT).show();
                 })

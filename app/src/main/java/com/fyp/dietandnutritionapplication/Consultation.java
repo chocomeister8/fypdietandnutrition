@@ -9,7 +9,8 @@ public class Consultation implements Serializable {
     private String clientName;
     private String date;
     private String time;
-    private String status; // e.g., Pending, Confirmed, Completed
+    private String status;
+    private String zoomLink;
     private int price;
 
     // Default constructor (required for Firebase)
@@ -17,7 +18,7 @@ public class Consultation implements Serializable {
     }
 
     // Parameterized constructor
-    public Consultation(String consultationId, String nutritionistName, String clientName, String date, String time, String status, int price) {
+    public Consultation(String consultationId, String nutritionistName, String clientName, String date, String time, String status, int price, String zoomLink) {
         this.consultationId = consultationId;
         this.nutritionistName = nutritionistName;
         this.clientName = clientName;
@@ -25,6 +26,7 @@ public class Consultation implements Serializable {
         this.time = time;
         this.status = status;
         this.price = price;
+        this.zoomLink = zoomLink;
     }
 
     // Getters and setters for each field
@@ -62,6 +64,14 @@ public class Consultation implements Serializable {
 
     public int getPrice() {
         return price;
+    }
+
+    public void setZoomLink(String zoomLink) {
+        this.zoomLink = zoomLink;
+    }
+
+    public String getZoomLink() {
+        return zoomLink;
     }
 
     public void setDate(String date) {

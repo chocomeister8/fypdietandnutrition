@@ -35,9 +35,9 @@ public class ConsultationController {
         });
     }
 
-    public void checkUpdateConsult(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, int price, Context context){
+    public void checkUpdateConsult(String consultationId, String nutritionistName, String date, String time, String ClientName, String status, int price,String zoomLink, Context context){
         ConsultationEntity conEntity = new ConsultationEntity();
-        conEntity.updateConsultInFirestore(consultationId, nutritionistName,date, time, ClientName,status,price,context);
+        conEntity.updateConsultInFirestore(consultationId, nutritionistName,date, time, ClientName,status,price,zoomLink,context);
     }
 
     // Set Consultation ID

@@ -2,11 +2,15 @@ package com.fyp.dietandnutritionapplication;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +28,8 @@ import com.google.firebase.auth.FirebaseUser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -33,6 +39,7 @@ public class NutriHomeFragment extends Fragment {
     private ImageView logoutImageView;
     private RecyclerView bookingsRecyclerView;
     private Button addBookingButton;
+    private Spinner filter_button;
     private List<String> bookingsList;
     private FirebaseFirestore firestore;
     private BookingsAdapter adapter;
@@ -49,6 +56,7 @@ public class NutriHomeFragment extends Fragment {
         Button button_consultation = view.findViewById(R.id.consultation);
         Button button_profile = view.findViewById(R.id.profile);
         Button button_recommendation = view.findViewById(R.id.button_recommendRecipes);
+        filter_button = view.findViewById(R.id.filter_button);
         bookingsRecyclerView = view.findViewById(R.id.bookings_recycler_view);
         addBookingButton = view.findViewById(R.id.add_booking_button);
         totalConsultationsText = view.findViewById(R.id.carbohydrates_value);
@@ -62,6 +70,40 @@ public class NutriHomeFragment extends Fragment {
 //        bookingsList.add("Booking 1: John Doe - 10/10/2024");
 //        bookingsList.add("Booking 2: Jane Smith - 12/10/2024");
 //        bookingsList.add("Booking 3: Mark Johnson - 14/10/2024");
+        // Set up Spinner for star ratings
+        List<String> sortOptions = new ArrayList<>();
+        sortOptions.add("▼ Oldest");
+        sortOptions.add("▼ Most Recent");
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, sortOptions);
+        sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filter_button.setAdapter(sortAdapter);
+
+        sortBookingsByDate(true);
+
+        // Set up Spinner item selected listener
+        filter_button.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        // Oldest to newest
+                        sortBookingsByDate(false);
+                        break;
+                    case 1:
+                        // Most recent to oldest
+                        sortBookingsByDate(true);
+                        break;
+                }
+                // Update ListView with sorted reviews
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Handle case where no selection is made if needed
+            }
+        });
+
 
         // Set up RecyclerView with hardcoded data
         bookingsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -136,6 +178,43 @@ public class NutriHomeFragment extends Fragment {
         return view;
     }
 
+    private void sortBookingsByDate(boolean mostRecentFirst) {
+        Collections.sort(bookingsList, (b1, b2) -> {
+            // Assuming the date format in bookingsList is "dd/MM/yyyy"
+            String date1 = extractDate(b1);
+            String date2 = extractDate(b2);
+            Date parsedDate1 = parseDate(date1);
+            Date parsedDate2 = parseDate(date2);
+
+            if (parsedDate1 == null || parsedDate2 == null) return 0;
+
+            return mostRecentFirst ? parsedDate2.compareTo(parsedDate1) : parsedDate1.compareTo(parsedDate2);
+        });
+    }
+
+    // Helper method to extract the date part from the booking string
+    private String extractDate(String booking) {
+        // Assuming date is formatted as "Date: dd/MM/yyyy" in booking string
+        String[] lines = booking.split("\n");
+        for (String line : lines) {
+            if (line.startsWith("Date: ")) {
+                return line.replace("Date: ", "").trim();
+            }
+        }
+        return null;
+    }
+
+    // Helper method to parse date strings
+    private Date parseDate(String dateStr) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        try {
+            return dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private void fetchBookingsFromFirestore() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -163,7 +242,8 @@ public class NutriHomeFragment extends Fragment {
                                             String bookingInfo = "Nutritionist: " + slot.getNutritionistName() +
                                                     "\nDate: " + slot.getDate() +
                                                     "\nTime: " + slot.getTime() +
-                                                    "\nStatus: " + slot.getStatus() + "\n";
+                                                    "\nStatus: " + slot.getStatus() +
+                                                    "\nZoom Link: " + slot.getZoomLink() + "\n";
 
                                             // Add the formatted string to the bookings list
                                             bookingsList.add(bookingInfo);
@@ -224,6 +304,8 @@ public class NutriHomeFragment extends Fragment {
         public void onBindViewHolder(@NonNull BookingViewHolder holder, int position) {
             String booking = bookings.get(position);
             holder.bookingTextView.setText(booking);
+
+            Linkify.addLinks(holder.bookingTextView, Linkify.WEB_URLS);
         }
 
         @Override
