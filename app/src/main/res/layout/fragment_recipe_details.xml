@@ -48,6 +48,7 @@
         android:id="@+id/scrollView3"
         android:layout_width="405dp"
         android:layout_height="730dp"
+        android:layout_marginBottom="25dp"
         android:background="#FFFFFF"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -61,15 +62,17 @@
             android:padding="16dp">
 
             <TableRow>
+
                 <ImageView
                     android:id="@+id/detail_image"
                     android:layout_width="0dp"
                     android:layout_height="350dp"
-                    android:scaleType="fitCenter"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:scaleType="fitCenter" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/detail_recipe_title"
                     android:layout_width="wrap_content"
@@ -89,19 +92,19 @@
                     android:id="@+id/calorie_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Calories:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_calories"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <View
@@ -109,26 +112,25 @@
                 android:layout_height="1dp"
                 android:background="@android:color/darker_gray" />
 
-            <TableRow
-                android:paddingVertical="4dp">
+            <TableRow android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/calorie_per100g_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Calories per 100g:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_calories_p100g"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <View
@@ -137,26 +139,25 @@
                 android:background="@android:color/darker_gray" />
 
             <!-- Total Weight -->
-            <TableRow
-                android:paddingVertical="4dp">
+            <TableRow android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/label_detail_total_weight"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Total Weight:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_total_weight"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <View
@@ -165,26 +166,25 @@
                 android:background="@android:color/darker_gray" />
 
             <!-- Meal Type -->
-            <TableRow
-                android:paddingVertical="4dp">
+            <TableRow android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/detail_meal_type_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Meal Type:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_meal_type"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <View
@@ -193,26 +193,25 @@
                 android:background="@android:color/darker_gray" />
 
             <!-- Cuisine Type -->
-            <TableRow
-                android:paddingVertical="4dp">
+            <TableRow android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/detail_cuisine_type_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Cuisine Type:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_cuisine_type"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <View
@@ -221,26 +220,25 @@
                 android:background="@android:color/darker_gray" />
 
             <!-- Dish Type -->
-            <TableRow
-                android:paddingVertical="4dp">
+            <TableRow android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/detail_dish_type_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Dish Type:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_dish_type"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <View
@@ -249,26 +247,25 @@
                 android:background="@android:color/darker_gray" />
 
             <!-- Diet Labels -->
-            <TableRow
-                android:paddingVertical="4dp">
+            <TableRow android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/detail_diet_labels_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Diet Labels:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_diet_labels"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <View
@@ -277,46 +274,46 @@
                 android:background="@android:color/darker_gray" />
 
             <!-- Health Labels -->
-            <TableRow
-                android:paddingVertical="4dp">
+            <TableRow android:paddingVertical="4dp">
 
                 <TextView
                     android:id="@+id/detail_health_labels_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Health Labels:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_health_labels"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/view_more_health_labels"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="View More"
                     android:textColor="@android:color/holo_blue_dark"
-                    android:visibility="gone"
-                    android:layout_weight="2" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/view_less_health_labels"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="View Less"
                     android:textColor="@android:color/holo_blue_dark"
-                    android:visibility="gone"
-                    android:layout_weight="2" />
+                    android:visibility="gone" />
             </TableRow>
 
             <View
@@ -333,66 +330,69 @@
                     android:id="@+id/detail_ingredients_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="Ingredients List:"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/detail_ingredients"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:paddingStart="4dp"
                     android:text=""
-                    android:textSize="16sp"
-                    android:layout_weight="2" />
+                    android:textSize="16sp" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/view_more_ingredients"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="View More"
                     android:textColor="@android:color/holo_blue_dark"
-                    android:visibility="gone"
-                    android:layout_weight="2" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/view_less_ingredients"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="View Less"
                     android:textColor="@android:color/holo_blue_dark"
-                    android:visibility="gone"
-                    android:layout_weight="2" />
+                    android:visibility="gone" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/view_more_instructions"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="View More"
                     android:textColor="@android:color/holo_blue_dark"
-                    android:visibility="gone"
-                    android:layout_weight="2" />
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/view_less_instructions"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:text="View Less"
                     android:textColor="@android:color/holo_blue_dark"
-                    android:visibility="gone"
-                    android:layout_weight="2" />
+                    android:visibility="gone" />
             </TableRow>
+
             <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="@android:color/darker_gray" />
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/darker_gray" />
 
             <TextView
                 android:id="@+id/detail_instructions_link"
@@ -409,9 +409,9 @@
                 android:id="@+id/button_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
                 android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:orientation="horizontal"
                 android:paddingTop="16dp">
 
                 <!-- Back Button -->
@@ -426,16 +426,16 @@
                     android:id="@+id/addFavouriteButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add to Favourite"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:text="Add to Favourite" />
 
                 <!-- New Button -->
                 <Button
                     android:id="@+id/addToFolder"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add"
-                    android:layout_marginStart="16dp" />
+                    android:layout_marginStart="16dp"
+                    android:text="Add" />
 
             </LinearLayout>
 

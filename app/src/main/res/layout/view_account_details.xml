@@ -25,18 +25,22 @@
                 android:id="@+id/logo"
                 android:layout_width="100dp"
                 android:layout_height="70dp"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:layout_marginStart="5dp"
                 android:src="@drawable/dietdietmusttry_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginStart="16dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_toStartOf="@+id/right_icon"
+                android:layout_toEndOf="@+id/logo"
                 android:text="Accounts"
                 android:textSize="18sp"
-                android:layout_centerInParent="true"
                 android:textStyle="bold" />
 
             <ImageView
