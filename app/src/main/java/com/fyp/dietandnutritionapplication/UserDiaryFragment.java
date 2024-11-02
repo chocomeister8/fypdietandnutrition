@@ -23,9 +23,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import android.widget.Toast;
@@ -325,16 +327,13 @@ public class UserDiaryFragment extends Fragment {
                         return;
                     }
 
-                    String[] dateParts = selectedDate.split("-");
-                    int year = Integer.parseInt(dateParts[0]);
-                    int month = Integer.parseInt(dateParts[1]) - 1;
-                    int day = Integer.parseInt(dateParts[2]);
-
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(Calendar.YEAR, year);
-                    calendar.set(Calendar.MONTH, month);
-                    calendar.set(Calendar.DAY_OF_MONTH, day);
-                    Timestamp entryDateTime = new Timestamp(calendar.getTimeInMillis());
+                    Date date = null;
+                    try {
+                        date = dateFormat.parse(selectedDate);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Timestamp entryDateTime = new Timestamp(date.getTime());
 
                     userDiaryController.handleDiaryEntry(entryDateTime, selectedMealRecordID, description, selectedTags, username, mealRecordString);
                     fetchDiaryEntries();
