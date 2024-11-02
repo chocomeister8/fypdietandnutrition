@@ -224,7 +224,10 @@ public class navCreateFolderFragment extends Fragment {
                     }
                     if (fragment != null) {
                         // Replace the current fragment with the target fragment
-                        ((MainActivity) v.getContext()).replaceFragment(fragment); // Assuming MainActivity has replaceFragment method
+                       // ((MainActivity) v.getContext()).replaceFragment(fragment);
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).replaceFragment(fragment);
+                        }
                     }
                 } else {
                     // Handle user-created folders
@@ -235,7 +238,10 @@ public class navCreateFolderFragment extends Fragment {
                     NavUserFolderFragment userFolderFragment = new NavUserFolderFragment();
                     userFolderFragment.setArguments(args); // Pass the folder name to the fragment
 
-                    ((MainActivity) v.getContext()).replaceFragment(userFolderFragment); // Replace with the generic fragment
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).replaceFragment(userFolderFragment);
+                    }
+
                 }
             });
 
