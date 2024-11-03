@@ -51,6 +51,7 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
     private Spinner dishTypeSpinner;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser currentUser;
+    List<Recipe> filteredList = new ArrayList<>();
 
     private TextView notificationBadgeTextView;
     private NotificationUController notificationUController;
@@ -138,9 +139,6 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
             fetchRecipesFromFavourite();
         }, 1000);
 
-
-//        displayFavouriteRecipes();
-
         searchEditText = view.findViewById(R.id.search_recipe);
         // Setup spinners
         mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
@@ -198,17 +196,43 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
     }
 
     private void filterRecipes() {
-        String searchQuery = searchEditText.getText().toString().trim();
+        Log.d("FilterRecipes", "filterRecipes called");
+
+        filteredList.clear();
+
+        String searchQuery = searchEditText.getText().toString().trim().toLowerCase();
         String selectedMealType = mealTypeSpinner.getSelectedItem() != null ? mealTypeSpinner.getSelectedItem().toString() : "--Select Meal Type--";
         String selectedDishType = dishTypeSpinner.getSelectedItem() != null ? dishTypeSpinner.getSelectedItem().toString() : "--Select Dish Type--";
 
-        // Log the current selections
-        Log.d("FilterRecipes", "Search Query: " + searchQuery + ", Meal Type: " + selectedMealType + ", Dish Type: " + selectedDishType);
+        Log.d("FilterRecipes", "Search Query: " + searchQuery);
+        Log.d("FilterRecipes", "Selected Meal Type: " + selectedMealType);
+        Log.d("FilterRecipes", "Selected Dish Type: " + selectedDishType);
 
-        // Call fetchRecipes with all current parameters
-        fetchFavoriteRecipes(searchQuery, selectedMealType.equals("--Select Meal Type--") ? null : selectedMealType,
-                selectedDishType.equals("--Select Dish Type--") ? null : selectedDishType);
+        if (searchQuery.isEmpty()) {
+            // If the query is empty, reset to the original list
+            filteredList.addAll(recipeList);
+        }
+        else{
+            for (Recipe recipe : recipeList) {
+                boolean matchesSearchQuery = searchQuery.isEmpty() || recipe.getLabel().toLowerCase().contains(searchQuery);
+                boolean matchesMealType = selectedMealType.equals("--Select Meal Type--") || recipe.getMealType().equals(selectedMealType);
+                boolean matchesDishType = selectedDishType.equals("--Select Dish Type--") || recipe.getDishType().equals(selectedDishType);
+
+                Log.d("FilterRecipes", "Recipe: " + recipe.getLabel() + ", Matches: " + matchesSearchQuery + ", " + matchesMealType + ", " + matchesDishType);
+
+                if (matchesSearchQuery && matchesMealType && matchesDishType) {
+                    filteredList.add(recipe);
+                }
+            }
+        }
+
+        Log.d("FilterRecipes", "Filtered List Size: " + filteredList.size());
+
+        recipeAdapter.updateRecipeList(filteredList);
+        recipeAdapter.notifyDataSetChanged();
     }
+
+
 
     private void setupSpinnerListeners() {
         mealTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -237,20 +261,15 @@ public class ViewFavouriteRecipesFragment extends Fragment implements NavFavouri
     private void setupSearchBar() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // Do nothing before text is changed
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterRecipes(); // Call filterRecipes whenever the text changes
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // Call the method to filter recipes based on search input
-                filterRecipes(); // This now calls the combined filter method
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void afterTextChanged(Editable editable) {
-                // Do nothing after text is changed
-            }
+            public void afterTextChanged(Editable s) {}
         });
     }
 

@@ -106,7 +106,6 @@
                 android:text="Clear Filters"
                 android:textColor="@android:color/white"
                 android:textSize="12sp" />
-
         </RelativeLayout>
 
         <LinearLayout
@@ -121,7 +120,6 @@
             android:layout_marginEnd="10dp"
             android:orientation="horizontal">
 
-            <!-- Meal Type Spinner -->
             <Spinner
                 android:id="@+id/spinner_meal_type"
                 android:layout_width="0dp"
@@ -129,17 +127,17 @@
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/rounded_search_bar_background"
-                android:hint="Select Meal Type" />
+                android:hint="Select Meal Type"
+                android:visibility="gone" />
 
-            <!-- Dish Type Spinner -->
             <Spinner
                 android:id="@+id/spinner_dish_type"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/rounded_search_bar_background"
-                android:hint="Select Dish Type" />
-
+                android:hint="Select Dish Type"
+                android:visibility="gone" />
         </LinearLayout>
 
         <FrameLayout
@@ -269,6 +267,7 @@
             android:background="@android:color/darker_gray" />
 
         <LinearLayout
+            android:id="@+id/linearLayout5"
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:layout_margin="8dp"
