@@ -330,35 +330,28 @@ public class NavAllRecipesFragment extends Fragment {
             @Override
             public void onResponse(Call<RecipeResponse> call, Response<RecipeResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<RecipeResponse.Hit> hits = response.body().getHits(); // Get hits from response
+                    List<RecipeResponse.Hit> hits = response.body().getHits();
 
-                    // Debugging: Log the number of recipes fetched
-                    Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
-
-                    // Clear previous recipes
-                    recipeList.clear();
-
-                    for (RecipeResponse.Hit hit : hits) {
-                        Recipe recipe = hit.getRecipe(); // Extract the Recipe from Hit
-
-                        double caloriesPer100g = recipe.getCaloriesPer100g();
-                        if (recipe.getTotalWeight() > 0) {
-                            caloriesPer100g = (recipe.getCalories() / recipe.getTotalWeight()) * 100;
+                    if (hits.isEmpty()) {
+                        Log.d("Fetch Recipes", "No recipes found for current filters.");
+                        // Show a message in the UI about no results
+                    } else {
+                        Log.d("Fetched Recipes", "Number of recipes fetched: " + hits.size());
+                        recipeList.clear();
+                        for (RecipeResponse.Hit hit : hits) {
+                            Recipe recipe = hit.getRecipe();
+                            double caloriesPer100g = recipe.getTotalWeight() > 0
+                                    ? (recipe.getCalories() / recipe.getTotalWeight()) * 100
+                                    : recipe.getCaloriesPer100g();
+                            recipe.setCaloriesPer100g(caloriesPer100g);
+                            recipeList.add(recipe);
                         }
-                        recipe.setCaloriesPer100g(caloriesPer100g); // Update recipe object
-
-                        recipeList.add(recipe);
-                    }
-                    recipeAdapter.notifyDataSetChanged();
-
-                    if (!initialLoadDone) {
-                        setupSpinnerListeners();
-                        setupSearchBar();
-                        initialLoadDone = true; // Set flag to true after first fetch
+                        recipeAdapter.notifyDataSetChanged();
                     }
 
                 } else {
-                    Log.d("Fetch Recipes", "Response was not successful or body is null. Code: " + response.code());
+                    Log.d("Fetch Recipes", "Response was not successful. Code: " + response.code());
+                    // Show a fallback message in case of an unsuccessful response
                 }
             }
 
