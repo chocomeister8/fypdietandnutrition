@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +24,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -48,6 +51,12 @@ public class NavUserFolderFragment extends Fragment {
     private List<Recipe> recipeNewList;
     private List<Recipe> APIRecipeList;
 
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
+
+    private TextView notificationBadgeTextView;
+    private NotificationUController notificationUController;
+
     private final String[] mealTypes = {"--Select Meal Type--", "Breakfast", "Lunch", "Dinner", "Snack", "Teatime"};
     private final String[] dishTypes = {"--Select Dish Type--", "Starter", "Main course", "Side dish", "Soup", "Condiments and sauces", "Desserts", "Drinks", "Salad"};
 
@@ -56,12 +65,55 @@ public class NavUserFolderFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_folder, container, false);
 
+
+
         // Retrieve folder name from arguments if provided
         if (getArguments() != null) {
             folderName = getArguments().getString("folder_name");
             TextView folderTitle = view.findViewById(R.id.folder_title);
             folderTitle.setText(folderName);
         }
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
+
 
         initializeViews(view);
         loadRecipes(); // Load recipes based on the folder

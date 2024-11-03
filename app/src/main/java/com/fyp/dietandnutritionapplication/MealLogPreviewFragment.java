@@ -122,8 +122,6 @@ public class MealLogPreviewFragment extends Fragment {
     private String selectedMealType;
 
     private UserMealRecordController userMealRecordController;
-    private NotificationUController notificationUController;
-
     private LinearLayout breakfastLinearLayout;
     private LinearLayout lunchLinearLayout;
     private LinearLayout dinnerLinearLayout;

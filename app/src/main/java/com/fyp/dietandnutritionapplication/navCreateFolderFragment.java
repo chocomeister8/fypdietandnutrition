@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,10 +40,19 @@ public class navCreateFolderFragment extends Fragment {
     private FolderAdapter folderAdapter;
     private List<Folder> folderList; // List of Folder objects
 
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
+
+    private TextView notificationBadgeTextView;
+    private NotificationUController notificationUController;
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.nav_create_recipes_folder, container, false);
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
 
         // Initialize Firebase Firestore
         db = FirebaseFirestore.getInstance();
@@ -62,6 +72,44 @@ public class navCreateFolderFragment extends Fragment {
             Toast.makeText(requireContext(), "User not logged in. Cannot create folders.", Toast.LENGTH_SHORT).show();
             return view;
         }
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
+
 
         // Initialize folder creation button
         ImageButton buttonCreateRecipes = view.findViewById(R.id.button_folder);

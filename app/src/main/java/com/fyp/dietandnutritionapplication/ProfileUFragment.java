@@ -305,6 +305,7 @@ public class ProfileUFragment extends Fragment {
             View view = dietaryContainer.getChildAt(i);
             if (view instanceof CheckBox) {
                 CheckBox checkBox = (CheckBox) view;
+
                 if (checkBox.isChecked()) {
                     preferences.append(checkBox.getText().toString()).append(", ");
                 }
@@ -326,6 +327,8 @@ public class ProfileUFragment extends Fragment {
             View view = allergyContainer.getChildAt(i);
             if (view instanceof CheckBox) {
                 CheckBox checkBox = (CheckBox) view;
+                checkBox.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
+
                 if (checkBox.isChecked()) {
                     allergies.append(checkBox.getText().toString()).append(", ");
                 }

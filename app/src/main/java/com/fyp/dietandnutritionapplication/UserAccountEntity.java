@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -964,6 +965,8 @@ public class UserAccountEntity {
                     String option = document.getString("diet");
                     CheckBox dietCheckBox = new CheckBox(context);
                     dietCheckBox.setText(option);
+                    dietCheckBox.setTextColor(ContextCompat.getColor(context, R.color.black)); // Set text color to black
+
 
                     // Check the checkbox if it matches user's dietary preferences
                     if (user.getDietaryPreference() != null && user.getDietaryPreference().contains(option)) {
@@ -988,6 +991,7 @@ public class UserAccountEntity {
                     String option = document.getString("healthPreference");
                     CheckBox allergyCheckBox = new CheckBox(context);
                     allergyCheckBox.setText(option);
+                    allergyCheckBox.setTextColor(ContextCompat.getColor(context, R.color.black)); // Set text color to black
 
                     // Check the checkbox if it matches user's health/allergy preferences
                     if (user.getFoodAllergies() != null && user.getFoodAllergies().contains(option)) {

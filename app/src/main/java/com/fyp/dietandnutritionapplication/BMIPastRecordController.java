@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -25,6 +26,7 @@ public class BMIPastRecordController extends Fragment {
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+    private FirebaseUser currentUser;
     private RecyclerView recyclerView;
     private BMIRecordFragment adapter;
     private List<BMIEntity> bmiList;
@@ -45,6 +47,7 @@ public class BMIPastRecordController extends Fragment {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        currentUser = auth.getCurrentUser();
 
         recyclerView = view.findViewById(R.id.bmiRecord_recycler_view);
         adapter = new BMIRecordFragment(bmiList);
@@ -52,28 +55,34 @@ public class BMIPastRecordController extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
-        notificationUController = new NotificationUController();
-        String userId = "";
-        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
-            @Override
-            public void onNotificationsFetched(List<Notification> notifications) {
-                // Notifications can be processed if needed
 
-                // After fetching notifications, count them
-                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
-                    @Override
-                    public void onCountFetched(int count) {
-                        if (count > 0) {
-                            notificationBadgeTextView.setText(String.valueOf(count));
-                            notificationBadgeTextView.setVisibility(View.VISIBLE);
-                        } else {
-                            notificationBadgeTextView.setVisibility(View.GONE);
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+
+        }
 
         ImageView notiImage = view.findViewById(R.id.noti_icon);
         notiImage.setOnClickListener(v -> {
@@ -83,6 +92,7 @@ public class BMIPastRecordController extends Fragment {
                     .commit();
 
         });
+
 
         // Fetch BMI records from Firestore
         fetchBMIRecords();

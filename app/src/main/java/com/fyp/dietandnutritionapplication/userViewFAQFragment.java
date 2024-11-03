@@ -13,6 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,7 +28,8 @@ public class userViewFAQFragment extends Fragment {
     private ViewFAQController viewFAQController;
     private NotificationUController notificationUController;
     private TextView notificationBadgeTextView;
-
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -36,28 +40,36 @@ public class userViewFAQFragment extends Fragment {
         faqExpandableListView = view.findViewById(R.id.faqExpandableListView);
         viewFAQController = new ViewFAQController();
 
-        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
-        notificationUController = new NotificationUController();
-        String userId = "";
-        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
-            @Override
-            public void onNotificationsFetched(List<Notification> notifications) {
-                // Notifications can be processed if needed
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
 
-                // After fetching notifications, count them
-                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
-                    @Override
-                    public void onCountFetched(int count) {
-                        if (count > 0) {
-                            notificationBadgeTextView.setText(String.valueOf(count));
-                            notificationBadgeTextView.setVisibility(View.VISIBLE);
-                        } else {
-                            notificationBadgeTextView.setVisibility(View.GONE);
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+
+        }
 
         ImageView notiImage = view.findViewById(R.id.noti_icon);
         notiImage.setOnClickListener(v -> {

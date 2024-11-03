@@ -13,13 +13,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,6 +44,9 @@ public class NavAllRecipesFragment extends Fragment {
     private Spinner mealTypeSpinner;
     private Spinner dishTypeSpinner;
 
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
+
     private final Random random = new Random();
 
     // Define your meal types and dish types
@@ -48,6 +56,9 @@ public class NavAllRecipesFragment extends Fragment {
 
     private boolean initialLoadDone = false;
     private boolean isViewInitialized = false; // New flag to check if view is fully initialized
+
+    private TextView notificationBadgeTextView;
+    private NotificationUController notificationUController;
 
     @Override
     public void onResume() {
@@ -102,6 +113,7 @@ public class NavAllRecipesFragment extends Fragment {
             // Fetch recipes based on restored state
             filterRecipes();
 
+
         } else if (getArguments() != null) {
             // Restore state from arguments (when returning from RecipeDetailFragment)
             String savedSearchQuery = getArguments().getString("search_query", "");
@@ -117,6 +129,47 @@ public class NavAllRecipesFragment extends Fragment {
             fetchRecipes(getRandomSimpleFoodSearch(), null, null);
             initialLoadDone = true;
         }
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
+
 
         // Clear filters button logic
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);

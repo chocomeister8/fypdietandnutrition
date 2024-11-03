@@ -9,8 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.List;
 import java.util.Locale;
 import android.widget.Toast;
 
@@ -58,6 +61,12 @@ public class ConsultationsFragment extends Fragment {
     private EditText statusEditText;
     private String searchText = "";
 
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
+
+    private TextView notificationBadgeTextView;
+    private NotificationUController notificationUController;
+
     public ConsultationsFragment() {
 
     }
@@ -79,6 +88,46 @@ public class ConsultationsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,@Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_u_book_consultation, container, false);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
 
         // Initialize the ListView
         consultationListView = view.findViewById(R.id.available_slots_list_view);

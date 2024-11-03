@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BMICalculatorController extends Fragment {
-
+    private FirebaseUser currentUser;
     private EditText heightInput, weightInput, ageInput;
     private TextView bmiResultValue, bmrValue, calorieValue, bmiAdvice;
     private Button pastRecordButton;
@@ -43,6 +44,7 @@ public class BMICalculatorController extends Fragment {
         View view = inflater.inflate(R.layout.calculate_bmi, container, false);
 
         auth = FirebaseAuth.getInstance();
+        currentUser = auth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
 
         heightInput = view.findViewById(R.id.height_input);
@@ -57,28 +59,34 @@ public class BMICalculatorController extends Fragment {
         buttonFemale = view.findViewById(R.id.button_female);
         bmiAdvice = view.findViewById(R.id.bmi_advice);
 
-        notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
-        notificationUController = new NotificationUController();
-        String userId = "";
-        notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
-            @Override
-            public void onNotificationsFetched(List<Notification> notifications) {
-                // Notifications can be processed if needed
 
-                // After fetching notifications, count them
-                notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
-                    @Override
-                    public void onCountFetched(int count) {
-                        if (count > 0) {
-                            notificationBadgeTextView.setText(String.valueOf(count));
-                            notificationBadgeTextView.setVisibility(View.VISIBLE);
-                        } else {
-                            notificationBadgeTextView.setVisibility(View.GONE);
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+
+        }
 
         ImageView notiImage = view.findViewById(R.id.noti_icon);
         notiImage.setOnClickListener(v -> {
@@ -88,6 +96,9 @@ public class BMICalculatorController extends Fragment {
                     .commit();
 
         });
+
+        String userId = "";
+
 
         // Set button backgrounds
         updateButtonBackground(buttonMale, false);

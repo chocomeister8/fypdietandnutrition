@@ -38,6 +38,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -1004,8 +1005,8 @@ public class UserMealRecordFragment extends Fragment {
             moreOptionsIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Create a PopupMenu
-                    PopupMenu popup = new PopupMenu(getContext(), moreOptionsIcon);
+                    Context wrapper = new ContextThemeWrapper(getContext(), R.style.CustomPopupMenuStyle);
+                    PopupMenu popup = new PopupMenu(wrapper, moreOptionsIcon);
                     // Inflate the popup menu from a menu resource
                     popup.getMenuInflater().inflate(R.menu.meal_record_menu, popup.getMenu());
 

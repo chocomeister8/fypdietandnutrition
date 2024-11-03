@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.ArrayList;
 import android.widget.Toast;
 
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -40,6 +41,8 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class UserDiaryFragment extends Fragment {
 
@@ -57,11 +60,58 @@ public class UserDiaryFragment extends Fragment {
     private ImageView moreOptionsIcon;
     private UserMealRecordController userMealRecordController;
 
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser currentUser;
+
+    private TextView notificationBadgeTextView;
+    private NotificationUController notificationUController;
+
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_diary, container, false);
+
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        currentUser = firebaseAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
+
+            notificationUController = new NotificationUController();
+            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
+                @Override
+                public void onNotificationsFetched(List<Notification> notifications) {
+                    // Notifications can be processed if needed
+
+                    // After fetching notifications, count them
+                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
+                        @Override
+                        public void onCountFetched(int count) {
+                            if (count > 0) {
+                                notificationBadgeTextView.setText(String.valueOf(count));
+                                notificationBadgeTextView.setVisibility(View.VISIBLE);
+                            } else {
+                                notificationBadgeTextView.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
 
         userDiaryController = new UserDiaryController();
         userMealRecordController = new UserMealRecordController();
@@ -225,8 +275,8 @@ public class UserDiaryFragment extends Fragment {
         }
 
         moreOptionsIcon.setOnClickListener(v -> {
-            // Create a PopupMenu
-            PopupMenu popup = new PopupMenu(getContext(), moreOptionsIcon);
+            Context wrapper = new ContextThemeWrapper(getContext(), R.style.CustomPopupMenuStyle);
+            PopupMenu popup = new PopupMenu(wrapper, moreOptionsIcon);
             // Inflate the popup menu from a menu resource
             popup.getMenuInflater().inflate(R.menu.user_diary_menu, popup.getMenu());
 
