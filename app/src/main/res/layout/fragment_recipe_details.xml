@@ -10,7 +10,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="45dp"
         android:background="#F4FBF8"
         android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@+id/scrollView3"
@@ -41,8 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="20dp"
-            >
+            android:layout_marginTop="20dp">
 
             <ImageView
                 android:id="@+id/noti_icon"
@@ -55,13 +54,13 @@
                 android:id="@+id/notificationBadgeTextView"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:background="@drawable/badge_background"
-                android:textColor="@android:color/white"
                 android:layout_gravity="top|end"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="2dp"
-                android:textSize="12sp"
+                android:background="@drawable/badge_background"
                 android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
                 android:visibility="gone" />
         </FrameLayout>
     </RelativeLayout>
@@ -444,12 +443,26 @@
                     android:text="Back" />
 
                 <!-- New Button -->
-                <Button
+                <ImageButton
                     android:id="@+id/addFavouriteButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="Add to Favourite" />
+                    android:background="@null"
+                    android:padding="16dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_star_border" />
+
+                <ImageButton
+                    android:id="@+id/removeFavouriteButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:background="@null"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_star"
+                    android:text="Remove Favourite"
+                    android:visibility="gone" />
 
                 <!-- New Button -->
                 <Button

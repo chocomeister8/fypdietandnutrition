@@ -1,6 +1,7 @@
 package com.fyp.dietandnutritionapplication;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.webkit.WebViewFragment;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
@@ -34,6 +37,9 @@ public class RecipeDetailFragment extends Fragment {
     private TextView notificationBadgeTextView;
     private NotificationUController notificationUController;
     private FirebaseUser currentUser;
+    private Button saveButton;
+    private Button removeButton;
+    private String favoriteRecipeId;
 
     @Nullable
     @Override
@@ -44,7 +50,6 @@ public class RecipeDetailFragment extends Fragment {
         if (getArguments() != null) {
             recipe = getArguments().getParcelable("selected_recipe");
         }
-
 
         currentUser = auth.getCurrentUser();
 
@@ -98,7 +103,8 @@ public class RecipeDetailFragment extends Fragment {
         TextView ingredientsTextView = view.findViewById(R.id.detail_ingredients);
         ImageView imageView = view.findViewById(R.id.detail_image);
         Button backButton = view.findViewById(R.id.back_button);
-        Button saveButton = view.findViewById(R.id.addFavouriteButton);
+        ImageButton saveButton = view.findViewById(R.id.addFavouriteButton);
+        ImageButton removeButton = view.findViewById(R.id.removeFavouriteButton);
         Button addToFolderButton = view.findViewById(R.id.addToFolder);
         TextView healthLabelsTextView = view.findViewById(R.id.detail_health_labels);
         TextView viewMoreHealthLabels = view.findViewById(R.id.view_more_health_labels);
@@ -250,9 +256,6 @@ public class RecipeDetailFragment extends Fragment {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
-        AddFavouriteRecipeController addFavouriteRecipeController = new AddFavouriteRecipeController();
-        saveButton.setOnClickListener(v -> addFavouriteRecipeController.checkAddFavouriteRecipe(recipe, getContext()));
-
         // Add to folder functionality
         addToFolderButton.setOnClickListener(v -> {
             // Create an instance of AddToFolderFragment
@@ -262,9 +265,49 @@ public class RecipeDetailFragment extends Fragment {
             addToFolderFragment.showAddToFolderDialog(getActivity());
         });
 
+        AddFavouriteRecipeController addFavouriteRecipeController = new AddFavouriteRecipeController();
+
+        // Call the method to check if the recipe is a favorite
+        addFavouriteRecipeController.checkRecipeFavouriteStatus(recipe, getContext(), new FavouriteRecipesEntity.OnRecipeCheckListener() {
+            @Override
+            public void onRecipeChecked(boolean isFavorite) {
+                if (isFavorite) {
+                    // Recipe is a favorite
+                    saveButton.setVisibility(View.GONE);
+                    removeButton.setVisibility(View.VISIBLE);
+                } else {
+                    // Recipe is not a favorite
+                    saveButton.setVisibility(View.VISIBLE);
+                    removeButton.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        saveButton.setOnClickListener(v -> {
+            addRecipeToFavorites(getContext());
+            saveButton.setVisibility(View.GONE);
+            removeButton.setVisibility(View.VISIBLE);
+        });
+
+        removeButton.setOnClickListener(v -> {
+            removeRecipeFromFavorites(getContext());
+            removeButton.setVisibility(View.GONE);
+            saveButton.setVisibility(View.VISIBLE);
+        });
 
         return view;
     }
+
+    private void addRecipeToFavorites(Context context) {
+        AddFavouriteRecipeController addFavouriteRecipeController = new AddFavouriteRecipeController();
+        addFavouriteRecipeController.checkAddFavouriteRecipe(recipe, context);
+    }
+
+    private void removeRecipeFromFavorites(Context context) {
+        AddFavouriteRecipeController addFavouriteRecipeController = new AddFavouriteRecipeController();
+        addFavouriteRecipeController.removeFavouriteRecipe(recipe, context);
+    }
+
 
     private String formatAsBulletList(List<String> items) {
         StringBuilder bulletList = new StringBuilder();

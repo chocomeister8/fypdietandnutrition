@@ -98,6 +98,83 @@ public class FavouriteRecipesEntity {
         }
     }
 
+    public void checkRecipeFavouriteStatus(Recipe recipe, Context context, OnRecipeCheckListener listener) {
+        if (recipe == null || context == null) {
+            Log.e("CheckFavStatus", "Recipe or context is null");
+            return; // Handle null parameters appropriately
+        }
+
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get the current user's ID
+        String recipeTitle = recipe.getLabel(); // Assuming your Recipe class has a method to get the ID
+
+        Log.d("CheckFavStatus", "Checking favorite status for userId: " + userId + ", recipeId: " + recipeTitle);
+
+
+        db.collection("FavouriteRecipes")
+                .whereEqualTo("userId", userId) // Filter by user ID
+                .whereEqualTo("title", recipeTitle) // Filter by recipe ID
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            // Recipe exists in favorites
+                            Log.d("CheckFavStatus", "Recipe is a favorite.");
+                            listener.onRecipeChecked(true); // Notify the listener that the recipe is a favorite
+                        } else {
+                            // Recipe does not exist in favorites
+                            Log.d("CheckFavStatus", "Recipe is not a favorite.");
+                            listener.onRecipeChecked(false); // Notify the listener that the recipe is not a favorite
+                        }
+                    } else {
+                        // Handle any errors
+                        Log.w("AddFavouriteRecipeController", "Error checking favorite status", task.getException());
+                    }
+                });
+    }
+
+    public interface OnRecipeCheckListener {
+        void onRecipeChecked(boolean isFavorite);
+    }
+
+    public void removeRecipeFromFirestore(Recipe recipe, Context context) {
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        // Ensure user is logged in before removing the recipe
+        if (currentUser != null) {
+            String userId = currentUser.getUid(); // Get the logged-in user's ID
+            String recipeLabel = recipe.getLabel(); // Get the label of the recipe
+
+            // Query for the recipe in the "FavouriteRecipes" collection by userId and title
+            db.collection("FavouriteRecipes")
+                    .whereEqualTo("userId", userId)
+                    .whereEqualTo("title", recipeLabel)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            // If the recipe exists, delete it
+                            queryDocumentSnapshots.getDocuments().forEach(documentSnapshot -> {
+                                db.collection("FavouriteRecipes")
+                                        .document(documentSnapshot.getId())
+                                        .delete()
+                                        .addOnSuccessListener(aVoid ->
+                                                Toast.makeText(context, "Recipe removed from favorites", Toast.LENGTH_SHORT).show())
+                                        .addOnFailureListener(e ->
+                                                Toast.makeText(context, "Failed to remove recipe", Toast.LENGTH_SHORT).show());
+                            });
+                        } else {
+                            // Recipe not found in favorites
+                            Toast.makeText(context, "This recipe is not in your favorites", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(context, "Failed to find recipe to remove", Toast.LENGTH_SHORT).show());
+        } else {
+            // Handle the case where the user is not logged in
+            Toast.makeText(context, "You need to log in to remove recipes", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void getRecipesFromFirestore(String userId, Context context, OnRecipesRetrievedListener listener) {
         // Check if userId is not null or empty
         if (userId != null && !userId.isEmpty()) {
