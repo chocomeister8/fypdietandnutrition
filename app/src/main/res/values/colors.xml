@@ -9,4 +9,5 @@
     <color name="lightGrey">#D3D3D3</color>
     <color name="suspendedAccountRed">#FFCDD2</color>
     <color name="activeAccountGreen">#C8E6C9</color>
+    <color name="teal">#33CCCC</color>
 </resources>

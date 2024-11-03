@@ -198,6 +198,15 @@ public class UserMealRecordFragment extends Fragment {
 
         calendar = Calendar.getInstance();
 
+        ImageView notiImage = view.findViewById(R.id.noti_icon);
+        notiImage.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new NotificationUFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+        });
+
 
 
         if (currentUser != null) {

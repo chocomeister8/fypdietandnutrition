@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -522,7 +523,7 @@ public class ProfileUFragment extends Fragment {
             for (String diet : diets) {
                 CheckBox dietCheckBox = new CheckBox(getContext());
                 dietCheckBox.setText(diet);
-                dietCheckBox.setChecked(true);  // Mark them as checked
+                dietCheckBox.setChecked(true);
                 dietaryContainer.addView(dietCheckBox);
             }
         }
