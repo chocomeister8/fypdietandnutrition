@@ -59,6 +59,12 @@
         <item>Performance</item>
     </string-array>
 
+    <string-array name="test">
+        <item>Functionality</item>
+        <item>Usability</item>
+        <item>Performance</item>
+    </string-array>
+
 
     <string-array name="health_goals_array">
         <item>Select your health goal</item>
