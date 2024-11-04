@@ -107,7 +107,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                         }
                     });
         } else {
-            holder.imageView.setImageResource(R.drawable.accounts_flat_icon_vector_7303401); // Placeholder image for missing URL
+            holder.imageView.setImageResource(R.drawable.community_recipe); // Placeholder image for missing URL
         }
 
         // Set the click listener for the recipe item
