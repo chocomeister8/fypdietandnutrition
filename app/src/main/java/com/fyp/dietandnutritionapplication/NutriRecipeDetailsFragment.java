@@ -17,13 +17,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NutriRecipeDetailsFragment extends Fragment {
 
     private FirebaseFirestore db;
     private TextView labelTextView, caloriesTextView, cuisineTypeTextView, dishTypeTextView,
-            mealTypeTextView, recipeIdTextView, statusTextView, totalWeightTextView, totalTimeTextView, userIdTextView;
+            mealTypeTextView, recipeIdTextView, statusTextView, totalWeightTextView, totalTimeTextView, userIdTextView,  ingredientListTextView, instructionsTextView;
 
     private Button backButton, approveButton, rejectButton;
 
@@ -38,7 +39,6 @@ public class NutriRecipeDetailsFragment extends Fragment {
         // Initialize TextViews
         labelTextView = view.findViewById(R.id.labelTextView);
         caloriesTextView = view.findViewById(R.id.caloriesTextView);
-        cuisineTypeTextView = view.findViewById(R.id.cuisineTypeTextView);
         dishTypeTextView = view.findViewById(R.id.dishTypeTextView);
         mealTypeTextView = view.findViewById(R.id.mealTypeTextView);
         recipeIdTextView = view.findViewById(R.id.recipeIdTextView);
@@ -46,7 +46,8 @@ public class NutriRecipeDetailsFragment extends Fragment {
         totalWeightTextView = view.findViewById(R.id.totalWeightTextView);
         totalTimeTextView = view.findViewById(R.id.totalTimeTextView);
         userIdTextView = view.findViewById(R.id.userIdTextView);
-
+        ingredientListTextView = view.findViewById(R.id.detail_ingredients);
+        instructionsTextView = view.findViewById(R.id.detail_instructions);
         backButton = view.findViewById(R.id.backButton);
         approveButton = view.findViewById(R.id.approveButton);
         rejectButton = view.findViewById(R.id.rejectButton);
@@ -81,22 +82,63 @@ public class NutriRecipeDetailsFragment extends Fragment {
 
                         if (recipe != null) {
                             // Convert lists to comma-separated strings
-                            String cuisineTypeStr = String.join(", ", recipe.getCuisineType());
+
                             String dishTypeStr = String.join(", ", recipe.getDishType());
                             String mealTypeStr = String.join(", ", recipe.getMealType());
                             Integer totalTimeValue = recipe.getTotal_Time();
 
+                            if (documentSnapshot.contains("ingredientsList")) {
+                                List<String> ingredientLines = (List<String>) documentSnapshot.get("ingredientsList");
+                                recipe.setIngredientLines(ingredientLines);  // Use setter to set ingredientLines
+                            }
+
+                            if (documentSnapshot.contains("recipeStepsList")) {
+                                List<String> recipeLines = (List<String>) documentSnapshot.get("recipeStepsList");
+                                recipe.setRecipeStepsLines(recipeLines);  // Use setter to set ingredientLines
+                            }
+
+                            String ingredientStr = "";
+                            if (recipe.getIngredientLines() != null) {
+                                List<String> ingredients = recipe.getIngredientLines();
+                                StringBuilder formattedIngredients = new StringBuilder();
+                                for (int i = 0; i < ingredients.size(); i++) {
+                                    formattedIngredients.append(ingredients.get(i)).append(" g");
+                                    if (i < ingredients.size() - 1) {
+                                        formattedIngredients.append("\n");  // Add a comma and space between ingredients
+                                    }
+                                }
+                                ingredientStr = formattedIngredients.toString();
+                            } else {
+                                ingredientStr = "-";
+                            }
+
+
+                            String stepsStr = "";
+                            if (recipe.getRecipeStepsLines() != null) {
+                                List<String> steps = recipe.getRecipeStepsLines();
+                                StringBuilder numberedSteps = new StringBuilder();
+                                for (int i = 0; i < steps.size(); i++) {
+                                    numberedSteps.append(i + 1).append(". ").append(steps.get(i));
+                                    if (i < steps.size() - 1) {
+                                        numberedSteps.append("\n");  // Add a space between steps
+                                    }
+                                }
+                                stepsStr = numberedSteps.toString();
+                            } else {
+                                stepsStr = "No steps available";
+                            }
 
                             // Set data to views
                             labelTextView.setText("Label: " + recipe.getLabel());
                             caloriesTextView.setText("Calories: " + recipe.getCalories());
-                            cuisineTypeTextView.setText("Cuisine Type: " + cuisineTypeStr);
                             dishTypeTextView.setText("Dish Type: " + dishTypeStr);
                             mealTypeTextView.setText("Meal Type: " + mealTypeStr);
                             recipeIdTextView.setText("Recipe ID: " + recipe.getRecipe_id());
                             statusTextView.setText("Status: " + recipe.getStatus());
                             totalWeightTextView.setText("Total Weight: " + recipe.getTotalWeight() + "g");
                             totalTimeTextView.setText("Total Time: " + totalTimeValue + " minutes");
+                            ingredientListTextView.setText(ingredientStr);
+                            instructionsTextView.setText(stepsStr);
                             userIdTextView.setText("User ID: " + recipe.getuserId());
                         }
                     }

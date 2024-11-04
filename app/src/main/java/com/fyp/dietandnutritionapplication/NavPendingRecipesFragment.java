@@ -98,6 +98,7 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
 
         ViewRecipesController viewRecipesController = new ViewRecipesController();
 
+
         setupNavigationButtons(view);
 
         String userId = getCurrentUserId(); // Get the current user ID
