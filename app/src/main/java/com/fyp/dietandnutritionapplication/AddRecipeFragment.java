@@ -124,11 +124,6 @@ public class AddRecipeFragment extends Fragment {
         // Handle the recipe submission
         saveRecipeButton.setOnClickListener(v -> saveRecipeToFirestore());
 
-        if (mealTypeCheckboxes != null && dishTypeCheckboxes != null) {
-            Log.d("LayoutStatus", "Checkbox containers are found.");
-        } else {
-            Log.e("LayoutStatus", "Checkbox containers are not found.");
-        }
         return view;
     }
 
@@ -192,6 +187,7 @@ public class AddRecipeFragment extends Fragment {
 
         ingredientsSection.addView(ingredientRow);
     }
+
     private void addRecipeStep() {
         LinearLayout recipeSteps = new LinearLayout(getContext());
         recipeSteps.setOrientation(LinearLayout.HORIZONTAL);

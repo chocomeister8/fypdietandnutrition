@@ -278,6 +278,7 @@ public class RecipesEntity {
                     }
                 });
     }
+
     public void fetchPendingRecipes(OnRecipesFetchedListener listener) {
         db.collection("Recipes")
                 .whereEqualTo("status", "Pending")

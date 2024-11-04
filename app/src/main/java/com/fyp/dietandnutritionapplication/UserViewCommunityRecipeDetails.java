@@ -211,6 +211,46 @@ public class UserViewCommunityRecipeDetails extends Fragment {
                             String mealTypeStr = String.join(", ", recipe.getMealType());
                             Integer totalTimeValue = recipe.getTotal_Time();
 
+                            if (documentSnapshot.contains("ingredientsList")) {
+                                List<String> ingredientLines = (List<String>) documentSnapshot.get("ingredientsList");
+                                recipe.setIngredientLines(ingredientLines);  // Use setter to set ingredientLines
+                            }
+
+                            if (documentSnapshot.contains("recipeStepsList")) {
+                                List<String> recipeLines = (List<String>) documentSnapshot.get("recipeStepsList");
+                                recipe.setRecipeStepsLines(recipeLines);  // Use setter to set ingredientLines
+                            }
+
+                            String ingredientStr = "";
+                            if (recipe.getIngredientLines() != null) {
+                                List<String> ingredients = recipe.getIngredientLines();
+                                StringBuilder formattedIngredients = new StringBuilder();
+                                for (int i = 0; i < ingredients.size(); i++) {
+                                    formattedIngredients.append(ingredients.get(i)).append(" g");
+                                    if (i < ingredients.size() - 1) {
+                                        formattedIngredients.append("\n");  // Add a comma and space between ingredients
+                                    }
+                                }
+                                ingredientStr = formattedIngredients.toString();
+                            } else {
+                                ingredientStr = "-";
+                            }
+
+
+                            String stepsStr = "";
+                            if (recipe.getRecipeStepsLines() != null) {
+                                List<String> steps = recipe.getRecipeStepsLines();
+                                StringBuilder numberedSteps = new StringBuilder();
+                                for (int i = 0; i < steps.size(); i++) {
+                                    numberedSteps.append(i + 1).append(". ").append(steps.get(i));
+                                    if (i < steps.size() - 1) {
+                                        numberedSteps.append("\n");  // Add a space between steps
+                                    }
+                                }
+                                stepsStr = numberedSteps.toString();
+                            } else {
+                                stepsStr = "No steps available";
+                            }
 
                             // Set data to views
                             labelTextView.setText(recipe.getLabel());
@@ -219,19 +259,8 @@ public class UserViewCommunityRecipeDetails extends Fragment {
                             mealTypeTextView.setText(mealTypeStr);
                             totalWeightTextView.setText(String.valueOf(recipe.getTotalWeight()));
                             totalTimeTextView.setText(String.valueOf(totalTimeValue));
-                            List<String> ingredientLines = recipe.getIngredientLines();
-                            if (ingredientLines != null) {
-                                ingredientListTextView.setText(TextUtils.join(", ", ingredientLines));
-                            } else {
-                                ingredientListTextView.setText("-");
-                            }
-                            String instructions = recipe.getInstructions();
-                            if (instructions != null) {
-                                instructionsTextView.setText(instructions);
-                            } else {
-                                instructionsTextView.setText("-");
-                            }
-
+                            ingredientListTextView.setText(ingredientStr);
+                            instructionsTextView.setText(stepsStr);
 
 
                         }
