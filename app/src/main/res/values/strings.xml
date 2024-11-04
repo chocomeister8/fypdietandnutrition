@@ -54,9 +54,9 @@
     </string-array>
 
     <string-array name="title_options">
-        <item>Highly Recommend!</item>
-        <item>Just Okay</item>
-        <item>Loved It!</item>
+        <item>Functionality</item>
+        <item>Usability</item>
+        <item>Performance</item>
     </string-array>
 
 
