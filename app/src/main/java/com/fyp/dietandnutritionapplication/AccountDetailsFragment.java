@@ -130,12 +130,25 @@ public class AccountDetailsFragment extends Fragment {
         suspendUserButton.setOnClickListener(v -> {
             if (selectedProfile != null) {
                 String usernameToSuspend = selectedProfile.getUsername();
-                suspendUserController.suspendUser(usernameToSuspend); // Suspend user
-                selectedProfile.setStatus("deactivated"); // Update the profile status
-                Toast.makeText(getActivity(), "Suspended user: " + usernameToSuspend, Toast.LENGTH_SHORT).show();
 
-                // Redirect to ViewAccountsFragment after suspension
-                redirectToViewAccountsFragment();
+                // Call the suspendUser method with the callback
+                suspendUserController.suspendUser(usernameToSuspend, new SuspendUserController.SuspendUserCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("SuspendUserController", "User profile suspended successfully.");
+                        selectedProfile.setStatus("deactivated"); // Update the profile status locally
+                        Toast.makeText(getActivity(), "Suspended user: " + usernameToSuspend, Toast.LENGTH_SHORT).show();
+
+                        // Redirect to ViewAccountsFragment after successful suspension
+                        redirectToViewAccountsFragment();
+                    }
+
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Log.e("SuspendUserController", "Failed to suspend user profile: " + errorMessage);
+                        Toast.makeText(getActivity(), "Failed to suspend user: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 Toast.makeText(getActivity(), "No user selected to suspend.", Toast.LENGTH_SHORT).show();
             }
@@ -144,12 +157,24 @@ public class AccountDetailsFragment extends Fragment {
         reactivateUserButton.setOnClickListener(v -> {
             if (selectedProfile != null) {
                 String usernameToReactivate = selectedProfile.getUsername();
-                reactivateUserController.ReactivateUser(usernameToReactivate); // Reactivate user
-                selectedProfile.setStatus("active"); // Update the profile status
-                Toast.makeText(getActivity(), "Reactivated user: " + usernameToReactivate, Toast.LENGTH_SHORT).show();
 
-                // Redirect to ViewAccountsFragment after reactivation
-                redirectToViewAccountsFragment();
+                reactivateUserController.ReactivateUser(usernameToReactivate, new ReactivateUserController.ReactivateUserCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("ReactivateUserController", "User profile reactivated successfully.");
+                        selectedProfile.setStatus("deactivated"); // Update the profile status locally
+                        Toast.makeText(getActivity(), "Reactivated user: " + usernameToReactivate, Toast.LENGTH_SHORT).show();
+
+                        // Redirect to ViewAccountsFragment after successful suspension
+                        redirectToViewAccountsFragment();
+                    }
+
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Log.e("ReactivateUserController", "Failed to reactivate user profile: " + errorMessage);
+                        Toast.makeText(getActivity(), "Failed to reactivate user: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 Toast.makeText(getActivity(), "No user selected to reactivate.", Toast.LENGTH_SHORT).show();
             }

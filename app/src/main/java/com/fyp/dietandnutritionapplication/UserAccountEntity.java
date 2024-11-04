@@ -214,7 +214,9 @@ public class UserAccountEntity {
     }
 
     public void retrieveAllUsers(final DataCallback callback) {
-        db.collection("Users").get()
+        db.collection("Users")
+                .whereEqualTo("status", "active") // Add this line to filter active users
+                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
@@ -255,6 +257,7 @@ public class UserAccountEntity {
                     }
                 });
     }
+
 
     private User createUserFromDocument(QueryDocumentSnapshot document) {
         User user = new User();

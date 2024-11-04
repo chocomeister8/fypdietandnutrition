@@ -9,7 +9,7 @@ public class ReactivateUserController {
         userAccountEntity = new UserAccountEntity(); // Initialize entity class
     }
 
-    public void ReactivateUser(String username) {
+    public void ReactivateUser(String username, ReactivateUserCallback callback) {
         // Check for null or empty username
         if (username == null || username.isEmpty()) {
             Log.e("ReactivateUserController", "Username cannot be null or empty");
@@ -23,12 +23,22 @@ public class ReactivateUserController {
             @Override
             public void onSuccess() {
                 Log.d("ReactivateUserController", "User profile reactivated successfully.");
+                if (callback != null) {
+                    callback.onSuccess(); // Notify success
+                }
             }
 
             @Override
             public void onFailure(String errorMessage) {
                 Log.e("ReactivateUserController", "Failed to reactivate user profile: " + errorMessage);
+                if (callback != null) {
+                    callback.onFailure(errorMessage); // Notify failure
+                }
             }
         });
+    }
+    public interface ReactivateUserCallback {
+        void onSuccess();
+        void onFailure(String errorMessage);
     }
 }

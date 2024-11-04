@@ -170,7 +170,28 @@ public class viewAccountsFragment extends Fragment {
         if (getArguments() != null) {
             int scrollPosition = getArguments().getInt("scrollPosition", 0); // Default to 0 if not found
             listView.setSelection(scrollPosition); // Restore the scroll position
+            getArguments().remove("scrollPosition");
         }
+
+        ViewAccountsController viewAccountsController = new ViewAccountsController();
+        viewAccountsController.retrieveAccounts(new UserAccountEntity.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Profile> accounts) {
+                profiles.clear();
+                profiles.addAll(accounts);
+
+                originalProfiles.clear();
+                originalProfiles.addAll(accounts);
+
+                filterProfiles(); // Reapply filter to show updated results
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Failed to load accounts.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Combined method to filter by both role and name

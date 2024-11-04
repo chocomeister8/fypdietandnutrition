@@ -10,8 +10,11 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
         android:background="#F4FBF8"
         android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView3"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -47,7 +50,7 @@
     <ScrollView
         android:id="@+id/scrollView3"
         android:layout_width="405dp"
-        android:layout_height="730dp"
+        android:layout_height="650dp"
         android:background="#FFFFFF"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"

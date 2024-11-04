@@ -23,7 +23,6 @@ public class ViewAllUserToRecommendFragment extends Fragment {
     ListView listView;
     ArrayList<Profile> profiles = new ArrayList<>();
     ArrayList<Profile> originalProfiles = new ArrayList<>(); // Keep the unfiltered original list
-    private Spinner roleSpinner;
     private ProfileAdapter adapter; // Ensure you have a ProfileAdapter to handle Profile objects
     private EditText searchAdminEditText;
     private String selectedRole = "All Users"; // To keep track of the selected role
@@ -64,7 +63,6 @@ public class ViewAllUserToRecommendFragment extends Fragment {
         }
 
         listView = view.findViewById(R.id.listView);
-        roleSpinner = view.findViewById(R.id.filterRoleSpinner);
         searchAdminEditText = view.findViewById(R.id.searchAdminEditText);
 
         // Initialize and set up the ProfileAdapter
