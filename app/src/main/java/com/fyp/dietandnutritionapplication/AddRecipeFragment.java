@@ -124,6 +124,11 @@ public class AddRecipeFragment extends Fragment {
         // Handle the recipe submission
         saveRecipeButton.setOnClickListener(v -> saveRecipeToFirestore());
 
+        if (mealTypeCheckboxes != null && dishTypeCheckboxes != null) {
+            Log.d("LayoutStatus", "Checkbox containers are found.");
+        } else {
+            Log.e("LayoutStatus", "Checkbox containers are not found.");
+        }
         return view;
     }
 
@@ -341,6 +346,7 @@ public class AddRecipeFragment extends Fragment {
         AddRecipeController addRecipeController = new AddRecipeController();
         addRecipeController.addRecipe(recipeTitle, calories, weight, totalTime, mealTypes, dishTypes, ingredientsList, recipeStepsList, userId, status);
         redirectToViewPendingRecipes();
+        sendNotification(userId, recipeTitle);
     }
 
     private void redirectToViewPendingRecipes(){
@@ -360,11 +366,11 @@ public class AddRecipeFragment extends Fragment {
         }
     }
 
-    private void sendNotification(String userId, String recipeId) {
+    private void sendNotification(String userId, String recipeTitle) {
 
     Map<String, Object> notificationData = new HashMap<>();
     notificationData.put("userId", userId);
-    notificationData.put("message", "Your recipe (ID: " + recipeId + ") has been submitted and is waiting for approval.");
+    notificationData.put("message", "Your recipe (ID: " + recipeTitle + ") has been submitted and is waiting for approval.");
     notificationData.put("type", "Recipe Submission");
     notificationData.put("isRead", false);
     Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());

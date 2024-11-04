@@ -167,6 +167,22 @@ public class NavCommunityRecipesFragment extends Fragment implements RecipeAdapt
     }
 
     public void onRecipeClick(Recipe recipe) {
-        // Handle recipe click if necessary
+        String recipeId = recipe.getRecipe_id(); // Get the recipe ID
+
+        // Create a new instance of NutriRecipeDetailsFragment
+        UserViewCommunityRecipeDetails recipeDetailsFragment = new UserViewCommunityRecipeDetails();
+
+        // Create a bundle to pass the recipe ID
+        Bundle args = new Bundle();
+        args.putString("recipeId", recipeId);
+
+        // Set the arguments for NutriRecipeDetailsFragment
+        recipeDetailsFragment.setArguments(args);
+
+        // Navigate to NutriRecipeDetailsFragment
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, recipeDetailsFragment)
+                .addToBackStack(null)  // Add to back stack to enable back navigation
+                .commit();
     }
 }
