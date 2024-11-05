@@ -36,33 +36,7 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <FrameLayout
-            android:id="@+id/notificationContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="20dp">
 
-            <ImageView
-                android:id="@+id/noti_icon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/baseline_notifications_24" />
-
-
-            <TextView
-                android:id="@+id/notificationBadgeTextView"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
-                android:background="@drawable/badge_background"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                android:visibility="gone" />
-        </FrameLayout>
     </RelativeLayout>
 
     <ScrollView

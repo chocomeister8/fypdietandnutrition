@@ -31,7 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NutriApprovedRecipesFragment extends Fragment {
+public class NutriApprovedRecipesFragment extends Fragment implements RecipeAdapter.OnRecipeClickListener {
 
     private RecyclerView recyclerView;
     private RecipeAdapter recipesAdapter;
@@ -67,8 +67,9 @@ public class NutriApprovedRecipesFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         recipeList = new ArrayList<>();
-        recipesAdapter = new RecipeAdapter(recipeList, null, true);
+        recipesAdapter = new RecipeAdapter(recipeList, this, true);
         recyclerView.setAdapter(recipesAdapter);
+
 
         mealTypeSpinner = view.findViewById(R.id.spinner_meal_type);
         dishTypeSpinner = view.findViewById(R.id.spinner_dish_type);
@@ -247,6 +248,27 @@ public class NutriApprovedRecipesFragment extends Fragment {
         searchEditText.setText(""); // This will clear the search bar
 
         // Optionally: Fetch random recipes or reset the recipe list
+    }
+
+    @Override
+    public void onRecipeClick(Recipe recipe) {
+        String recipeId = recipe.getRecipe_id(); // Get the recipe ID
+
+        // Create a new instance of NutriRecipeDetailsFragment
+        NutriRecipeDetailsFragment recipeDetailsFragment = new NutriRecipeDetailsFragment();
+
+        // Create a bundle to pass the recipe ID
+        Bundle args = new Bundle();
+        args.putString("recipeId", recipeId);
+
+        // Set the arguments for NutriRecipeDetailsFragment
+        recipeDetailsFragment.setArguments(args);
+
+        // Navigate to NutriRecipeDetailsFragment
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, recipeDetailsFragment)
+                .addToBackStack(null)  // Add to back stack to enable back navigation
+                .commit();
     }
 
 }

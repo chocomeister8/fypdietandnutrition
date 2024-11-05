@@ -34,8 +34,6 @@ public class RecipeDetailFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
     private Recipe recipe;
-    private TextView notificationBadgeTextView;
-    private NotificationUController notificationUController;
     private FirebaseUser currentUser;
     private Button saveButton;
     private Button removeButton;
@@ -53,42 +51,6 @@ public class RecipeDetailFragment extends Fragment {
 
         currentUser = auth.getCurrentUser();
 
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-
-            notificationBadgeTextView = view.findViewById(R.id.notificationBadgeTextView);
-
-            notificationUController = new NotificationUController();
-            notificationUController.fetchNotifications(userId, new Notification.OnNotificationsFetchedListener() {
-                @Override
-                public void onNotificationsFetched(List<Notification> notifications) {
-                    // Notifications can be processed if needed
-
-                    // After fetching notifications, count them
-                    notificationUController.countNotifications(userId, new Notification.OnNotificationCountFetchedListener() {
-                        @Override
-                        public void onCountFetched(int count) {
-                            if (count > 0) {
-                                notificationBadgeTextView.setText(String.valueOf(count));
-                                notificationBadgeTextView.setVisibility(View.VISIBLE);
-                            } else {
-                                notificationBadgeTextView.setVisibility(View.GONE);
-                            }
-                        }
-                    });
-                }
-            });
-
-        }
-
-        ImageView notiImage = view.findViewById(R.id.noti_icon);
-        notiImage.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new NotificationUFragment())
-                    .addToBackStack(null)
-                    .commit();
-
-        });
 
 
         // Initialize views
