@@ -51,7 +51,7 @@
 
     <LinearLayout
         android:id="@+id/container"
-        android:layout_width="410dp"
+        android:layout_width="match_parent"
         android:layout_height="512dp"
         android:background="#C2F4C3"
         android:orientation="vertical"

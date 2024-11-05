@@ -122,6 +122,7 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
+        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
 
         // Set up button click listeners to navigate between fragments
         button_all_recipes.setOnClickListener(v -> navigateToFragment(new NavAllRecipesFragment()));
@@ -130,6 +131,7 @@ public class NavPendingRecipesFragment extends Fragment implements RecipeAdapter
         button_personalise_recipes.setOnClickListener(v -> navigateToFragment(new NavCommunityRecipesFragment()));
         button_recipes_status.setOnClickListener(v -> navigateToFragment(new NavPendingRecipesFragment()));
         button_recommendedRecipes.setOnClickListener(v -> navigateToFragment(new NavRecommendedRecipesFragment()));
+        button_add_recipe.setOnClickListener(v -> navigateToFragment(new AddRecipeFragment()));
     }
 
     private void navigateToFragment(Fragment fragment) {

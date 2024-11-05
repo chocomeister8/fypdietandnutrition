@@ -145,6 +145,7 @@ public class NavVegetarianRecipesFragment extends Fragment {
         Button button_personalise_recipes = view.findViewById(R.id.button_personalise);
         Button button_recipes_status = view.findViewById(R.id.button_recipes_status);
         Button button_recommendedRecipes = view.findViewById(R.id.button_recommendRecipes);
+        Button button_add_recipe = view.findViewById(R.id.add_recipe_button);
 
         Button clearFiltersButton = view.findViewById(R.id.clear_filters_button);
         clearFiltersButton.setOnClickListener(v -> clearFiltersAndFetchRandomRecipes());
@@ -189,6 +190,12 @@ public class NavVegetarianRecipesFragment extends Fragment {
                     .replace(R.id.frame_layout, new NavRecommendedRecipesFragment())
                     .addToBackStack(null)
                     .commit();
+        });
+        button_add_recipe.setOnClickListener(v -> {
+                    requireActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frame_layout, new AddRecipeFragment())
+                            .addToBackStack(null)
+                            .commit();
         });
 
         setupSpinnerListeners();

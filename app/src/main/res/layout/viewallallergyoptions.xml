@@ -10,7 +10,7 @@
         android:id="@+id/relativeLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="75dp"
         android:layout_marginBottom="1dp"
         android:background="#F4F1E1"
         android:padding="16dp"

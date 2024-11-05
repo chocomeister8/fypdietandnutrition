@@ -270,7 +270,7 @@ public class NutriAddRecipeFragment extends Fragment {
     private void redirectToViewCommunityRecipes(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_layout, new NavCommunityRecipesFragment()); // Use your container ID
+        fragmentTransaction.replace(R.id.frame_layout, new NutriApprovedRecipesFragment()); // Use your container ID
         fragmentTransaction.addToBackStack(null); // Optional: Add to back stack
         fragmentTransaction.commit();
     }

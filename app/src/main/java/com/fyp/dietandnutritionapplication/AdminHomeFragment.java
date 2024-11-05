@@ -361,8 +361,7 @@ public class AdminHomeFragment extends Fragment {
                         // User confirmed to log out
                         Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
                         if (getActivity() instanceof MainActivity) {
-                            hideBottomNavigationView();
-                            ((MainActivity) getActivity()).replaceFragment(new AdminLoginFragment());
+                            ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
                         }
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> {

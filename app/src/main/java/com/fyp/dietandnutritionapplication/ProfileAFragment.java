@@ -3,6 +3,7 @@ package com.fyp.dietandnutritionapplication;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -64,6 +65,7 @@ public class ProfileAFragment extends Fragment {
             saveButton = view.findViewById(R.id.save_button);
             adminImageView = view.findViewById(R.id.imageView);
 
+
             //adminProfile = new Admin("Weiss", "Low", "admin123", "81889009", "weiss@gmail.com", "Male", "admin", "11-09-2024");
             viewAdminProfileController = new ViewAdminProfileController((MainActivity) requireActivity());
             loadAdminProfile();
@@ -77,6 +79,8 @@ public class ProfileAFragment extends Fragment {
             uploadImageButton.setOnClickListener(v -> openFileChooser());
             saveButton.setOnClickListener(v -> updateProfile(adminId));
         }
+
+        setupUI(view);
         return view;
     }
 
@@ -238,6 +242,28 @@ public class ProfileAFragment extends Fragment {
             public void onFailure(String errorMessage) {
                 Toast.makeText(getContext(), "Error fetching admin data: " + errorMessage, Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void setupUI(View view) {
+        ImageView logoutImage = view.findViewById(R.id.logout_button);
+        logoutImage.setOnClickListener(v -> {
+            // Create an AlertDialog to confirm logout
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Confirm Logout")
+                    .setMessage("Are you sure you want to log out?")
+                    .setPositiveButton("Log out", (dialog, which) -> {
+                        // User confirmed to log out
+                        Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        // User cancelled the logout action
+                        dialog.dismiss();
+                    })
+                    .show();
         });
     }
 }
