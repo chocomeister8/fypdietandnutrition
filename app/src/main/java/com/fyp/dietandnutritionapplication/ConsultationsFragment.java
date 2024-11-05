@@ -312,6 +312,12 @@ public class ConsultationsFragment extends Fragment {
         consultationAdapter.notifyDataSetChanged(); // Refresh the adapter
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchConsultationsFromFirestore(); // Refresh consultations when the fragment is resumed
+    }
+
     public void fetchConsultationsFromFirestore() {
         // Clear the existing list to avoid duplication
         consultationList.clear();
