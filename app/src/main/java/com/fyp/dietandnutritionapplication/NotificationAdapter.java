@@ -101,7 +101,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         (notification.getType().toLowerCase().contains("booking") ||
                                 notification.getType().toLowerCase().contains("consultation"))) {
                     // Create a new instance of BookingFragment
-                    BookingHistoryFragment bookingFragment = new BookingHistoryFragment();
+                    PendingConsultationFragment bookingFragment = new PendingConsultationFragment();
 
                     // Pass the notification ID to the fragment if needed
                     Bundle bundle = new Bundle();

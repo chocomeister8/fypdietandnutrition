@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +62,7 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
             viewHolder.dateTextView = convertView.findViewById(R.id.date);
             viewHolder.timeTextView = convertView.findViewById(R.id.time);
             viewHolder.zoomLinkTextView = convertView.findViewById(R.id.consultation);
+            viewHolder.cancelBookingButton = convertView.findViewById(R.id.button2);
 
             convertView.setTag(viewHolder);
         } else {
@@ -81,8 +83,41 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
             Toast.makeText(context, "Consultation slot data is not available.", Toast.LENGTH_SHORT).show();
         }
 
+        viewHolder.cancelBookingButton.setOnClickListener(v -> {
+            // Show confirmation dialog
+            new AlertDialog.Builder(context)
+                    .setTitle("Cancel Booking")
+                    .setMessage("Do you really want to cancel this booking?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        // Call method to cancel the booking (e.g., delete from Firestore)
+                        cancelBooking(currentSlot);
+                        Toast.makeText(context, "Booking canceled", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .show();
+        });
+
         return convertView;
     }
+
+    private void cancelBooking(Consultation consultation) {
+        if (consultation != null) {
+            // Set the clientName field to an empty string instead of deleting the document
+            firestore.collection("Consultation_slots")
+                    .document(consultation.getConsultationId())
+                    .update("clientName", "")
+                    .addOnSuccessListener(aVoid -> {
+                        // Clear clientName locally in the consultation object (optional)
+                        consultation.setClientName("");
+                        notifyDataSetChanged(); // Refresh the list to show the updated state
+                        Toast.makeText(context, "Booking successfully canceled.", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "Failed to cancel booking: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
 
     // Method to update the consultation list and notify the adapter
     public void setConsultationSlots(ArrayList<Consultation> slots) {
@@ -97,5 +132,6 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
         TextView dateTextView;
         TextView timeTextView;
         TextView zoomLinkTextView;
+        Button cancelBookingButton;
     }
 }

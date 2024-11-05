@@ -2,7 +2,6 @@ package com.fyp.dietandnutritionapplication;
 
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 
@@ -17,14 +16,11 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import com.fyp.dietandnutritionapplication.databinding.ActivityMainBinding;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 
@@ -200,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 //                    replaceFragment(new AddRecipeFragment());
 //                    break;
                 case R.id.bookingPage:
-                    replaceFragment(new BookingHistoryFragment());
+                    replaceFragment(new PendingConsultationFragment());
                     break;
                 case R.id.NutriViewProfile:
                     replaceFragment(new NutriViewProfileFragment());

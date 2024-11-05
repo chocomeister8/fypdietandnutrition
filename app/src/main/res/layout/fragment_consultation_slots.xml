@@ -82,7 +82,7 @@
                     android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="Booking History"
+                    android:text="Pending Consultation"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="11sp" />
@@ -109,7 +109,7 @@
                     android:clickable="true"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="Pending Consultation"
+                    android:text="Booking History"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="11sp" />

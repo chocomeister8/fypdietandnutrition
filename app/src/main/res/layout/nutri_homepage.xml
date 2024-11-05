@@ -257,10 +257,10 @@
 
                     <Spinner
                         android:id="@+id/filter_button"
-                        android:layout_width="111dp"
+                        android:layout_width="148dp"
                         android:layout_height="50dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginStart="66dp"
+                        android:layout_marginBottom="2dp"
                         android:background="@color/lightGrey"
                         android:padding="8dp"
                         android:popupBackground="@color/lightGreen"

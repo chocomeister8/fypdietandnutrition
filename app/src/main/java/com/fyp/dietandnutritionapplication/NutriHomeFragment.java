@@ -72,8 +72,8 @@ public class NutriHomeFragment extends Fragment {
 //        bookingsList.add("Booking 3: Mark Johnson - 14/10/2024");
         // Set up Spinner for star ratings
         List<String> sortOptions = new ArrayList<>();
-        sortOptions.add("▼ Oldest");
-        sortOptions.add("▼ Most Recent");
+        sortOptions.add("▼ Nearest Date");
+        sortOptions.add("▼ Most Recent Added");
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, sortOptions);
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         filter_button.setAdapter(sortAdapter);
@@ -86,8 +86,7 @@ public class NutriHomeFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        // Oldest to newest
-                        sortBookingsByDate(false);
+                        sortBookingsByNearestTime();
                         break;
                     case 1:
                         // Most recent to oldest
@@ -191,6 +190,23 @@ public class NutriHomeFragment extends Fragment {
             return mostRecentFirst ? parsedDate2.compareTo(parsedDate1) : parsedDate1.compareTo(parsedDate2);
         });
     }
+    private void sortBookingsByNearestTime() {
+        Collections.sort(bookingsList, (b1, b2) -> {
+            String date1 = extractDate(b1);
+            String time1 = extractTime(b1);
+            String date2 = extractDate(b2);
+            String time2 = extractTime(b2);
+
+            // Parse combined date and time for comparison
+            Date parsedDateTime1 = parseDateAndTime(date1, time1);
+            Date parsedDateTime2 = parseDateAndTime(date2, time2);
+
+            // Ensure neither date is null before comparing
+            if (parsedDateTime1 == null) return 1; // Treat null as later
+            if (parsedDateTime2 == null) return -1; // Treat null as later
+            return parsedDateTime1.compareTo(parsedDateTime2);
+        });
+    }
 
     // Helper method to extract the date part from the booking string
     private String extractDate(String booking) {
@@ -204,7 +220,28 @@ public class NutriHomeFragment extends Fragment {
         return null;
     }
 
+    private String extractTime(String booking) {
+        // Assuming time is formatted as "Time: HH:mm" in booking string
+        String[] lines = booking.split("\n");
+        for (String line : lines) {
+            if (line.startsWith("Time: ")) {
+                return line.replace("Time: ", "").trim();
+            }
+        }
+        return null;
+    }
+
     // Helper method to parse date strings
+    private Date parseDateAndTime(String dateStr, String timeStr) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        try {
+            return dateFormat.parse(dateStr + " " + timeStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null; // Return null if parsing fails
+        }
+    }
+
     private Date parseDate(String dateStr) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         try {
@@ -238,15 +275,18 @@ public class NutriHomeFragment extends Fragment {
                                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                             Slot slot = document.toObject(Slot.class);
 
-                                            // Create a string to display in the RecyclerView
-                                            String bookingInfo = "Nutritionist: " + slot.getNutritionistName() +
-                                                    "\nDate: " + slot.getDate() +
-                                                    "\nTime: " + slot.getTime() +
-                                                    "\nStatus: " + slot.getStatus() +
-                                                    "\nZoom Link: " + slot.getZoomLink() + "\n";
+                                            // Check if the booking status is not 'completed'
+                                            if (!"completed".equalsIgnoreCase(slot.getStatus())) {
+                                                // Create a string to display in the RecyclerView
+                                                String bookingInfo = "Nutritionist: " + slot.getNutritionistName() +
+                                                        "\nDate: " + slot.getDate() +
+                                                        "\nTime: " + slot.getTime() +
+                                                        "\nStatus: " + slot.getStatus() +
+                                                        "\nZoom Link: " + slot.getZoomLink() + "\n";
 
-                                            // Add the formatted string to the bookings list
-                                            bookingsList.add(bookingInfo);
+                                                // Add the formatted string to the bookings list
+                                                bookingsList.add(bookingInfo);
+                                            }
                                         }
 
                                         // Update counts
