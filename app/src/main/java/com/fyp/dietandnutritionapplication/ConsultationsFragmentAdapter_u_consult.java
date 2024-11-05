@@ -2,6 +2,7 @@ package com.fyp.dietandnutritionapplication;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
 
@@ -102,19 +106,40 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
 
     private void cancelBooking(Consultation consultation) {
         if (consultation != null) {
-            // Set the clientName field to an empty string instead of deleting the document
-            firestore.collection("Consultation_slots")
-                    .document(consultation.getConsultationId())
-                    .update("clientName", "")
-                    .addOnSuccessListener(aVoid -> {
-                        // Clear clientName locally in the consultation object (optional)
-                        consultation.setClientName("");
-                        notifyDataSetChanged(); // Refresh the list to show the updated state
-                        Toast.makeText(context, "Booking successfully canceled.", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(context, "Failed to cancel booking: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
+
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            FirebaseUser currentUser = auth.getCurrentUser();
+
+            if (currentUser != null) {
+                String userId = currentUser.getUid();
+
+                // Fetch current user's username
+                firestore.collection("Users").document(userId)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                // Set the clientName field to an empty string instead of deleting the document
+                                firestore.collection("Consultation_slots")
+                                        .document(consultation.getConsultationId())
+                                        .update("clientName", "")
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Clear clientName locally in the consultation object (optional)
+                                            consultation.setClientName("");
+                                            notifyDataSetChanged(); // Refresh the list to show the updated state
+                                            Toast.makeText(context, "Booking successfully canceled.", Toast.LENGTH_SHORT).show();
+
+                                            // Pass userId and consultationId to sendCancelNotification
+                                            sendCancelNotification(userId, consultation.getConsultationId());
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(context, "Failed to cancel booking: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(context, "Failed to retrieve user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+            }
         }
     }
 
@@ -134,4 +159,35 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
         TextView zoomLinkTextView;
         Button cancelBookingButton;
     }
+
+    private void sendCancelNotification(String userId, String consultationId) {
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("userId", userId);
+        notificationData.put("message", "Your consultation (ID: " + consultationId + ") has been canceled.");
+        notificationData.put("type", "Consultation Cancellation");
+        notificationData.put("isRead", false);
+        Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
+        notificationData.put("timestamp", entryDateTime);
+
+        firestore.collection("Notifications")
+                .add(notificationData) // Use add() to create a new document
+                .addOnSuccessListener(documentReference -> {
+                    String notificationId = documentReference.getId(); // Get the document ID
+
+                    // Now update the document to include the ID as a field
+                    firestore.collection("Notifications").document(notificationId)
+                            .update("notificationId", notificationId) // Store the document ID
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Notification", "Notification added with ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Notification", "Error updating notification ID", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to send notification: " + e.getMessage());
+                });
+    }
+
 }

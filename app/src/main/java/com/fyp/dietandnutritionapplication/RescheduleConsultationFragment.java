@@ -24,11 +24,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class RescheduleConsultationFragment extends Fragment {
 
@@ -127,12 +130,26 @@ public class RescheduleConsultationFragment extends Fragment {
                                     .get()
                                     .addOnSuccessListener(queryDocumentSnapshots -> {
                                         if (!queryDocumentSnapshots.isEmpty()) {
+                                            String clientName = queryDocumentSnapshots.getDocuments().get(0).getString("clientName");
+
                                             // Update the consultation
                                             db.collection("Consultation_slots").document(queryDocumentSnapshots.getDocuments().get(0).getId())
                                                     .update("date", selectedDate, "time", selectedTime, "zoomLink", newZoomLink)
                                                     .addOnSuccessListener(aVoid -> {
-                                                        Toast.makeText(getContext(), "Consultation updated successfully", Toast.LENGTH_SHORT).show();
-                                                        requireActivity().getSupportFragmentManager().popBackStack();
+                                                                db.collection("Users")
+                                                                        .whereEqualTo("username", clientName)
+                                                                        .get()
+                                                                        .addOnSuccessListener(clientQueryDocumentSnapshots -> {
+                                                                            if (!clientQueryDocumentSnapshots.isEmpty()) {
+                                                                                String clientId = clientQueryDocumentSnapshots.getDocuments().get(0).getId();
+                                                                                Toast.makeText(getContext(), "Consultation updated successfully", Toast.LENGTH_SHORT).show();
+                                                                                requireActivity().getSupportFragmentManager().popBackStack();
+                                                                                sendRescheduleNotification(clientId, consultationId);
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(e -> Log.e("FirestoreError", "Error retrieving client document", e));
+
+
                                                     })
                                                     .addOnFailureListener(e -> {
                                                         Log.e("FirestoreError", "Error updating consultation", e);
@@ -178,17 +195,32 @@ public class RescheduleConsultationFragment extends Fragment {
                                     .get()
                                     .addOnSuccessListener(queryDocumentSnapshots -> {
                                         if (!queryDocumentSnapshots.isEmpty()) {
-                                            // Proceed with deletion
-                                            db.collection("Consultation_slots").document(queryDocumentSnapshots.getDocuments().get(0).getId())
-                                                    .delete()
-                                                    .addOnSuccessListener(aVoid -> {
-                                                        Toast.makeText(getContext(), "Consultation deleted successfully", Toast.LENGTH_SHORT).show();
-                                                        requireActivity().getSupportFragmentManager().popBackStack();
+                                            String consultationDocId = queryDocumentSnapshots.getDocuments().get(0).getId();
+                                            String clientName = queryDocumentSnapshots.getDocuments().get(0).getString("clientName");
+
+                                            db.collection("Users")
+                                                    .whereEqualTo("username", clientName)
+                                                    .get()
+                                                    .addOnSuccessListener(clientQueryDocumentSnapshots -> {
+                                                        if (!clientQueryDocumentSnapshots.isEmpty()) {
+                                                            String clientId = clientQueryDocumentSnapshots.getDocuments().get(0).getId();
+                                                            db.collection("Consultation_slots").document(queryDocumentSnapshots.getDocuments().get(0).getId())
+                                                                    .delete()
+                                                                    .addOnSuccessListener(aVoid -> {
+                                                                        Toast.makeText(getContext(), "Consultation deleted successfully", Toast.LENGTH_SHORT).show();
+                                                                        requireActivity().getSupportFragmentManager().popBackStack();
+                                                                        sendCancelNotification(clientId, consultationId);
+                                                                    })
+                                                                    .addOnFailureListener(e -> {
+                                                                        Log.e("FirestoreError", "Error deleting consultation", e);
+                                                                        Toast.makeText(getContext(), "Error deleting consultation", Toast.LENGTH_SHORT).show();
+                                                                    });
+                                                        }
                                                     })
-                                                    .addOnFailureListener(e -> {
-                                                        Log.e("FirestoreError", "Error deleting consultation", e);
-                                                        Toast.makeText(getContext(), "Error deleting consultation", Toast.LENGTH_SHORT).show();
-                                                    });
+                                                    .addOnFailureListener(e -> Log.e("FirestoreError", "Error retrieving client document", e));
+
+                                            // Proceed with deletion
+
                                         } else {
                                             Toast.makeText(getContext(), "You do not have permission to delete this consultation.", Toast.LENGTH_SHORT).show();
                                         }
@@ -216,4 +248,66 @@ public class RescheduleConsultationFragment extends Fragment {
                 .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
+    private void sendRescheduleNotification(String clientId, String consultationId) {
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("userId", clientId);
+        notificationData.put("message", "Your consultation (ID: " + consultationId + ") has been rescheduled. Please check the details.");
+        notificationData.put("type", "Consultation Reschedule");
+        notificationData.put("isRead", false);
+        Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
+        notificationData.put("timestamp", entryDateTime);
+
+        db.collection("Notifications")
+                .add(notificationData) // Use add() to create a new document
+                .addOnSuccessListener(documentReference -> {
+                    String notificationId = documentReference.getId(); // Get the document ID
+
+                    // Now update the document to include the ID as a field
+                    db.collection("Notifications").document(notificationId)
+                            .update("notificationId", notificationId) // Store the document ID
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Notification", "Notification rescheduled with ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Notification", "Error updating notification ID", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to send notification: " + e.getMessage());
+                });
+    }
+
+    private void sendCancelNotification(String clientId, String consultationId) {
+
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("userId", clientId);
+        notificationData.put("message", "Your consultation (ID: " + consultationId + ") has been canceled by the nutritionist.");
+        notificationData.put("type", "Consultation Cancellation");
+        notificationData.put("isRead", false);
+        Timestamp entryDateTime = new Timestamp(System.currentTimeMillis());
+        notificationData.put("timestamp", entryDateTime);
+
+        db.collection("Notifications")
+                .add(notificationData) // Use add() to create a new document
+                .addOnSuccessListener(documentReference -> {
+                    String notificationId = documentReference.getId(); // Get the document ID
+
+                    // Now update the document to include the ID as a field
+                    db.collection("Notifications").document(notificationId)
+                            .update("notificationId", notificationId) // Store the document ID
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Notification", "Notification cancel with ID: " + notificationId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Notification", "Error updating notification ID", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Notification", "Failed to send notification: " + e.getMessage());
+                });
+    }
+
+
 }
