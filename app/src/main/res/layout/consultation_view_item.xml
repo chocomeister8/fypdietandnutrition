@@ -167,16 +167,25 @@
             app:layout_constraintTop_toTopOf="@+id/status_label"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Dynamic Status Value -->
+        <TextView
+            android:id="@+id/zoom_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zoom Link: "
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/status_label"
+            android:layout_marginTop="8dp" />
         <TextView
             android:id="@+id/zoom"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autoLink="web"
             android:textSize="15sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:layout_editor_absoluteY="213dp"
-            tools:ignore="MissingConstraints" />
+            app:layout_constraintStart_toEndOf="@+id/zoom_label"
+            app:layout_constraintTop_toTopOf="@+id/zoom_label"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Book Button -->
         <Button
@@ -189,7 +198,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/status_label" />
+            app:layout_constraintTop_toBottomOf="@+id/zoom_label" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -100,8 +100,11 @@ public class ViewConsultationDetailsFragment extends Fragment {
 
                 // Notify the adapter that the data has changed
                 consultationAdapter.notifyDataSetChanged();
-
-                Toast.makeText(getContext(), "Consultations loaded successfully.", Toast.LENGTH_SHORT).show();
+                if (!consultationList2.isEmpty()) {
+                    Toast.makeText(getContext(), "Consultations loaded successfully.", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getContext(), "No slots available yet", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override

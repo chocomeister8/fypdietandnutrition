@@ -168,7 +168,7 @@ public class ConsultationsFragment extends Fragment {
 //                    Toast.makeText(getContext(), "You haven't booked any consultation yet, our nutritionist is always there for you.", Toast.LENGTH_LONG).show();
 //                } else {
                     // Success, consultations found, update the list
-                    Toast.makeText(getContext(), "Success to load your consultations.", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "Success to load your consultations.", Toast.LENGTH_SHORT).show();
                     consultationList.clear();
                     consultationList.addAll(consultationList);
                     consultationAdapter.notifyDataSetChanged();
