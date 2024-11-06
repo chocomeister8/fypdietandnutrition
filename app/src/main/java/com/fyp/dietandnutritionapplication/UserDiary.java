@@ -120,10 +120,10 @@ public class UserDiary {
                     List<UserDiary> diaryEntries = new ArrayList<>();
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                         UserDiary entry = new UserDiary();
+                        entry.setDiaryID(document.getId());
                         entry.setMealRecordID(document.getString("mealRecordID"));
                         entry.setThoughts(document.getString("thoughts"));
                         entry.setTags(document.getString("tags"));
-                        entry.setDiaryID(document.getString("diaryID"));
                         entry.setMealRecordString(document.getString("mealRecordString"));
 
 
@@ -149,16 +149,32 @@ public class UserDiary {
     public void deleteDiaryEntry(String diaryID, UserDiaryFragment.OnEntryDeletedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("UserDiaries").document(diaryID)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    if (listener != null) {
-                        listener.onEntryDeleted(true); // Notify success
+        db.collection("UserDiaries").document(diaryID).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        db.collection("UserDiaries").document(diaryID)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    if (listener != null) {
+                                        listener.onEntryDeleted(true); // Notify success
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    if (listener != null) {
+                                        listener.onEntryDeleted(false); // Notify failure
+                                    }
+                                });
+                    } else {
+                        Log.e("DeleteDiaryEntry", "Document does not exist");
+                        if (listener != null) {
+                            listener.onEntryDeleted(false); // Notify failure because document does not exist
+                        }
                     }
                 })
                 .addOnFailureListener(e -> {
+                    Log.e("DeleteDiaryEntry", "Error fetching document: " + e.getMessage());
                     if (listener != null) {
-                        listener.onEntryDeleted(false); // Notify failure
+                        listener.onEntryDeleted(false); // Notify failure because of error fetching document
                     }
                 });
     }
