@@ -137,6 +137,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
+            <TextView
+                android:id="@+id/messageTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal|bottom"
+                android:padding="16dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="350dp"
+                android:textSize="22dp"
+                android:visibility="gone"/>
+
 
 
         </LinearLayout>

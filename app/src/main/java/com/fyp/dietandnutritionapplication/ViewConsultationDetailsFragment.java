@@ -63,6 +63,7 @@ public class ViewConsultationDetailsFragment extends Fragment {
         TextView bioTextView = view.findViewById(R.id.bio);
         TextView phonenumberTextView = view.findViewById(R.id.phoneNumber);
         TextView expertiseTextView = view.findViewById(R.id.expertise);
+        TextView messageTextView = view.findViewById(R.id.messageTextView);
 
         if (selectedNutri != null) {
             fullNameTextView.setText("Full Name - " + selectedNutri.getFullName());
@@ -103,8 +104,9 @@ public class ViewConsultationDetailsFragment extends Fragment {
                 if (!consultationList2.isEmpty()) {
                     Toast.makeText(getContext(), "Consultations loaded successfully.", Toast.LENGTH_SHORT).show();
                 }else {
-                    Toast.makeText(getContext(), "No slots available yet", Toast.LENGTH_SHORT).show();
-                }
+                    consultationListView.setVisibility(View.GONE);
+                    messageTextView.setVisibility(View.VISIBLE);
+                    messageTextView.setText("No slots available yet  ˙◠˙");                }
             }
 
             @Override

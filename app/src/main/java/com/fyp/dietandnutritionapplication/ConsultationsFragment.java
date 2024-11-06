@@ -59,6 +59,7 @@ public class ConsultationsFragment extends Fragment {
     private EditText clientNameEditText;
     private EditText zoomLinkEditText;
     private EditText statusEditText;
+    private TextView messageTextView;
     private String searchText = "";
 
     private FirebaseAuth firebaseAuth;
@@ -134,6 +135,7 @@ public class ConsultationsFragment extends Fragment {
         searchBar = view.findViewById(R.id.search_bar);
         viewNutriButton = view.findViewById(R.id.view_nutri);
         viewConsultationButton = view.findViewById(R.id.booking_consultation);
+        messageTextView = view.findViewById(R.id.messageTextView);
 
         db = FirebaseFirestore.getInstance();
 
@@ -362,13 +364,15 @@ public class ConsultationsFragment extends Fragment {
                                                 }
                                             }
 
+                                            consultationAdapter.notifyDataSetChanged();
+
                                             // Update ListView based on matching consultations
-                                            if (consultationList.isEmpty()) {
-                                                Toast.makeText(getContext(), "No consultations found for your account.", Toast.LENGTH_LONG).show();
-                                                consultationListView.setVisibility(View.GONE); // Hide ListView if no consultations
+                                            if (!consultationList.isEmpty()) {
+                                                Toast.makeText(getContext(), "Consultations loaded successfully.", Toast.LENGTH_SHORT).show();
                                             } else {
-                                                consultationListView.setVisibility(View.VISIBLE); // Show ListView if consultations exist
-                                                consultationAdapter.notifyDataSetChanged(); // Refresh the adapter
+                                                consultationListView.setVisibility(View.GONE);
+                                                messageTextView.setVisibility(View.VISIBLE);
+                                                messageTextView.setText("No consultation booked yet \n Book a consultation with our experts now ˙ᵕ˙");
                                             }
                                         } else {
                                             Toast.makeText(getContext(), "Failed to fetch consultations: " + task.getException(), Toast.LENGTH_SHORT).show();
