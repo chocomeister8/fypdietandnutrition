@@ -246,6 +246,16 @@ public class AddRecipeFragment extends Fragment {
     private void saveRecipeToFirestore() {
 
         String recipeTitle = recipeTitleInput.getText().toString();
+        String caloriesInputValue = caloriesInput.getText().toString().trim();
+        String weightInputValue = weightInput.getText().toString().trim();
+        String totalTimeInputValue = totalTimeInput.getText().toString().trim();
+
+        // Validate mandatory fields
+        if (recipeTitle.isEmpty() || caloriesInputValue.isEmpty() || weightInputValue.isEmpty() || totalTimeInputValue.isEmpty()) {
+            Toast.makeText(getContext(), "Please fill out all required fields.", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if any required field is empty
+        }
+
         double calories = 0;
         double weight = 0;
         double totalTime = 0;
@@ -259,36 +269,27 @@ public class AddRecipeFragment extends Fragment {
         }
 
         // Parse calories input
-        String caloriesInputValue = caloriesInput.getText().toString().trim();
-        if (!caloriesInputValue.isEmpty()) {
-            try {
-                calories = Double.parseDouble(caloriesInputValue);
-            } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Invalid input for calories. Please enter a valid number.", Toast.LENGTH_SHORT).show();
-                return; // Stop execution if input is invalid
-            }
+        try {
+            calories = Double.parseDouble(caloriesInputValue);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "Invalid input for calories. Please enter a valid number.", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if input is invalid
         }
 
         // Parse weight input
-        String weightInputValue = weightInput.getText().toString().trim();
-        if (!weightInputValue.isEmpty()) {
-            try {
-                weight = Double.parseDouble(weightInputValue);
-            } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Invalid input for weight. Please enter a valid number.", Toast.LENGTH_SHORT).show();
-                return; // Stop execution if input is invalid
-            }
+        try {
+            weight = Double.parseDouble(weightInputValue);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "Invalid input for weight. Please enter a valid number.", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if input is invalid
         }
 
         // Parse total time input
-        String totalTimeInputValue = totalTimeInput.getText().toString().trim();
-        if (!totalTimeInputValue.isEmpty()) {
-            try {
-                totalTime = Double.parseDouble(totalTimeInputValue);
-            } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Invalid input for total time. Please enter a valid number.", Toast.LENGTH_SHORT).show();
-                return; // Stop execution if input is invalid
-            }
+        try {
+            totalTime = Double.parseDouble(totalTimeInputValue);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "Invalid input for total time. Please enter a valid number.", Toast.LENGTH_SHORT).show();
+            return; // Stop execution if input is invalid
         }
 
         Log.d("RecipeInput", "Calories: " + calories);
@@ -300,7 +301,7 @@ public class AddRecipeFragment extends Fragment {
         List<String> dishTypes = getSelectedCheckboxes(dishTypeCheckboxes, false);
 
         // Collect dynamic ingredients
-        List<String> ingredientsList = new ArrayList<>(); // Change to List<String>
+        List<String> ingredientsList = new ArrayList<>();
         int ingredientCount = ingredientsSection.getChildCount();
         for (int i = 0; i < ingredientCount; i++) {
             View ingredientRow = ingredientsSection.getChildAt(i);
@@ -312,16 +313,16 @@ public class AddRecipeFragment extends Fragment {
                 String ingredientName = ingredientNameInput.getText().toString();
                 String ingredientWeight = ingredientWeightInput.getText().toString();
 
-                // Check if both fields are filled
-                if (!ingredientName.isEmpty() && !ingredientWeight.isEmpty()) {
-                    // Format the ingredient as a string (e.g., "ingredientName: ingredientWeight")
-                    String ingredientString = ingredientName + ": " + ingredientWeight;
-                    ingredientsList.add(ingredientString); // Add the formatted string to the list
+                // Ensure both fields are filled
+                if (ingredientName.isEmpty() || ingredientWeight.isEmpty()) {
+                    Toast.makeText(getContext(), "Please fill out all ingredient fields.", Toast.LENGTH_SHORT).show();
+                    return; // Stop if any ingredient field is empty
                 }
+                ingredientsList.add(ingredientName + ": " + ingredientWeight); // Add formatted string to the list
             }
         }
 
-        List<String> recipeStepsList = new ArrayList<>(); // Change to List<String>
+        List<String> recipeStepsList = new ArrayList<>();
         int recipeStepsCount = recipeStepsSection.getChildCount();
         for (int i = 0; i < recipeStepsCount; i++) {
             View recipeSteps = recipeStepsSection.getChildAt(i);
@@ -331,11 +332,12 @@ public class AddRecipeFragment extends Fragment {
 
                 String recipeStep = recipeStepInput.getText().toString();
 
-                // Check if both fields are filled
-                if (!recipeStep.isEmpty()) {
-                    // Format the ingredient as a string (e.g., "ingredientName: ingredientWeight")
-                    recipeStepsList.add(recipeStep); // Add the formatted string to the list
+                // Ensure recipe step is filled
+                if (recipeStep.isEmpty()) {
+                    Toast.makeText(getContext(), "Please fill out all recipe steps.", Toast.LENGTH_SHORT).show();
+                    return; // Stop if any recipe step is empty
                 }
+                recipeStepsList.add(recipeStep); // Add the formatted string to the list
             }
         }
 
@@ -344,6 +346,7 @@ public class AddRecipeFragment extends Fragment {
         redirectToViewPendingRecipes();
         sendNotification(userId, recipeTitle);
     }
+
 
     private void redirectToViewPendingRecipes(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
