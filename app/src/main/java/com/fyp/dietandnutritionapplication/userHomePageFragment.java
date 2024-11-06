@@ -118,175 +118,175 @@ public class userHomePageFragment extends Fragment {
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
 
-            // Inflate the layout for this fragment
-            View view = inflater.inflate(R.layout.user_homepage, container, false);
-            firestore = FirebaseFirestore.getInstance();
-            fetchUserCalorieGoal();
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.user_homepage, container, false);
+        firestore = FirebaseFirestore.getInstance();
+        fetchUserCalorieGoal();
 
-            userMealRecordController = new UserMealRecordController();
-            carbsTextView = view.findViewById(R.id.carbohydrates_value);
-            proteinsTextView = view.findViewById(R.id.proteins_value);
-            fatsTextView = view.findViewById(R.id.fats_value);
+        userMealRecordController = new UserMealRecordController();
+        carbsTextView = view.findViewById(R.id.carbohydrates_value);
+        proteinsTextView = view.findViewById(R.id.proteins_value);
+        fatsTextView = view.findViewById(R.id.fats_value);
 
-            getTodaysTotalMacronutrients(getUserId());
+        getTodaysTotalMacronutrients(getUserId());
 
-            ImageView reviewIcon = view.findViewById(R.id.reviewIcon);
-            ImageView logoutIcon = view.findViewById(R.id.logout_icon);
-
-
-            db = FirebaseFirestore.getInstance();
+        ImageView reviewIcon = view.findViewById(R.id.reviewIcon);
+        ImageView logoutIcon = view.findViewById(R.id.logout_icon);
 
 
-            // Initialize buttons using view.findViewById
-            Button button_recipes = view.findViewById(R.id.button_recipes);
-            Button button_mealLog = view.findViewById(R.id.button_MealLog);
-            Button button_diary = view.findViewById(R.id.diary);
-            Button button_bmiCalculator = view.findViewById(R.id.bmiCalculator);
-            Button button_consultation = view.findViewById(R.id.consultation);
-            Button button_healthReport = view.findViewById(R.id.healthReport);
-            Button button_faq = view.findViewById(R.id.FAQ);
-            Button button_profile = view.findViewById(R.id.profile);
-            Button button_mealLog1 = view.findViewById(R.id.button_MealLog1);
-            noRecommendationText = view.findViewById(R.id.no_recommendation_text);
-            lineChart = view.findViewById(R.id.LineChart);
-            barChart = view.findViewById(R.id.bar_chart);
-            currentStartDate = Calendar.getInstance();
-            currentStartDate.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        db = FirebaseFirestore.getInstance();
 
 
-            // Initialize EditText fields
-            etWeight = view.findViewById(R.id.etWeight);
-            etHeight = view.findViewById(R.id.etHeight);
-            etBMI = view.findViewById(R.id.etBMI);
-            etWeightGoal = view.findViewById(R.id.etWeightGoal);
+        // Initialize buttons using view.findViewById
+        Button button_recipes = view.findViewById(R.id.button_recipes);
+        Button button_mealLog = view.findViewById(R.id.button_MealLog);
+        Button button_diary = view.findViewById(R.id.diary);
+        Button button_bmiCalculator = view.findViewById(R.id.bmiCalculator);
+        Button button_consultation = view.findViewById(R.id.consultation);
+        Button button_healthReport = view.findViewById(R.id.healthReport);
+        Button button_faq = view.findViewById(R.id.FAQ);
+        Button button_profile = view.findViewById(R.id.profile);
+        Button button_mealLog1 = view.findViewById(R.id.button_MealLog1);
+        noRecommendationText = view.findViewById(R.id.no_recommendation_text);
+        lineChart = view.findViewById(R.id.LineChart);
+        barChart = view.findViewById(R.id.bar_chart);
+        currentStartDate = Calendar.getInstance();
+        currentStartDate.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 
-            recyclerView = view.findViewById(R.id.recipeRecyclerView);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Initialize EditText fields
+        etWeight = view.findViewById(R.id.etWeight);
+        etHeight = view.findViewById(R.id.etHeight);
+        etBMI = view.findViewById(R.id.etBMI);
+        etWeightGoal = view.findViewById(R.id.etWeightGoal);
+
+        recyclerView = view.findViewById(R.id.recipeRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-            // Initialize the recipe list and adapter
-            recipeList = new ArrayList<>();
-            APIRecipeList = new ArrayList<>();
-            recipeNewList = new ArrayList<>();
-            recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
-            recyclerView.setAdapter(recipeAdapter);
+        // Initialize the recipe list and adapter
+        recipeList = new ArrayList<>();
+        APIRecipeList = new ArrayList<>();
+        recipeNewList = new ArrayList<>();
+        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
+        recyclerView.setAdapter(recipeAdapter);
 
 
-            // Setup and update the line chart after view creation
-            displayWeightProgressChart();
-            fetchUserData();
-            fetchWeeklyCalorieData();
+        // Setup and update the line chart after view creation
+        displayWeightProgressChart();
+        fetchUserData();
+        fetchWeeklyCalorieData();
 
-            // Fetch recipes
-            fetchRecipes();
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                // Start fetching recipes after the delay
-                fetchRecipesFromRecommended();
-            }, 1000);
+        // Fetch recipes
+        fetchRecipes();
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            // Start fetching recipes after the delay
+            fetchRecipesFromRecommended();
+        }, 1000);
 
-            // Set up button click listeners to navigate between fragments
-            button_recipes.setOnClickListener(v -> {
-                // Replace current fragment with NavAllRecipesFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new navCreateFolderFragment())
-                        .addToBackStack(null)  // Add to back stack to enable back navigation
-                        .commit();
-            });
-            reviewIcon.setOnClickListener(v -> {
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).replaceFragment(new userReviewAppFragment());
-                }
-            });
-            logoutIcon.setOnClickListener(v -> {
-                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.clear();
-                editor.apply();
+        // Set up button click listeners to navigate between fragments
+        button_recipes.setOnClickListener(v -> {
+            // Replace current fragment with NavAllRecipesFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new navCreateFolderFragment())
+                    .addToBackStack(null)  // Add to back stack to enable back navigation
+                    .commit();
+        });
+        reviewIcon.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).replaceFragment(new userReviewAppFragment());
+            }
+        });
+        logoutIcon.setOnClickListener(v -> {
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
 
-                FirebaseAuth.getInstance().signOut();
-                // Create an AlertDialog to confirm logout
-                new AlertDialog.Builder(getContext())
-                        .setTitle("Confirm Logout")
-                        .setMessage("Are you sure you want to log out?")
-                        .setPositiveButton("Log out", (dialog, which) -> {
-                            // User confirmed to log out
-                            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-                            if (getActivity() instanceof MainActivity) {
-                                UserMealRecordFragment userMealRecordFragment = (UserMealRecordFragment) getFragmentManager().findFragmentByTag("UserMealRecordFragment");
-                                if (userMealRecordFragment != null) {
-                                    userMealRecordFragment.clearMealLogUI();
-                                }
-                                ((MainActivity) getActivity()).switchToGuestMode();
-                                ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
+            FirebaseAuth.getInstance().signOut();
+            // Create an AlertDialog to confirm logout
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Confirm Logout")
+                    .setMessage("Are you sure you want to log out?")
+                    .setPositiveButton("Log out", (dialog, which) -> {
+                        // User confirmed to log out
+                        Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                        if (getActivity() instanceof MainActivity) {
+                            UserMealRecordFragment userMealRecordFragment = (UserMealRecordFragment) getFragmentManager().findFragmentByTag("UserMealRecordFragment");
+                            if (userMealRecordFragment != null) {
+                                userMealRecordFragment.clearMealLogUI();
                             }
-                        })
-                        .setNegativeButton("Cancel", (dialog, which) -> {
-                            // User cancelled the logout action
-                            dialog.dismiss();
-                        })
-                        .show();
-            });
+                            ((MainActivity) getActivity()).switchToGuestMode();
+                            ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
+                        }
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> {
+                        // User cancelled the logout action
+                        dialog.dismiss();
+                    })
+                    .show();
+        });
 
-            // Define the OnClickListener
-            View.OnClickListener buttonClickListener = v -> {
-                // Replace current fragment with MealLogPreviewFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new UserMealRecordFragment())
-                        .addToBackStack(null)
-                        .commit();
-            };
+        // Define the OnClickListener
+        View.OnClickListener buttonClickListener = v -> {
+            // Replace current fragment with MealLogPreviewFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new UserMealRecordFragment())
+                    .addToBackStack(null)
+                    .commit();
+        };
 
 // Assign the OnClickListener to both buttons
-            button_mealLog.setOnClickListener(buttonClickListener);
-            button_mealLog1.setOnClickListener(buttonClickListener);
+        button_mealLog.setOnClickListener(buttonClickListener);
+        button_mealLog1.setOnClickListener(buttonClickListener);
 
-            button_diary.setOnClickListener(v -> {
-                // Replace current fragment with NavFavouriteRecipesFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new UserDiaryFragment())
-                        .addToBackStack(null)
-                        .commit();
-            });
+        button_diary.setOnClickListener(v -> {
+            // Replace current fragment with NavFavouriteRecipesFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new UserDiaryFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
-            button_bmiCalculator.setOnClickListener(v -> {
-                // Replace current fragment with NavRecipesStatusFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new BMICalculatorController())
-                        .addToBackStack(null)
-                        .commit();
-            });
+        button_bmiCalculator.setOnClickListener(v -> {
+            // Replace current fragment with NavRecipesStatusFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new BMICalculatorController())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
-            button_consultation.setOnClickListener(v -> {
-                // Replace current fragment with NavConsultationFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new ConsultationsUFragment())
-                        .addToBackStack(null)
-                        .commit();
-            });
+        button_consultation.setOnClickListener(v -> {
+            // Replace current fragment with NavConsultationFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ConsultationsUFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
-            button_healthReport.setOnClickListener(v -> {
-                // Replace current fragment with NavHealthReportFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new healthReportFragment())
-                        .addToBackStack(null)
-                        .commit();
-            });
+        button_healthReport.setOnClickListener(v -> {
+            // Replace current fragment with NavHealthReportFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new healthReportFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
-            button_faq.setOnClickListener(v -> {
-                // Replace current fragment with NavFAQFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new userViewFAQFragment())
-                        .addToBackStack(null)
-                        .commit();
-            });
+        button_faq.setOnClickListener(v -> {
+            // Replace current fragment with NavFAQFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new userViewFAQFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
-            button_profile.setOnClickListener(v -> {
-                // Replace current fragment with NavProfileFragment
-                requireActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.frame_layout, new ProfileUFragment())
-                        .addToBackStack(null)
-                        .commit();
-            });
+        button_profile.setOnClickListener(v -> {
+            // Replace current fragment with NavProfileFragment
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_layout, new ProfileUFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
 
         return view;
@@ -387,6 +387,53 @@ public class userHomePageFragment extends Fragment {
                 });
     }
 
+    private void checkForChangesAndPrompt(String field, Double originalValue, EditText editText, String userId) {
+        Double newValue;
+        try {
+            newValue = Double.valueOf(editText.getText().toString());
+        } catch (NumberFormatException e) {
+            Toast.makeText(getActivity(), "Invalid input for " + field, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!newValue.equals(originalValue)) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle("Confirm Changes")
+                    .setMessage("Do you want to update " + field + " to " + newValue + "?")
+                    .setPositiveButton("Confirm", (dialog, which) -> {
+                        // Update the user data
+                        updateUserData(field, newValue, userId);
+
+                        // Recalculate BMI after update
+                        recalculateBMI(userId);
+                    })
+                    .setNegativeButton("Cancel", (dialog, which) -> editText.setText(String.valueOf(originalValue)))
+                    .show();
+        }
+    }
+
+    private void recalculateBMI(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Users").document(userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            // Fetch the updated weight and height
+                            Double weight = document.getDouble("currentWeight");
+                            Double height = document.getDouble("currentHeight");
+
+                            if (weight != null && height != null) {
+                                double heightInMeters = height / 100; // Convert cm to meters
+                                double bmi = weight / (heightInMeters * heightInMeters);
+                                etBMI.setText(String.format("%.2f", bmi)); // Update BMI field with the recalculated value
+                            }
+                        }
+                    }
+                });
+    }
+
     private void setupChangeListeners(Double initialWeight, Double initialHeight, Double initialWeightGoal, String userId) {
         etWeight.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) checkForChangesAndPrompt("currentWeight", initialWeight, etWeight, userId);
@@ -401,38 +448,15 @@ public class userHomePageFragment extends Fragment {
         });
     }
 
-    private void checkForChangesAndPrompt(String field, Double originalValue, EditText editText, String userId) {
-        Double newValue;
-        try {
-            newValue = Double.valueOf(editText.getText().toString());
-        } catch (NumberFormatException e) {
-            Toast.makeText(getActivity(), "Invalid input for " + field, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (!newValue.equals(originalValue)) {
-            Double weight = originalValue.equals("currentWeight") ? newValue : Double.valueOf(etWeight.getText().toString());
-            Double height = originalValue.equals("currentHeight") ? newValue : Double.valueOf(etHeight.getText().toString());
-            Double weightGoal = originalValue.equals("weightGoal") ? newValue : Double.valueOf(etWeightGoal.getText().toString());
-
-            new AlertDialog.Builder(getActivity())
-                    .setTitle("Confirm Changes")
-                    .setMessage("Do you want to update " + field + " to " + newValue + "?")
-                    .setPositiveButton("Confirm", (dialog, which) -> updateUserData(field, newValue, userId, weight, height, weightGoal))
-                    .setNegativeButton("Cancel", (dialog, which) -> editText.setText(String.valueOf(originalValue)))
-                    .show();
-        }
-    }
-
-    private void updateUserData(String field, Double newValue, String userId, double weight, double height, double weightGoal) {
+    private void updateUserData(String field, Double newValue, String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Users").document(userId)
                 .update(field, newValue)
                 .addOnSuccessListener(aVoid -> {
                     Log.d("Firestore", field + " updated successfully.");
                     Toast.makeText(getActivity(), field + " updated.", Toast.LENGTH_SHORT).show();
-                    // Step 2: Store in `MeasurementHistory` with a timestamp
-                    //addMeasurementToHistory(userId, weight, height, weightGoal);
+                    // Optionally store the change in a history collection
+                    // addMeasurementToHistory(userId, weight, height, weightGoal);
                 })
                 .addOnFailureListener(e -> {
                     Log.w("Firestore", "Error updating " + field, e);
@@ -812,6 +836,7 @@ public class userHomePageFragment extends Fragment {
     }
 
 }
+
 
 
 
