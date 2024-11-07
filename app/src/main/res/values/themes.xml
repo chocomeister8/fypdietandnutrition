@@ -7,8 +7,11 @@
         <item name="colorPrimaryVariant">@color/lavender</item>
         <!-- Set the app background color or drawable -->
         <item name="android:windowBackground">@color/white</item>
+        <item name="buttonStyle">@style/CustomButtonStyle</item>
     </style>
-
+    <style name="CustomButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:textColor">@color/black</item>
+    </style>
 
 
     <style name="Theme.DietAndNutritionApplication" parent="Base.Theme.DietAndNutritionApplication" />

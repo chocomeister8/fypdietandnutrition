@@ -510,31 +510,38 @@ public class MealLogPreviewFragment extends Fragment {
 
                 // Show the options dialog (Snap a Photo or Enter Manually)
                 AlertDialog.Builder optionBuilder = new AlertDialog.Builder(requireContext());
-                optionBuilder.setTitle("Choose an Option")
-                        .setItems(new CharSequence[]{"Snap a Photo", "Upload from Gallery", "Enter Manually"}, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch (which) {
-                                    case 0:
-                                        // Handle snapping a photo
-                                        if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-                                        } else {
-                                            openCameraWithMealType(selectedMealType);
-                                        }
-                                        break;
-                                    case 1:
-                                        openGalleryForImage(selectedMealType);
-                                        break;
-                                    case 2:
-                                        // Handle entering manually
-                                        handleFoodNameInput(selectedMealType, null);
-                                        break;
+                optionBuilder.setTitle("Choose an Option");
+
+                // Create a list of options
+                String[] options = {"Snap a Photo", "Upload from Gallery", "Enter Manually"};
+
+                // Create an ArrayAdapter with the custom item layout
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(requireContext(), R.layout.custom_dialog_list_item, options);
+
+                // Set the adapter to the dialog
+                optionBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                                } else {
+                                    openCameraWithMealType(selectedMealType);
                                 }
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
+                                break;
+                            case 1:
+                                openGalleryForImage(selectedMealType);
+                                break;
+                            case 2:
+                                handleFoodNameInput(userId, selectedMealType);
+                                break;
+                        }
+                    }
+                });
+
+                optionBuilder.setNegativeButton("Cancel", null);
+                optionBuilder.show();
             }
         });
 

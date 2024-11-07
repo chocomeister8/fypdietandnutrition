@@ -530,6 +530,7 @@ public class UserMealRecordFragment extends Fragment {
             RecognizedIngredient ingredient = uniqueIngredients.get(i);
             CheckBox checkBox = new CheckBox(requireContext());
             checkBox.setText(ingredient.getDisplayName() + " - Calories: " + ingredient.getNutrition().getCalories() + " kcal");
+            checkBox.setTextColor(getResources().getColor(R.color.black));
             checkboxContainer.addView(checkBox);
 
             // Set the checkbox listener to track selections
@@ -912,10 +913,8 @@ public class UserMealRecordFragment extends Fragment {
         lunchTextView.setText("");
         dinnerTextView.setText("");
         snackTextView.setText("");
-        Log.d("MealLogFragment", "Meal Records size: " + mealRecords.size());
 
         for (MealRecord mealRecord : mealRecords) {
-            Log.d("MealLogFragment", "line432 Meal Records: " + mealRecord);
             String mealName = mealRecord.getMealName();
             double mealCalories = mealRecord.getCalories();
             double carbs = mealRecord.getCarbs();
@@ -1264,23 +1263,34 @@ public class UserMealRecordFragment extends Fragment {
     }
 
     private void deleteMealRecord(String mealRecordID, String mealTypeD) {
-        // Call the controller to delete the meal record from the database
-        userMealRecordController.deleteMealRecord(mealRecordID, new MealRecord.OnMealDeletedListener() {
-            @Override
-            public void onMealDeleted() {
-                // Show success message to the user
-                Toast.makeText(getActivity(), "Meal deleted successfully", Toast.LENGTH_SHORT).show();
-                refreshMealData();
-                checkAndHideEmptyMealTypeCard(mealTypeD);
-                Log.d("MealLogFragment", "After refresh - " + mealTypeD);
-            }
+        // Create a confirmation dialog
+        new AlertDialog.Builder(getContext())
+                .setTitle("Delete Meal")
+                .setMessage("Are you sure you want to delete this meal record?")
+                .setPositiveButton("Confirm", (dialog, which) -> {
+                    // If user confirms, proceed with the deletion
+                    userMealRecordController.deleteMealRecord(mealRecordID, new MealRecord.OnMealDeletedListener() {
+                        @Override
+                        public void onMealDeleted() {
+                            // Show success message to the user
+                            Toast.makeText(getActivity(), "Meal deleted successfully", Toast.LENGTH_SHORT).show();
+                            refreshMealData();
+                            checkAndHideEmptyMealTypeCard(mealTypeD);
+                            Log.d("MealLogFragment", "After refresh - " + mealTypeD);
+                        }
 
-            @Override
-            public void onError(String error) {
-                // Show error message if the delete operation fails
-                Toast.makeText(getActivity(), "Error deleting meal: " + error, Toast.LENGTH_SHORT).show();
-            }
-        });
+                        @Override
+                        public void onError(String error) {
+                            // Show error message if the delete operation fails
+                            Toast.makeText(getActivity(), "Error deleting meal: " + error, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // If user cancels, just dismiss the dialog
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     private void checkAndHideEmptyMealTypeCard(String mealType) {
@@ -1408,32 +1418,39 @@ public class UserMealRecordFragment extends Fragment {
                     return; // Stop if no meal type is selected
                 }
 
-                // Show the options dialog (Snap a Photo or Enter Manually)
                 AlertDialog.Builder optionBuilder = new AlertDialog.Builder(requireContext());
-                optionBuilder.setTitle("Choose an Option")
-                        .setItems(new CharSequence[]{"Snap a Photo", "Upload from Gallery", "Enter Manually"}, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch (which) {
-                                    case 0:
-                                        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                                            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-                                        } else {
-                                            openCameraWithMealType(selectedMealType);
-                                        }
-                                        break;
-                                    case 1:
-                                        openGalleryForImage(selectedMealType);
-                                        break;
-                                    case 2:
-                                        // Handle entering manually
-                                        handleFoodNameInput(userId, selectedMealType);
-                                        break;
+                optionBuilder.setTitle("Choose an Option");
+
+                // Create a list of options
+                String[] options = {"Snap a Photo", "Upload from Gallery", "Enter Manually"};
+
+                // Create an ArrayAdapter with the custom item layout
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(requireContext(), R.layout.custom_dialog_list_item, options);
+
+                // Set the adapter to the dialog
+                optionBuilder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                                } else {
+                                    openCameraWithMealType(selectedMealType);
                                 }
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
+                                break;
+                            case 1:
+                                openGalleryForImage(selectedMealType);
+                                break;
+                            case 2:
+                                handleFoodNameInput(userId, selectedMealType);
+                                break;
+                        }
+                    }
+                });
+
+                optionBuilder.setNegativeButton("Cancel", null);
+                optionBuilder.show();
             }
         });
 
