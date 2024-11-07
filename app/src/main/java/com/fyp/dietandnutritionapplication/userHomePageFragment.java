@@ -136,157 +136,165 @@ public class userHomePageFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
 
-        // Initialize buttons using view.findViewById
-        Button button_recipes = view.findViewById(R.id.button_recipes);
-        Button button_mealLog = view.findViewById(R.id.button_MealLog);
-        Button button_diary = view.findViewById(R.id.diary);
-        Button button_bmiCalculator = view.findViewById(R.id.bmiCalculator);
-        Button button_consultation = view.findViewById(R.id.consultation);
-        Button button_healthReport = view.findViewById(R.id.healthReport);
-        Button button_faq = view.findViewById(R.id.FAQ);
-        Button button_profile = view.findViewById(R.id.profile);
-        Button button_mealLog1 = view.findViewById(R.id.button_MealLog1);
-        noRecommendationText = view.findViewById(R.id.no_recommendation_text);
-        lineChart = view.findViewById(R.id.LineChart);
-        barChart = view.findViewById(R.id.bar_chart);
-        currentStartDate = Calendar.getInstance();
-        currentStartDate.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        if (user != null) {
+            userId = user.getUid();
 
-
-        // Initialize EditText fields
-        etWeight = view.findViewById(R.id.etWeight);
-        etHeight = view.findViewById(R.id.etHeight);
-        etBMI = view.findViewById(R.id.etBMI);
-        etWeightGoal = view.findViewById(R.id.etWeightGoal);
-
-        recyclerView = view.findViewById(R.id.recipeRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            // Initialize buttons using view.findViewById
+            Button button_recipes = view.findViewById(R.id.button_recipes);
+            Button button_mealLog = view.findViewById(R.id.button_MealLog);
+            Button button_diary = view.findViewById(R.id.diary);
+            Button button_bmiCalculator = view.findViewById(R.id.bmiCalculator);
+            Button button_consultation = view.findViewById(R.id.consultation);
+            Button button_healthReport = view.findViewById(R.id.healthReport);
+            Button button_faq = view.findViewById(R.id.FAQ);
+            Button button_profile = view.findViewById(R.id.profile);
+            Button button_mealLog1 = view.findViewById(R.id.button_MealLog1);
+            noRecommendationText = view.findViewById(R.id.no_recommendation_text);
+            lineChart = view.findViewById(R.id.LineChart);
+            barChart = view.findViewById(R.id.bar_chart);
+            currentStartDate = Calendar.getInstance();
+            currentStartDate.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 
 
-        // Initialize the recipe list and adapter
-        recipeList = new ArrayList<>();
-        APIRecipeList = new ArrayList<>();
-        recipeNewList = new ArrayList<>();
-        recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
-        recyclerView.setAdapter(recipeAdapter);
+            // Initialize EditText fields
+            etWeight = view.findViewById(R.id.etWeight);
+            etHeight = view.findViewById(R.id.etHeight);
+            etBMI = view.findViewById(R.id.etBMI);
+            etWeightGoal = view.findViewById(R.id.etWeightGoal);
+
+            recyclerView = view.findViewById(R.id.recipeRecyclerView);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-        // Setup and update the line chart after view creation
-        displayWeightProgressChart();
-        fetchUserData();
-        fetchWeeklyCalorieData();
+            // Initialize the recipe list and adapter
+            recipeList = new ArrayList<>();
+            APIRecipeList = new ArrayList<>();
+            recipeNewList = new ArrayList<>();
+            recipeAdapter = new RecipeAdapter(recipeList, this::openRecipeDetailFragment, false);
+            recyclerView.setAdapter(recipeAdapter);
 
-        // Fetch recipes
-        fetchRecipes();
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Start fetching recipes after the delay
-            fetchRecipesFromRecommended();
-        }, 1000);
 
-        // Set up button click listeners to navigate between fragments
-        button_recipes.setOnClickListener(v -> {
-            // Replace current fragment with NavAllRecipesFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new navCreateFolderFragment())
-                    .addToBackStack(null)  // Add to back stack to enable back navigation
-                    .commit();
-        });
-        reviewIcon.setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).replaceFragment(new userReviewAppFragment());
-            }
-        });
-        logoutIcon.setOnClickListener(v -> {
-            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.clear();
-            editor.apply();
+            // Setup and update the line chart after view creation
+            displayWeightProgressChart();
+            fetchUserData();
+            fetchWeeklyCalorieData();
 
-            FirebaseAuth.getInstance().signOut();
-            // Create an AlertDialog to confirm logout
-            new AlertDialog.Builder(getContext())
-                    .setTitle("Confirm Logout")
-                    .setMessage("Are you sure you want to log out?")
-                    .setPositiveButton("Log out", (dialog, which) -> {
-                        // User confirmed to log out
-                        Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
-                        if (getActivity() instanceof MainActivity) {
-                            UserMealRecordFragment userMealRecordFragment = (UserMealRecordFragment) getFragmentManager().findFragmentByTag("UserMealRecordFragment");
-                            if (userMealRecordFragment != null) {
-                                userMealRecordFragment.clearMealLogUI();
+            // Fetch recipes
+            fetchRecipes();
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                // Start fetching recipes after the delay
+                fetchRecipesFromRecommended();
+            }, 1000);
+
+            // Set up button click listeners to navigate between fragments
+            button_recipes.setOnClickListener(v -> {
+                // Replace current fragment with NavAllRecipesFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new navCreateFolderFragment())
+                        .addToBackStack(null)  // Add to back stack to enable back navigation
+                        .commit();
+            });
+            reviewIcon.setOnClickListener(v -> {
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).replaceFragment(new userReviewAppFragment());
+                }
+            });
+            logoutIcon.setOnClickListener(v -> {
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MealPref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
+
+                FirebaseAuth.getInstance().signOut();
+                // Create an AlertDialog to confirm logout
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Confirm Logout")
+                        .setMessage("Are you sure you want to log out?")
+                        .setPositiveButton("Log out", (dialog, which) -> {
+                            // User confirmed to log out
+                            Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                            if (getActivity() instanceof MainActivity) {
+                                UserMealRecordFragment userMealRecordFragment = (UserMealRecordFragment) getFragmentManager().findFragmentByTag("UserMealRecordFragment");
+                                if (userMealRecordFragment != null) {
+                                    userMealRecordFragment.clearMealLogUI();
+                                }
+                                ((MainActivity) getActivity()).switchToGuestMode();
+                                ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
                             }
-                            ((MainActivity) getActivity()).switchToGuestMode();
-                            ((MainActivity) getActivity()).replaceFragment(new LoginFragment());
-                        }
-                    })
-                    .setNegativeButton("Cancel", (dialog, which) -> {
-                        // User cancelled the logout action
-                        dialog.dismiss();
-                    })
-                    .show();
-        });
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) -> {
+                            // User cancelled the logout action
+                            dialog.dismiss();
+                        })
+                        .show();
+            });
 
-        // Define the OnClickListener
-        View.OnClickListener buttonClickListener = v -> {
-            // Replace current fragment with MealLogPreviewFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new UserMealRecordFragment())
-                    .addToBackStack(null)
-                    .commit();
-        };
+            // Define the OnClickListener
+            View.OnClickListener buttonClickListener = v -> {
+                // Replace current fragment with MealLogPreviewFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new UserMealRecordFragment())
+                        .addToBackStack(null)
+                        .commit();
+            };
 
 // Assign the OnClickListener to both buttons
-        button_mealLog.setOnClickListener(buttonClickListener);
-        button_mealLog1.setOnClickListener(buttonClickListener);
+            button_mealLog.setOnClickListener(buttonClickListener);
+            button_mealLog1.setOnClickListener(buttonClickListener);
 
-        button_diary.setOnClickListener(v -> {
-            // Replace current fragment with NavFavouriteRecipesFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new UserDiaryFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+            button_diary.setOnClickListener(v -> {
+                // Replace current fragment with NavFavouriteRecipesFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new UserDiaryFragment())
+                        .addToBackStack(null)
+                        .commit();
+            });
 
-        button_bmiCalculator.setOnClickListener(v -> {
-            // Replace current fragment with NavRecipesStatusFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new BMICalculatorController())
-                    .addToBackStack(null)
-                    .commit();
-        });
+            button_bmiCalculator.setOnClickListener(v -> {
+                // Replace current fragment with NavRecipesStatusFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new BMICalculatorController())
+                        .addToBackStack(null)
+                        .commit();
+            });
 
-        button_consultation.setOnClickListener(v -> {
-            // Replace current fragment with NavConsultationFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new ConsultationsUFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+            button_consultation.setOnClickListener(v -> {
+                // Replace current fragment with NavConsultationFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new ConsultationsUFragment())
+                        .addToBackStack(null)
+                        .commit();
+            });
 
-        button_healthReport.setOnClickListener(v -> {
-            // Replace current fragment with NavHealthReportFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new healthReportFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+            button_healthReport.setOnClickListener(v -> {
+                // Replace current fragment with NavHealthReportFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new healthReportFragment())
+                        .addToBackStack(null)
+                        .commit();
+            });
 
-        button_faq.setOnClickListener(v -> {
-            // Replace current fragment with NavFAQFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new userViewFAQFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+            button_faq.setOnClickListener(v -> {
+                // Replace current fragment with NavFAQFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new userViewFAQFragment())
+                        .addToBackStack(null)
+                        .commit();
+            });
 
-        button_profile.setOnClickListener(v -> {
-            // Replace current fragment with NavProfileFragment
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_layout, new ProfileUFragment())
-                    .addToBackStack(null)
-                    .commit();
-        });
+            button_profile.setOnClickListener(v -> {
+                // Replace current fragment with NavProfileFragment
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_layout, new ProfileUFragment())
+                        .addToBackStack(null)
+                        .commit();
+            });
+
+        }
+
 
 
         return view;
