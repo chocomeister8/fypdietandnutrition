@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -1072,6 +1073,9 @@ public class UserAccountEntity {
                 // Clear existing checkboxes before populating
                 allergyContainer.removeAllViews();
 
+                final CheckBox[] noneCheckBox = new CheckBox[1];
+                List<CheckBox> otherCheckBoxes = new ArrayList<>();
+
                 // Add allergy/health options as checkboxes
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     String option = document.getString("healthPreference");
@@ -1084,11 +1088,35 @@ public class UserAccountEntity {
                         allergyCheckBox.setChecked(true);
                     }
 
+                    if ("None".equalsIgnoreCase(option)) {
+                        noneCheckBox[0] = allergyCheckBox; // Save reference to the "None" checkbox
+                    } else {
+                        otherCheckBoxes.add(allergyCheckBox); // Add to other checkboxes list
+                        // Add listener to uncheck "None" if any other checkbox is checked
+                        allergyCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                            if (isChecked &&  noneCheckBox[0] != null) {
+                                noneCheckBox[0].setChecked(false); // Uncheck "None" if any other checkbox is checked
+                            }
+                        });
+                    }
+
                     allergyContainer.addView(allergyCheckBox);
+                }
+                if (noneCheckBox[0] != null) {
+                    noneCheckBox[0].setOnCheckedChangeListener((buttonView, isChecked) -> {
+                        if (isChecked) {
+                            // When "None" is checked, uncheck all other checkboxes
+                            for (CheckBox checkBox : otherCheckBoxes) {
+                                checkBox.setChecked(false);
+                            }
+                        }
+                    });
                 }
             } else {
                 Log.w("Firestore", "Error getting allergy options.", task.getException());
             }
         });
     }
+
+
 }

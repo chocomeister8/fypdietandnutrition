@@ -780,6 +780,8 @@ public class UserMealRecordFragment extends Fragment {
     }
 
     public void searchFoodInEdamam(String userId, String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageUrl) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
         userMealRecordController.fetchUsernameAndCalorieLimit(userId, new MealRecord.OnUsernameAndCalorieLimitFetchedListener() {
             @Override
             public void onDataFetched(String username, double calorielimit) {
@@ -828,11 +830,11 @@ public class UserMealRecordFragment extends Fragment {
                                                     } else {
                                                         Log.d("FoodDebug", "Image URL: " + imageURL);
                                                     }
-                                                    double adjustedCalories = nutrients.getCalories() * scaleFactor;
-                                                    double adjustedProtein = nutrients.getProtein() * scaleFactor;
-                                                    double adjustedFat = nutrients.getFat() * scaleFactor;
-                                                    double adjustedCarbohydrates = nutrients.getCarbohydrates() * scaleFactor;
-                                                    double adjustedFiber = nutrients.getFiber() * scaleFactor;
+                                                    double adjustedCalories = Double.parseDouble(decimalFormat.format(nutrients.getCalories() * scaleFactor));
+                                                    double adjustedProtein = Double.parseDouble(decimalFormat.format(nutrients.getProtein() * scaleFactor));
+                                                    double adjustedFat = Double.parseDouble(decimalFormat.format(nutrients.getFat() * scaleFactor));
+                                                    double adjustedCarbohydrates = Double.parseDouble(decimalFormat.format(nutrients.getCarbohydrates() * scaleFactor));
+                                                    double adjustedFiber = Double.parseDouble(decimalFormat.format(nutrients.getFiber() * scaleFactor));
 
                                                     // Log all the nutrients for verification
                                                     Log.d("FoodAPI", "Adjusted Calories: " + adjustedCalories);

@@ -190,6 +190,8 @@ public class MealRecord {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             MealRecord mealRecord = document.toObject(MealRecord.class);
                             // Check if createdDate is a String and convert it to Timestamp or Date
+                            mealRecord.setMealRecordID(document.getId());
+
                             if (document.contains("createdDate")) {
                                 Object createdDateObj = document.get("createdDate");
                                 if (createdDateObj instanceof Timestamp) {
