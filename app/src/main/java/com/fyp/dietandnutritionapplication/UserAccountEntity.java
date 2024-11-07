@@ -2,6 +2,7 @@ package com.fyp.dietandnutritionapplication;
 
 import static java.security.AccessController.getContext;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,6 +16,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -67,11 +70,63 @@ public class UserAccountEntity {
         void onFailure(Exception e);
     }
 
-//    public interface UserProfileUpdateCallback {
-//        void onSuccess();
-//        void onFailure(String errorMessage);
-//    }
 
+    public void updateNutritionistProfile(String userId, String username, String firstName, String lastName,
+                                          String email, String contactInfo, String education,
+                                          String expertise, String bio,Context context) {
+        // Reference to the Firestore document for the specific userId
+        DocumentReference docRef = FirebaseFirestore.getInstance().collection("Users").document(userId);
+
+        // Prepare the data to be updated in a Map
+        Map<String, Object> updatedData = new HashMap<>();
+        updatedData.put("username", username);
+        updatedData.put("firstName", firstName);
+        updatedData.put("lastName", lastName);
+        updatedData.put("email", email);
+        updatedData.put("contactInfo", contactInfo);
+        updatedData.put("education", education);
+        updatedData.put("expertise", expertise);
+        updatedData.put("bio", bio);
+
+        // Update the Firestore document
+        docRef.update(updatedData)
+                .addOnSuccessListener(aVoid -> {
+                    // On success, show a success message
+                    Log.d("Firestore", "Profile updated successfully.");
+                    Toast.makeText(context, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    // On failure, show an error message
+                    Log.e("Firestore", "Error updating document", e);
+                    Toast.makeText(context, "Failed to update profile", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void retrieveNutritionistByUid(String userId, final NutritionistCallback callback) {
+        db.collection("Users")
+                .document(userId)  // Accessing document by its ID (userId is document ID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String status = document.getString("status");
+
+                            if ("active".equalsIgnoreCase(status) || "deactivated".equalsIgnoreCase(status)) {
+                                Nutritionist nutritionist = createNutritionistFromDocument2(document);
+                                nutritionist.setStatus(status);
+                                callback.onSuccess(nutritionist);
+                            } else {
+                                callback.onFailure(new Exception("Nutritionist status is not active or deactivated"));
+                            }
+                        } else {
+                            callback.onFailure(new Exception("No nutritionist found with this userId"));
+                        }
+                    } else {
+                        callback.onFailure(task.getException());
+                    }
+                });
+    }
     public void retrieveAndClassifyUsers(final DataCallback callback) {
         db.collection("Users").get()
                 .addOnCompleteListener(task -> {
@@ -123,7 +178,10 @@ public class UserAccountEntity {
                     }
                 });
     }
-
+    public interface NutritionistCallback {
+        void onSuccess(Nutritionist nutritionist);
+        void onFailure(Exception e);
+    }
 
     public void retrieveNutritionists(final DataCallback callback) {
         db.collection("Users").get()
@@ -259,6 +317,8 @@ public class UserAccountEntity {
     }
 
 
+
+
     private User createUserFromDocument(QueryDocumentSnapshot document) {
         User user = new User();
 
@@ -316,6 +376,29 @@ public class UserAccountEntity {
     }
 
     private Nutritionist createNutritionistFromDocument(QueryDocumentSnapshot document) {
+        // Assuming profilePicture is a string path; handle conversion if needed
+        Nutritionist user = new Nutritionist();
+        user.setUsername(document.getString("username"));
+        user.setRole(document.getString("role"));
+        user.setLastName(document.getString("lastName"));
+        user.setFirstName(document.getString("firstName"));
+        user.setPhoneNumber(document.getString("phoneNumber"));
+        user.setEmail(document.getString("email"));
+        user.setGender(document.getString("gender"));
+        user.setRole(document.getString("role"));
+        user.setSpecialization(document.getString("specialization"));
+        user.setExperience(document.getString("experience"));
+        user.setDateJoined(document.getString("dateJoined"));
+        user.setEducation(document.getString("education"));
+        user.setContactInfo(document.getString("contactInfo"));
+        user.setExpertise(document.getString("expertise"));
+        user.setBio(document.getString("bio"));
+        user.setProfilePicture(document.getString("profilePicture"));
+
+        return user;
+    }
+
+    private Nutritionist createNutritionistFromDocument2(DocumentSnapshot document) {
         // Assuming profilePicture is a string path; handle conversion if needed
         Nutritionist user = new Nutritionist();
         user.setUsername(document.getString("username"));

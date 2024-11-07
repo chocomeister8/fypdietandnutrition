@@ -15,6 +15,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+
 import androidx.fragment.app.Fragment;
 
 import java.text.DecimalFormat;
@@ -160,14 +166,37 @@ public class AppReviewsFragment extends Fragment {
     }
 
     // Method to sort reviews by date (most recent)
+//    private void sortReviewsByDate() {
+//        Collections.sort(reviews, new Comparator<AppRatingsReviews>() {
+//            @Override
+//            public int compare(AppRatingsReviews r1, AppRatingsReviews r2) {
+//                // Assuming the date is in "dd-MM-yyyy HH:mm" format
+//                return r2.getDateTime().compareTo(r1.getDateTime()); // Most recent first
+//            }
+//        });
+//        // Notify the adapter of the change
+//        adapter.notifyDataSetChanged();
+//    }
     private void sortReviewsByDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+
         Collections.sort(reviews, new Comparator<AppRatingsReviews>() {
             @Override
             public int compare(AppRatingsReviews r1, AppRatingsReviews r2) {
-                // Assuming the date is in "dd-MM-yyyy HH:mm" format
-                return r2.getDateTime().compareTo(r1.getDateTime()); // Most recent first
+                try {
+                    // Parse the date strings into Date objects
+                    Date date1 = dateFormat.parse(r1.getDateTime());
+                    Date date2 = dateFormat.parse(r2.getDateTime());
+
+                    // Sort in descending order (most recent first)
+                    return date2.compareTo(date1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0; // Handle parse failure
+                }
             }
         });
+
         // Notify the adapter of the change
         adapter.notifyDataSetChanged();
     }
