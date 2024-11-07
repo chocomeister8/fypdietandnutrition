@@ -528,13 +528,16 @@ public class MealLogPreviewFragment extends Fragment {
                                     ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                                 } else {
                                     openCameraWithMealType(selectedMealType);
+                                    Log.d("DEBUG 326", "531" + selectedMealType);
                                 }
                                 break;
                             case 1:
                                 openGalleryForImage(selectedMealType);
+                                Log.d("DEBUG 326", "536" + selectedMealType);
                                 break;
                             case 2:
-                                handleFoodNameInput(userId, selectedMealType);
+                                handleFoodNameInput(selectedMealType);
+                                Log.d("DEBUG 326", "540" + selectedMealType);
                                 break;
                         }
                     }
@@ -549,8 +552,8 @@ public class MealLogPreviewFragment extends Fragment {
         builder.show();
     }
 
-    private void handleFoodNameInput(String selectedMealType, String imageUrl) {
-        // Prompt for Food Name
+    private void handleFoodNameInput(String sMealType) {
+        Log.d("DEBUG 326", "555" +sMealType);
         AlertDialog.Builder foodNameBuilder = new AlertDialog.Builder(requireContext());
         foodNameBuilder.setTitle("Enter Food Name");
 
@@ -568,7 +571,8 @@ public class MealLogPreviewFragment extends Fragment {
                 Log.d("MealLogFragment", "Food Name Entered: " + foodName);
 
                 // After food name is entered, proceed to fetch serving units
-                fetchFoodServingUnits(selectedMealType, foodName, imageUrl);
+                fetchFoodServingUnits(sMealType, foodName, null);
+                Log.d("DEBUG 326", "575" +sMealType);
             } else {
                 Toast.makeText(requireContext(), "Please enter a valid food name", Toast.LENGTH_SHORT).show();
             }
@@ -612,7 +616,8 @@ public class MealLogPreviewFragment extends Fragment {
                             Log.d("MealLogFragment", "Available Serving Units: " + servingUnits.toString());
 
                             // Proceed to show dialog for selecting serving unit and entering size
-                            handleServingInput(selectedMealType, foodName, servingUnits, imageUrl);
+                            handleServingInput(selectedMealType, foodName, servingUnits);
+                            Log.d("DEBUG 326", "618" + selectedMealType);
                         } else {
                             Toast.makeText(requireContext(), "No serving units found for: " + foodName, Toast.LENGTH_SHORT).show();
                         }
@@ -631,7 +636,7 @@ public class MealLogPreviewFragment extends Fragment {
         });
     }
 
-    private void handleServingInput(String selectedMealType, String foodName, List<String> servingUnits, String imageURL) {
+    private void handleServingInput(String selectedMealType, String foodName, List<String> servingUnits) {
         // Prompt for Serving Unit and Size
         AlertDialog.Builder servingBuilder = new AlertDialog.Builder(requireContext());
         servingBuilder.setTitle("Enter Serving Details");
@@ -663,8 +668,9 @@ public class MealLogPreviewFragment extends Fragment {
                 Log.d("MealLogFragment", "Serving Unit Selected: " + selectedServingUnit);
 
                 String selectedDate =  dateTextView.getText().toString();
+                Log.d("DEBUG 326", "669" + selectedMealType);
                 // Call the function to search for the food and scale nutrients accordingly
-                searchFoodInEdamam(foodName, servingSize, selectedServingUnit, selectedMealType, selectedDate, false, "", imageURL);
+                searchFoodInEdamam(foodName, servingSize, selectedServingUnit, selectedMealType, selectedDate, false, "", null);
             } else {
                 Toast.makeText(requireContext(), "Please enter a valid serving size", Toast.LENGTH_SHORT).show();
             }
@@ -674,7 +680,7 @@ public class MealLogPreviewFragment extends Fragment {
         servingBuilder.create().show();
     }
 
-    public void searchFoodInEdamam(String foodName, Double servingSize, String servingUnit, String selectedMealType, String selectedDate, boolean isUpdate, String mealRecordID, String imageUrl) {
+    public void searchFoodInEdamam(String foodName, Double servingSize, String servingUnit, String mType, String selectedDate, boolean isUpdate, String mealRecordID, String imageUrl) {
 
         String appId = "997e8d42";
         String appKey = "4483ab153d93c4a64d6f156fcffa78ff";
@@ -743,7 +749,7 @@ public class MealLogPreviewFragment extends Fragment {
                                         Log.d("FoodAPI", "Adjusted Carbs: " + adjustedCarbohydrates);
                                         Log.d("FoodAPI", "Adjusted Fiber: " + adjustedFiber);
 
-                                        displayMealLogForGuest(foodName, servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, imageURL, selectedMealType, null);
+                                        displayMealLogForGuest(foodName, servingSize + " " + servingUnit, adjustedCalories, adjustedCarbohydrates, adjustedProtein, adjustedFat, imageURL, mType, null);
                                     }
                                 }
                             } else {
@@ -817,6 +823,7 @@ public class MealLogPreviewFragment extends Fragment {
             RecognizedIngredient ingredient = uniqueIngredients.get(i);
             CheckBox checkBox = new CheckBox(requireContext());
             checkBox.setText(ingredient.getDisplayName() + " - Calories: " + ingredient.getNutrition().getCalories() + " kcal");
+            checkBox.setTextColor(getResources().getColor(R.color.black));
             checkboxContainer.addView(checkBox);
 
             // Set the checkbox listener to track selections
@@ -897,7 +904,7 @@ public class MealLogPreviewFragment extends Fragment {
         // Manual input button
         builder.setNegativeButton("Enter Manually", (dialog, which) -> {
             // Show the manual input dialog
-            handleFoodNameInput(selectedMealType, null);
+            handleFoodNameInput(selectedMealType);
         });
 
         builder.show();
@@ -1001,7 +1008,7 @@ public class MealLogPreviewFragment extends Fragment {
         builder.setTitle("Recognition Failed")
                 .setMessage("We couldn't recognize the food item. What would you like to do?")
                 .setPositiveButton("Enter Manually", (dialog, which) -> {
-                    handleFoodNameInput(selectedMealType, null);
+                    handleFoodNameInput(selectedMealType);
                 })
                 .setNegativeButton("Retry", (dialog, which) -> {
                     openCameraWithMealType(selectedMealType);

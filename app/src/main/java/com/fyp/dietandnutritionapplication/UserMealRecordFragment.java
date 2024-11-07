@@ -768,9 +768,8 @@ public class UserMealRecordFragment extends Fragment {
                 Log.d("MealLogFragment", "Serving Unit Selected: " + selectedServingUnit);
 
                 String selectedDate =  dateTextView.getText().toString();
-                String imageURL = "url_of_the_uploaded_image";
                 // Call the function to search for the food and scale nutrients accordingly
-                searchFoodInEdamam(userId, foodName, servingSize, selectedServingUnit, selectedMealType, selectedDate, false, "", imageURL);
+                searchFoodInEdamam(userId, foodName, servingSize, selectedServingUnit, selectedMealType, selectedDate, false, "", null);
             } else {
                 Toast.makeText(requireContext(), "Please enter a valid serving size", Toast.LENGTH_SHORT).show();
             }
