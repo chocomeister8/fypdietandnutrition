@@ -1,5 +1,8 @@
 package com.fyp.dietandnutritionapplication;
 
+import android.app.Activity;
+import java.util.Comparator;
+import java.util.Collections;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -48,6 +51,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,6 +83,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 public class userHomePageFragment extends Fragment {
@@ -178,9 +184,9 @@ public class userHomePageFragment extends Fragment {
 
 
             // Setup and update the line chart after view creation
-            displayWeightProgressChart();
             fetchUserData();
             fetchWeeklyCalorieData();
+            fetchMeasurementHistoryData();
 
             // Fetch recipes
             fetchRecipes();
@@ -301,60 +307,6 @@ public class userHomePageFragment extends Fragment {
     }
 
 
-
-    private void displayWeightProgressChart() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Set up a listener to monitor changes in the user's document
-        ListenerRegistration listenerRegistration = db.collection("Users").document(userId)
-                .addSnapshotListener((documentSnapshot, e) -> {
-                    if (e != null) {
-                        Log.w("Firestore", "Listen failed.", e);
-                        return;
-                    }
-
-                    if (documentSnapshot != null && documentSnapshot.exists()) {
-                        double currentWeight = documentSnapshot.getDouble("currentWeight");
-                        double weightGoal = documentSnapshot.getDouble("weightGoal");
-
-                        // Create entries for the line chart with corresponding date
-                        List<Entry> entries = new ArrayList<>();
-                        entries.add(new Entry(0, (float) currentWeight));  // Current weight
-                        entries.add(new Entry(1, (float) weightGoal));     // Weight goal
-
-                        // Create a dataset and style it
-                        LineDataSet lineDataSet = new LineDataSet(entries, "Weight Progress");
-                        lineDataSet.setColor(Color.RED);
-                        lineDataSet.setLineWidth(2f);
-                        lineDataSet.setCircleRadius(4f);
-                        lineDataSet.setCircleColor(Color.RED);
-                        lineDataSet.setValueTextSize(12f);
-
-                        // Create line data from dataset
-                        LineData lineData = new LineData(lineDataSet);
-
-                        lineChart.setData(lineData);
-                        lineChart.getDescription().setEnabled(false);       // Disable description text
-                        lineChart.getXAxis().setEnabled(false);              // Disable the X-axis
-                        lineChart.getAxisLeft().setDrawGridLines(false);    // Disable Y-axis left grid lines
-                        lineChart.getAxisRight().setEnabled(false);         // Disable right Y-axis and labels
-
-                        // Remove grid background and borders
-                        lineChart.setDrawGridBackground(false);             // Remove grid background
-                        lineChart.setDrawBorders(false);                    // Remove borders if any
-
-                        // Refresh the chart
-                        lineChart.invalidate(); // Refresh chart after setting data
-
-                    } else {
-                        Log.d("Database", "No such document");
-                    }
-                });
-    }
-
-
-
     private void fetchUserData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = getUserId();
@@ -414,6 +366,9 @@ public class userHomePageFragment extends Fragment {
 
                         // Recalculate BMI after update
                         recalculateBMI(userId);
+
+                        storeMeasurementHistory(userId, newValue, field.equals("weightGoal") ? originalValue : newValue, field);
+
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> editText.setText(String.valueOf(originalValue)))
                     .show();
@@ -774,12 +729,12 @@ public class userHomePageFragment extends Fragment {
         ArrayList<String> labels = new ArrayList<>();
 
         Calendar calendar = (Calendar) currentStartDate.clone();
-        calendar.add(Calendar.DAY_OF_MONTH, -5);  // Start from 5 days before the selected date
+        calendar.add(Calendar.DAY_OF_MONTH, -6);
         SimpleDateFormat sdf = new SimpleDateFormat("d MMM", Locale.getDefault());
 
-        float maxCalories = 0f;  // Variable to hold the maximum calorie intake
+        float maxCalories = 0f;
 
-        for (int i = 0; i < 7; i++) {  // Loop for 7 days (5 days prior + selected day + 1 day after)
+        for (int i = 0; i < 7; i++) {
             String dateKey = sdf.format(calendar.getTime());
             labels.add(dateKey);
 
@@ -788,18 +743,16 @@ public class userHomePageFragment extends Fragment {
             float dinner = dinnerData.getOrDefault(dateKey, 0f);
             float snacks = snacksData.getOrDefault(dateKey, 0f);
 
-            float totalCalories = breakfast + lunch + dinner + snacks;  // Calculate total calories for the day
+            float totalCalories = breakfast + lunch + dinner + snacks;
             entries.add(new BarEntry(i, new float[]{breakfast, lunch, dinner, snacks}));
 
-            // Update maxCalories if totalCalories is greater
             if (totalCalories > maxCalories) {
                 maxCalories = totalCalories;
             }
 
-            calendar.add(Calendar.DAY_OF_MONTH, 1);  // Move to the next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        // Log the entries and labels
         Log.d("ChartData", "Entries: " + entries);
         Log.d("ChartData", "Labels: " + labels);
 
@@ -815,32 +768,305 @@ public class userHomePageFragment extends Fragment {
         BarData barData = new BarData(dataSet);
         barData.setBarWidth(0.9f);
 
-        // Set the data for the chart
         barChart.setData(barData);
 
-        // Set X-axis properties
         XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
         xAxis.setDrawGridLines(false);
 
-        // Set Y-axis properties
         barChart.getAxisLeft().setDrawGridLines(false);
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisLeft().setAxisMinimum(0f);
 
         barChart.getDescription().setEnabled(false);
 
-        // Set chart legend properties
         Legend legend = barChart.getLegend();
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         barChart.setDrawGridBackground(false);
         barChart.setDrawBorders(false);
         barChart.setBackgroundColor(Color.WHITE);
 
+        float finalMaxCalories = maxCalories;
+        db.collection("Users").document(userId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists() && document.contains("calorieLimit")) {
+                        Long calorieGoal = document.getLong("calorieLimit");
+                        Log.d("CalorieGoal", "Calorie goal: " + calorieGoal);
+
+                        if (calorieGoal != null) {
+                            com.github.mikephil.charting.components.LimitLine goalLine =
+                                    new com.github.mikephil.charting.components.LimitLine(calorieGoal, "Daily Goal");
+                            goalLine.setLineWidth(2f);
+                            goalLine.setLineColor(Color.RED);
+                            goalLine.enableDashedLine(10f, 10f, 0f);
+                            goalLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+
+                            barChart.getAxisLeft().removeAllLimitLines();
+                            barChart.getAxisLeft().addLimitLine(goalLine);
+                            Log.d("LimitLine", "Added limit line with calorie goal: " + calorieGoal);
+
+                            barChart.getAxisLeft().setAxisMaximum(Math.max(finalMaxCalories, calorieGoal) + 100);
+                            barChart.invalidate();
+                        }
+                    } else {
+                        Log.e("CalorieGoal", "Calorie goal not found in database.");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("DatabaseError", "Failed to fetch calorie goal", e));
+    }
+
+    private void storeMeasurementHistory(String userId, Double newValue, Double originalValue, String field) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Get today's date in yyyy-MM-dd format to check if there's already a measurement for today
+        String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // Query the database for existing entry on this date
+        db.collection("measurementHistory")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("dateTime", todayDate)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        // If there is an existing entry for today, update it
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        String documentId = document.getId();
+
+                        // Prepare the updated measurement data only if the field is 'currentWeight'
+                        if (field.equals("currentWeight")) {
+                            Map<String, Object> updatedData = new HashMap<>();
+                            updatedData.put("userId", userId);
+                            updatedData.put("field", field);
+                            updatedData.put("currentWeight", newValue);
+                            updatedData.put("dateTime", todayDate);
+
+                            // Update the existing document with the new currentWeight value
+                            db.collection("measurementHistory").document(documentId)
+                                    .update(updatedData)
+                                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "Measurement history updated successfully"))
+                                    .addOnFailureListener(e -> Log.w("Firestore", "Error updating measurement history", e));
+                        } else {
+                            Log.d("Firestore", "No change in currentWeight, not updating.");
+                        }
+                    } else {
+                        // If no entry exists for today, create a new one only for currentWeight
+                        if (field.equals("currentWeight")) {
+                            Map<String, Object> measurementData = new HashMap<>();
+                            measurementData.put("userId", userId);
+                            measurementData.put("field", field);
+                            measurementData.put("currentWeight", newValue);
+                            measurementData.put("dateTime", todayDate);
+
+                            // Add a new document to the collection for currentWeight
+                            db.collection("measurementHistory").add(measurementData)
+                                    .addOnSuccessListener(documentReference -> Log.d("Firestore", "Measurement history saved successfully"))
+                                    .addOnFailureListener(e -> Log.w("Firestore", "Error saving measurement history", e));
+                        } else {
+                            Log.d("Firestore", "No update for non-currentWeight field.");
+                        }
+                    }
+                });
+    }
+
+
+    private void fetchMeasurementHistoryData() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Fetch the user's weight goal from the "Users" collection in real-time
+        db.collection("Users").document(userId)
+                .addSnapshotListener((userSnapshot, userError) -> {
+                    if (userError != null) {
+                        Log.e("Firestore", "Error fetching user data", userError);
+                        return;
+                    }
+
+                    if (userSnapshot != null && userSnapshot.exists()) {
+                        Double userWeightGoal = userSnapshot.getDouble("weightGoal");
+
+                        if (userWeightGoal != null) {
+                            fetchMeasurementHistoryDataWithGoal(userId, userWeightGoal);
+                        } else {
+                            Log.w("Firestore", "User weight goal is missing.");
+                        }
+                    } else {
+                        Log.e("Firestore", "User document does not exist.");
+                    }
+                });
+    }
+
+    private void fetchMeasurementHistoryDataWithGoal(String userId, Double weightGoal) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Fetch measurement history data for the user
+        db.collection("measurementHistory")
+                .whereEqualTo("userId", userId)
+                .addSnapshotListener((querySnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("Firestore", "Error fetching measurement history data", error);
+                        return;
+                    }
+
+                    if (querySnapshot != null) {
+                        List<Entry> currentWeightEntries = new ArrayList<>();
+                        List<Entry> weightGoalEntries = new ArrayList<>();
+
+                        SimpleDateFormat displayFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+                        if (querySnapshot.isEmpty()) {
+                            // If no measurement history data found, fetch the current weight from the "Users" collection
+                            db.collection("Users").document(userId)
+                                    .get()
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot userSnapshot = task.getResult();
+                                            if (userSnapshot != null && userSnapshot.exists()) {
+                                                Double currentWeight = userSnapshot.getDouble("currentWeight");
+                                                if (currentWeight != null) {
+                                                    // Add the user's current weight and weight goal to the entries
+                                                    float timestamp = System.currentTimeMillis(); // Use current timestamp
+                                                    currentWeightEntries.add(new Entry(timestamp, currentWeight.floatValue()));
+                                                    weightGoalEntries.add(new Entry(timestamp, weightGoal.floatValue()));
+
+                                                    // Display chart with current weight and goal
+                                                    displayWeightProgressChart(currentWeightEntries, weightGoalEntries);
+                                                } else {
+                                                    Log.w("Firestore", "User current weight is missing.");
+                                                }
+                                            } else {
+                                                Log.e("Firestore", "User document does not exist.");
+                                            }
+                                        } else {
+                                            Log.e("Firestore", "Error fetching user data", task.getException());
+                                        }
+                                    });
+                        } else {
+                            // Process the measurement history if available
+                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                Double currentWeight = document.getDouble("currentWeight");
+                                String dateString = document.getString("dateTime");
+
+                                if (currentWeight != null && dateString != null) {
+                                    try {
+                                        // Parse the dateString into a Date object
+                                        Date date = displayFormat.parse(dateString);
+                                        if (date != null) {
+                                            // Convert the Date object to a timestamp (milliseconds)
+                                            float timestamp = date.getTime();
+
+                                            // Add the current weight entry with timestamp as x-value
+                                            currentWeightEntries.add(new Entry(timestamp, currentWeight.floatValue()));
+
+                                            // Add the same weightGoal value for each x-axis entry to create a horizontal line
+                                            weightGoalEntries.add(new Entry(timestamp, weightGoal.floatValue()));
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e("Firestore", "Error processing data", e);
+                                    }
+                                } else {
+                                    Log.w("Firestore", "Missing fields in document: " + document.getId());
+                                }
+                            }
+
+                            // Display chart with separate lines if data is available
+                            if (!currentWeightEntries.isEmpty()) {
+                                displayWeightProgressChart(currentWeightEntries, weightGoalEntries);
+                            } else {
+                                Log.d("Database", "No measurement history data found.");
+                            }
+                        }
+                    }
+                });
+    }
+
+
+    private void displayWeightProgressChart(List<Entry> currentWeightEntries, List<Entry> weightGoalEntries) {
+        // Sort both lists by the x-value (time in ascending order)
+        Collections.sort(currentWeightEntries, new Comparator<Entry>() {
+            @Override
+            public int compare(Entry e1, Entry e2) {
+                return Float.compare(e1.getX(), e2.getX()); // Compare by timestamp (x-value)
+            }
+        });
+
+        Collections.sort(weightGoalEntries, new Comparator<Entry>() {
+            @Override
+            public int compare(Entry e1, Entry e2) {
+                return Float.compare(e1.getX(), e2.getX()); // Compare by timestamp (x-value)
+            }
+        });
+
+        // Keep only the latest 7 entries
+        if (currentWeightEntries.size() > 7) {
+            currentWeightEntries = currentWeightEntries.subList(0, 7);
+        }
+        if (weightGoalEntries.size() > 7) {
+            weightGoalEntries = weightGoalEntries.subList(0, 7);
+        }
+
+        // Create dataset for current weight and style it
+        LineDataSet currentWeightDataSet = new LineDataSet(currentWeightEntries, "Current Weight");
+        currentWeightDataSet.setColor(Color.rgb(176, 224, 230)); // Set to custom RGB color
+        currentWeightDataSet.setLineWidth(2f);
+        currentWeightDataSet.setCircleRadius(4f);
+        currentWeightDataSet.setCircleColor(Color.rgb(176, 224, 230));
+        currentWeightDataSet.setValueTextSize(12f);
+
+        // Create dataset for weight goal and style it as a dotted horizontal line
+        LineDataSet weightGoalDataSet = new LineDataSet(weightGoalEntries, "Weight Goal");
+        weightGoalDataSet.setColor(Color.RED);
+        weightGoalDataSet.setLineWidth(2f);
+        weightGoalDataSet.setCircleRadius(4f);
+        weightGoalDataSet.setCircleColor(Color.RED);
+        weightGoalDataSet.setValueTextSize(12f);
+
+        // Set dashed line effect for weight goal line (horizontal dotted line)
+        weightGoalDataSet.enableDashedLine(10f, 10f, 0f); // 10 pixels on, 10 pixels off, no phase offset
+
+        // Disable value labels on the weightGoal line
+        weightGoalDataSet.setDrawValues(false); // This hides the value labels on the weight goal line
+
+        // Combine both datasets into LineData
+        LineData lineData = new LineData(currentWeightDataSet, weightGoalDataSet);
+        lineChart.setData(lineData);
+
+        // Set up the x-axis to display dates
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f); // Ensure one label per date
+
+        // Set dynamic x-axis based on actual data points
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                // Convert x-axis value (timestamp in milliseconds) back to a date string
+                long timestamp = (long) value;
+                Date date = new Date(timestamp); // Convert timestamp to Date object
+                SimpleDateFormat dateFormat = new SimpleDateFormat("d MMM", Locale.getDefault());
+                return dateFormat.format(date); // Format the date and return it as string
+            }
+        });
+
+        // Rotate x-axis labels to prevent overlapping
+        xAxis.setLabelRotationAngle(45f); // Rotates the labels by 45 degrees
+
+        // Adjust the number of labels shown on the x-axis
+        xAxis.setLabelCount(5, true); // Show only 5 labels for better readability
+
+        // Customize the chart appearance
+        lineChart.getDescription().setEnabled(false); // Disable description text
+        lineChart.getAxisLeft().setDrawGridLines(false); // Disable left Y-axis grid lines
+        lineChart.getAxisRight().setEnabled(false); // Disable right Y-axis
+
+        // Remove grid background and borders
+        lineChart.setDrawGridBackground(false);
+        lineChart.setDrawBorders(false);
+
         // Refresh the chart
-        barChart.invalidate();
+        lineChart.invalidate(); // Refresh chart after setting data
     }
 
 }
