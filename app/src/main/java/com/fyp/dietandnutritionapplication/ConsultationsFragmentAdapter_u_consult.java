@@ -13,7 +13,9 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -106,29 +108,26 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
 
     private void cancelBooking(Consultation consultation) {
         if (consultation != null) {
-
             FirebaseAuth auth = FirebaseAuth.getInstance();
             FirebaseUser currentUser = auth.getCurrentUser();
 
             if (currentUser != null) {
                 String userId = currentUser.getUid();
 
-                // Fetch current user's username
                 firestore.collection("Users").document(userId)
                         .get()
                         .addOnSuccessListener(documentSnapshot -> {
                             if (documentSnapshot.exists()) {
-                                // Set the clientName field to an empty string instead of deleting the document
                                 firestore.collection("Consultation_slots")
                                         .document(consultation.getConsultationId())
                                         .update("clientName", "")
                                         .addOnSuccessListener(aVoid -> {
-                                            // Clear clientName locally in the consultation object (optional)
-                                            consultation.setClientName("");
-                                            notifyDataSetChanged(); // Refresh the list to show the updated state
-                                            Toast.makeText(context, "Booking successfully canceled.", Toast.LENGTH_SHORT).show();
+                                            consultation.setClientName(""); // Clear locally
+                                            notifyDataSetChanged(); // Refresh the list locally
 
-                                            // Pass userId and consultationId to sendCancelNotification
+                                            refreshConsultations();
+
+                                            // Send cancel notification
                                             sendCancelNotification(userId, consultation.getConsultationId());
                                         })
                                         .addOnFailureListener(e -> {
@@ -140,6 +139,69 @@ public class ConsultationsFragmentAdapter_u_consult extends BaseAdapter {
                             Toast.makeText(context, "Failed to retrieve user data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         });
             }
+        }
+    }
+
+    // Method to refresh consultations from Firestore and update adapter
+    private void refreshConsultations() {
+        consultationSlots.clear();
+
+        // Get the current user's information
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+
+            // Retrieve the current user's username
+            firestore.collection("Users").document(userId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String currentUsername = documentSnapshot.getString("username");
+
+                            // Fetch consultations from Firestore
+                            firestore.collection("Consultation_slots")
+                                    .get()
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            // Loop through each document
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                // Retrieve consultation details from Firestore
+                                                String id = document.getId();
+                                                String nutritionistName = document.getString("nutritionistName");
+                                                String clientName = document.getString("clientName");
+                                                String date = document.getString("date");
+                                                String time = document.getString("time");
+                                                String status = document.getString("status");
+                                                String zoomLink = document.getString("zoomLink");
+
+                                                // Only add consultations where clientName matches the logged-in user's username
+                                                if (clientName != null && clientName.equals(currentUsername)) {
+                                                    Consultation consultation = new Consultation(id, nutritionistName, clientName, date, time, status, 150, zoomLink);
+                                                    consultationSlots.add(consultation);
+
+                                                }
+                                            }
+
+                                            // Notify adapter and update UI
+                                            notifyDataSetChanged();
+
+                                            if (!consultationSlots.isEmpty()) {
+                                                Toast.makeText(context, "Consultations loaded successfully.", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                // Handle empty state if there are no consultations
+                                                Toast.makeText(context, "No consultations found.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            Toast.makeText(context, "Failed to fetch consultations: " + task.getException(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(context, "User data not found.", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "Error retrieving user information.", Toast.LENGTH_SHORT).show();
+                    });
         }
     }
 
