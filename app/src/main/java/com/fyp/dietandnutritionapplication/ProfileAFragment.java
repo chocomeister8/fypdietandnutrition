@@ -246,7 +246,7 @@ public class ProfileAFragment extends Fragment {
     }
 
     private void setupUI(View view) {
-        ImageView logoutImage = view.findViewById(R.id.logout_button);
+        ImageView logoutImage = view.findViewById(R.id.logout_icon);
         logoutImage.setOnClickListener(v -> {
             // Create an AlertDialog to confirm logout
             new AlertDialog.Builder(getContext())
