@@ -19,7 +19,7 @@ public class rejectNutritionistController {
         Log.d("rejectNutritionistController ", "Rejecting Nutritionist: " + username);
 
         // Call the update method from the UserAccountEntity
-        userAccountEntity. rejectNutritionist(username, new UserAccountEntity.RegisterCallback() {
+        userAccountEntity.rejectNutritionist(username, new UserAccountEntity.RegisterCallback() {
             @Override
             public void onSuccess(String successMessage) {
                 Log.d("approveNutritionistController", "Nutritionist rejected.");

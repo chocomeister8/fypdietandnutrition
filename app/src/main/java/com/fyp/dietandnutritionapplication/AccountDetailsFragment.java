@@ -162,7 +162,7 @@ public class AccountDetailsFragment extends Fragment {
                     @Override
                     public void onSuccess() {
                         Log.d("ReactivateUserController", "User profile reactivated successfully.");
-                        selectedProfile.setStatus("deactivated"); // Update the profile status locally
+                        selectedProfile.setStatus("active"); // Update the profile status locally
                         Toast.makeText(getActivity(), "Reactivated user: " + usernameToReactivate, Toast.LENGTH_SHORT).show();
 
                         // Redirect to ViewAccountsFragment after successful suspension
