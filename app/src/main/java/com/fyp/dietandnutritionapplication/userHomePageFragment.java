@@ -999,12 +999,12 @@ public class userHomePageFragment extends Fragment {
             }
         });
 
-        // Keep only the latest 7 entries
+        // Keep only the latest 7 entries by taking the last 7 elements
         if (currentWeightEntries.size() > 7) {
-            currentWeightEntries = currentWeightEntries.subList(0, 7);
+            currentWeightEntries = currentWeightEntries.subList(currentWeightEntries.size() - 7, currentWeightEntries.size());
         }
         if (weightGoalEntries.size() > 7) {
-            weightGoalEntries = weightGoalEntries.subList(0, 7);
+            weightGoalEntries = weightGoalEntries.subList(weightGoalEntries.size() - 7, weightGoalEntries.size());
         }
 
         // Create dataset for current weight and style it
@@ -1054,7 +1054,7 @@ public class userHomePageFragment extends Fragment {
         xAxis.setLabelRotationAngle(45f); // Rotates the labels by 45 degrees
 
         // Adjust the number of labels shown on the x-axis
-        xAxis.setLabelCount(5, true); // Show only 5 labels for better readability
+        xAxis.setLabelCount(7, true); // Show only 5 labels for better readability
 
         // Customize the chart appearance
         lineChart.getDescription().setEnabled(false); // Disable description text
