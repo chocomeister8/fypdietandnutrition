@@ -49,10 +49,6 @@ public class RecipeDetailFragment extends Fragment {
             recipe = getArguments().getParcelable("selected_recipe");
         }
 
-        currentUser = auth.getCurrentUser();
-
-
-
         // Initialize views
         TextView titleTextView = view.findViewById(R.id.detail_recipe_title);
         TextView caloriesTextView = view.findViewById(R.id.detail_calories);
@@ -74,6 +70,29 @@ public class RecipeDetailFragment extends Fragment {
         TextView viewMoreIngredients = view.findViewById(R.id.view_more_ingredients);
         TextView viewLessIngredients = view.findViewById(R.id.view_less_ingredients);
         TextView instructionsLink = view.findViewById(R.id.detail_instructions_link);
+
+        currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            db.collection("Users").document(currentUser.getUid()).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        String role = document.getString("role");  // Make sure "role" matches the field name in Firestore
+                        if ("nutritionist".equals(role)) {
+                            saveButton.setVisibility(View.GONE); // Hide save button for nutritionists
+                            removeButton.setVisibility(View.GONE);
+                        } else {
+                            saveButton.setVisibility(View.VISIBLE); // Show save button for users
+                            removeButton.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        Log.d("RecipeDetailFragment", "No such document");
+                    }
+                } else {
+                    Log.d("RecipeDetailFragment", "get failed with ", task.getException());
+                }
+            });
+        }
 
         // Set recipe details
         if (recipe != null) {
