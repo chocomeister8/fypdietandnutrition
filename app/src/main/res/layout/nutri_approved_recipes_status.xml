@@ -183,6 +183,7 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:text="Approved Recipes"
+                    android:textStyle="bold"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="10dp" />

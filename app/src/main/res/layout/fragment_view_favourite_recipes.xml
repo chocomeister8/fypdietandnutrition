@@ -214,6 +214,7 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:text="My Fav"
+                    android:textStyle="bold"
                     android:textAlignment="viewStart"
                     android:textColor="#333333"
                     android:textSize="11dp" />
