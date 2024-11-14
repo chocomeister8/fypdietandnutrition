@@ -74,7 +74,6 @@ public class DietPreferenceFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.viewalldietpreference, container, false);
         DietPreferenceListView = view.findViewById(R.id.dietPreferenceListView);
-        searchDietPreferenceEditText = view.findViewById(R.id.dietpreferenceEditText);
 
         // Set the adapter to the ListView
         //FAQAdapter adapter = new FAQAdapter(getContext(), faqs);
@@ -103,23 +102,9 @@ public class DietPreferenceFragment extends Fragment{
             }
         });
 
-        searchDietPreferenceEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
 
         DietPreferenceListView.setOnItemClickListener((parent, view1, position, id) -> {
 
-            savedSearchText = searchDietPreferenceEditText.getText().toString();
             savedScrollPosition = DietPreferenceListView.getFirstVisiblePosition();
 
         });

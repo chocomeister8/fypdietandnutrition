@@ -77,14 +77,12 @@ public class SpecializationFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.viewallspecializations, container, false);
         specializationListView = view.findViewById(R.id.specializationListView);
-        specializationEditText = view.findViewById(R.id.specializationEditText);
 
         // Set the adapter to the ListView
         //FAQAdapter adapter = new FAQAdapter(getContext(), faqs);
         adapter = new SpecializationAdapter(getContext(), specialization);
         specializationListView.setAdapter(adapter);
 
-        specializationEditText.setText(savedSearchText);
 
         // Scroll to the saved scroll position
         specializationListView.post(() -> specializationListView.setSelection(savedScrollPosition));
@@ -108,25 +106,10 @@ public class SpecializationFragment extends Fragment{
             }
         });
 
-        specializationEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
 
 
         specializationListView.setOnItemClickListener((parent, view1, position, id) -> {
 
-            savedSearchText = specializationEditText.getText().toString();
             savedScrollPosition = specializationListView.getFirstVisiblePosition();
 
         });

@@ -62,25 +62,7 @@
         app:layout_constraintBottom_toTopOf="@+id/dietPreferenceListView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout3">
-
-        <EditText
-            android:id="@+id/dietpreferenceEditText"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_row="0"
-            android:layout_column="0"
-            android:layout_columnWeight="1"
-            android:layout_marginEnd="8dp"
-            android:background="#E6E0E9"
-            android:gravity="center"
-            android:hint="Search.."
-            android:inputType="text"
-            android:padding="8dp"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
-
-    </GridLayout>
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout3"/>
 
     <ListView
         android:id="@+id/dietPreferenceListView"
