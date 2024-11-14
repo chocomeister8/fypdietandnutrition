@@ -118,7 +118,11 @@
                 android:id="@+id/username_data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="" />
+                android:text=""
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:inputType="none"
+                android:enabled="false"/>
             <!-- Full Name -->
             <TextView
                 android:layout_width="match_parent"
