@@ -1120,6 +1120,7 @@ public class UserMealRecordFragment extends Fragment {
                     // Save the updated record
                     userMealRecordController.updateMealRecord(mealRecordID, mealRecord);
                     refreshMealData();
+                    checkAndHideEmptyMealTypeCard(updatedMealType);
                     Toast.makeText(getActivity(), "Meal updated successfully", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
@@ -1277,6 +1278,7 @@ public class UserMealRecordFragment extends Fragment {
                             checkAndHideEmptyMealTypeCard(mealTypeD);
                             Log.d("MealLogFragment", "After refresh - " + mealTypeD);
                         }
+
 
                         @Override
                         public void onError(String error) {
