@@ -729,12 +729,12 @@ public class userHomePageFragment extends Fragment {
         ArrayList<String> labels = new ArrayList<>();
 
         Calendar calendar = (Calendar) currentStartDate.clone();
-        calendar.add(Calendar.DAY_OF_MONTH, -6);
+        calendar.add(Calendar.DAY_OF_MONTH, -5);
         SimpleDateFormat sdf = new SimpleDateFormat("d MMM", Locale.getDefault());
 
         float maxCalories = 0f;
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 6; i++) {
             String dateKey = sdf.format(calendar.getTime());
             labels.add(dateKey);
 

@@ -657,7 +657,7 @@ public class healthReportFragment extends Fragment {  // Class name should be ca
         ArrayList<String> labels = new ArrayList<>();
 
         Calendar calendar = (Calendar) currentStartDate.clone();
-        calendar.add(Calendar.DAY_OF_MONTH, -5);  // Start from 5 days before the selected date
+        calendar.add(Calendar.DAY_OF_MONTH, -6);  // Start from 5 days before the selected date
         SimpleDateFormat sdf = new SimpleDateFormat("d MMM", Locale.getDefault());
 
 
