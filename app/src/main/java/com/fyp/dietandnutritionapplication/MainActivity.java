@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         switch (userRole) {
             case "admin":
                 hideBottomNavigationView();
-                replaceFragment(new AdminLoginFragment());
+                replaceFragment(new LoginFragment());
                 break;
 
             default: // guest or undefined role
