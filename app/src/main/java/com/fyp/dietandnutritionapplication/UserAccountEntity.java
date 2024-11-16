@@ -211,8 +211,10 @@ public class UserAccountEntity {
                                         break;
                                     case "nutritionist":
                                         Nutritionist nutritionist = createNutritionistFromDocument(document);
-                                        nutritionists.add(nutritionist);
-                                        accounts.add(nutritionist);
+                                        if ("active".equals(nutritionist.getStatus())) {
+                                            nutritionists.add(nutritionist);
+                                            accounts.add(nutritionist);
+                                        }
                                         break;
                                 }
                             }
@@ -394,6 +396,7 @@ public class UserAccountEntity {
         user.setContactInfo(document.getString("contactInfo"));
         user.setExpertise(document.getString("expertise"));
         user.setBio(document.getString("bio"));
+        user.setStatus(document.getString("status"));
         user.setProfilePicture(document.getString("profilePicture"));
 
         return user;
