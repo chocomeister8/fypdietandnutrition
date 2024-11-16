@@ -52,10 +52,10 @@ public class NutriProfileAdapter extends ArrayAdapter<Profile> {
 //            viewHolder.usernameTextView.setText(((Nutritionist) currentProfile).getEducation());
 //        }
         String size = String.valueOf(nutritionists.size());
-        viewHolder.expertiseTextView.setText(currentProfile.getExpertise());
+        viewHolder.expertiseTextView.setText(currentProfile.getSpecialization());
         String fullName = currentProfile.getFirstName() + " " + currentProfile.getLastName();
         viewHolder.fullnameTextView.setText(fullName);
-        viewHolder.bioTextView.setText(currentProfile.getBio());
+        viewHolder.bioTextView.setText(currentProfile.getExperience());
         viewHolder.educationTextView.setText(currentProfile.getEducation());
 
         return convertView;
