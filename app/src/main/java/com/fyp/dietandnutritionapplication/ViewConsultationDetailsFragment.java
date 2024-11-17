@@ -18,6 +18,7 @@ public class ViewConsultationDetailsFragment extends Fragment {
     private FirebaseFirestore db;
     private ArrayList<Consultation> consultationList2 = new ArrayList<>();
     private ConsultationAdapter consultationAdapter;
+    private BeforeBookConsultationAdapter consultationAdapter2;
     private Profile selectedProfile;
     private Nutritionist selectedNutri;
     private ListView consultationListView;
@@ -80,8 +81,9 @@ public class ViewConsultationDetailsFragment extends Fragment {
         consultationListView = view.findViewById(R.id.consultationListView);
         db = FirebaseFirestore.getInstance();
 
-        consultationAdapter = new ConsultationAdapter(requireContext(), consultationList2);
-        consultationListView.setAdapter(consultationAdapter);
+        consultationAdapter2 = new BeforeBookConsultationAdapter(requireContext(),consultationList2);
+//        consultationAdapter = new ConsultationAdapter(requireContext(), consultationList2);
+        consultationListView.setAdapter(consultationAdapter2);
         ConsultationEntity consultationEntity = new ConsultationEntity();
         consultationEntity.retrieveCons(new ConsultationEntity.DataCallback() {
             @Override
@@ -100,7 +102,7 @@ public class ViewConsultationDetailsFragment extends Fragment {
                 }
 
                 // Notify the adapter that the data has changed
-                consultationAdapter.notifyDataSetChanged();
+                consultationAdapter2.notifyDataSetChanged();
                 if (!consultationList2.isEmpty()) {
                     Toast.makeText(getContext(), "Consultations loaded successfully.", Toast.LENGTH_SHORT).show();
                 }else {
