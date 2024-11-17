@@ -861,7 +861,7 @@ public class UserAccountEntity {
 
         // Define the hard-coded updates for status
         final Map<String, Object> updatedFields = new HashMap<>();
-        updatedFields.put("status", "active"); // Change status to inactive
+        updatedFields.put("status", "active"); // Change status to active
 
         Log.d("UserAccountEntity", "Attempting to approve Nutritionist: " + username);
 
@@ -870,7 +870,6 @@ public class UserAccountEntity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (task.getResult() != null && !task.getResult().isEmpty()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d("UserAccountEntity", "User found: " + document.getId());
