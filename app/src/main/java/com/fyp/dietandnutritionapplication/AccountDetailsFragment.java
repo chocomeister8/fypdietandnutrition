@@ -207,7 +207,6 @@ public class AccountDetailsFragment extends Fragment {
                 Toast.makeText(getActivity(), "No Nutritionist to approve.", Toast.LENGTH_SHORT).show();
             }
         });
-
         backButton.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
